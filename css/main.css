@@ -2007,6 +2007,8 @@ h6 {
   margin-bottom: 20px;
 }
 
+
+
 .emergency-blood-form-page .form-row {
   display: flex;
   gap: 20px;
@@ -2374,5 +2376,72 @@ h6 {
   .donor-form-page .form-row {
     flex-direction: row;
     gap: 2rem;
+  }
+}
+
+/* Sticky Emergency Blood Request Button Styles */
+.sticky-emergency-button {
+  animation: emergencyPulse 2s infinite !important;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4) !important;
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  z-index: 9999 !important;
+  border-radius: 9999px !important;
+  background-color: #f59e0b !important;
+  color: white !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 1rem 1.5rem !important;
+  transition: all 0.3s ease !important;
+  transform: scale(1) !important;
+}
+
+.sticky-emergency-button:hover {
+  animation: none !important;
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5) !important;
+  background-color: #ef4444 !important;
+  transform: scale(1.1) !important;
+}
+
+@keyframes emergencyPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.8), 0 0 20px rgba(245, 158, 11, 0.6);
+  }
+}
+
+/* Mobile responsive adjustments for sticky button */
+@media (max-width: 768px) {
+  .sticky-emergency-button {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .sticky-emergency-button .text-sm {
+    font-size: 0.75rem;
+  }
+
+  .sticky-emergency-button .text-xs {
+    font-size: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sticky-emergency-button {
+    bottom: 0.5rem !important;
+    right: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .sticky-emergency-button .space-x-3>*+* {
+    margin-left: 0.5rem;
   }
 }

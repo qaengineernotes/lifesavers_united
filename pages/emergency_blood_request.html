@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <script type="module"
         src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Flifesaver8673back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.5"></script>
-    Eligibility Checker
-    Quick assessment to determine if you're eligible to donate blood today.
 </head>
 
 <body class="emergency-blood-form-page">
@@ -215,6 +213,19 @@
         </div>
     </section>
 
+    <!-- Success/Error Modal -->
+    <div id="submissionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
+        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <div id="modalContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+            <button id="closeModal"
+                class="mt-4 w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-smooth">
+                Close
+            </button>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-text-primary text-white py-12 mt-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -286,6 +297,101 @@
         </div>
     </footer>
     <script id="dhws-dataInjector" src="../public/dhws-data-injector.js"></script>
+
+    <script>
+        // Local proxy URL to avoid CORS issues
+        const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz7dBZqc2t36QwY8nRw2rPViKpiKWelilUPlre5TrsvhWenaBXW5UKndknbyMb7A5q3zQ/exec';
+
+        document.getElementById('bloodRequestForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            // Show loading state
+            const submitButton = this.querySelector('button[type="submit"]');
+            const originalText = submitButton.textContent;
+            submitButton.textContent = 'Submitting...';
+            submitButton.disabled = true;
+
+            try {
+                // Collect form data
+                const formDataObj = new FormData(this);
+                const data = {
+                    patientName: formDataObj.get('patientName'),
+                    contactPerson: formDataObj.get('contactPerson'),
+                    contactNumber: formDataObj.get('contactNumber'),
+                    contactEmail: formDataObj.get('contactEmail'),
+                    bloodType: formDataObj.get('bloodType'),
+                    unitsRequired: formDataObj.get('unitsRequired'),
+                    requiredDate: formDataObj.get('requiredDate'),
+                    urgency: formDataObj.get('urgency'),
+                    hospitalName: formDataObj.get('hospitalName'),
+                    city: formDataObj.get('city'),
+                    hospitalAddress: formDataObj.get('hospitalAddress'),
+                    additionalInfo: formDataObj.get('additionalInfo'),
+                    notifications: formDataObj.getAll('notifications')
+                };
+
+                // Submit to Google Apps Script
+                const submitData = new URLSearchParams();
+                submitData.append('data', JSON.stringify(data));
+
+                const response = await fetch(SUBMIT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: submitData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showModal('Success!', 'Your blood request has been submitted successfully. We will contact you soon.', 'success');
+                    this.reset(); // Reset form
+                } else {
+                    showModal('Error', 'Failed to submit blood request. Please try again.', 'error');
+                }
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showModal('Error', 'An error occurred while submitting your request. Please try again.', 'error');
+            } finally {
+                // Reset button state
+                submitButton.textContent = originalText;
+                submitButton.disabled = false;
+            }
+        });
+
+        // Function to show modal
+        function showModal(title, message, type) {
+            const modal = document.getElementById('submissionModal');
+            const modalContent = document.getElementById('modalContent');
+
+            const icon = type === 'success' ? '✅' : '❌';
+            const titleColor = type === 'success' ? 'text-green-600' : 'text-red-600';
+
+            modalContent.innerHTML = `
+                <div class="text-center">
+                    <div class="text-4xl mb-4">${icon}</div>
+                    <h3 class="text-xl font-bold ${titleColor} mb-2">${title}</h3>
+                    <p class="text-gray-600">${message}</p>
+                </div>
+            `;
+
+            modal.classList.remove('hidden');
+        }
+
+        // Close modal
+        document.getElementById('closeModal').addEventListener('click', function () {
+            document.getElementById('submissionModal').classList.add('hidden');
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('submissionModal').addEventListener('click', function (e) {
+            if (e.target === this) {
+                this.classList.add('hidden');
+            }
+        });
+    </script>
 </body>
 
 </html>

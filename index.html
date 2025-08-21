@@ -97,15 +97,7 @@
                             </svg>
                             Become a Donor
                         </button>
-                        <button
-                            class="bg-warning text-white font-semibold py-4 px-8 rounded-lg hover:bg-yellow-600 transition-smooth">
-                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Need Blood
-                        </button>
+
                     </div>
                 </div>
 
@@ -511,8 +503,31 @@
         </div>
     </footer>
 
+    <!-- Sticky Emergency Blood Request Button -->
+    <a href="pages/emergency_blood_request.html" class="sticky-emergency-button">
+        <div class="relative">
+            <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+            </svg>
+            <!-- Pulsing dot for urgency -->
+            <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+            <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+        </div>
+        <div class="text-left ml-3">
+            <div class="font-bold text-sm">Need Blood?</div>
+            <div class="text-xs opacity-90">Emergency Request</div>
+        </div>
+        <svg class="w-5 h-5 ml-3 transform group-hover:translate-x-1 transition-transform" fill="none"
+            stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+        </svg>
+    </a>
+
     <script>
-        // Simple carousel functionality for hero section
+        // Local proxy URL to avoid CORS issues
+        const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbz7dBZqc2t36QwY8nRw2rPViKpiKWelilUPlre5TrsvhWenaBXW5UKndknbyMb7A5q3zQ/exec';
+
         document.addEventListener('DOMContentLoaded', function () {
             // Add smooth scrolling for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -542,6 +557,8 @@
             counters.forEach(counter => {
                 observer.observe(counter);
             });
+
+
         });
     </script>
     <script id="dhws-dataInjector" src="public/dhws-data-injector.js"></script>
