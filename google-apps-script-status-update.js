@@ -35,13 +35,13 @@ function doGet(e) {
                 inquiryTime: row[15] || ''
             };
 
-            // Only include open requests
-            if (request.status === 'Open') {
+            // Only include open requests that have actual patient names
+            if ((request.status === 'Open' || request.status === "Verified") && request.patientName && request.patientName.trim() !== '') {
                 requests.push(request);
             }
         }
 
-        console.log(`Found ${requests.length} open requests`);
+        console.log(`Found ${requests.length} valid open requests`);
 
         // Return the data
         return ContentService
