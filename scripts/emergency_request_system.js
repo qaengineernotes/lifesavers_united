@@ -152,10 +152,20 @@ async function loadEmergencyRequests() {
             // Calculate and update statistics
             updateStatistics(data.requests, data.statistics);
 
-            // Display each request
+            // Display each request and initialize button states
             data.requests.forEach(request => {
                 const requestCard = createRequestCard(request);
                 container.appendChild(requestCard);
+
+                // Initialize button states based on request status
+                const cardKey = `${request.patientName}-${request.bloodType}`;
+                const requestStatus = request.status || 'Open';
+
+                if (requestStatus === 'Verified') {
+                    buttonStates.set(cardKey, { verifyStatus: 'verified' });
+                } else if (requestStatus === 'Closed') {
+                    buttonStates.set(cardKey, { closeStatus: 'closed' });
+                }
             });
         } else {
             // Show no requests state
@@ -196,29 +206,31 @@ function createRequestCard(request) {
 
 
 
-    // Check stored button states
+    // Check stored button states and request status
     const cardKey = `${request.patientName}-${request.bloodType}`;
     const storedState = buttonStates.get(cardKey);
+    const requestStatus = request.status || 'Open';
 
-    // Determine button states
-    let verifyButtonClass = 'btn-primary flex-1 verify-btn';
+    // Determine button states based on request status and stored state
+    let verifyButtonClass = 'btn-verify btn-flex verify-btn';
     let verifyButtonText = 'Verify';
     let verifyButtonDisabled = '';
-    let closeButtonClass = 'btn-outline flex-1 close-btn';
+    let closeButtonClass = 'btn-close btn-flex close-btn';
     let closeButtonText = 'Close';
     let closeButtonDisabled = '';
 
-    if (storedState) {
-        if (storedState.verifyStatus === 'verified') {
-            verifyButtonClass = 'bg-green-600 text-white hover:bg-green-700 cursor-not-allowed flex-1 verify-btn';
-            verifyButtonText = 'Verified';
-            verifyButtonDisabled = 'disabled';
-        }
-        if (storedState.closeStatus === 'closed') {
-            closeButtonClass = 'bg-gray-600 text-white hover:bg-gray-700 cursor-not-allowed flex-1 close-btn';
-            closeButtonText = 'Closed';
-            closeButtonDisabled = 'disabled';
-        }
+    // Check if request is already verified based on status or stored state
+    if (requestStatus === 'Verified' || (storedState && storedState.verifyStatus === 'verified')) {
+        verifyButtonClass = 'btn-verified btn-flex verify-btn';
+        verifyButtonText = 'Verified';
+        verifyButtonDisabled = 'disabled';
+    }
+
+    // Check if request is already closed based on status or stored state
+    if (requestStatus === 'Closed' || (storedState && storedState.closeStatus === 'closed')) {
+        closeButtonClass = 'btn-closed btn-flex close-btn';
+        closeButtonText = 'Closed';
+        closeButtonDisabled = 'disabled';
     }
 
     card.innerHTML = `
@@ -257,7 +269,7 @@ function createRequestCard(request) {
                     </div>
                 </div>
 
-                <div class="flex space-x-3">
+                <div class="btn-container">
                     <button class="${verifyButtonClass}" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}>
                         <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -355,6 +367,8 @@ function getUrgencyConfig(level) {
 
     return configs[level] || configs.normal;
 }
+
+
 
 // Function to calculate time since request
 function calculateTimeSince(inquiryDate) {
@@ -458,21 +472,19 @@ async function verifyRequest(patientName, bloodType, button) {
                             </svg>
                             Verified
                         `;
-                button.classList.remove('btn-primary');
-                button.classList.add('bg-green-600', 'text-white', 'hover:bg-green-700', 'cursor-not-allowed');
-                button.disabled = true;
+                button.classList.remove('btn-verify');
+                button.classList.add('btn-verified');
+                // button.disabled = true;
 
-                // Update the status badge
-                const badge = card.querySelector('.bg-error, .bg-warning, .bg-accent');
-                if (badge) {
-                    badge.textContent = 'VERIFIED';
-                    badge.classList.remove('bg-error', 'bg-warning', 'bg-accent');
-                    badge.classList.add('bg-green-600');
-                }
+
 
                 // Store the button state locally
                 const cardKey = `${patientName}-${bloodType}`;
-                const newState = { verifyStatus: 'verified', closeStatus: 'available' };
+                const existingState = buttonStates.get(cardKey) || {};
+                const newState = {
+                    ...existingState,
+                    verifyStatus: 'verified'
+                };
                 buttonStates.set(cardKey, newState);
 
                 // Update statistics after verification
@@ -500,6 +512,8 @@ async function verifyRequest(patientName, bloodType, button) {
                             </svg>
                             Verify
                         `;
+                button.classList.remove('btn-verified');
+                button.classList.add('btn-verify');
                 showSuccessMessage('Failed to update status. Please try again.');
                 isButtonActionInProgress = false; // Reset flag on error
             }
@@ -514,6 +528,8 @@ async function verifyRequest(patientName, bloodType, button) {
                         </svg>
                         Verify
                     `;
+            button.classList.remove('btn-verified');
+            button.classList.add('btn-verify');
             showSuccessMessage('Error updating status. Please try again.');
             isButtonActionInProgress = false; // Reset flag on error
         }
@@ -577,21 +593,19 @@ async function closeRequest(patientName, bloodType, button) {
                             </svg>
                             Closed
                         `;
-                button.classList.remove('btn-outline');
-                button.classList.add('bg-gray-600', 'text-white', 'hover:bg-gray-700', 'cursor-not-allowed');
+                button.classList.remove('btn-close');
+                button.classList.add('btn-closed');
                 button.disabled = true;
 
-                // Update the status badge
-                const badge = card.querySelector('.bg-error, .bg-warning, .bg-accent, .bg-green-600');
-                if (badge) {
-                    badge.textContent = 'CLOSED';
-                    badge.classList.remove('bg-error', 'bg-warning', 'bg-accent', 'bg-green-600');
-                    badge.classList.add('bg-gray-600');
-                }
+
 
                 // Store the button state locally
                 const cardKey = `${patientName}-${bloodType}`;
-                const newState = { verifyStatus: 'available', closeStatus: 'closed' };
+                const existingState = buttonStates.get(cardKey) || {};
+                const newState = {
+                    ...existingState,
+                    closeStatus: 'closed'
+                };
                 buttonStates.set(cardKey, newState);
 
                 // Update statistics after closing
@@ -619,6 +633,8 @@ async function closeRequest(patientName, bloodType, button) {
                             </svg>
                             Close
                         `;
+                button.classList.remove('btn-closed');
+                button.classList.add('btn-close');
                 showSuccessMessage('Failed to update status. Please try again.');
                 isButtonActionInProgress = false; // Reset flag on error
             }
@@ -633,6 +649,8 @@ async function closeRequest(patientName, bloodType, button) {
                         </svg>
                         Close
                     `;
+            button.classList.remove('btn-closed');
+            button.classList.add('btn-close');
             showSuccessMessage('Error updating status. Please try again.');
             isButtonActionInProgress = false; // Reset flag on error
         }
@@ -645,7 +663,7 @@ function updateStatistics(requests, statistics = null) {
 
     if (statistics) {
         // Use statistics from Google Apps Script (more accurate)
-        openRequests = statistics.open;
+        openRequests = statistics.open + statistics.verified;
         const totalRequests = statistics.total;
         const verifiedRequests = statistics.verified;
         const closedRequests = statistics.closed;
