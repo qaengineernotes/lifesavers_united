@@ -155,184 +155,7 @@
     </section>
 
     <!-- Hospital Request Portal -->
-    <section class="py-16">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-section mb-4">Hospital Emergency Request Portal</h2>
-                <p class="text-text-secondary max-w-2xl mx-auto">
-                    Authorized medical professionals can broadcast critical blood needs to our donor network with
-                    hospital-grade security and verification.
-                </p>
-            </div>
 
-            <div class="max-w-4xl mx-auto">
-                <div class="bg-white rounded-2xl shadow-card p-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <!-- Request Form -->
-                        <div>
-                            <h3 class="text-xl font-semibold mb-6">Submit Emergency Request</h3>
-
-                            <form class="space-y-6">
-                                <div>
-                                    <label class="block text-sm font-semibold text-text-primary mb-2">Hospital/Medical
-                                        Facility</label>
-                                    <select class="form-input">
-                                        <option>Select Hospital</option>
-                                        <option>Metro General Hospital</option>
-                                        <option>City Medical Center</option>
-                                        <option>Regional Medical Center</option>
-                                        <option>University Hospital</option>
-                                    </select>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-text-primary mb-2">Blood
-                                            Type</label>
-                                        <select class="form-input">
-                                            <option>Select Type</option>
-                                            <option>O-</option>
-                                            <option>O+</option>
-                                            <option>A-</option>
-                                            <option>A+</option>
-                                            <option>B-</option>
-                                            <option>B+</option>
-                                            <option>AB-</option>
-                                            <option>AB+</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-text-primary mb-2">Units
-                                            Needed</label>
-                                        <input type="number" class="form-input" placeholder="Number of units" min="1" />
-                                    </div>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-semibold text-text-primary mb-2">Priority
-                                            Level</label>
-                                        <select class="form-input">
-                                            <option>Select Priority</option>
-                                            <option>CRITICAL - Life Threatening</option>
-                                            <option>HIGH - Urgent Surgery</option>
-                                            <option>MEDIUM - Scheduled Procedure</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-semibold text-text-primary mb-2">Time
-                                            Frame</label>
-                                        <select class="form-input">
-                                            <option>Select Timeframe</option>
-                                            <option>Immediate (1-2 hours)</option>
-                                            <option>Urgent (2-6 hours)</option>
-                                            <option>Standard (6-24 hours)</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-semibold text-text-primary mb-2">Medical
-                                        Details</label>
-                                    <textarea class="form-input h-24"
-                                        placeholder="Brief medical context (optional - for donor awareness)"></textarea>
-                                </div>
-
-                                <div>
-                                    <label class="block text-sm font-semibold text-text-primary mb-2">Authorized Medical
-                                        Professional</label>
-                                    <input type="text" class="form-input" placeholder="Dr. Name, Title, License #" />
-                                </div>
-
-                                <button type="submit" class="btn-primary w-full text-lg py-4">
-                                    <svg class="w-6 h-6 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                        <path
-                                            d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                                    </svg>
-                                    Broadcast Emergency Request
-                                </button>
-                            </form>
-                        </div>
-
-                        <!-- Request Guidelines -->
-                        <div>
-                            <h3 class="text-xl font-semibold mb-6">Emergency Request Guidelines</h3>
-
-                            <div class="space-y-4">
-                                <div class="flex items-start">
-                                    <div class="bg-primary-100 p-2 rounded-full mr-3 mt-1">
-                                        <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-text-primary">Verification Required</h4>
-                                        <p class="text-text-secondary text-sm">All requests must be submitted by
-                                            authorized medical professionals with valid credentials.</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start">
-                                    <div class="bg-secondary-100 p-2 rounded-full mr-3 mt-1">
-                                        <svg class="w-4 h-4 text-secondary" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-text-primary">Real-Time Matching</h4>
-                                        <p class="text-text-secondary text-sm">System automatically matches requests
-                                            with eligible donors based on blood type and proximity.</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start">
-                                    <div class="bg-accent-100 p-2 rounded-full mr-3 mt-1">
-                                        <svg class="w-4 h-4 text-accent" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-text-primary">Privacy Protected</h4>
-                                        <p class="text-text-secondary text-sm">All communications maintain HIPAA
-                                            compliance and donor privacy protection.</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-start">
-                                    <div class="bg-warning-100 p-2 rounded-full mr-3 mt-1">
-                                        <svg class="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd"
-                                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                                clip-rule="evenodd" />
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-semibold text-text-primary">Backup Protocols</h4>
-                                        <p class="text-text-secondary text-sm">System expands search radius and
-                                            activates additional donor pools if initial response is insufficient.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="mt-8 p-4 bg-surface rounded-lg">
-                                <h4 class="font-semibold text-text-primary mb-2">Emergency Contact</h4>
-                                <p class="text-text-secondary text-sm mb-2">For immediate assistance or technical
-                                    support:</p>
-                                <p class="font-bold text-primary">24/7 Emergency Line: (555) 123-LIFE</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <!-- Response Statistics -->
     <section class="py-16 bg-surface">
@@ -347,21 +170,21 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="text-center">
                     <div class="bg-white rounded-2xl p-8 shadow-card">
-                        <div class="text-4xl font-bold text-primary mb-2">94%</div>
+                        <div id="successRate" class="text-4xl font-bold text-primary mb-2">94%</div>
                         <div class="text-text-secondary mb-2">Success Rate</div>
                         <div class="text-accent text-sm">Emergency requests fulfilled</div>
                     </div>
                 </div>
                 <div class="text-center">
                     <div class="bg-white rounded-2xl p-8 shadow-card">
-                        <div class="text-4xl font-bold text-secondary mb-2">18</div>
-                        <div class="text-text-secondary mb-2">Avg Response Time</div>
-                        <div class="text-accent text-sm">Minutes to first donor</div>
+                        <div id="openRequests" class="text-4xl font-bold text-secondary mb-2">0</div>
+                        <div class="text-text-secondary mb-2">Open Requests</div>
+                        <div class="text-accent text-sm">Currently active requests</div>
                     </div>
                 </div>
                 <div class="text-center">
                     <div class="bg-white rounded-2xl p-8 shadow-card">
-                        <div class="text-4xl font-bold text-accent mb-2">847</div>
+                        <div id="livesSaved" class="text-4xl font-bold text-accent mb-2">847</div>
                         <div class="text-text-secondary mb-2">Lives Saved</div>
                         <div class="text-accent text-sm">Through emergency system</div>
                     </div>
@@ -497,7 +320,7 @@
 
     <script>
         // Local proxy URL to avoid CORS issues
-        const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzpvCCtWPAGTnUuI0B55PPU8F4qlugtu3waOmMU5qN37fLCY46pwSuA2FJBCnqprRxBfw/exec';
+        const FETCH_URL = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
         let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 
@@ -647,6 +470,9 @@
                     loadingState.classList.add('hidden');
                     noRequestsState.classList.add('hidden');
 
+                    // Calculate and update statistics
+                    updateStatistics(data.requests, data.statistics);
+
                     // Display each request
                     data.requests.forEach(request => {
                         const requestCard = createRequestCard(request);
@@ -656,6 +482,9 @@
                     // Show no requests state
                     loadingState.classList.add('hidden');
                     noRequestsState.classList.remove('hidden');
+
+                    // Update statistics with empty data
+                    updateStatistics([], { total: 0, open: 0, verified: 0, closed: 0 });
                 }
 
             } catch (error) {
@@ -902,7 +731,7 @@
                     };
 
                     // Call the Google Apps Script directly
-                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbx6PcS-BKZyh495QmGf6PN9dw_tjssHPIgPwG81oMc6AmC_SotT6TZ3YNGb1BAyWIA7TA/exec';
+                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
 
                     // Create URL-encoded form data
                     const formData = new URLSearchParams();
@@ -953,6 +782,14 @@
                         const cardKey = `${patientName}-${bloodType}`;
                         const newState = { verifyStatus: 'verified', closeStatus: 'available' };
                         buttonStates.set(cardKey, newState);
+
+                        // Update statistics after verification
+                        const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
+                            const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
+                            const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
+                            return { patientName, bloodType };
+                        });
+                        updateStatistics(allRequests);
 
                         // Show success message
                         showSuccessMessage('Request marked as VERIFIED successfully!');
@@ -1013,7 +850,7 @@
                     };
 
                     // Call the Google Apps Script directly
-                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbx6PcS-BKZyh495QmGf6PN9dw_tjssHPIgPwG81oMc6AmC_SotT6TZ3YNGb1BAyWIA7TA/exec';
+                    const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
 
                     // Create URL-encoded form data
                     const formData = new URLSearchParams();
@@ -1065,6 +902,14 @@
                         const newState = { verifyStatus: 'available', closeStatus: 'closed' };
                         buttonStates.set(cardKey, newState);
 
+                        // Update statistics after closing
+                        const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
+                            const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
+                            const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
+                            return { patientName, bloodType };
+                        });
+                        updateStatistics(allRequests);
+
                         // Show success message
                         showSuccessMessage('Request marked as CLOSED successfully!');
 
@@ -1099,6 +944,60 @@
                     showSuccessMessage('Error updating status. Please try again.');
                     isButtonActionInProgress = false; // Reset flag on error
                 }
+            }
+        }
+
+        // Function to update statistics based on request data
+        function updateStatistics(requests, statistics = null) {
+            let openRequests, successRate, livesSaved;
+
+            if (statistics) {
+                // Use statistics from Google Apps Script (more accurate)
+                openRequests = statistics.open;
+                const totalRequests = statistics.total;
+                const verifiedRequests = statistics.verified;
+                const closedRequests = statistics.closed;
+
+                successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
+                livesSaved = closedRequests; // Show actual closed count as lives saved
+            } else {
+                // Fallback to local calculation (for backward compatibility)
+                openRequests = requests.filter(request => {
+                    const cardKey = `${request.patientName}-${request.bloodType}`;
+                    const storedState = buttonStates.get(cardKey);
+                    return !storedState || storedState.closeStatus !== 'closed';
+                }).length;
+
+                const totalRequests = requests.length;
+                const verifiedRequests = requests.filter(request => {
+                    const cardKey = `${request.patientName}-${request.bloodType}`;
+                    const storedState = buttonStates.get(cardKey);
+                    return storedState && storedState.verifyStatus === 'verified';
+                }).length;
+
+                successRate = totalRequests > 0 ? Math.round((verifiedRequests / totalRequests) * 100) : 94;
+
+                const closedRequests = requests.filter(request => {
+                    const cardKey = `${request.patientName}-${request.bloodType}`;
+                    const storedState = buttonStates.get(cardKey);
+                    return storedState && storedState.closeStatus === 'closed';
+                }).length;
+                livesSaved = closedRequests * 3;
+            }
+
+            // Update the DOM elements
+            const openRequestsElement = document.getElementById('openRequests');
+            const successRateElement = document.getElementById('successRate');
+            const livesSavedElement = document.getElementById('livesSaved');
+
+            if (openRequestsElement) {
+                openRequestsElement.textContent = openRequests;
+            }
+            if (successRateElement) {
+                successRateElement.textContent = successRate + '%';
+            }
+            if (livesSavedElement) {
+                livesSavedElement.textContent = livesSaved;
             }
         }
 

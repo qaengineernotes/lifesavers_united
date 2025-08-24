@@ -83,21 +83,26 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="patientName">Patient Name *</label>
-                            <input type="text" id="patientName" name="patientName" required>
+                            <input type="text" id="patientName" name="patientName" required
+                                placeholder="e.g., Sanjay Mohanlal Sharma">
                         </div>
                         <div class="form-group">
                             <label for="contactPerson">Contact Person *</label>
-                            <input type="text" id="contactPerson" name="contactPerson" required>
+                            <input type="text" id="contactPerson" name="contactPerson" required
+                                placeholder="e.g., Sanjay Kumar">
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="contactNumber">Contact Number *</label>
-                            <input type="tel" id="contactNumber" name="contactNumber" required>
+                            <input type="text" id="contactNumber" name="contactNumber" required
+                                placeholder="e.g., 9876543210" pattern="[0-9]*" inputmode="numeric" minlength="10"
+                                maxlength="15">
                         </div>
                         <div class="form-group">
                             <label for="contactEmail">Email Address</label>
-                            <input type="email" id="contactEmail" name="contactEmail">
+                            <input type="email" id="contactEmail" name="contactEmail"
+                                placeholder="e.g., sanjay@gmail.com">
                         </div>
                     </div>
                     <div class="form-group">
@@ -139,18 +144,35 @@
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label for="unitsRequired">Units Required</label>
-                            <select id="unitsRequired" name="unitsRequired">
-                                <option value="1">1 Unit</option>
-                                <option value="2">2 Units</option>
-                                <option value="3">3 Units</option>
-                                <option value="4">4 Units</option>
-                                <option value="5+">5+ Units</option>
-                            </select>
+                            <label for="unitsRequired">Units Required *</label>
+                            <input type="text" id="unitsRequired" name="unitsRequired" required
+                                placeholder="e.g., 2 units, SDP, Platelets, etc.">
                         </div>
                         <div class="form-group">
-                            <label for="requiredDate">Required Date *</label>
-                            <input type="date" id="requiredDate" name="requiredDate" required>
+                            <label for="patientAge">Age of Patient</label>
+                            <input type="text" id="patientAge" name="patientAge" placeholder="e.g., 45" pattern="[0-9]*"
+                                inputmode="numeric">
+                        </div>
+                        <div class="form-group">
+                            <label for="diagnosis">Diagnosis / Patient Suffering From *</label>
+                            <select id="diagnosis" name="diagnosis" required>
+                                <option value="">Select diagnosis...</option>
+                                <option value="Accident/Trauma">Accident/Trauma</option>
+                                <option value="Surgery">Surgery</option>
+                                <option value="Cancer Treatment">Cancer Treatment</option>
+                                <option value="Childbirth/Postpartum">Childbirth/Postpartum</option>
+                                <option value="Anemia">Anemia</option>
+                                <option value="Thalassemia">Thalassemia</option>
+                                <option value="Leukemia">Leukemia</option>
+                                <option value="Dengue">Dengue</option>
+                                <option value="Malaria">Malaria</option>
+                                <option value="Kidney Disease">Kidney Disease</option>
+                                <option value="Liver Disease">Liver Disease</option>
+                                <option value="Heart Surgery">Heart Surgery</option>
+                                <option value="Bone Marrow Transplant">Bone Marrow Transplant</option>
+                                <option value="Bleeding Disorder">Bleeding Disorder</option>
+                                <option value="Other">Other</option>
+                            </select>
                         </div>
                     </div>
                     <div class="form-group">
@@ -173,11 +195,12 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="hospitalName">Hospital Name *</label>
-                            <input type="text" id="hospitalName" name="hospitalName" required>
+                            <input type="text" id="hospitalName" name="hospitalName" required
+                                placeholder="e.g., Apollo Hospital">
                         </div>
                         <div class="form-group">
                             <label for="city">City *</label>
-                            <input type="text" id="city" name="city" required>
+                            <input type="text" id="city" name="city" required placeholder="e.g., Ahmedabad">
                         </div>
                     </div>
                     <div class="form-group">
@@ -190,41 +213,14 @@
                         <textarea id="additionalInfo" name="additionalInfo"
                             placeholder="Any additional information that might help donors..."></textarea>
                     </div>
-                    <div class="notification-panel">
-                        <h3>Notification Preferences</h3>
-                        <div class="notification-options">
-                            <div class="notification-option">
-                                <input type="checkbox" id="notifyEmail" name="notifications" value="email" checked>
-                                <label for="notifyEmail">📧 Email Notifications</label>
-                            </div>
-                            <div class="notification-option">
-                                <input type="checkbox" id="notifyWhatsApp" name="notifications" value="whatsapp">
-                                <label for="notifyWhatsApp">📱 WhatsApp Notifications</label>
-                            </div>
-                            <div class="notification-option">
-                                <input type="checkbox" id="notifyBrowser" name="notifications" value="browser">
-                                <label for="notifyBrowser">🔔 Browser Notifications</label>
-                            </div>
-                        </div>
-                    </div>
+
                     <button type="submit" class="btn">Submit Blood Request</button>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Success/Error Modal -->
-    <div id="submissionModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <div id="modalContent">
-                <!-- Content will be populated by JavaScript -->
-            </div>
-            <button id="closeModal"
-                class="mt-4 w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary-dark transition-smooth">
-                Close
-            </button>
-        </div>
-    </div>
+
 
     <!-- Footer -->
     <footer class="bg-text-primary text-white py-12 mt-16">
@@ -300,7 +296,7 @@
 
     <script>
         // Local proxy URL to avoid CORS issues
-        const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzpvCCtWPAGTnUuI0B55PPU8F4qlugtu3waOmMU5qN37fLCY46pwSuA2FJBCnqprRxBfw/exec';
+        const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
 
         document.getElementById('bloodRequestForm').addEventListener('submit', async function (e) {
             e.preventDefault();
@@ -321,13 +317,13 @@
                     contactEmail: formDataObj.get('contactEmail'),
                     bloodType: formDataObj.get('bloodType'),
                     unitsRequired: formDataObj.get('unitsRequired'),
-                    requiredDate: formDataObj.get('requiredDate'),
+                    patientAge: formDataObj.get('patientAge'),
+                    diagnosis: formDataObj.get('diagnosis'),
                     urgency: formDataObj.get('urgency'),
                     hospitalName: formDataObj.get('hospitalName'),
                     city: formDataObj.get('city'),
                     hospitalAddress: formDataObj.get('hospitalAddress'),
-                    additionalInfo: formDataObj.get('additionalInfo'),
-                    notifications: formDataObj.getAll('notifications')
+                    additionalInfo: formDataObj.get('additionalInfo')
                 };
 
                 // Submit to Google Apps Script
@@ -345,15 +341,15 @@
                 const result = await response.json();
 
                 if (result.success) {
-                    showModal('Success!', 'Your blood request has been submitted successfully. We will contact you soon.', 'success');
+                    showSuccessMessage('Blood request submitted successfully! We will contact you soon.');
                     this.reset(); // Reset form
                 } else {
-                    showModal('Error', 'Failed to submit blood request. Please try again.', 'error');
+                    showSuccessMessage('Failed to submit blood request. Please try again.');
                 }
 
             } catch (error) {
                 console.error('Error submitting form:', error);
-                showModal('Error', 'An error occurred while submitting your request. Please try again.', 'error');
+                showSuccessMessage('An error occurred while submitting your request. Please try again.');
             } finally {
                 // Reset button state
                 submitButton.textContent = originalText;
@@ -361,36 +357,43 @@
             }
         });
 
-        // Function to show modal
-        function showModal(title, message, type) {
-            const modal = document.getElementById('submissionModal');
-            const modalContent = document.getElementById('modalContent');
-
-            const icon = type === 'success' ? '✅' : '❌';
-            const titleColor = type === 'success' ? 'text-green-600' : 'text-red-600';
-
-            modalContent.innerHTML = `
-                <div class="text-center">
-                    <div class="text-4xl mb-4">${icon}</div>
-                    <h3 class="text-xl font-bold ${titleColor} mb-2">${title}</h3>
-                    <p class="text-gray-600">${message}</p>
-                </div>
+        // Function to show success message without using alert
+        function showSuccessMessage(message) {
+            // Create a temporary success message element
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #10B981;
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                z-index: 9999;
+                font-weight: 600;
+                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+                animation: slideIn 0.3s ease-out;
             `;
+            successDiv.textContent = message;
 
-            modal.classList.remove('hidden');
+            // Add animation CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            document.body.appendChild(successDiv);
+
+            // Remove the message after 3 seconds
+            setTimeout(() => {
+                successDiv.remove();
+                style.remove();
+            }, 3000);
         }
-
-        // Close modal
-        document.getElementById('closeModal').addEventListener('click', function () {
-            document.getElementById('submissionModal').classList.add('hidden');
-        });
-
-        // Close modal when clicking outside
-        document.getElementById('submissionModal').addEventListener('click', function (e) {
-            if (e.target === this) {
-                this.classList.add('hidden');
-            }
-        });
     </script>
 </body>
 
