@@ -2531,3 +2531,119 @@ h6 {
   justify-content: center !important;
   gap: 0.5rem !important;
 }
+
+/* Error Message Styles */
+.error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+  font-weight: 500;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.error-message.hidden {
+  display: none;
+}
+
+.error-message.show {
+  display: block;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Form validation states */
+.form-group input.error {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+.form-group input.valid {
+  border-color: #10b981;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+}
+
+/* Donor Info Modal Styles */
+#donorInfoModal {
+  animation: fadeIn 0.3s ease-out;
+}
+
+#donorInfoModal .bg-white {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Modal input focus styles */
+#donorInfoModal input[type="text"]:focus {
+  border-color: rgb(220 38 38);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+/* Radio button custom styles */
+#donorInfoModal input[type="radio"] {
+  accent-color: rgb(220 38 38);
+}
+
+#donorInfoModal input[type="radio"]:checked {
+  border-color: rgb(220 38 38);
+}
+
+/* Button hover effects */
+#donorInfoModal #submitBtn:hover {
+  background-color: rgb(185 28 28);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+#donorInfoModal #cancelBtn:hover {
+  background-color: rgb(249 250 251);
+  border-color: rgb(156 163 175);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  #donorInfoModal .bg-white {
+    margin: 1rem;
+    padding: 1.5rem;
+  }
+
+  #donorInfoModal h3 {
+    font-size: 1.5rem;
+  }
+
+  #donorInfoModal .space-y-4>div {
+    margin-bottom: 1rem;
+  }
+}

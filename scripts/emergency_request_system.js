@@ -1,7 +1,31 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
+console.log('🚀 Emergency request system script loaded');
+console.log('🌐 FETCH_URL:', FETCH_URL);
+console.log('🔧 isButtonActionInProgress:', isButtonActionInProgress);
+
+// Test function to check if Google Apps Script is accessible
+async function testGoogleAppsScript() {
+    try {
+        console.log('🧪 Testing Google Apps Script accessibility...');
+        const response = await fetch(FETCH_URL);
+        console.log('✅ Response received:', response.status, response.statusText);
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('✅ Data received:', data);
+            return true;
+        } else {
+            console.error('❌ Response not OK:', response.status, response.statusText);
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Error testing Google Apps Script:', error);
+        return false;
+    }
+}
 
 
 // Override the remove function to prevent card removal when button action is in progress
@@ -16,7 +40,10 @@ let buttonStates = new Map(); // Store button states locally
 
 // Emergency system functionality
 document.addEventListener('DOMContentLoaded', function () {
-    // Load emergency requests on page load (only once)
+    console.log('📱 DOM Content Loaded event fired');
+
+    // Load emergency requests directly (bypass test for now)
+    console.log('🚀 Loading emergency requests directly...');
     loadEmergencyRequests();
 
     // Add event listeners for verify and close buttons
@@ -33,13 +60,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (e.target.closest('.close-btn')) {
+            console.log('🔴 Close button clicked!');
             const button = e.target.closest('.close-btn');
+            console.log('🔴 Button element:', button);
+            console.log('🔴 Button disabled:', button.disabled);
+
             // Only allow clicking if button is not disabled
             if (!button.disabled) {
+                console.log('🔴 Starting close request process...');
                 isButtonActionInProgress = true; // Set flag to prevent refresh
                 const patientName = button.getAttribute('data-patient-name');
                 const bloodType = button.getAttribute('data-blood-type');
+                console.log('🔴 Patient:', patientName, 'Blood Type:', bloodType);
                 closeRequest(patientName, bloodType, button);
+            } else {
+                console.log('🔴 Button is disabled, ignoring click');
             }
         }
 
@@ -106,26 +141,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to load emergency requests from Google Sheets
 async function loadEmergencyRequests() {
+    console.log('🔄 Loading emergency requests...');
 
-    // Don't refresh if a button action is in progress (but allow initial load)
+    // Only prevent refresh if button action is in progress AND we already have cards
+    // For initial load, always proceed
     if (isButtonActionInProgress && document.querySelectorAll('.emergency-request-card').length > 0) {
-        return;
-    }
-
-    // If this is a refresh and button action is in progress, don't proceed
-    if (isButtonActionInProgress) {
-        return;
-    }
-
-    // Additional check: if there are cards and button action is in progress, don't refresh
-    const existingCards = document.querySelectorAll('.emergency-request-card');
-    if (existingCards.length > 0 && isButtonActionInProgress) {
+        console.log('⏸️ Skipping refresh - button action in progress');
         return;
     }
 
     const container = document.getElementById('emergencyRequestsContainer');
     const loadingState = document.getElementById('loadingState');
     const noRequestsState = document.getElementById('noRequestsState');
+
+    console.log('🔍 DOM elements found:', {
+        container: !!container,
+        loadingState: !!loadingState,
+        noRequestsState: !!noRequestsState
+    });
+
+    if (!container || !loadingState || !noRequestsState) {
+        console.error('❌ Required DOM elements not found');
+        return;
+    }
 
     try {
         // Show loading state
@@ -140,11 +178,30 @@ async function loadEmergencyRequests() {
             return; // Don't proceed with the rest of the function
         }
 
-        // Fetch data from local proxy
-        const response = await fetch(FETCH_URL);
+        // Fetch data from Google Apps Script
+        console.log('🌐 Fetching from:', FETCH_URL);
+        console.log('🌐 About to make fetch request...');
+
+        const response = await fetch(FETCH_URL, {
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache'
+        });
+
+        console.log('📡 Response received!');
+        console.log('📡 Response status:', response.status);
+        console.log('📡 Response statusText:', response.statusText);
+        console.log('📡 Response headers:', response.headers);
+        console.log('📡 Response ok:', response.ok);
+
         const data = await response.json();
+        console.log('📊 Received data:', data);
 
         if (data.success && data.requests && data.requests.length > 0) {
+            console.log('✅ Data validation passed - processing requests...');
+            console.log('📋 Number of requests to process:', data.requests.length);
+            console.log('📋 Sample request:', data.requests[0]);
+
             // Hide loading and no requests states
             loadingState.classList.add('hidden');
             noRequestsState.classList.add('hidden');
@@ -153,9 +210,12 @@ async function loadEmergencyRequests() {
             updateStatistics(data.requests, data.statistics);
 
             // Display each request and initialize button states
-            data.requests.forEach(request => {
+            data.requests.forEach((request, index) => {
+                console.log(`🏥 Creating card ${index + 1} for patient: ${request.patientName}`);
                 const requestCard = createRequestCard(request);
+                console.log('🏥 Card created successfully, appending to container...');
                 container.appendChild(requestCard);
+                console.log('🏥 Card appended to DOM');
 
                 // Initialize button states based on request status
                 const cardKey = `${request.patientName}-${request.bloodType}`;
@@ -177,7 +237,13 @@ async function loadEmergencyRequests() {
         }
 
     } catch (error) {
-        console.error('Error loading emergency requests:', error);
+        console.error('❌ Error loading emergency requests:', error);
+        console.error('❌ Error details:', {
+            name: error.name,
+            message: error.message,
+            stack: error.stack
+        });
+
         loadingState.classList.add('hidden');
         noRequestsState.classList.remove('hidden');
         noRequestsState.innerHTML = `
@@ -186,6 +252,7 @@ async function loadEmergencyRequests() {
                     </svg>
                     <h3 class="text-xl font-semibold text-text-primary mb-2">Error Loading Requests</h3>
                     <p class="text-text-secondary">Unable to load emergency requests. Please try again later.</p>
+                    <p class="text-sm text-red-500 mt-2">Error: ${error.message}</p>
                 `;
     }
 }
@@ -244,7 +311,7 @@ function createRequestCard(request) {
                         <div>
                             <h3 class="text-xl font-bold ${urgencyConfig.textColor}">${urgencyConfig.title} - ${request.bloodType} Blood Needed</h3>
                             <p class="text-text-secondary">Patient: ${request.patientName}</p>
-                            <p class="text-text-secondary">${request.hospitalName} - ${request.additionalInfo || 'Emergency Request'}</p>
+                            <p class="text-text-secondary">${request.hospitalName} - ${request.diagnosis || request.additionalInfo || 'Emergency Request'}</p>
                         </div>
                     </div>
                     <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold">${urgencyConfig.badgeText}</span>
@@ -437,7 +504,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -501,8 +568,8 @@ async function verifyRequest(patientName, bloodType, button) {
                 // Keep the card visible and don't refresh automatically
                 // The button state change is sufficient to show the action was completed
 
-                // Keep the flag true to prevent automatic refresh
-                // User can manually refresh if needed
+                // Reset the flag to allow refresh button to work
+                isButtonActionInProgress = false;
             } else {
                 // Reset button state on error
                 button.disabled = false;
@@ -538,122 +605,138 @@ async function verifyRequest(patientName, bloodType, button) {
 
 // Function to handle "Closed" button click
 async function closeRequest(patientName, bloodType, button) {
+    console.log('🔴 closeRequest function called with:', { patientName, bloodType });
 
-    if (confirm(`Close this ${bloodType} blood request for ${patientName}?`)) {
-        try {
-            // Show loading state
-            button.disabled = true;
+    // Check authorization first
+    console.log('🔴 Checking authorization...');
+    const isAuthorized = await checkAuthorization();
+    console.log('🔴 Authorization result:', isAuthorized);
+
+    if (!isAuthorized) {
+        console.log('🔴 User not authorized, returning');
+        return; // User is not authorized
+    }
+
+    // Show custom popup for donor information
+    const donorInfo = await showDonorInfoPopup(patientName, bloodType);
+    if (!donorInfo) {
+        return; // User cancelled the popup
+    }
+
+    try {
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = `
+                    <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                    </svg>
+                    Updating...
+                `;
+
+        // Prepare the data for the API call
+        const requestData = {
+            patientName: patientName,
+            bloodType: bloodType,
+            status: 'Closed',
+            donorInfo: donorInfo
+        };
+
+        // Call the Google Apps Script directly
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
+
+        // Create URL-encoded form data
+        const formData = new URLSearchParams();
+        formData.append('action', 'update_status');
+        formData.append('data', JSON.stringify(requestData));
+
+        console.log('Sending request to:', scriptUrl);
+        console.log('Request data:', requestData);
+
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString(),
+            redirect: 'follow'
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response headers:', response.headers);
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Store reference to the card
+            const card = button.closest('.emergency-request-card');
+
+            // Change button appearance to show closed status
             button.innerHTML = `
-                        <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                        </svg>
-                        Updating...
-                    `;
-
-            // Prepare the data for the API call
-            const requestData = {
-                patientName: patientName,
-                bloodType: bloodType,
-                status: 'Closed'
-            };
-
-            // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbx0IuZUv6ZQOjA-nm55VqiBVlI2VOhTJJ6z8yNyEtBx8OKdil8BwxqKJl326mIcxCGV4g/exec';
-
-            // Create URL-encoded form data
-            const formData = new URLSearchParams();
-            formData.append('action', 'update_status');
-            formData.append('data', JSON.stringify(requestData));
-
-            console.log('Sending request to:', scriptUrl);
-            console.log('Request data:', requestData);
-
-            const response = await fetch(scriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData.toString(),
-                redirect: 'follow'
-            });
-
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
-
-            const result = await response.json();
-
-            if (result.success) {
-                // Store reference to the card
-                const card = button.closest('.emergency-request-card');
-
-                // Change button appearance to show closed status
-                button.innerHTML = `
                             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                             Closed
                         `;
-                button.classList.remove('btn-close');
-                button.classList.add('btn-closed');
-                button.disabled = true;
+            button.classList.remove('btn-close');
+            button.classList.add('btn-closed');
+            button.disabled = true;
 
 
 
-                // Store the button state locally
-                const cardKey = `${patientName}-${bloodType}`;
-                const existingState = buttonStates.get(cardKey) || {};
-                const newState = {
-                    ...existingState,
-                    closeStatus: 'closed'
-                };
-                buttonStates.set(cardKey, newState);
+            // Store the button state locally
+            const cardKey = `${patientName}-${bloodType}`;
+            const existingState = buttonStates.get(cardKey) || {};
+            const newState = {
+                ...existingState,
+                closeStatus: 'closed'
+            };
+            buttonStates.set(cardKey, newState);
 
-                // Update statistics after closing
-                const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
-                    const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
-                    const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
-                    return { patientName, bloodType };
-                });
-                updateStatistics(allRequests);
+            // Update statistics after closing
+            const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
+                const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
+                const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
+                return { patientName, bloodType };
+            });
+            updateStatistics(allRequests);
 
-                // Show success message
-                showSuccessMessage('Request marked as CLOSED successfully!');
+            // Show success message
+            showSuccessMessage('Request marked as CLOSED successfully!');
 
-                // Keep the card visible and don't refresh automatically
-                // The button state change is sufficient to show the action was completed
+            // Keep the card visible and don't refresh automatically
+            // The button state change is sufficient to show the action was completed
 
-                // Keep the flag true to prevent automatic refresh
-                // User can manually refresh if needed
-            } else {
-                // Reset button state on error
-                button.disabled = false;
-                button.innerHTML = `
+            // Reset the flag to allow refresh button to work
+            isButtonActionInProgress = false;
+        } else {
+            // Reset button state on error
+            button.disabled = false;
+            button.innerHTML = `
                             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                             </svg>
                             Close
                         `;
-                button.classList.remove('btn-closed');
-                button.classList.add('btn-close');
-                showSuccessMessage('Failed to update status. Please try again.');
-                isButtonActionInProgress = false; // Reset flag on error
-            }
-        } catch (error) {
-            console.error('Error updating status:', error);
+            button.classList.remove('btn-closed');
+            button.classList.add('btn-close');
+            showSuccessMessage('Failed to update status. Please try again.');
+            isButtonActionInProgress = false; // Reset flag on error
+        }
+    } catch (error) {
+        console.error('Error updating status:', error);
 
-            // Reset button state on error
-            button.disabled = false;
-            button.innerHTML = `
+        // Reset button state on error
+        button.disabled = false;
+        button.innerHTML = `
                         <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
                         </svg>
                         Close
                     `;
-            button.classList.remove('btn-closed');
-            button.classList.add('btn-close');
-            showSuccessMessage('Error updating status. Please try again.');
-            isButtonActionInProgress = false; // Reset flag on error
-        }
+        button.classList.remove('btn-closed');
+        button.classList.add('btn-close');
+        showSuccessMessage('Error updating status. Please try again.');
+        isButtonActionInProgress = false; // Reset flag on error
     }
 }
 
@@ -751,4 +834,385 @@ function showSuccessMessage(message) {
         successDiv.remove();
         style.remove();
     }, 3000);
+}
+
+// Function to check user authorization
+async function checkAuthorization() {
+    console.log('🔐 checkAuthorization function called');
+
+    // Check if user has access via URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const hasAccess = urlParams.get('closeAccess');
+    console.log('🔐 URL access check:', hasAccess);
+
+    if (hasAccess === 'true') {
+        console.log('🔐 User has URL access, returning true');
+        return true; // User has access via URL
+    }
+
+    // Show custom password popup
+    console.log('🔐 Creating password popup...');
+    return new Promise((resolve) => {
+        // Create modal overlay with explicit inline styles
+        const modal = document.createElement('div');
+        modal.id = 'passwordModal';
+        console.log('🔐 Modal created:', modal);
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        `;
+
+        // Create modal content with explicit inline styles
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #fef3c7; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #d97706;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Authorization Required</h3>
+                <p style="color: #6b7280;">Enter password to close blood requests</p>
+            </div>
+            
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Password *</label>
+                <input type="password" id="authPassword" style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;" placeholder="Enter your password" required>
+                <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">This action requires proper authorization</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="cancelAuthBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
+                    Cancel
+                </button>
+                <button id="submitAuthBtn" style="flex: 1; padding: 12px 16px; background-color: #dc2626; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    Authorize
+                </button>
+            </div>
+        `;
+
+        // Add event listeners
+        const cancelBtn = modalContent.querySelector('#cancelAuthBtn');
+        const submitBtn = modalContent.querySelector('#submitAuthBtn');
+        const passwordInput = modalContent.querySelector('#authPassword');
+
+        // Add hover effects
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.backgroundColor = '#f3f4f6';
+            cancelBtn.style.borderColor = '#9ca3af';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.backgroundColor = 'white';
+            cancelBtn.style.borderColor = '#d1d5db';
+        });
+
+        submitBtn.addEventListener('mouseenter', () => {
+            submitBtn.style.backgroundColor = '#b91c1c';
+        });
+        submitBtn.addEventListener('mouseleave', () => {
+            submitBtn.style.backgroundColor = '#dc2626';
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(false);
+        });
+
+        // Handle submit
+        submitBtn.addEventListener('click', () => {
+            const password = passwordInput.value.trim();
+            if (!password) {
+                passwordInput.style.borderColor = '#ef4444';
+                passwordInput.focus();
+                return;
+            }
+
+            // Simple password check (you can make this more secure)
+            // For production, this should be server-side validation
+            const validPasswords = ['admin123', 'lifesaver2025', 'emergency']; // Add your passwords here
+
+            if (validPasswords.includes(password)) {
+                modal.remove();
+                resolve(true);
+            } else {
+                passwordInput.style.borderColor = '#ef4444';
+                passwordInput.value = '';
+                passwordInput.focus();
+
+                // Show error message
+                const errorMsg = modalContent.querySelector('.error-message') || document.createElement('p');
+                errorMsg.style.cssText = 'color: #ef4444; font-size: 14px; margin-top: 8px; text-align: center;';
+                errorMsg.textContent = 'Invalid password. Please try again.';
+                errorMsg.className = 'error-message';
+
+                if (!modalContent.querySelector('.error-message')) {
+                    modalContent.insertBefore(errorMsg, modalContent.querySelector('div:last-child'));
+                }
+            }
+        });
+
+        // Handle Enter key
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                submitBtn.click();
+            }
+        });
+
+        // Add modal content to modal
+        modal.appendChild(modalContent);
+        console.log('🔐 Modal content added to modal');
+
+        // Focus on password input
+        passwordInput.focus();
+
+        // Add modal to page
+        console.log('🔐 Adding modal to DOM...');
+        document.body.appendChild(modal);
+        console.log('🔐 Modal added to DOM, modal element:', modal);
+        console.log('🔐 Modal visible:', modal.offsetWidth > 0 && modal.offsetHeight > 0);
+    });
+}
+
+// Function to show custom popup for donor information
+function showDonorInfoPopup(patientName, bloodType) {
+    return new Promise((resolve) => {
+        // Create modal overlay with explicit inline styles
+        const modal = document.createElement('div');
+        modal.id = 'donorInfoModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        `;
+
+        // Create modal content with explicit inline styles
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Close Blood Request</h3>
+                <p style="color: #6b7280;">Patient: ${patientName} | Blood Type: ${bloodType}</p>
+            </div>
+            
+            <div style="margin-bottom: 24px;">
+                <p style="font-size: 18px; font-weight: 600; color: #374151; margin-bottom: 16px;">Who has donated the blood?</p>
+                
+                <div style="margin-bottom: 16px;">
+                    <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 12px;">
+                        <input type="radio" name="donorType" value="relative" style="width: 16px; height: 16px; margin-right: 12px;">
+                        <span style="color: #374151; font-weight: 500;">Relative</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="donorType" value="donor" style="width: 16px; height: 16px; margin-right: 12px;">
+                        <span style="color: #374151; font-weight: 500;">Donor</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div id="donorDetailsSection" style="display: none; margin-bottom: 24px;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Donor Name *</label>
+                    <input type="text" id="donorName" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;" placeholder="Enter donor name" required>
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">This field is required when selecting 'Donor'</p>
+                </div>
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Info (Optional)</label>
+                    <input type="text" id="donorContact" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;" placeholder="Phone number or email">
+                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Phone number or email address</p>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="cancelBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer;">
+                    Cancel
+                </button>
+                <button id="submitBtn" style="flex: 1; padding: 12px 16px; background-color: #dc2626; color: white; border-radius: 8px; font-weight: 500; cursor: pointer; opacity: 0.5;" disabled>
+                    Close Request
+                </button>
+            </div>
+        `;
+
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        // Get elements
+        const donorTypeRadios = modal.querySelectorAll('input[name="donorType"]');
+        const donorDetailsSection = modal.querySelector('#donorDetailsSection');
+        const donorNameInput = modal.querySelector('#donorName');
+        const donorContactInput = modal.querySelector('#donorContact');
+        const submitBtn = modal.querySelector('#submitBtn');
+        const cancelBtn = modal.querySelector('#cancelBtn');
+
+        // Handle radio button changes
+        donorTypeRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'donor') {
+                    donorDetailsSection.style.display = 'block';
+                    submitBtn.disabled = true; // Disable until name is entered
+                    submitBtn.style.opacity = '0.5';
+                    donorNameInput.focus(); // Focus on the name input
+                } else {
+                    donorDetailsSection.style.display = 'none';
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '1';
+                }
+            });
+        });
+
+        // Handle donor name input
+        donorNameInput.addEventListener('input', () => {
+            const hasName = donorNameInput.value.trim().length > 0;
+            const selectedType = modal.querySelector('input[name="donorType"]:checked')?.value;
+
+            if (selectedType === 'donor') {
+                submitBtn.disabled = !hasName;
+                submitBtn.style.opacity = hasName ? '1' : '0.5';
+            }
+        });
+
+        // Handle submit
+        submitBtn.addEventListener('click', () => {
+            const selectedType = modal.querySelector('input[name="donorType"]:checked')?.value;
+
+            if (!selectedType) {
+                showModalError('Please select who donated the blood.');
+                return;
+            }
+
+            let donorInfo = '';
+            if (selectedType === 'relative') {
+                donorInfo = 'Relative';
+            } else if (selectedType === 'donor') {
+                const donorName = donorNameInput.value.trim();
+                const donorContact = donorContactInput.value.trim();
+
+                if (!donorName) {
+                    showModalError('Please enter the donor name.');
+                    donorNameInput.focus();
+                    return;
+                }
+
+                // Validate donor name (basic validation)
+                if (donorName.length < 2) {
+                    showModalError('Donor name must be at least 2 characters long.');
+                    donorNameInput.focus();
+                    return;
+                }
+
+                donorInfo = donorContact ? `${donorName}, ${donorContact}` : donorName;
+            }
+
+            // Remove modal
+            modal.remove();
+            resolve(donorInfo);
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(null);
+        });
+
+        // Handle clicking outside modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(null);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                modal.remove();
+                resolve(null);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        });
+
+        // Handle enter key in input fields
+        donorNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                submitBtn.click();
+            }
+        });
+
+        donorContactInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !submitBtn.disabled) {
+                submitBtn.click();
+            }
+        });
+
+        // Focus on first radio button initially
+        setTimeout(() => {
+            const firstRadio = modal.querySelector('input[name="donorType"]');
+            if (firstRadio) {
+                firstRadio.focus();
+            }
+        }, 100);
+    });
+}
+
+// Function to show error messages in the modal
+function showModalError(message) {
+    // Remove any existing error messages
+    const existingError = document.querySelector('.modal-error');
+    if (existingError) {
+        existingError.remove();
+    }
+
+    // Create error message element
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'modal-error bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm';
+    errorDiv.textContent = message;
+
+    // Insert error message before the buttons
+    const modal = document.getElementById('donorInfoModal');
+    const buttonsContainer = modal.querySelector('.flex.space-x-3');
+    buttonsContainer.parentNode.insertBefore(errorDiv, buttonsContainer);
+
+    // Auto-remove error after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
 }
