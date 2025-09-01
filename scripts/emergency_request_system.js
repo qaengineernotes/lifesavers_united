@@ -948,7 +948,7 @@ async function checkAuthorization() {
 
             // Simple password check (you can make this more secure)
             // For production, this should be server-side validation
-            const validPasswords = ['admin123', 'lifesaver2025', 'emergency']; // Add your passwords here
+            const validPasswords = ['lifesaver2025', 'emergency']; // Add your passwords here
 
             if (validPasswords.includes(password)) {
                 modal.remove();
