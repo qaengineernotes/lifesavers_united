@@ -1,10 +1,11 @@
 ﻿// Local proxy URL to avoid CORS issues
-const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
 
 // Initialize form validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     initializeFormValidation();
     initializeDuplicateChecking();
+    initializeCaptcha();
 });
 
 // Initialize form validation
@@ -105,8 +106,9 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
     // Validate form fields before submission
     const isPatientNameValid = validatePatientName();
     const isContactNumberValid = validateContactNumber();
+    const isCaptchaValid = validateCaptcha();
 
-    if (!isPatientNameValid || !isContactNumberValid) {
+    if (!isPatientNameValid || !isContactNumberValid || !isCaptchaValid) {
         showErrorMessage('Please fix the validation errors before submitting.');
         return;
     }
@@ -133,7 +135,8 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             hospitalName: formDataObj.get('hospitalName'),
             city: formDataObj.get('city'),
             hospitalAddress: formDataObj.get('hospitalAddress'),
-            additionalInfo: formDataObj.get('additionalInfo')
+            additionalInfo: formDataObj.get('additionalInfo'),
+            captchaAnswer: formDataObj.get('captchaAnswer')
         };
 
         // Submit to Google Apps Script
@@ -159,6 +162,7 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             }
             this.reset(); // Reset form
             clearDuplicateWarning(); // Clear any warnings
+            generateCaptcha(); // Generate new captcha after successful submission
             // Reset submit button state
             const submitBtn = this.querySelector('button[type="submit"]');
             if (submitBtn) {
@@ -446,4 +450,115 @@ function showErrorMessage(message) {
     setTimeout(() => {
         errorDiv.remove();
     }, 6000);
+}
+
+// Captcha functionality
+let currentCaptchaAnswer = 0;
+
+function initializeCaptcha() {
+    generateCaptcha();
+
+    // Add event listener for refresh button
+    const refreshBtn = document.getElementById('refreshCaptcha');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', generateCaptcha);
+    }
+
+    // Add event listener for captcha input
+    const captchaInput = document.getElementById('captchaAnswer');
+    if (captchaInput) {
+        captchaInput.addEventListener('input', clearCaptchaError);
+    }
+}
+
+function generateCaptcha() {
+    const num1 = Math.floor(Math.random() * 10) + 1; // 1-10
+    const num2 = Math.floor(Math.random() * 10) + 1; // 1-10
+    const operators = ['+', '-', '×'];
+    const operator = operators[Math.floor(Math.random() * operators.length)];
+
+    let answer;
+    let question;
+
+    switch (operator) {
+        case '+':
+            answer = num1 + num2;
+            question = `${num1} + ${num2} = ?`;
+            break;
+        case '-':
+            // Ensure positive result
+            if (num1 < num2) {
+                answer = num2 - num1;
+                question = `${num2} - ${num1} = ?`;
+            } else {
+                answer = num1 - num2;
+                question = `${num1} - ${num2} = ?`;
+            }
+            break;
+        case '×':
+            answer = num1 * num2;
+            question = `${num1} × ${num2} = ?`;
+            break;
+    }
+
+    currentCaptchaAnswer = answer;
+
+    const questionElement = document.getElementById('captchaQuestion');
+    if (questionElement) {
+        questionElement.textContent = question;
+    }
+
+    // Clear the input and any errors
+    const captchaInput = document.getElementById('captchaAnswer');
+    if (captchaInput) {
+        captchaInput.value = '';
+        clearCaptchaError();
+    }
+}
+
+function validateCaptcha() {
+    const captchaInput = document.getElementById('captchaAnswer');
+    const errorDiv = document.getElementById('captchaError');
+
+    if (!captchaInput || !errorDiv) return false;
+
+    const userAnswer = parseInt(captchaInput.value.trim());
+
+    if (!captchaInput.value.trim()) {
+        showCaptchaError('Please solve the captcha to continue');
+        return false;
+    }
+
+    if (userAnswer !== currentCaptchaAnswer) {
+        showCaptchaError('Incorrect answer. Please try again.');
+        return false;
+    }
+
+    clearCaptchaError();
+    return true;
+}
+
+function showCaptchaError(message) {
+    const captchaInput = document.getElementById('captchaAnswer');
+    const errorDiv = document.getElementById('captchaError');
+
+    if (captchaInput && errorDiv) {
+        captchaInput.classList.add('error');
+        captchaInput.classList.remove('valid');
+        errorDiv.textContent = message;
+        errorDiv.classList.remove('hidden');
+        errorDiv.classList.add('show');
+    }
+}
+
+function clearCaptchaError() {
+    const captchaInput = document.getElementById('captchaAnswer');
+    const errorDiv = document.getElementById('captchaError');
+
+    if (captchaInput && errorDiv) {
+        captchaInput.classList.remove('error');
+        captchaInput.classList.add('valid');
+        errorDiv.classList.remove('show');
+        errorDiv.classList.add('hidden');
+    }
 }

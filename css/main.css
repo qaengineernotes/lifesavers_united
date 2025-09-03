@@ -911,7 +911,7 @@ h6 {
 }
 
 .h-10 {
-  height: 2.5rem;
+  height: 3.5rem;
 }
 
 .h-12 {
@@ -2197,6 +2197,65 @@ h6 {
 .emergency-blood-form-page .notification-panel h3 {
   color: #333;
   margin-bottom: 15px;
+}
+
+/* Captcha Styles */
+.emergency-blood-form-page .captcha-container {
+  margin-top: 10px;
+}
+
+.emergency-blood-form-page .captcha-question {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 12px 15px;
+  background: #f8f9fa;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.emergency-blood-form-page .captcha-question span {
+  flex: 1;
+}
+
+.emergency-blood-form-page .captcha-refresh-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emergency-blood-form-page .captcha-refresh-btn:hover {
+  background: #5a6268;
+  transform: scale(1.05);
+}
+
+.emergency-blood-form-page .captcha-refresh-btn:active {
+  transform: scale(0.95);
+}
+
+.emergency-blood-form-page .captcha-container input[type="number"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.emergency-blood-form-page .captcha-container input[type="number"]:focus {
+  outline: none;
+  border-color: #e74c3c;
 }
 
 .emergency-blood-form-page .notification-options {

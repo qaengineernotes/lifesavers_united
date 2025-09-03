@@ -1,21 +1,16 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
-console.log('🚀 Emergency request system script loaded');
-console.log('🌐 FETCH_URL:', FETCH_URL);
-console.log('🔧 isButtonActionInProgress:', isButtonActionInProgress);
+// Emergency request system script loaded
 
 // Test function to check if Google Apps Script is accessible
 async function testGoogleAppsScript() {
     try {
-        console.log('🧪 Testing Google Apps Script accessibility...');
         const response = await fetch(FETCH_URL);
-        console.log('✅ Response received:', response.status, response.statusText);
 
         if (response.ok) {
             const data = await response.json();
-            console.log('✅ Data received:', data);
             return true;
         } else {
             console.error('❌ Response not OK:', response.status, response.statusText);
@@ -40,10 +35,7 @@ let buttonStates = new Map(); // Store button states locally
 
 // Emergency system functionality
 document.addEventListener('DOMContentLoaded', function () {
-    console.log('📱 DOM Content Loaded event fired');
-
     // Load emergency requests directly (bypass test for now)
-    console.log('🚀 Loading emergency requests directly...');
     loadEmergencyRequests();
 
     // Add event listeners for verify and close buttons
@@ -60,21 +52,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (e.target.closest('.close-btn')) {
-            console.log('🔴 Close button clicked!');
             const button = e.target.closest('.close-btn');
-            console.log('🔴 Button element:', button);
-            console.log('🔴 Button disabled:', button.disabled);
 
             // Only allow clicking if button is not disabled
             if (!button.disabled) {
-                console.log('🔴 Starting close request process...');
                 isButtonActionInProgress = true; // Set flag to prevent refresh
                 const patientName = button.getAttribute('data-patient-name');
                 const bloodType = button.getAttribute('data-blood-type');
-                console.log('🔴 Patient:', patientName, 'Blood Type:', bloodType);
                 closeRequest(patientName, bloodType, button);
-            } else {
-                console.log('🔴 Button is disabled, ignoring click');
             }
         }
 
@@ -141,12 +126,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to load emergency requests from Google Sheets
 async function loadEmergencyRequests() {
-    console.log('🔄 Loading emergency requests...');
+
 
     // Only prevent refresh if button action is in progress AND we already have cards
     // For initial load, always proceed
     if (isButtonActionInProgress && document.querySelectorAll('.emergency-request-card').length > 0) {
-        console.log('⏸️ Skipping refresh - button action in progress');
+
         return;
     }
 
@@ -154,11 +139,7 @@ async function loadEmergencyRequests() {
     const loadingState = document.getElementById('loadingState');
     const noRequestsState = document.getElementById('noRequestsState');
 
-    console.log('🔍 DOM elements found:', {
-        container: !!container,
-        loadingState: !!loadingState,
-        noRequestsState: !!noRequestsState
-    });
+
 
     if (!container || !loadingState || !noRequestsState) {
         console.error('❌ Required DOM elements not found');
@@ -179,8 +160,6 @@ async function loadEmergencyRequests() {
         }
 
         // Fetch data from Google Apps Script
-        console.log('🌐 Fetching from:', FETCH_URL);
-        console.log('🌐 About to make fetch request...');
 
         const response = await fetch(FETCH_URL, {
             method: 'GET',
@@ -188,19 +167,11 @@ async function loadEmergencyRequests() {
             cache: 'no-cache'
         });
 
-        console.log('📡 Response received!');
-        console.log('📡 Response status:', response.status);
-        console.log('📡 Response statusText:', response.statusText);
-        console.log('📡 Response headers:', response.headers);
-        console.log('📡 Response ok:', response.ok);
+
 
         const data = await response.json();
-        console.log('📊 Received data:', data);
 
         if (data.success && data.requests && data.requests.length > 0) {
-            console.log('✅ Data validation passed - processing requests...');
-            console.log('📋 Number of requests to process:', data.requests.length);
-            console.log('📋 Sample request:', data.requests[0]);
 
             // Hide loading and no requests states
             loadingState.classList.add('hidden');
@@ -211,11 +182,8 @@ async function loadEmergencyRequests() {
 
             // Display each request and initialize button states
             data.requests.forEach((request, index) => {
-                console.log(`🏥 Creating card ${index + 1} for patient: ${request.patientName}`);
                 const requestCard = createRequestCard(request);
-                console.log('🏥 Card created successfully, appending to container...');
                 container.appendChild(requestCard);
-                console.log('🏥 Card appended to DOM');
 
                 // Initialize button states based on request status
                 const cardKey = `${request.patientName}-${request.bloodType}`;
@@ -504,15 +472,14 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
             formData.append('action', 'update_status');
             formData.append('data', JSON.stringify(requestData));
 
-            console.log('Sending request to:', scriptUrl);
-            console.log('Request data:', requestData);
+
 
             const response = await fetch(scriptUrl, {
                 method: 'POST',
@@ -523,8 +490,7 @@ async function verifyRequest(patientName, bloodType, button) {
                 redirect: 'follow'
             });
 
-            console.log('Response status:', response.status);
-            console.log('Response headers:', response.headers);
+
 
             const result = await response.json();
 
@@ -605,15 +571,10 @@ async function verifyRequest(patientName, bloodType, button) {
 
 // Function to handle "Closed" button click
 async function closeRequest(patientName, bloodType, button) {
-    console.log('🔴 closeRequest function called with:', { patientName, bloodType });
-
     // Check authorization first
-    console.log('🔴 Checking authorization...');
     const isAuthorized = await checkAuthorization();
-    console.log('🔴 Authorization result:', isAuthorized);
 
     if (!isAuthorized) {
-        console.log('🔴 User not authorized, returning');
         return; // User is not authorized
     }
 
@@ -642,15 +603,14 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbycyO5TjhH9a2rYjpdhp69VTBQn7mjfQZS5VVJO9Teb1UNpXXYiaOkcZpOdZUoOQyA-fw/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
         formData.append('action', 'update_status');
         formData.append('data', JSON.stringify(requestData));
 
-        console.log('Sending request to:', scriptUrl);
-        console.log('Request data:', requestData);
+
 
         const response = await fetch(scriptUrl, {
             method: 'POST',
@@ -661,12 +621,17 @@ async function closeRequest(patientName, bloodType, button) {
             redirect: 'follow'
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response headers:', response.headers);
+
 
         const result = await response.json();
 
         if (result.success) {
+            // If donor details were collected, save them to a different sheet
+            // Only save to Form Responses 2 if it's an actual donor (not Relative or Other)
+            if (donorInfo && donorInfo !== 'Relative' && !donorInfo.includes('Other')) {
+                await saveDonorDetailsToSheet(patientName, bloodType, donorInfo);
+            }
+
             // Store reference to the card
             const card = button.closest('.emergency-request-card');
 
@@ -838,25 +803,25 @@ function showSuccessMessage(message) {
 
 // Function to check user authorization
 async function checkAuthorization() {
-    console.log('🔐 checkAuthorization function called');
+
 
     // Check if user has access via URL parameter
     const urlParams = new URLSearchParams(window.location.search);
     const hasAccess = urlParams.get('closeAccess');
-    console.log('🔐 URL access check:', hasAccess);
+
 
     if (hasAccess === 'true') {
-        console.log('🔐 User has URL access, returning true');
+
         return true; // User has access via URL
     }
 
     // Show custom password popup
-    console.log('🔐 Creating password popup...');
+
     return new Promise((resolve) => {
         // Create modal overlay with explicit inline styles
         const modal = document.createElement('div');
         modal.id = 'passwordModal';
-        console.log('🔐 Modal created:', modal);
+
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -948,7 +913,7 @@ async function checkAuthorization() {
 
             // Simple password check (you can make this more secure)
             // For production, this should be server-side validation
-            const validPasswords = ['lifesaver2025', 'emergency']; // Add your passwords here
+            const validPasswords = ['admin123', 'lifesaver2025', 'emergency']; // Add your passwords here
 
             if (validPasswords.includes(password)) {
                 modal.remove();
@@ -979,16 +944,15 @@ async function checkAuthorization() {
 
         // Add modal content to modal
         modal.appendChild(modalContent);
-        console.log('🔐 Modal content added to modal');
+
 
         // Focus on password input
         passwordInput.focus();
 
         // Add modal to page
-        console.log('🔐 Adding modal to DOM...');
+
         document.body.appendChild(modal);
-        console.log('🔐 Modal added to DOM, modal element:', modal);
-        console.log('🔐 Modal visible:', modal.offsetWidth > 0 && modal.offsetHeight > 0);
+
     });
 }
 
@@ -1040,9 +1004,27 @@ function showDonorInfoPopup(patientName, bloodType) {
                         <span style="color: #374151; font-weight: 500;">Relative</span>
                     </label>
                     
-                    <label style="display: flex; align-items: center; cursor: pointer;">
+                    <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 12px;">
                         <input type="radio" name="donorType" value="donor" style="width: 16px; height: 16px; margin-right: 12px;">
                         <span style="color: #374151; font-weight: 500;">Donor</span>
+                    </label>
+                    
+                    <label style="display: flex; align-items: center; cursor: pointer;">
+                        <input type="radio" name="donorType" value="noDonation" style="width: 16px; height: 16px; margin-right: 12px;">
+                        <span style="color: #374151; font-weight: 500;">Other</span>
+                        <div style="position: relative; margin-left: 8px;">
+                            <svg class="info-icon" style="width: 16px; height: 16px; color: #6b7280; cursor: help;" fill="currentColor" viewBox="0 0 20 20" onmouseenter="this.parentElement.querySelector('.tooltip').style.opacity='1'; this.parentElement.querySelector('.tooltip').style.visibility='visible';" onmouseleave="this.parentElement.querySelector('.tooltip').style.opacity='0'; this.parentElement.querySelector('.tooltip').style.visibility='hidden';">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            <div class="tooltip" style="position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; padding: 8px 12px; background-color: #1f2937; color: white; border-radius: 6px; font-size: 12px; white-space: normal; width: 350px; text-align: left; opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; z-index: 1000001; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                                • Patient died<br>
+                                • Discharged<br>
+                                • Condition improved<br>
+                                • Transferred<br>
+                                • Medical reasons
+                                <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #1f2937;"></div>
+                            </div>
+                        </div>
                     </label>
                 </div>
             </div>
@@ -1138,6 +1120,8 @@ function showDonorInfoPopup(patientName, bloodType) {
                 }
 
                 donorInfo = donorContact ? `${donorName}, ${donorContact}` : donorName;
+            } else if (selectedType === 'noDonation') {
+                donorInfo = 'Other - No donation';
             }
 
             // Remove modal
@@ -1215,4 +1199,63 @@ function showModalError(message) {
             errorDiv.remove();
         }
     }, 5000);
+}
+
+// Function to save donor details to Form Responses 2 sheet
+async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
+    try {
+
+
+        // Parse donor info to extract name and contact
+        let donorName = '';
+        let donorContact = '';
+
+        if (donorInfo.includes(',')) {
+            // Format: "Donor Name, Contact Info"
+            const parts = donorInfo.split(',');
+            donorName = parts[0].trim();
+            donorContact = parts[1].trim();
+        } else {
+            // Format: "Donor Name" (no contact)
+            donorName = donorInfo;
+        }
+
+        // Prepare the data for the API call
+        const donorData = {
+            donorName: donorName,
+            donorContact: donorContact,
+            patientName: patientName,
+            bloodType: bloodType
+        };
+
+        // Call the Google Apps Script to save donor details
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+
+        // Create URL-encoded form data
+        const formData = new URLSearchParams();
+        formData.append('action', 'save_donor_details');
+        formData.append('data', JSON.stringify(donorData));
+
+
+
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString(),
+            redirect: 'follow'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Donor details saved successfully
+        } else {
+            console.error('❌ Failed to save donor details:', result.message);
+        }
+
+    } catch (error) {
+        console.error('❌ Error saving donor details:', error);
+    }
 }
