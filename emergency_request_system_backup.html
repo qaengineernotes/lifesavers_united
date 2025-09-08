@@ -132,87 +132,23 @@
     <!-- Live Emergency Requests -->
     <section class="py-12 bg-surface">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between mb-8 mobile-header-section">
-                <style>
-                    @media (max-width: 639px) {
-                        .mobile-header-section {
-                            flex-direction: column !important;
-                            align-items: flex-start !important;
-                            gap: 16px !important;
-                            margin-bottom: 24px !important;
-                        }
-
-                        .mobile-header-section .mobile-title-section {
-                            width: 100% !important;
-                        }
-
-                        .mobile-header-section .mobile-title {
-                            font-size: 1.5rem !important;
-                            line-height: 1.33 !important;
-                            margin-bottom: 8px !important;
-                        }
-
-                        .mobile-header-section .mobile-count-badge {
-                            margin-left: 8px !important;
-                            padding: 4px 8px !important;
-                            font-size: 0.75rem !important;
-                        }
-
-                        .mobile-header-section .mobile-subtitle {
-                            font-size: 0.875rem !important;
-                            line-height: 1.25 !important;
-                        }
-
-                        .mobile-header-section .mobile-controls {
-                            width: 100% !important;
-                            justify-content: space-between !important;
-                            gap: 12px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-indicator {
-                            gap: 6px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-dot {
-                            width: 10px !important;
-                            height: 10px !important;
-                            margin-right: 6px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-text {
-                            font-size: 0.75rem !important;
-                        }
-
-                        .mobile-header-section .mobile-refresh-btn {
-                            font-size: 0.75rem !important;
-                            padding: 6px 12px !important;
-                        }
-
-                        .mobile-header-section .mobile-refresh-btn svg {
-                            width: 14px !important;
-                            height: 14px !important;
-                            margin-right: 4px !important;
-                        }
-                    }
-                </style>
-
-                <div class="mobile-title-section">
-                    <h2 class="text-section mb-2 mobile-title">
+            <div class="flex items-center justify-between mb-8">
+                <div>
+                    <h2 class="text-section mb-2">
                         Active Emergency Requests
                         <span id="activeRequestsCount"
-                            class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-error text-white mobile-count-badge">
+                            class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-error text-white">
                             <span id="activeRequestsNumber">0</span>
                         </span>
                     </h2>
-                    <p class="text-text-secondary mobile-subtitle">Real-time critical blood needs requiring immediate
-                        response</p>
+                    <p class="text-text-secondary">Real-time critical blood needs requiring immediate response</p>
                 </div>
-                <div class="flex items-center space-x-4 mobile-controls">
-                    <div class="flex items-center mobile-live-indicator">
-                        <div class="w-3 h-3 bg-error rounded-full mr-2 animate-pulse mobile-live-dot"></div>
-                        <span class="text-sm font-semibold text-error mobile-live-text">LIVE</span>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center">
+                        <div class="w-3 h-3 bg-error rounded-full mr-2 animate-pulse"></div>
+                        <span class="text-sm font-semibold text-error">LIVE</span>
                     </div>
-                    <button class="btn-outline text-sm refresh-btn mobile-refresh-btn">
+                    <button class="btn-outline text-sm refresh-btn">
                         <svg class="w-4 h-4 mr-1 inline" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd"
                                 d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"

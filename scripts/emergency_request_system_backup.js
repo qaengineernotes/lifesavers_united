@@ -90,11 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 refreshBtn.disabled = false;
             });
         }
-        if (e.target.closest('.copy-btn')) {
-            const copyBtn = e.target.closest('.copy-btn');
-            const requestData = JSON.parse(copyBtn.getAttribute('data-request-data'));
-            copyRequestData(requestData);
-        }
     });
 
 
@@ -274,153 +269,56 @@ function createRequestCard(request) {
     }
 
     card.innerHTML = `
-    <style>
-        @media (max-width: 639px) {
-            .emergency-request-card .mobile-header {
-                flex-direction: column !important;
-                gap: 12px !important;
-            }
-            .emergency-request-card .mobile-icon-container {
-                align-items: flex-start !important;
-            }
-            .emergency-request-card .mobile-icon {
-                padding: 8px !important;
-                margin-right: 12px !important;
-                flex-shrink: 0 !important;
-            }
-            .emergency-request-card .mobile-icon svg {
-                width: 20px !important;
-                height: 20px !important;
-            }
-            .emergency-request-card .mobile-text-container {
-                min-width: 0 !important;
-                flex: 1 !important;
-            }
-            .emergency-request-card .mobile-title {
-                font-size: 1.125rem !important;
-                line-height: 1.25 !important;
-            }
-            .emergency-request-card .mobile-subtitle {
-                font-size: 0.875rem !important;
-            }
-            .emergency-request-card .mobile-subtitle.patient {
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                white-space: nowrap !important;
-            }
-            .emergency-request-card .mobile-subtitle.hospital {
-                word-wrap: break-word !important;
-            }
-            .emergency-request-card .mobile-badge {
-                padding: 4px 8px !important;
-                font-size: 0.75rem !important;
-                align-self: flex-start !important;
-                white-space: nowrap !important;
-            }
-            .emergency-request-card .mobile-grid {
-                grid-template-columns: 1fr !important;
-                gap: 12px !important;
-            }
-            .emergency-request-card .mobile-grid-item {
-                display: flex !important;
-                justify-content: space-between !important;
-            }
-            .emergency-request-card .mobile-grid-value {
-                font-size: 1rem !important;
-            }
-            .emergency-request-card .mobile-grid-value.contact {
-                word-break: break-all !important;
-            }
-            .emergency-request-card .mobile-buttons {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-            .emergency-request-card .mobile-button {
-                width: 100% !important;
-            }
-            .emergency-request-card .mobile-button svg {
-                width: 16px !important;
-                height: 16px !important;
-                flex-shrink: 0 !important;
-            }
-            .emergency-request-card .mobile-button span {
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-            }
-            .emergency-request-card .mobile-copy-container {
-                flex-direction: row !important;
-                align-items: center !important;
-                gap: 8px !important;
-            }
-            .emergency-request-card .mobile-copy-btn {
-                padding: 6px !important;
-            }
-            .emergency-request-card .mobile-copy-btn svg {
-                width: 18px !important;
-                height: 18px !important;
-            }
-        }
-    </style>
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center">
+                        <div class="${urgencyConfig.iconBg} p-3 rounded-full mr-4">
+                            <svg class="w-6 h-6 ${urgencyConfig.iconColor}" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="${urgencyConfig.iconPath}" clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold ${urgencyConfig.textColor}">${urgencyConfig.title} - ${request.bloodType} Blood Needed</h3>
+                            <p class="text-text-secondary">Patient: ${request.patientName}</p>
+                            <p class="text-text-secondary">${request.hospitalName}${request.diagnosis ? ` - ${request.diagnosis}` : ''}</p>
+                        </div>
+                    </div>
+                    <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold">${urgencyConfig.badgeText}</span>
+                </div>
 
-    <div class="flex items-start justify-between mb-4 mobile-header">
-        <div class="flex items-center mobile-icon-container">
-            <div class="${urgencyConfig.iconBg} p-3 rounded-full mr-4 mobile-icon">
-                <svg class="w-6 h-6 ${urgencyConfig.iconColor}" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="${urgencyConfig.iconPath}" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="mobile-text-container">
-                <h3 class="text-xl font-bold ${urgencyConfig.textColor} mobile-title">${urgencyConfig.title} - ${request.bloodType} Blood Needed</h3>
-                <p class="text-text-secondary mobile-subtitle patient">Patient: ${request.patientName}</p>
-                <p class="text-text-secondary mobile-subtitle hospital">${request.hospitalName}${request.diagnosis ? ` - ${request.diagnosis}` : ''}</p>
-            </div>
-        </div>
-        <div class="flex items-center space-x-2 mobile-q-container">
-            <button class="copy-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Copy request details">
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
-            </button>
-            <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">${urgencyConfig.badgeText}</span>
-        </div>
-    </div>
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <span class="text-sm text-text-secondary">Blood Type</span>
+                        <p class="font-bold text-lg">${request.bloodType}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-text-secondary">Quantity Needed</span>
+                        <p class="font-bold text-lg">${request.unitsRequired} Units</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-text-secondary">Time Since Request</span>
+                        <p class="font-bold text-lg ${urgencyConfig.timeColor}">${timeSince}</p>
+                    </div>
+                    <div>
+                        <span class="text-sm text-text-secondary">Contact</span>
+                        <p class="font-bold text-lg">${request.contactNumber}</p>
+                    </div>
+                </div>
 
-    <div class="grid grid-cols-2 gap-4 mb-4 mobile-grid">
-        <div class="mobile-grid-item">
-            <span class="text-sm text-text-secondary">Blood Type</span>
-            <p class="font-bold text-lg mobile-grid-value">${request.bloodType}</p>
-        </div>
-        <div class="mobile-grid-item">
-            <span class="text-sm text-text-secondary">Quantity Needed</span>
-            <p class="font-bold text-lg mobile-grid-value">${request.unitsRequired} Units</p>
-        </div>
-        <div class="mobile-grid-item">
-            <span class="text-sm text-text-secondary">Time Since Request</span>
-            <p class="font-bold text-lg ${urgencyConfig.timeColor} mobile-grid-value">${timeSince}</p>
-        </div>
-        <div class="mobile-grid-item">
-            <span class="text-sm text-text-secondary">Contact</span>
-            <p class="font-bold text-lg mobile-grid-value contact">${request.contactNumber}</p>
-        </div>
-    </div>
-
-    <div class="btn-container mobile-buttons">
-        <button class="${verifyButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}>
-            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-            </svg>
-            <span>${verifyButtonText}</span>
-        </button>
-        <button class="${closeButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${closeButtonDisabled}>
-            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </path>
-            </svg>
-            <span>${closeButtonText}</span>
-        </button>
-    </div>
-`;
+                <div class="btn-container">
+                    <button class="${verifyButtonClass}" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}>
+                        <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                        ${verifyButtonText}
+                    </button>
+                    <button class="${closeButtonClass}" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${closeButtonDisabled}>
+                        <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        ${closeButtonText}
+                    </button>
+                </div>
+            `;
 
     return card;
 }
@@ -1360,100 +1258,4 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
     } catch (error) {
         console.error('❌ Error saving donor details:', error);
     }
-}
-// Function to copy request data to clipboard
-async function copyRequestData(requestData) {
-    try {
-        // Format the data according to the specified format
-        const formattedData = formatRequestDataForCopy(requestData);
-
-        // Copy to clipboard
-        await navigator.clipboard.writeText(formattedData);
-
-        // Show success toast
-        showCopyToast();
-
-    } catch (error) {
-        console.error('❌ Error copying to clipboard:', error);
-
-        // Fallback for browsers that don't support clipboard API
-        try {
-            const textArea = document.createElement('textarea');
-            textArea.value = formatRequestDataForCopy(requestData);
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-
-            // Show success toast
-            showCopyToast();
-        } catch (fallbackError) {
-            console.error('❌ Fallback copy also failed:', fallbackError);
-            showCopyToast('Failed to copy');
-        }
-    }
-}
-
-// Function to format request data for copying
-function formatRequestDataForCopy(requestData) {
-    const formatField = (label, value) => {
-        return `${label}: ${value || ''}`;
-    };
-
-    return [
-        formatField('Patient Name', requestData.patientName),
-        formatField('Age', requestData.patientAge),
-        formatField('Blood Group', requestData.bloodType),
-        formatField('Units Required', requestData.unitsRequired),
-        formatField('Hospital', requestData.hospitalName),
-        formatField('Location', requestData.city),
-        formatField('Suffering From', requestData.diagnosis),
-        formatField('Contact Person', requestData.contactPerson),
-        formatField('Contact Number', requestData.contactNumber)
-    ].join('\n');
-}
-
-// Function to show copy toast notification
-function showCopyToast(message = 'Copied') {
-    // Create toast element
-    const toast = document.createElement('div');
-    toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10B981;
-        color: white;
-        padding: 12px 20px;
-        border-radius: 8px;
-        z-index: 9999;
-        font-weight: 600;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        animation: slideInRight 0.3s ease-out;
-        font-size: 14px;
-    `;
-    toast.textContent = message;
-
-    // Add animation CSS
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideInRight {
-            from { 
-                transform: translateX(100%); 
-                opacity: 0; 
-            }
-            to { 
-                transform: translateX(0); 
-                opacity: 1; 
-            }
-        }
-    `;
-    document.head.appendChild(style);
-
-    document.body.appendChild(toast);
-
-    // Remove the toast after 2 seconds
-    setTimeout(() => {
-        toast.remove();
-        style.remove();
-    }, 2000);
 }
