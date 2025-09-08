@@ -1,0 +1,4 @@
+warning: in the working copy of 'css/main.css', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'scripts/emergency_request_system.js', LF will be replaced by CRLF the next time Git touches it
+css/main.css
+scripts/emergency_request_system.js

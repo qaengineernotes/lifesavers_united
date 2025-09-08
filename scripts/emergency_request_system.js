@@ -350,8 +350,8 @@ function createRequestCard(request) {
                 text-overflow: ellipsis !important;
             }
             .emergency-request-card .mobile-copy-container {
-                flex-direction: column !important;
-                align-items: flex-end !important;
+                flex-direction: row !important;
+                align-items: center !important;
                 gap: 8px !important;
             }
             .emergency-request-card .mobile-copy-btn {
@@ -377,7 +377,7 @@ function createRequestCard(request) {
                 <p class="text-text-secondary mobile-subtitle hospital">${request.hospitalName}${request.diagnosis ? ` - ${request.diagnosis}` : ''}</p>
             </div>
         </div>
-        <div class="flex items-center space-x-2 mobile-copy-container">
+        <div class="flex items-center space-x-2 mobile-q-container">
             <button class="copy-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Copy request details">
                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
