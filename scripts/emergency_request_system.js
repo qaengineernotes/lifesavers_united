@@ -90,7 +90,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 refreshBtn.disabled = false;
             });
         }
-
         if (e.target.closest('.copy-btn')) {
             const copyBtn = e.target.closest('.copy-btn');
             const requestData = JSON.parse(copyBtn.getAttribute('data-request-data'));
@@ -1362,7 +1361,6 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         console.error('❌ Error saving donor details:', error);
     }
 }
-
 // Function to copy request data to clipboard
 async function copyRequestData(requestData) {
     try {
