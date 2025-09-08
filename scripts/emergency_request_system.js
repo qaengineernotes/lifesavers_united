@@ -554,8 +554,13 @@ function calculateTimeSince(inquiryDate) {
 
 // Function to handle "Verified" button click
 async function verifyRequest(patientName, bloodType, button) {
+    // Show custom verification popup
+    const confirmed = await showVerificationPopup(patientName, bloodType);
+    if (!confirmed) {
+        return; // User cancelled the verification
+    }
 
-    if (confirm(`Mark this ${bloodType} blood request for ${patientName} as VERIFIED?`)) {
+    if (true) { // Always proceed if user confirmed
         try {
             // Show loading state
             button.disabled = true;
@@ -1055,6 +1060,130 @@ async function checkAuthorization() {
 
         document.body.appendChild(modal);
 
+    });
+}
+
+// Function to show custom verification popup
+function showVerificationPopup(patientName, bloodType) {
+    return new Promise((resolve) => {
+        // Create modal overlay with explicit inline styles
+        const modal = document.createElement('div');
+        modal.id = 'verificationModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        `;
+
+        // Create modal content with explicit inline styles
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #2563eb;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Verify Blood Request</h3>
+                <p style="color: #6b7280;">Patient: ${patientName} | Blood Type: ${bloodType}</p>
+            </div>
+            
+            <div style="margin-bottom: 24px; padding: 16px; background-color: #f3f4f6; border-radius: 8px;">
+                <p style="font-size: 16px; color: #374151; text-align: center; margin: 0;">
+                    Are you sure you want to mark this blood request as <strong>VERIFIED</strong>?
+                </p>
+                <p style="font-size: 14px; color: #6b7280; text-align: center; margin: 8px 0 0 0;">
+                    This action will confirm that the blood request has been verified and is legitimate.
+                </p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="cancelVerifyBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
+                    Cancel
+                </button>
+                <button id="confirmVerifyBtn" style="flex: 1; padding: 12px 16px; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    Verify Request
+                </button>
+            </div>
+        `;
+
+        // Add event listeners
+        const cancelBtn = modalContent.querySelector('#cancelVerifyBtn');
+        const confirmBtn = modalContent.querySelector('#confirmVerifyBtn');
+
+        // Add hover effects
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.backgroundColor = '#f3f4f6';
+            cancelBtn.style.borderColor = '#9ca3af';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.backgroundColor = 'white';
+            cancelBtn.style.borderColor = '#d1d5db';
+        });
+
+        confirmBtn.addEventListener('mouseenter', () => {
+            confirmBtn.style.backgroundColor = '#1d4ed8';
+        });
+        confirmBtn.addEventListener('mouseleave', () => {
+            confirmBtn.style.backgroundColor = '#2563eb';
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(false);
+        });
+
+        // Handle confirm
+        confirmBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(true);
+        });
+
+        // Handle clicking outside modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(false);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                modal.remove();
+                resolve(false);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        });
+
+        // Add modal content to modal
+        modal.appendChild(modalContent);
+
+        // Add modal to page
+        document.body.appendChild(modal);
+
+        // Focus on confirm button initially
+        setTimeout(() => {
+            confirmBtn.focus();
+        }, 100);
     });
 }
 
