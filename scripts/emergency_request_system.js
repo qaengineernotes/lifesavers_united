@@ -371,7 +371,7 @@ function createRequestCard(request) {
                 </svg>
             </div>
             <div class="mobile-text-container">
-                <h3 class="text-xl font-bold ${urgencyConfig.textColor} mobile-title">${urgencyConfig.title} - ${request.bloodType} Blood Needed</h3>
+                <h3 class="text-xl font-bold ${urgencyConfig.textColor} mobile-title">${request.bloodType} Blood Needed</h3>
                 <p class="text-text-secondary mobile-subtitle patient">Patient: ${request.patientName}</p>
                 <p class="text-text-secondary mobile-subtitle hospital">${request.hospitalName}${request.diagnosis ? ` - ${request.diagnosis}` : ''}</p>
             </div>
