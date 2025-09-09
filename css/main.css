@@ -2086,22 +2086,26 @@ h6 {
   }
 }
 
-.emergency-blood-form-page .blood-type-grid {
+.emergency-blood-form-page .blood-type-grid,
+.donor-form-page .blood-type-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
   gap: 15px;
   margin-top: 10px;
 }
 
-.emergency-blood-form-page .blood-type-option {
+.emergency-blood-form-page .blood-type-option,
+.donor-form-page .blood-type-option {
   position: relative;
 }
 
-.emergency-blood-form-page .blood-type-option input[type="radio"] {
+.emergency-blood-form-page .blood-type-option input[type="radio"],
+.donor-form-page .blood-type-option input[type="radio"] {
   display: none;
 }
 
-.emergency-blood-form-page .blood-type-option label {
+.emergency-blood-form-page .blood-type-option label,
+.donor-form-page .blood-type-option label {
   display: block;
   padding: 15px;
   background: #f8f9fa;
@@ -2114,7 +2118,8 @@ h6 {
   color: #333;
 }
 
-.emergency-blood-form-page .blood-type-option input[type="radio"]:checked+label {
+.emergency-blood-form-page .blood-type-option input[type="radio"]:checked+label,
+.donor-form-page .blood-type-option input[type="radio"]:checked+label {
   background: #e74c3c;
   color: white;
   border-color: #c0392b;
@@ -2204,11 +2209,13 @@ h6 {
 }
 
 /* Captcha Styles */
-.emergency-blood-form-page .captcha-container {
+.emergency-blood-form-page .captcha-container,
+.donor-form-page .captcha-container {
   margin-top: 10px;
 }
 
-.emergency-blood-form-page .captcha-question {
+.emergency-blood-form-page .captcha-question,
+.donor-form-page .captcha-question {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -2222,11 +2229,13 @@ h6 {
   color: #333;
 }
 
-.emergency-blood-form-page .captcha-question span {
+.emergency-blood-form-page .captcha-question span,
+.donor-form-page .captcha-question span {
   flex: 1;
 }
 
-.emergency-blood-form-page .captcha-refresh-btn {
+.emergency-blood-form-page .captcha-refresh-btn,
+.donor-form-page .captcha-refresh-btn {
   background: #6c757d;
   color: white;
   border: none;
@@ -2239,16 +2248,21 @@ h6 {
   justify-content: center;
 }
 
-.emergency-blood-form-page .captcha-refresh-btn:hover {
+.emergency-blood-form-page .captcha-refresh-btn:hover,
+.donor-form-page .captcha-refresh-btn:hover {
   background: #5a6268;
   transform: scale(1.05);
 }
 
-.emergency-blood-form-page .captcha-refresh-btn:active {
+.emergency-blood-form-page .captcha-refresh-btn:active,
+.donor-form-page .captcha-refresh-btn:active {
   transform: scale(0.95);
 }
 
-.emergency-blood-form-page .captcha-container input[type="number"] {
+.emergency-blood-form-page .captcha-container input[type="number"],
+.emergency-blood-form-page .captcha-container input[type="text"],
+.donor-form-page .captcha-container input[type="number"],
+.donor-form-page .captcha-container input[type="text"] {
   width: 100%;
   padding: 12px 15px;
   border: 2px solid #ddd;
@@ -2257,7 +2271,10 @@ h6 {
   transition: border-color 0.3s ease;
 }
 
-.emergency-blood-form-page .captcha-container input[type="number"]:focus {
+.emergency-blood-form-page .captcha-container input[type="number"]:focus,
+.emergency-blood-form-page .captcha-container input[type="text"]:focus,
+.donor-form-page .captcha-container input[type="number"]:focus,
+.donor-form-page .captcha-container input[type="text"]:focus {
   outline: none;
   border-color: #e74c3c;
 }
@@ -2294,15 +2311,19 @@ h6 {
 }
 
 @media (max-width: 768px) {
-  .emergency-blood-form-page .form-row {
+
+  .emergency-blood-form-page .form-row,
+  .donor-form-page .form-row {
     flex-direction: column;
   }
 
-  .emergency-blood-form-page .form-row .form-group {
+  .emergency-blood-form-page .form-row .form-group,
+  .donor-form-page .form-row .form-group {
     min-width: 100%;
   }
 
-  .emergency-blood-form-page .blood-type-grid {
+  .emergency-blood-form-page .blood-type-grid,
+  .donor-form-page .blood-type-grid {
     grid-template-columns: repeat(4, 1fr);
   }
 
@@ -2311,20 +2332,16 @@ h6 {
   }
 }
 
-.donor-form-page .form-group {
-  margin-bottom: 1.5rem;
-}
 
 .donor-form-page .form-row {
   display: flex;
+  gap: 20px;
   flex-wrap: wrap;
-  gap: 2rem;
-  margin-bottom: 1.5rem;
 }
 
 .donor-form-page .form-row .form-group {
-  flex: 1 1 0;
-  min-width: 220px;
+  flex: 1;
+  min-width: 250px;
 }
 
 .donor-form-page label {
@@ -2430,17 +2447,6 @@ h6 {
   }
 }
 
-.donor-form-page .form-row {
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-@media (min-width: 600px) {
-  .donor-form-page .form-row {
-    flex-direction: row;
-    gap: 2rem;
-  }
-}
 
 /* Sticky Emergency Blood Request Button Styles */
 .sticky-emergency-button {

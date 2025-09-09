@@ -1526,7 +1526,7 @@ async function copyRequestData(requestData) {
 // Function to format request data for copying
 function formatRequestDataForCopy(requestData) {
     const formatField = (label, value) => {
-        return `${label}: ${value || ''}`;
+        return `*${label}*: ${value || ''}`;
     };
 
     return [
