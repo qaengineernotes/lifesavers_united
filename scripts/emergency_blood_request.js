@@ -1,5 +1,5 @@
 // Local proxy URL to avoid CORS issues
-const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
 
 // Initialize form validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {

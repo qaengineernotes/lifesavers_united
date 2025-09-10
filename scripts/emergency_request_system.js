@@ -1,5 +1,5 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -579,7 +579,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -710,7 +710,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1460,7 +1460,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script to save donor details
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbwCqsDLYh8qnBtS7qFITzze1ZTKX05l64mFkUDewGLmAudeR2GtayjgnH7XSV_B05DlMg/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
