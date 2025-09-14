@@ -1,6 +1,6 @@
 // Donor Registration Form Script
-// Google Apps Script URL for form submission
-const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
+// Local server API endpoint for form submission
+const SUBMIT_URL = '/api/submit-donor-registration';
 
 
 // CAPTCHA variables
@@ -45,18 +45,12 @@ function setupEventListeners() {
 
 // Initialize form validation
 function initializeFormValidation() {
-    // Real-time validation for key fields
+    // Real-time validation for mandatory fields only
     const fullNameInput = document.getElementById('fullName');
     const contactNumberInput = document.getElementById('contactNumber');
-    const emailInput = document.getElementById('email');
-    const dateOfBirthInput = document.getElementById('dateOfBirth');
-    const weightInput = document.getElementById('weight');
 
     fullNameInput.addEventListener('blur', () => validateFullName());
     contactNumberInput.addEventListener('blur', () => validateContactNumber());
-    emailInput.addEventListener('blur', () => validateEmail());
-    dateOfBirthInput.addEventListener('blur', () => validateDateOfBirth());
-    weightInput.addEventListener('blur', () => validateWeight());
 }
 
 // Generate CAPTCHA
@@ -336,23 +330,13 @@ function clearAllErrors() {
 function validateForm() {
     clearAllErrors();
 
+    // Only validate mandatory fields: Full Name, Contact Number, Blood Group, and Security Verification
     const isFullNameValid = validateFullName();
-    const isDateOfBirthValid = validateDateOfBirth();
-    const isGenderValid = validateGender();
     const isContactNumberValid = validateContactNumber();
-    const isEmailValid = validateEmail();
-    const isWeightValid = validateWeight();
     const isBloodGroupValid = validateBloodGroup();
-    const isCityValid = validateCity();
-    const isAreaValid = validateArea();
-    const isEmergencyValid = validateEmergencyAvailable();
-    const isPreferredContactValid = validatePreferredContact();
     const isCaptchaValid = validateCaptcha();
 
-    return isFullNameValid && isDateOfBirthValid && isGenderValid &&
-        isContactNumberValid && isEmailValid && isWeightValid &&
-        isBloodGroupValid && isCityValid && isAreaValid &&
-        isEmergencyValid && isPreferredContactValid && isCaptchaValid;
+    return isFullNameValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid;
 }
 
 // Handle form submission
@@ -392,9 +376,8 @@ async function handleFormSubmission(e) {
             registrationDate: new Date().toISOString()
         };
 
-        // Submit to Google Apps Script
+        // Submit to local server API
         const submitData = new URLSearchParams();
-        submitData.append('action', 'register_donor');
         submitData.append('data', JSON.stringify(data));
 
         const response = await fetch(SUBMIT_URL, {
@@ -410,15 +393,6 @@ async function handleFormSubmission(e) {
         if (result.success) {
             // Show success message
             showSuccessMessage();
-
-            // Reset form
-            e.target.reset();
-            generateCaptcha(); // Generate new CAPTCHA
-
-            // Reset submit button state
-            submitButton.disabled = false;
-            submitButton.style.opacity = '1';
-            submitButton.title = 'Register as Donor';
         } else {
             showErrorMessage(result.message || 'Failed to register. Please try again.');
         }
@@ -435,12 +409,53 @@ async function handleFormSubmission(e) {
 
 // Show success message
 function showSuccessMessage() {
-    const form = document.getElementById('donorRegistrationForm');
-    const successMessage = document.getElementById('successMessage');
+    // Create a success message element
+    const successDiv = document.createElement('div');
+    successDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #10b981;
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        z-index: 9999;
+        font-weight: 600;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.3s ease-out;
+        max-width: 400px;
+    `;
+    successDiv.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+            <span>Registration successful! Thank you for joining our donor community.</span>
+        </div>
+    `;
 
-    form.style.display = 'none';
-    successMessage.style.display = 'block';
-    successMessage.scrollIntoView({ behavior: 'smooth' });
+    // Add animation CSS
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(successDiv);
+
+    // Reset the form
+    const form = document.getElementById('donorRegistrationForm');
+    form.reset();
+    generateCaptcha(); // Generate new CAPTCHA
+
+    // Remove the message after 5 seconds
+    setTimeout(() => {
+        successDiv.remove();
+        style.remove();
+    }, 5000);
 }
 
 // Show error message

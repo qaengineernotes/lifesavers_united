@@ -43,7 +43,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = json.loads(post_data.decode('utf-8'))
                 
                 # Prepare data for Google Apps Script
-                script_url = 'https://script.google.com/macros/s/AKfycbz7dBZqc2t36QwY8nRw2rPViKpiKWelilUPlre5TrsvhWenaBXW5UKndknbyMb7A5q3zQ/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec'
                 
                 # Create form data
                 form_data = urllib.parse.urlencode({
@@ -76,6 +76,155 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(error_response.encode('utf-8'))
             return  # Important: return here to prevent fallback to super()
+        elif self.path == '/api/submit-donor-registration':
+            # Handle donor registration submission
+            print("Processing donor registration submission...")  # Debug log
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            try:
+                # Parse the form data
+                form_data = post_data.decode('utf-8')
+                print(f"Received form data: {form_data[:200]}...")  # Debug log
+                parsed_data = urllib.parse.parse_qs(form_data)
+                
+                # Extract the JSON data
+                if 'data' in parsed_data:
+                    data = json.loads(parsed_data['data'][0])
+                    print(f"Parsed data: {data}")  # Debug log
+                else:
+                    raise ValueError("No data found in form submission")
+                
+                # Prepare data for Google Apps Script (donor registration)
+                script_url = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec'
+                
+                # Create form data for Google Apps Script
+                # Use the correct action for donor registration
+                donor_data = {
+                    'action': 'submit_donor_registration',
+                    'data': json.dumps({
+                        'fullName': data.get('fullName'),
+                        'dateOfBirth': data.get('dateOfBirth'),
+                        'gender': data.get('gender'),
+                        'contactNumber': data.get('contactNumber'),
+                        'email': data.get('email'),
+                        'weight': data.get('weight'),
+                        'bloodGroup': data.get('bloodGroup'),
+                        'city': data.get('city'),
+                        'area': data.get('area'),
+                        'emergencyAvailable': data.get('emergencyAvailable'),
+                        'preferredContact': data.get('preferredContact'),
+                        'lastDonation': data.get('lastDonation', ''),
+                        'medicalHistory': data.get('medicalHistory', ''),
+                        'registrationDate': data.get('registrationDate'),
+                        'source': 'donor_registration'
+                    })
+                }
+                
+                script_form_data = urllib.parse.urlencode(donor_data).encode('utf-8')
+                
+                print(f"Submitting to Google Apps Script: {script_url}")  # Debug log
+                print(f"Donor data being sent: {donor_data}")  # Debug log
+                
+                # Make request to Google Apps Script
+                req = urllib.request.Request(script_url, data=script_form_data)
+                req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+                
+                with urllib.request.urlopen(req) as response:
+                    result = response.read().decode('utf-8')
+                    print(f"Google Apps Script response: {result}")  # Debug log
+                    
+                # Return the result
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(result.encode('utf-8'))
+                
+            except Exception as e:
+                print(f"Error in donor registration: {str(e)}")  # Debug log
+                # Return error response
+                error_response = json.dumps({
+                    'success': False,
+                    'message': 'Failed to submit donor registration',
+                    'error': str(e)
+                })
+                
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(error_response.encode('utf-8'))
+            return  # Important: return here to prevent fallback to super()
+        elif self.path == '/api/submit-donor-details':
+            # Handle donor details submission from emergency request system
+            print("Processing donor details submission from emergency system...")  # Debug log
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            try:
+                # Parse the JSON data
+                data = json.loads(post_data.decode('utf-8'))
+                print(f"Received donor details: {data}")  # Debug log
+                
+                # Prepare data for Google Apps Script (donor details from emergency system)
+                script_url = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec'
+                
+                # Create form data for Google Apps Script
+                # Try action that might route to Form Responses 2
+                donor_data = {
+                    'action': 'form_responses_2',
+                    'data': json.dumps({
+                        'fullName': data.get('fullName'),
+                        'dateOfBirth': data.get('dateOfBirth'),
+                        'gender': data.get('gender'),
+                        'contactNumber': data.get('contactNumber'),
+                        'email': data.get('email'),
+                        'weight': data.get('weight'),
+                        'bloodGroup': data.get('bloodGroup'),
+                        'city': data.get('city'),
+                        'area': data.get('area'),
+                        'emergencyAvailable': data.get('emergencyAvailable', 'Yes'),
+                        'preferredContact': data.get('preferredContact'),
+                        'lastDonation': data.get('lastDonation', ''),
+                        'medicalHistory': data.get('medicalHistory', ''),
+                        'registrationDate': data.get('registrationDate'),
+                        'source': 'emergency_request_system',
+                        'relatedRequestId': data.get('requestId', ''),
+                        'relatedPatientName': data.get('patientName', '')
+                    })
+                }
+                
+                script_form_data = urllib.parse.urlencode(donor_data).encode('utf-8')
+                
+                print(f"Submitting donor details to Google Apps Script: {script_url}")  # Debug log
+                
+                # Make request to Google Apps Script
+                req = urllib.request.Request(script_url, data=script_form_data)
+                req.add_header('Content-Type', 'application/x-www-form-urlencoded')
+                
+                with urllib.request.urlopen(req) as response:
+                    result = response.read().decode('utf-8')
+                    print(f"Google Apps Script response: {result}")  # Debug log
+                    
+                # Return the result
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(result.encode('utf-8'))
+                
+            except Exception as e:
+                print(f"Error in donor details submission: {str(e)}")  # Debug log
+                # Return error response
+                error_response = json.dumps({
+                    'success': False,
+                    'message': 'Failed to submit donor details',
+                    'error': str(e)
+                })
+                
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(error_response.encode('utf-8'))
+            return  # Important: return here to prevent fallback to super()
         else:
             super().do_POST()
     
@@ -84,7 +233,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/api/fetch-requests':
             # Handle fetching emergency requests
             try:
-                script_url = 'https://script.google.com/macros/s/AKfycbz7dBZqc2t36QwY8nRw2rPViKpiKWelilUPlre5TrsvhWenaBXW5UKndknbyMb7A5q3zQ/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec'
                 
                 with urllib.request.urlopen(script_url) as response:
                     result = response.read().decode('utf-8')

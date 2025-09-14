@@ -1,5 +1,5 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -579,7 +579,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -710,7 +710,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1451,37 +1451,46 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
             donorName = donorInfo;
         }
 
-        // Prepare the data for the API call
+        // Prepare donor data for Form Responses 2
         const donorData = {
-            donorName: donorName,
-            donorContact: donorContact,
-            patientName: patientName,
-            bloodType: bloodType
+            fullName: donorName,
+            contactNumber: donorContact,
+            bloodGroup: bloodType,
+            email: '', // Not available from emergency system
+            dateOfBirth: '', // Not available from emergency system
+            gender: '', // Not available from emergency system
+            weight: '', // Not available from emergency system
+            city: '', // Not available from emergency system
+            area: '', // Not available from emergency system
+            emergencyAvailable: 'Yes', // Default to Yes since they're helping
+            preferredContact: 'Phone', // Default to Phone
+            lastDonation: '', // Not available from emergency system
+            medicalHistory: '', // Not available from emergency system
+            registrationDate: new Date().toISOString(),
+            source: 'emergency_request_system',
+            relatedPatientName: patientName
         };
 
-        // Call the Google Apps Script to save donor details
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxu6XbNiI1kB0Zi1gITsOEXCJbu4RL3fkNC08yc9oFth0O5CaYNDP_kDpnx18l2maRllw/exec';
+        // Call the Google Apps Script directly
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
-        formData.append('action', 'save_donor_details');
+        formData.append('action', 'submit_emergency_donor');
         formData.append('data', JSON.stringify(donorData));
-
-
 
         const response = await fetch(scriptUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: formData.toString(),
-            redirect: 'follow'
+            body: formData
         });
 
         const result = await response.json();
 
         if (result.success) {
-            // Donor details saved successfully
+            console.log('✅ Donor details saved to Form Responses 2 successfully');
         } else {
             console.error('❌ Failed to save donor details:', result.message);
         }
