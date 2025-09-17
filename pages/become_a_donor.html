@@ -261,9 +261,37 @@
                         </svg>
                     </div>
                     <h3 class="text-xl font-bold text-primary mb-4">How It Works</h3>
-                    <div class="w-full overflow-x-auto">
+                    <div class="w-full mb-4">
+                        <!-- Mobile Layout (Vertical Stack) -->
+                        <div class="flex flex-col items-center gap-4 md:hidden">
+                            <!-- Step 1 -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-3xl mb-2">📝</span>
+                                <span class="font-semibold text-primary text-sm">Register Online</span>
+                            </div>
+                            <span class="text-2xl text-gray-400">↓</span>
+                            <!-- Step 2 -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-3xl mb-2">📞</span>
+                                <span class="font-semibold text-primary text-sm">Get Contacted</span>
+                            </div>
+                            <span class="text-2xl text-gray-400">↓</span>
+                            <!-- Step 3 -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-3xl mb-2">💉</span>
+                                <span class="font-semibold text-primary text-sm">Donate Blood</span>
+                            </div>
+                            <span class="text-2xl text-gray-400">↓</span>
+                            <!-- Step 4 -->
+                            <div class="flex flex-col items-center">
+                                <span class="text-3xl mb-2">❤️</span>
+                                <span class="font-semibold text-primary text-sm">Save Lives</span>
+                            </div>
+                        </div>
+
+                        <!-- Desktop Layout (Horizontal) -->
                         <div
-                            class="flex flex-row items-center justify-center gap-4 md:gap-8 mb-4 whitespace-nowrap py-2">
+                            class="hidden md:flex flex-row items-center justify-center gap-4 lg:gap-8 py-2 overflow-x-auto">
                             <!-- Step 1 -->
                             <div class="flex flex-col items-center min-w-[100px]">
                                 <span class="text-3xl mb-2">📝</span>
@@ -542,6 +570,7 @@
             });
         });
     </script>
+    <script src="../scripts/mobile-menu.js"></script>
 </body>
 
 </html>

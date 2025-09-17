@@ -41,6 +41,9 @@ function setupEventListeners() {
             }
         });
     });
+
+    // City dropdown functionality
+    setupCityDropdown();
 }
 
 // Initialize form validation
@@ -211,7 +214,8 @@ function validateBloodGroup() {
 }
 
 function validateCity() {
-    const city = document.getElementById('city').value.trim();
+    const cityElement = document.getElementById('city');
+    const city = cityElement.value.trim();
 
     if (!city) {
         showFieldError('city', 'City is required');
@@ -280,6 +284,54 @@ function validateCaptcha() {
     }
 }
 
+function validateDeclaration() {
+    const declaration = document.getElementById('declaration').checked;
+
+    if (!declaration) {
+        showFieldError('declaration', 'Please accept the declaration to continue');
+        return false;
+    } else {
+        clearFieldError('declaration');
+        return true;
+    }
+}
+
+function validatePrivacy() {
+    const privacy = document.getElementById('privacy').checked;
+
+    if (!privacy) {
+        showFieldError('privacy', 'Please accept the privacy policy to continue');
+        return false;
+    } else {
+        clearFieldError('privacy');
+        return true;
+    }
+}
+
+function validateHealth() {
+    const health = document.getElementById('health').checked;
+
+    if (!health) {
+        showFieldError('health', 'Please confirm your health status to continue');
+        return false;
+    } else {
+        clearFieldError('health');
+        return true;
+    }
+}
+
+function validateConsent() {
+    const consent = document.getElementById('consent').checked;
+
+    if (!consent) {
+        showFieldError('consent', 'Please provide consent to continue');
+        return false;
+    } else {
+        clearFieldError('consent');
+        return true;
+    }
+}
+
 // Show field error
 function showFieldError(fieldId, message) {
     const errorDiv = document.getElementById(fieldId + 'Error');
@@ -330,13 +382,18 @@ function clearAllErrors() {
 function validateForm() {
     clearAllErrors();
 
-    // Only validate mandatory fields: Full Name, Contact Number, Blood Group, and Security Verification
+    // Validate mandatory fields: Full Name, Contact Number, Blood Group, Security Verification, and Consent Checkboxes
     const isFullNameValid = validateFullName();
     const isContactNumberValid = validateContactNumber();
     const isBloodGroupValid = validateBloodGroup();
     const isCaptchaValid = validateCaptcha();
+    const isDeclarationValid = validateDeclaration();
+    const isPrivacyValid = validatePrivacy();
+    const isHealthValid = validateHealth();
+    const isConsentValid = validateConsent();
 
-    return isFullNameValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid;
+    return isFullNameValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid &&
+        isDeclarationValid && isPrivacyValid && isHealthValid && isConsentValid;
 }
 
 // Handle form submission
@@ -358,6 +415,7 @@ async function handleFormSubmission(e) {
     try {
         // Collect form data
         const formDataObj = new FormData(e.target);
+
         const data = {
             fullName: formDataObj.get('fullName'),
             dateOfBirth: formDataObj.get('dateOfBirth'),
@@ -373,6 +431,10 @@ async function handleFormSubmission(e) {
             lastDonation: formDataObj.get('lastDonation') || '',
             medicalHistory: formDataObj.get('medicalHistory') || '',
             captchaAnswer: formDataObj.get('captchaAnswer'),
+            declaration: formDataObj.get('declaration') === 'on',
+            privacy: formDataObj.get('privacy') === 'on',
+            health: formDataObj.get('health') === 'on',
+            consent: formDataObj.get('consent') === 'on',
             registrationDate: new Date().toISOString()
         };
 
@@ -495,4 +557,128 @@ function showErrorMessage(message) {
         errorDiv.remove();
         style.remove();
     }, 5000);
+}
+
+// City data
+const cities = [
+    'Ahmedabad', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar',
+    'Gandhinagar', 'Junagadh', 'Anand', 'Morbi', 'Bharuch', 'Navsari',
+    'Porbandar', 'Surendranagar', 'Gandhidham', 'Bhuj', 'Mehsana', 'Patan',
+    'Vapi', 'Valsad', 'Amreli', 'Godhra', 'Palanpur', 'Jetpur', 'Veraval',
+    'Dahod', 'Kadi', 'Botad', 'Kalol', 'Visnagar'
+];
+
+// Setup city autocomplete functionality
+function setupCityDropdown() {
+    const cityInput = document.getElementById('city');
+    const suggestionsContainer = document.getElementById('citySuggestions');
+
+    if (!cityInput || !suggestionsContainer) return;
+
+    let selectedIndex = -1;
+    let filteredCities = [];
+
+    // Show suggestions
+    function showSuggestions() {
+        const query = cityInput.value.toLowerCase().trim();
+
+        if (query.length === 0) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        filteredCities = cities.filter(city =>
+            city.toLowerCase().includes(query)
+        );
+
+        if (filteredCities.length === 0) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        // Create suggestion elements
+        suggestionsContainer.innerHTML = '';
+        filteredCities.forEach((city, index) => {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'city-suggestion';
+            suggestion.textContent = city;
+            suggestion.dataset.index = index;
+
+            suggestion.addEventListener('click', () => {
+                selectCity(city);
+            });
+
+            suggestionsContainer.appendChild(suggestion);
+        });
+
+        suggestionsContainer.classList.remove('hidden');
+        selectedIndex = -1;
+    }
+
+    // Select a city
+    function selectCity(city) {
+        cityInput.value = city;
+        suggestionsContainer.classList.add('hidden');
+        clearFieldError('city');
+    }
+
+    // Handle keyboard navigation
+    function handleKeydown(e) {
+        if (!suggestionsContainer.classList.contains('hidden')) {
+            const suggestions = suggestionsContainer.querySelectorAll('.city-suggestion');
+
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    selectedIndex = Math.min(selectedIndex + 1, suggestions.length - 1);
+                    updateHighlight();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    selectedIndex = Math.max(selectedIndex - 1, -1);
+                    updateHighlight();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (selectedIndex >= 0 && suggestions[selectedIndex]) {
+                        selectCity(filteredCities[selectedIndex]);
+                    }
+                    break;
+                case 'Escape':
+                    suggestionsContainer.classList.add('hidden');
+                    selectedIndex = -1;
+                    break;
+            }
+        }
+    }
+
+    // Update highlight
+    function updateHighlight() {
+        const suggestions = suggestionsContainer.querySelectorAll('.city-suggestion');
+        suggestions.forEach((suggestion, index) => {
+            suggestion.classList.toggle('highlighted', index === selectedIndex);
+        });
+    }
+
+    // Event listeners
+    cityInput.addEventListener('input', showSuggestions);
+    cityInput.addEventListener('keydown', handleKeydown);
+    cityInput.addEventListener('blur', () => {
+        // Delay hiding to allow clicks on suggestions
+        setTimeout(() => {
+            suggestionsContainer.classList.add('hidden');
+        }, 200);
+    });
+    cityInput.addEventListener('focus', () => {
+        if (cityInput.value.trim().length > 0) {
+            showSuggestions();
+        }
+    });
+
+    // Click outside to close
+    document.addEventListener('click', (e) => {
+        if (!cityInput.contains(e.target) && !suggestionsContainer.contains(e.target)) {
+            suggestionsContainer.classList.add('hidden');
+        }
+    });
 }
