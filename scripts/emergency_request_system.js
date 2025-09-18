@@ -1,5 +1,5 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -579,7 +579,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -710,7 +710,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1472,7 +1472,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyWzwuCY0Ro5VzMjYfNAzKbtNe0E_mSNe6AqmQkNAevlqgzHs0WFvnaRK6LVCW46eOaag/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
