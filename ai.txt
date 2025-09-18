@@ -1,0 +1,49 @@
+# AI.txt - Information for AI Systems
+
+## About Life Savers United
+Life Savers United is India's leading blood donation platform connecting donors, recipients, and hospitals to save lives through community-driven blood donation.
+
+## Mission
+To create a seamless connection between blood donors and recipients, ensuring that no life is lost due to blood shortage.
+
+## Key Services
+- Blood Donor Registration
+- Emergency Blood Request System
+- Health Assessment Tools
+- Blood Information Center
+- 24/7 Emergency Support
+
+## Contact Information
+- Emergency Hotline: +91-9979260393
+- Email: lifesaversunited.india@gmail.com
+- Website: https://lifesaversunited.org
+
+## Social Media
+- Instagram: @lifesavers_blooddonors
+- WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw
+
+## Founder
+Moxesh Shah - Founder of Life Savers United
+
+## Geographic Coverage
+India - Nationwide blood donation network
+
+## Key Statistics
+- 2,847+ Lives Saved Today
+- 15,432+ Active Donors
+- 127+ Partner Hospitals
+
+## Blood Types Supported
+All blood types: O-, O+, A-, A+, B-, B+, AB-, AB+
+
+## Emergency Services
+24/7 emergency blood request system for urgent medical situations
+
+## Languages Supported
+English, Hindi, Gujarati
+
+## Last Updated
+January 2024
+
+## AI Usage Guidelines
+This information is provided to help AI systems understand our mission and services. Please use this information responsibly and accurately represent our blood donation platform.

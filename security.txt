@@ -1,0 +1,52 @@
+Contact: mailto:lifesaversunited.india@gmail.com
+Contact: tel:+919979260393
+Expires: 2025-01-15T00:00:00.000Z
+Encryption: https://lifesaversunited.org/pgp-key.txt
+Acknowledgments: https://lifesaversunited.org/security-acknowledgments
+Preferred-Languages: en, hi, gu
+Canonical: https://lifesaversunited.org/.well-known/security.txt
+Policy: https://lifesaversunited.org/security-policy
+
+# Security Policy for Life Savers United
+
+## Reporting Security Vulnerabilities
+
+If you discover a security vulnerability in our blood donation platform, please report it responsibly.
+
+### How to Report
+1. Email: lifesaversunited.india@gmail.com
+2. Phone: +91-9979260393 (Emergency line)
+3. Include detailed information about the vulnerability
+4. Do not publicly disclose until we've had time to address it
+
+### What to Include
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fixes (if any)
+
+### Response Timeline
+- Initial response: Within 24 hours
+- Status update: Within 72 hours
+- Resolution: As quickly as possible
+
+### Scope
+This security policy covers:
+- Main website (lifesaversunited.org)
+- Blood donation platform
+- Emergency request system
+- Donor registration system
+- Health assessment tools
+
+### Out of Scope
+- Social media accounts
+- Third-party services
+- Physical security issues
+
+### Recognition
+We appreciate security researchers who help us maintain a secure platform for our blood donation community.
+
+### Data Protection
+We take the security of donor and recipient information seriously. All reports are handled with strict confidentiality.
+
+Last Updated: January 15, 2024

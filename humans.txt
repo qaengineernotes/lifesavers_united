@@ -1,0 +1,59 @@
+# humans.txt - Information for Humans
+
+/* TEAM */
+Developer: Life Savers United Development Team
+Contact: lifesaversunited.india@gmail.com
+From: India
+
+/* THANKS */
+Special thanks to all blood donors who save lives every day
+Community volunteers and supporters
+Partner hospitals and medical professionals
+Open source community for web technologies
+
+/* SITE */
+Last update: 2024/01/15
+Standards: HTML5, CSS3, JavaScript ES6+
+Components: Responsive Design, Progressive Web App
+Software: Custom-built blood donation platform
+
+/* MISSION */
+Life Savers United is dedicated to connecting blood donors with recipients
+to save lives through community-driven blood donation initiatives.
+
+/* CONTACT */
+Emergency: +91-9979260393
+Email: lifesaversunited.india@gmail.com
+Website: https://lifesaversunited.org
+Instagram: @lifesavers_blooddonors
+
+/* FOUNDER */
+Moxesh Shah - Visionary leader committed to saving lives through technology
+
+/* STATS */
+Lives Saved: 2,847+ (and counting)
+Active Donors: 15,432+
+Partner Hospitals: 127+
+Coverage: All India
+
+/* BLOOD TYPES */
+We support all blood types: O-, O+, A-, A+, B-, B+, AB-, AB+
+
+/* EMERGENCY */
+24/7 emergency blood request system available
+Immediate response for critical medical situations
+
+/* LANGUAGES */
+English, Hindi, Gujarati support available
+
+/* ACCESSIBILITY */
+Our platform is designed to be accessible to everyone
+Supporting multiple languages and devices
+
+/* PRIVACY */
+We respect donor and recipient privacy
+Secure data handling and protection
+
+/* VOLUNTEER */
+Join our mission to save lives
+Every donation makes a difference

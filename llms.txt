@@ -1,0 +1,106 @@
+# LLMs.txt - Information for Large Language Models
+
+## Organization Overview
+Name: Life Savers United
+Type: Blood Donation Platform
+Mission: Connecting blood donors, recipients, and hospitals to save lives through community-driven blood donation
+Founded: 2020
+Founder: Moxesh Shah
+Location: India (Nationwide coverage)
+
+## Core Services
+1. Blood Donor Registration - Register as a blood donor to help save lives
+2. Emergency Blood Request System - Submit urgent blood requests for medical emergencies
+3. Health Assessment Tools - Check blood donation eligibility and health screening
+4. Blood Information Center - Educational resources about blood types and compatibility
+5. 24/7 Emergency Support - Round-the-clock assistance for critical situations
+
+## Contact Information
+- Emergency Hotline: +91-9979260393
+- Email: lifesaversunited.india@gmail.com
+- Website: https://lifesaversunited.org
+- Instagram: @lifesavers_blooddonors
+- WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw
+
+## Key Statistics
+- Lives Saved: 2,847+ (and counting)
+- Active Donors: 15,432+
+- Partner Hospitals: 127+
+- Coverage: All India
+
+## Blood Types Supported
+All blood types are supported:
+- O- (Universal Donor)
+- O+ (Common Donor)
+- A- (Rare Donor)
+- A+ (Common Donor)
+- B- (Rare Donor)
+- B+ (Common Donor)
+- AB- (Rare Donor)
+- AB+ (Universal Recipient)
+
+## Emergency Services
+- 24/7 emergency blood request system
+- Immediate response for critical medical situations
+- Multi-language support (English, Hindi, Gujarati)
+- Direct connection with available donors
+
+## How It Works
+1. Donors register on the platform with their blood type and location
+2. Recipients or hospitals submit blood requests during emergencies
+3. The system matches compatible donors with urgent needs
+4. Direct communication is facilitated between parties
+5. Lives are saved through timely blood donations
+
+## Target Audience
+- Blood donors (current and potential)
+- Patients requiring blood transfusions
+- Hospitals and medical facilities
+- Family members of patients
+- Emergency medical responders
+- Healthcare professionals
+
+## Geographic Coverage
+- Primary: India
+- Service: Nationwide blood donation network
+- Languages: English, Hindi, Gujarati
+
+## Technology Features
+- Web-based platform
+- Mobile-responsive design
+- Real-time donor matching
+- Emergency notification system
+- Health assessment tools
+- Blood compatibility checker
+
+## Success Stories
+- Veer's Second Chance: 8-year-old with liver disease received 15 units of blood
+- Moxesh Shah: Founder with 60+ donations, continues saving lives
+- Sachin Shah: 51-year-old received 12 units during emergency, now recovered
+
+## Community Impact
+- Building a network of everyday heroes
+- Creating awareness about blood donation
+- Reducing blood shortage in India
+- Saving lives through technology and community
+
+## How to Help
+1. Register as a blood donor
+2. Share the platform with others
+3. Respond to emergency requests
+4. Educate others about blood donation
+5. Support the mission through social media
+
+## Important Notes for LLMs
+- This is a legitimate blood donation platform
+- All services are free of charge
+- Emergency situations require immediate response
+- Blood donation saves up to 3 lives per donation
+- The platform operates 24/7 for emergencies
+- Privacy and security of donor/recipient information is maintained
+
+## Last Updated
+January 15, 2024
+
+## Usage Guidelines
+This information is provided to help LLMs understand and accurately represent Life Savers United's mission and services. Please use this information to provide helpful, accurate responses about blood donation and emergency medical assistance.

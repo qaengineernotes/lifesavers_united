@@ -1,0 +1,127 @@
+{
+    "name": "Life Savers United - Blood Donation Platform",
+    "short_name": "Life Savers",
+    "description": "India's leading blood donation platform connecting donors, recipients, and hospitals to save lives",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#dc2626",
+    "orientation": "portrait-primary",
+    "scope": "/",
+    "lang": "en",
+    "dir": "ltr",
+    "categories": [
+        "health",
+        "medical",
+        "lifestyle",
+        "social"
+    ],
+    "icons": [
+        {
+            "src": "imgs/favicon/android-icon-36x36.png",
+            "sizes": "36x36",
+            "type": "image/png",
+            "density": "0.75"
+        },
+        {
+            "src": "imgs/favicon/android-icon-48x48.png",
+            "sizes": "48x48",
+            "type": "image/png",
+            "density": "1.0"
+        },
+        {
+            "src": "imgs/favicon/android-icon-72x72.png",
+            "sizes": "72x72",
+            "type": "image/png",
+            "density": "1.5"
+        },
+        {
+            "src": "imgs/favicon/android-icon-96x96.png",
+            "sizes": "96x96",
+            "type": "image/png",
+            "density": "2.0"
+        },
+        {
+            "src": "imgs/favicon/android-icon-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png",
+            "density": "3.0"
+        },
+        {
+            "src": "imgs/favicon/android-icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "density": "4.0"
+        },
+        {
+            "src": "imgs/favicon/apple-icon-180x180.png",
+            "sizes": "180x180",
+            "type": "image/png"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "imgs/screenshot-mobile.png",
+            "sizes": "390x844",
+            "type": "image/png",
+            "form_factor": "narrow"
+        },
+        {
+            "src": "imgs/screenshot-desktop.png",
+            "sizes": "1280x720",
+            "type": "image/png",
+            "form_factor": "wide"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Emergency Blood Request",
+            "short_name": "Emergency",
+            "description": "Submit urgent blood request",
+            "url": "/emergency_blood_request.html",
+            "icons": [
+                {
+                    "src": "imgs/favicon/android-icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Donor Registration",
+            "short_name": "Register",
+            "description": "Register as blood donor",
+            "url": "/donor_registration.html",
+            "icons": [
+                {
+                    "src": "imgs/favicon/android-icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        },
+        {
+            "name": "Health Assessment",
+            "short_name": "Assessment",
+            "description": "Check donation eligibility",
+            "url": "/health_assessment_tools.html",
+            "icons": [
+                {
+                    "src": "imgs/favicon/android-icon-96x96.png",
+                    "sizes": "96x96"
+                }
+            ]
+        }
+    ],
+    "related_applications": [
+        {
+            "platform": "web",
+            "url": "https://lifesaversunited.org"
+        }
+    ],
+    "prefer_related_applications": false,
+    "edge_side_panel": {
+        "preferred_width": 400
+    },
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    }
+}
