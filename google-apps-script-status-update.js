@@ -512,6 +512,14 @@ function saveDonorToFormResponses(data, spreadsheet) {
         const now = new Date();
         const timestamp = Utilities.formatDate(now, Session.getScriptTimeZone(), "dd-MMM-yyyy HH:mm");
 
+        // Check for duplicates before saving (for both emergency donors and regular registrations)
+        const duplicateInfo = checkDuplicateDonor(formResponsesSheet, data.fullName, data.contactNumber);
+
+        if (duplicateInfo.isDuplicate) {
+            console.log(`Duplicate donor found - Name: "${data.fullName}", Contact: "${data.contactNumber}". Updating existing record.`);
+            return updateExistingDonor(formResponsesSheet, duplicateInfo.rowIndex, data, timestamp);
+        }
+
         // Determine the submission type and prepare appropriate row data
         let rowData = [];
 
@@ -577,6 +585,135 @@ function saveDonorToFormResponses(data, spreadsheet) {
 
     } catch (error) {
         console.error(`Error in saveDonorToFormResponses: ${error}`);
+        return ContentService.createTextOutput(JSON.stringify({
+            success: false,
+            message: error.toString()
+        })).setMimeType(ContentService.MimeType.JSON);
+    }
+}
+
+// Function to check for duplicate donors in Form Responses 2 sheet
+function checkDuplicateDonor(formResponsesSheet, donorName, contactNumber) {
+    try {
+        const dataRange = formResponsesSheet.getDataRange();
+        const values = dataRange.getValues();
+
+        // Skip header row and search for matching donor name and contact number
+        for (let i = 1; i < values.length; i++) {
+            const row = values[i];
+            const existingDonorName = row[2] || ''; // Column C - Full Name
+            const existingContactNumber = row[3] || ''; // Column D - Contact Number
+
+            // Check if donor name and contact number match (case-insensitive)
+            if (existingDonorName.toLowerCase().trim() === donorName.toLowerCase().trim() &&
+                existingContactNumber.toString().trim() === contactNumber.toString().trim()) {
+
+                console.log(`Duplicate found at row ${i + 1}: Name="${existingDonorName}", Contact="${existingContactNumber}"`);
+                return {
+                    isDuplicate: true,
+                    rowIndex: i + 1 // Return 1-based row index for Google Sheets
+                };
+            }
+        }
+
+        return { isDuplicate: false, rowIndex: null }; // No duplicate found
+    } catch (error) {
+        console.error("Error checking duplicate donor:", error);
+        return { isDuplicate: false, rowIndex: null }; // Return false on error to allow saving
+    }
+}
+
+// Function to update existing donor record with latest data
+function updateExistingDonor(formResponsesSheet, rowIndex, data, timestamp) {
+    try {
+        console.log(`Updating existing donor record at row ${rowIndex}`);
+
+        // Get current row data to preserve existing values
+        const currentRow = formResponsesSheet.getRange(rowIndex, 1, 1, 16).getValues()[0];
+
+        // Always update timestamp
+        formResponsesSheet.getRange(rowIndex, 2).setValue(timestamp); // Column B - Timestamp
+
+        if (data.source === 'donor_registration') {
+            // Full donor registration - update only fields with new data
+            // Calculate age from date of birth if provided
+            let age = '';
+            if (data.dateOfBirth) {
+                const birthDate = new Date(data.dateOfBirth);
+                const today = new Date();
+                age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+            }
+
+            // Update only fields that have new data (preserve existing data if new data is empty)
+            if (data.fullName && data.fullName.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 3).setValue(data.fullName); // Column C - Full Name
+            }
+            if (data.contactNumber && data.contactNumber.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 4).setValue(data.contactNumber); // Column D - Contact Number
+            }
+            if (data.bloodGroup && data.bloodGroup.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 5).setValue(data.bloodGroup); // Column E - Blood Group
+            }
+            if (data.area && data.area.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 6).setValue(data.area); // Column F - Area
+            }
+            if (data.emergencyAvailable && data.emergencyAvailable.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 7).setValue(data.emergencyAvailable); // Column G - Emergency Available
+            }
+            if (data.dateOfBirth && data.dateOfBirth.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 8).setValue(data.dateOfBirth); // Column H - Date of Birth
+            }
+            if (data.gender && data.gender.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 9).setValue(data.gender); // Column I - Gender
+            }
+            if (data.preferredContact && data.preferredContact.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 10).setValue(data.preferredContact); // Column J - Preferred Contact
+            }
+            if (age && age !== '') {
+                formResponsesSheet.getRange(rowIndex, 11).setValue(age); // Column K - Age (calculated)
+            }
+            if (data.weight && data.weight.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 12).setValue(data.weight); // Column L - Weight
+            }
+            if (data.lastDonation && data.lastDonation.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 13).setValue(data.lastDonation); // Column M - Last Donation
+            }
+            if (data.medicalHistory && data.medicalHistory.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 14).setValue(data.medicalHistory); // Column N - Medical History
+            }
+            if (data.email && data.email.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 15).setValue(data.email); // Column O - Email
+            }
+            if (data.city && data.city.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 16).setValue(data.city); // Column P - City
+            }
+
+        } else {
+            // Emergency donor submission - update only basic fields that have data
+            if (data.fullName && data.fullName.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 3).setValue(data.fullName); // Column C - Full Name
+            }
+            if (data.contactNumber && data.contactNumber.trim() !== '') {
+                formResponsesSheet.getRange(rowIndex, 4).setValue(data.contactNumber); // Column D - Contact Number
+            }
+            // Leave other columns unchanged for emergency donors
+        }
+
+        console.log(`Successfully updated donor record at row ${rowIndex} with selective field updates`);
+
+        return ContentService.createTextOutput(JSON.stringify({
+            success: true,
+            message: 'Donor details updated successfully in Form Responses 2 (selective update)',
+            action: 'updated',
+            rowIndex: rowIndex
+        })).setMimeType(ContentService.MimeType.JSON);
+
+    } catch (error) {
+        console.error(`Error updating existing donor: ${error}`);
         return ContentService.createTextOutput(JSON.stringify({
             success: false,
             message: error.toString()

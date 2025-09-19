@@ -1,5 +1,5 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -579,7 +579,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -627,13 +627,8 @@ async function verifyRequest(patientName, bloodType, button) {
                 };
                 buttonStates.set(cardKey, newState);
 
-                // Update statistics after verification
-                const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
-                    const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
-                    const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
-                    return { patientName, bloodType };
-                });
-                updateStatistics(allRequests);
+                // Statistics will be updated when the page refreshes or new data is loaded
+                // No need to update statistics here as it may cause incorrect calculations
 
                 // Show success message
                 showSuccessMessage('Request marked as VERIFIED successfully!');
@@ -710,7 +705,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -764,13 +759,8 @@ async function closeRequest(patientName, bloodType, button) {
             };
             buttonStates.set(cardKey, newState);
 
-            // Update statistics after closing
-            const allRequests = Array.from(document.querySelectorAll('.emergency-request-card')).map(card => {
-                const patientName = card.querySelector('.verify-btn').getAttribute('data-patient-name');
-                const bloodType = card.querySelector('.verify-btn').getAttribute('data-blood-type');
-                return { patientName, bloodType };
-            });
-            updateStatistics(allRequests);
+            // Statistics will be updated when the page refreshes or new data is loaded
+            // No need to update statistics here as it may cause incorrect calculations
 
             // Show success message
             showSuccessMessage('Request marked as CLOSED successfully!');
@@ -1472,7 +1462,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxMS8dF9_U8VlgU0oRPlCWdkThpkZxyfNHA3_Z_5HLQkjocrbiUM_h7zL0k9lxrsnfONw/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
