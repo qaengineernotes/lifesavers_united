@@ -1,6 +1,8 @@
 // Donor Registration Form Script
-// Local server API endpoint for form submission
-const SUBMIT_URL = '/api/submit-donor-registration';
+// API endpoint for form submission - automatically detects environment
+const SUBMIT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? '/api/submit-donor-registration'  // Local development
+    : 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';  // Production
 
 
 // CAPTCHA variables
@@ -411,17 +413,35 @@ async function handleFormSubmission(e) {
             registrationDate: new Date().toISOString()
         };
 
-        // Submit to local server API
-        const submitData = new URLSearchParams();
-        submitData.append('data', JSON.stringify(data));
+        // Submit to appropriate API based on environment
+        let response;
 
-        const response = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: submitData
-        });
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Local development - use local server
+            const submitData = new URLSearchParams();
+            submitData.append('data', JSON.stringify(data));
+
+            response = await fetch(SUBMIT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: submitData
+            });
+        } else {
+            // Production - submit directly to Google Apps Script
+            const submitData = new URLSearchParams();
+            submitData.append('action', 'submit_donor_registration');
+            submitData.append('data', JSON.stringify(data));
+
+            response = await fetch(SUBMIT_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: submitData
+            });
+        }
 
         const result = await response.json();
 
