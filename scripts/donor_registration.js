@@ -308,29 +308,6 @@ function validatePrivacy() {
     }
 }
 
-function validateHealth() {
-    const health = document.getElementById('health').checked;
-
-    if (!health) {
-        showFieldError('health', 'Please confirm your health status to continue');
-        return false;
-    } else {
-        clearFieldError('health');
-        return true;
-    }
-}
-
-function validateConsent() {
-    const consent = document.getElementById('consent').checked;
-
-    if (!consent) {
-        showFieldError('consent', 'Please provide consent to continue');
-        return false;
-    } else {
-        clearFieldError('consent');
-        return true;
-    }
-}
 
 // Show field error
 function showFieldError(fieldId, message) {
@@ -389,11 +366,9 @@ function validateForm() {
     const isCaptchaValid = validateCaptcha();
     const isDeclarationValid = validateDeclaration();
     const isPrivacyValid = validatePrivacy();
-    const isHealthValid = validateHealth();
-    const isConsentValid = validateConsent();
 
     return isFullNameValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid &&
-        isDeclarationValid && isPrivacyValid && isHealthValid && isConsentValid;
+        isDeclarationValid && isPrivacyValid;
 }
 
 // Handle form submission
@@ -433,8 +408,6 @@ async function handleFormSubmission(e) {
             captchaAnswer: formDataObj.get('captchaAnswer'),
             declaration: formDataObj.get('declaration') === 'on',
             privacy: formDataObj.get('privacy') === 'on',
-            health: formDataObj.get('health') === 'on',
-            consent: formDataObj.get('consent') === 'on',
             registrationDate: new Date().toISOString()
         };
 

@@ -802,63 +802,7 @@ async function closeRequest(patientName, bloodType, button) {
     }
 }
 
-// Function to update statistics based on request data
-function updateStatistics(requests, statistics = null) {
-    let openRequests, successRate, livesSaved;
-
-    if (statistics) {
-        // Use statistics from Google Apps Script (more accurate)
-        openRequests = statistics.open + statistics.verified;
-        const totalRequests = statistics.total;
-        const verifiedRequests = statistics.verified;
-        const closedRequests = statistics.closed;
-
-        successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = closedRequests; // Show actual closed count as lives saved
-    } else {
-        // Fallback to local calculation (for backward compatibility)
-        openRequests = requests.filter(request => {
-            const cardKey = `${request.patientName}-${request.bloodType}`;
-            const storedState = buttonStates.get(cardKey);
-            return !storedState || storedState.closeStatus !== 'closed';
-        }).length;
-
-        const totalRequests = requests.length;
-        const verifiedRequests = requests.filter(request => {
-            const cardKey = `${request.patientName}-${request.bloodType}`;
-            const storedState = buttonStates.get(cardKey);
-            return storedState && storedState.verifyStatus === 'verified';
-        }).length;
-
-        successRate = totalRequests > 0 ? Math.round((verifiedRequests / totalRequests) * 100) : 94;
-
-        const closedRequests = requests.filter(request => {
-            const cardKey = `${request.patientName}-${request.bloodType}`;
-            const storedState = buttonStates.get(cardKey);
-            return storedState && storedState.closeStatus === 'closed';
-        }).length;
-        livesSaved = closedRequests * 3;
-    }
-
-    // Update the DOM elements
-    const openRequestsElement = document.getElementById('openRequests');
-    const successRateElement = document.getElementById('successRate');
-    const livesSavedElement = document.getElementById('livesSaved');
-    const activeRequestsNumberElement = document.getElementById('activeRequestsNumber');
-
-    if (openRequestsElement) {
-        openRequestsElement.textContent = openRequests;
-    }
-    if (successRateElement) {
-        successRateElement.textContent = successRate + '%';
-    }
-    if (livesSavedElement) {
-        livesSavedElement.textContent = livesSaved;
-    }
-    if (activeRequestsNumberElement) {
-        activeRequestsNumberElement.textContent = openRequests;
-    }
-}
+// updateStatistics function is now imported from emergency-statistics.js
 
 // Function to show success message without using alert
 function showSuccessMessage(message) {

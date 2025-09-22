@@ -287,29 +287,43 @@
             </div>
         </section>
 
-        <!-- Live Impact Counters -->
-        <section class="py-12 bg-surface">
+        <!-- Response Statistics -->
+        <section class="py-16 bg-surface">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-section mb-4">Emergency Response Performance</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">
+                        Real-time metrics showing our community's life-saving response capabilities and success rates.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     <div class="text-center">
                         <div class="bg-white rounded-2xl p-8 shadow-card">
-                            <div class="text-4xl font-bold text-primary mb-2">2,847</div>
-                            <div class="text-text-secondary">Lives Saved Today</div>
-                            <div class="text-accent text-sm mt-2">↑ 12% from yesterday</div>
+                            <div id="successRate" class="text-4xl font-bold text-primary mb-2">0%</div>
+                            <div class="text-text-secondary mb-2">Success Rate</div>
+                            <div class="text-accent text-sm">Emergency requests fulfilled</div>
                         </div>
                     </div>
                     <div class="text-center">
                         <div class="bg-white rounded-2xl p-8 shadow-card">
-                            <div class="text-4xl font-bold text-secondary mb-2">15,432</div>
-                            <div class="text-text-secondary">Active Donors</div>
-                            <div class="text-accent text-sm mt-2">↑ 8% this month</div>
+                            <div id="openRequests" class="text-4xl font-bold text-secondary mb-2">0</div>
+                            <div class="text-text-secondary mb-2">Open Requests</div>
+                            <div class="text-accent text-sm">Currently active requests</div>
                         </div>
                     </div>
                     <div class="text-center">
                         <div class="bg-white rounded-2xl p-8 shadow-card">
-                            <div class="text-4xl font-bold text-accent mb-2">127</div>
-                            <div class="text-text-secondary">Partner Hospitals</div>
-                            <div class="text-accent text-sm mt-2">Nationwide network</div>
+                            <div id="livesSaved" class="text-4xl font-bold text-accent mb-2">0</div>
+                            <div class="text-text-secondary mb-2">Lives Saved</div>
+                            <div class="text-accent text-sm">Through emergency system</div>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        <div class="bg-white rounded-2xl p-8 shadow-card">
+                            <div class="text-4xl font-bold text-warning mb-2">24/7</div>
+                            <div class="text-text-secondary mb-2">System Uptime</div>
+                            <div class="text-accent text-sm">Always ready to help</div>
                         </div>
                     </div>
                 </div>
@@ -361,8 +375,7 @@
                             </div>
                             <h3 class="text-xl font-semibold mb-3">Submit Request</h3>
                             <p class="text-text-secondary mb-4">Submit an urgent blood request and connect with
-                                available
-                                donors in your area.</p>
+                                available donors in your area.</p>
                             <a href="emergency_blood_request.html" class="btn-outline w-full block text-center">Submit
                                 Request</a>
                         </div>
@@ -379,11 +392,12 @@
                                         clip-rule="evenodd" />
                                 </svg>
                             </div>
-                            <h3 class="text-xl font-semibold mb-3">Schedule Donation</h3>
-                            <p class="text-text-secondary mb-4">Book your blood donation appointment at your
-                                convenience.
+                            <h3 class="text-xl font-semibold mb-3">Join Our Community</h3>
+                            <p class="text-text-secondary mb-4">Connect with fellow blood donors and stay updated on
+                                urgent requests.
                             </p>
-                            <button class="btn-outline w-full">Schedule Now</button>
+                            <a href="https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw?mode=ac_t" target="_blank"
+                                class="btn-outline w-full block text-center">Join Now</a>
                         </div>
                     </div>
                 </div>
@@ -485,7 +499,7 @@
                         <h3 class="text-xl font-semibold mb-3">Veer's Second Chance</h3>
                         <p class="text-text-secondary mb-4">
                             While suffering from liver disease, my 8-year-old son needed 15 units of blood. Thanks to
-                            LifeSaver United's donor network, they helped us get the maximum units of blood needed.
+                            Lifesavers United's donor network, they helped us get the maximum units of blood needed.
                         </p>
                         <div class="flex items-center justify-between">
                             <span class="text-sm text-text-secondary">2 days ago</span>
@@ -504,8 +518,8 @@
                         </div>
                         <h3 class="text-xl font-semibold mb-3">Moxesh Shah: 60+ Blood and SDP Donations Strong</h3>
                         <p class="text-text-secondary mb-4">
-                            Regular donor and founder of LifeSaver United Moxesh Shah donated 60+ times and continues to
-                            save lots of lives by connecting patients with the donors
+                            Regular donor and founder of Lifesavers United Moxesh Shah donated 60+ times and continues
+                            to save lots of lives by connecting patients with the donors
                             through his consistent commitment to helping others.
                         </p>
                         <div class="flex items-center justify-between">
@@ -636,46 +650,8 @@
         </svg>
     </a>
 
-    <script>
-        // Local proxy URL to avoid CORS issues
-        const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
-
-        document.addEventListener('DOMContentLoaded', function () {
-            // Set current year
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-
-            // Add smooth scrolling for anchor links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    document.querySelector(this.getAttribute('href')).scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                });
-            });
-
-            // Add animation to counters when they come into view
-            const counters = document.querySelectorAll('.text-4xl');
-            const observerOptions = {
-                threshold: 0.5,
-                rootMargin: '0px 0px -100px 0px'
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-pulse-gentle');
-                    }
-                });
-            }, observerOptions);
-
-            counters.forEach(counter => {
-                observer.observe(counter);
-            });
-
-
-        });
-    </script>
+    <script src="scripts/common-page-functions.js"></script>
+    <script src="scripts/emergency-statistics.js"></script>
     <script id="dhws-dataInjector" src="public/dhws-data-injector.js"></script>
     <script src="scripts/mobile-menu.js"></script>
 </body>
