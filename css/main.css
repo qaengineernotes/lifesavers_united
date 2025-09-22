@@ -2803,6 +2803,21 @@ h6 {
   flex-shrink: 0;
 }
 
+/* Perfect circular icon class for consistent styling */
+.icon-circle {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 50% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin-right: 16px !important;
+  margin-top: 4px !important;
+  flex-shrink: 0 !important;
+  min-width: 32px !important;
+  min-height: 32px !important;
+}
+
 /* City Autocomplete Styles */
 .city-autocomplete-container {
   position: relative;
