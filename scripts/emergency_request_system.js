@@ -1481,7 +1481,12 @@ function formatRequestDataForCopy(requestData) {
         formatField('Location', requestData.city),
         formatField('Suffering From', requestData.diagnosis),
         formatField('Contact Person', requestData.contactPerson),
-        formatField('Contact Number', requestData.contactNumber)
+        formatField('Contact Number', requestData.contactNumber),
+        '',
+        '🩸 Connect with Life Savers United - Your community blood donation network',
+        '🌐 Visit: https://lifesaversunited.org/',
+        '📞 Emergency: 9979260393',
+        '💬 WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw'
     ].join('\n');
 }
 
