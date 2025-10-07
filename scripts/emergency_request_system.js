@@ -1485,7 +1485,6 @@ function formatRequestDataForCopy(requestData) {
         '',
         '🩸 Connect with Life Savers United - Your community blood donation network',
         '🌐 Visit: https://lifesaversunited.org/',
-        '📞 Emergency: 9979260393',
         '💬 WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw'
     ].join('\n');
 }
