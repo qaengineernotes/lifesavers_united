@@ -1,5 +1,5 @@
 ﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -579,7 +579,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -705,7 +705,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1406,7 +1406,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1481,7 +1481,11 @@ function formatRequestDataForCopy(requestData) {
         formatField('Location', requestData.city),
         formatField('Suffering From', requestData.diagnosis),
         formatField('Contact Person', requestData.contactPerson),
-        formatField('Contact Number', requestData.contactNumber)
+        formatField('Contact Number', requestData.contactNumber),
+        '',
+        '🩸 Connect with Life Savers United - Your community blood donation network',
+        '🌐 Visit: https://lifesaversunited.org/',
+        '💬 WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw'
     ].join('\n');
 }
 

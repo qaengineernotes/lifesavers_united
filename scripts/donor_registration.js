@@ -2,7 +2,7 @@
 // API endpoint for form submission - automatically detects environment
 const SUBMIT_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? '/api/submit-donor-registration'  // Local development
-    : 'https://script.google.com/macros/s/AKfycbxLpA_lEmKQlxKyErcxByHFSpdNPSOZqBcgBstwgGdreXBExF4PhJF_vaCZyLT6uB4_eQ/exec';  // Production
+    : 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';  // Production
 
 
 // CAPTCHA variables
