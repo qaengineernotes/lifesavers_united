@@ -1696,11 +1696,23 @@ function showShareOptions(requestData) {
 // Function to share to Facebook
 function shareToFacebook(requestData) {
     const shareText = formatRequestDataForSocialShare(requestData);
-    const shareUrl = encodeURIComponent('https://lifesaversunited.org');
-    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${encodeURIComponent(shareText)}`;
+    const shareUrl = 'https://lifesaversunited.org';
 
-    // Open in new window
-    window.open(facebookUrl, '_blank', 'width=600,height=400');
+    // Copy the text to clipboard first
+    navigator.clipboard.writeText(shareText).then(() => {
+        // Open Facebook sharing
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`;
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+
+        // Show message that text is copied and ready to paste
+        setTimeout(() => {
+            showCopyToast('Text copied! Paste it in the Facebook post');
+        }, 500);
+    }).catch(() => {
+        // Fallback if clipboard fails
+        const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+        window.open(facebookUrl, '_blank', 'width=600,height=400');
+    });
 }
 
 // Function to share to Twitter/X
