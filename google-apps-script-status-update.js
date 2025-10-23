@@ -1,7 +1,7 @@
-// Google Apps Script for Life Savers Donors - Fixed Version
+// Google Apps Script for LifeSavers United - Fixed Version
 
 // Handle GET requests (fetch requests)
-// Google Apps Script for Life Savers Donors - Updated Version with Statistics
+// Google Apps Script for LifeSavers United - Updated Version with Statistics
 
 // Handle GET requests (fetch requests)
 function doGet(e) {

@@ -90,10 +90,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 refreshBtn.disabled = false;
             });
         }
-        if (e.target.closest('.copy-btn')) {
-            const copyBtn = e.target.closest('.copy-btn');
-            const requestData = JSON.parse(copyBtn.getAttribute('data-request-data'));
-            copyRequestData(requestData);
+        if (e.target.closest('.share-btn')) {
+            const shareBtn = e.target.closest('.share-btn');
+            const requestData = JSON.parse(shareBtn.getAttribute('data-request-data'));
+            showShareOptions(requestData);
         }
     });
 
@@ -377,9 +377,9 @@ function createRequestCard(request) {
             </div>
         </div>
         <div class="flex items-center space-x-2 mobile-q-container">
-            <button class="copy-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Copy request details">
+            <button class="share-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Share request details">
                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
                 </svg>
             </button>
             <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">${urgencyConfig.badgeText}</span>
@@ -1532,4 +1532,300 @@ function showCopyToast(message = 'Copied') {
         toast.remove();
         style.remove();
     }, 2000);
+}
+
+// Function to show share options modal
+function showShareOptions(requestData) {
+    return new Promise((resolve) => {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'shareModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        `;
+
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                    </svg>
+                </div>
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Share Blood Request</h3>
+                <p style="color: #6b7280;">Choose how you want to share this request</p>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+                <button id="facebookShareBtn" style="display: flex; align-items: center; padding: 16px; border: 1px solid #d1d5db; border-radius: 12px; background-color: #1877f2; color: white; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    <svg style="width: 24px; height: 24px; margin-right: 12px;" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    <span>Share on Facebook</span>
+                </button>
+                
+                <button id="twitterShareBtn" style="display: flex; align-items: center; padding: 16px; border: 1px solid #d1d5db; border-radius: 12px; background-color: #000000; color: white; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    <svg style="width: 24px; height: 24px; margin-right: 12px;" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                    <span>Share on X (Twitter)</span>
+                </button>
+                
+                <button id="copyShareBtn" style="display: flex; align-items: center; padding: 16px; border: 1px solid #d1d5db; border-radius: 12px; background-color: white; color: #374151; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    <svg style="width: 24px; height: 24px; margin-right: 12px;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                    </svg>
+                    <span>Copy to Clipboard</span>
+                </button>
+            </div>
+            
+            <div style="display: flex; gap: 12px; margin-top: 24px;">
+                <button id="cancelShareBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
+                    Cancel
+                </button>
+            </div>
+        `;
+
+        // Add event listeners
+        const facebookBtn = modalContent.querySelector('#facebookShareBtn');
+        const twitterBtn = modalContent.querySelector('#twitterShareBtn');
+        const copyBtn = modalContent.querySelector('#copyShareBtn');
+        const cancelBtn = modalContent.querySelector('#cancelShareBtn');
+
+        // Add hover effects
+        facebookBtn.addEventListener('mouseenter', () => {
+            facebookBtn.style.backgroundColor = '#166fe5';
+        });
+        facebookBtn.addEventListener('mouseleave', () => {
+            facebookBtn.style.backgroundColor = '#1877f2';
+        });
+
+        twitterBtn.addEventListener('mouseenter', () => {
+            twitterBtn.style.backgroundColor = '#333333';
+        });
+        twitterBtn.addEventListener('mouseleave', () => {
+            twitterBtn.style.backgroundColor = '#000000';
+        });
+
+        copyBtn.addEventListener('mouseenter', () => {
+            copyBtn.style.backgroundColor = '#f3f4f6';
+        });
+        copyBtn.addEventListener('mouseleave', () => {
+            copyBtn.style.backgroundColor = 'white';
+        });
+
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.backgroundColor = '#f3f4f6';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.backgroundColor = 'white';
+        });
+
+        // Handle Facebook share
+        facebookBtn.addEventListener('click', () => {
+            shareToFacebook(requestData);
+            modal.remove();
+            resolve(true);
+        });
+
+        // Handle Twitter share
+        twitterBtn.addEventListener('click', () => {
+            shareToTwitter(requestData);
+            modal.remove();
+            resolve(true);
+        });
+
+        // Handle copy
+        copyBtn.addEventListener('click', () => {
+            copyRequestData(requestData);
+            modal.remove();
+            resolve(true);
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(false);
+        });
+
+        // Handle clicking outside modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(false);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                modal.remove();
+                resolve(false);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        });
+
+        // Add modal content to modal
+        modal.appendChild(modalContent);
+
+        // Add modal to page
+        document.body.appendChild(modal);
+    });
+}
+
+// Function to share to Facebook
+function shareToFacebook(requestData) {
+    const shareText = formatRequestDataForSocialShare(requestData);
+    const shareUrl = encodeURIComponent('https://lifesaversunited.org');
+    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}&quote=${encodeURIComponent(shareText)}`;
+
+    // Open in new window
+    window.open(facebookUrl, '_blank', 'width=600,height=400');
+}
+
+// Function to share to Twitter/X
+function shareToTwitter(requestData) {
+    const shareText = formatRequestDataForTwitter(requestData);
+    const shareUrl = 'https://lifesaversunited.org';
+    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+
+    // Open in new window
+    window.open(twitterUrl, '_blank', 'width=600,height=400');
+}
+
+// Function to format request data for Twitter (without URL in text)
+function formatRequestDataForTwitter(requestData) {
+    const city = requestData.city || '';
+    const urgency = requestData.urgency || 'Urgent';
+    const patientName = requestData.patientName || '';
+    const age = requestData.patientAge || '';
+    const bloodType = requestData.bloodType || '';
+    const units = requestData.unitsRequired || '';
+    const hospital = requestData.hospitalName || '';
+    const contactPerson = requestData.contactPerson || '';
+    const contactNumber = requestData.contactNumber || '';
+
+    // Build the message parts
+    const cityPart = city ? `#${city}` : '';
+    const urgencyPart = urgency ? `#${urgency}` : '';
+    const patientPart = patientName ? patientName : '';
+    const agePart = age ? `, ${age}` : '';
+    const unitsPart = units ? `${units} unit${units > 1 ? 's' : ''}` : '';
+    const bloodTypePart = bloodType ? ` of ${bloodType}` : '';
+    const hospitalPart = hospital ? `#${hospital.replace(/\s+/g, '')}` : '';
+    const contactPart = contactPerson ? contactPerson : '';
+    const phonePart = contactNumber ? ` at ${contactNumber}` : '';
+
+    // Construct the main message
+    let message = '';
+
+    // Add location and urgency tags
+    if (cityPart || urgencyPart) {
+        message += [cityPart, urgencyPart].filter(Boolean).join(' ') + ': ';
+    }
+
+    // Add patient info
+    if (patientPart) {
+        message += patientPart + agePart;
+    }
+
+    // Add blood requirement
+    if (unitsPart && bloodTypePart) {
+        message += `, needs ${unitsPart}${bloodTypePart} blood`;
+    }
+
+    // Add hospital info
+    if (hospitalPart) {
+        message += ` for treatment at ${hospitalPart}`;
+    }
+
+    // Add contact info
+    if (contactPart || phonePart) {
+        message += `. Contact ${contactPart}${phonePart}`;
+    }
+
+    // Add only hashtags (no URL for Twitter)
+    message += `. 
+#BloodDonation #SaveLives #lifesaversUnited #Gujarat`;
+
+    return message;
+}
+
+// Function to format request data for social media sharing
+function formatRequestDataForSocialShare(requestData) {
+    const city = requestData.city || '';
+    const urgency = requestData.urgency || 'Urgent';
+    const patientName = requestData.patientName || '';
+    const age = requestData.patientAge || '';
+    const bloodType = requestData.bloodType || '';
+    const units = requestData.unitsRequired || '';
+    const hospital = requestData.hospitalName || '';
+    const contactPerson = requestData.contactPerson || '';
+    const contactNumber = requestData.contactNumber || '';
+
+    // Build the message parts
+    const cityPart = city ? `#${city}` : '';
+    const urgencyPart = urgency ? `#${urgency}` : '';
+    const patientPart = patientName ? patientName : '';
+    const agePart = age ? `, ${age}` : '';
+    const unitsPart = units ? `${units} unit${units > 1 ? 's' : ''}` : '';
+    const bloodTypePart = bloodType ? ` of ${bloodType}` : '';
+    const hospitalPart = hospital ? `#${hospital.replace(/\s+/g, '')}` : '';
+    const contactPart = contactPerson ? contactPerson : '';
+    const phonePart = contactNumber ? ` at ${contactNumber}` : '';
+
+    // Construct the main message
+    let message = '';
+
+    // Add location and urgency tags
+    if (cityPart || urgencyPart) {
+        message += [cityPart, urgencyPart].filter(Boolean).join(' ') + ': ';
+    }
+
+    // Add patient info
+    if (patientPart) {
+        message += patientPart + agePart;
+    }
+
+    // Add blood requirement
+    if (unitsPart && bloodTypePart) {
+        message += `, needs ${unitsPart}${bloodTypePart} blood`;
+    }
+
+    // Add hospital info
+    if (hospitalPart) {
+        message += ` for treatment at ${hospitalPart}`;
+    }
+
+    // Add contact info
+    if (contactPart || phonePart) {
+        message += `. Contact ${contactPart}${phonePart}`;
+    }
+
+    // Add URL and hashtags
+    message += `. 
+https://lifesaversunited.org  
+#BloodDonation #SaveLives #lifesaversUnited #Gujarat`;
+
+    return message;
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Simple HTTP Server for Life Savers Donors
+Simple HTTP Server for LifeSavers United
 Run this to serve the website locally and avoid CORS issues
 """
 

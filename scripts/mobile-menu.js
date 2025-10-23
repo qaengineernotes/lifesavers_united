@@ -1,5 +1,5 @@
 /**
- * Mobile Menu Handler for Life Savers Donors
+ * Mobile Menu Handler for LifeSavers United
  * Handles hamburger menu functionality across all pages
  */
 
@@ -63,7 +63,7 @@ class MobileMenu {
         mobileMenuHeader.className = 'mobile-menu-header';
         mobileMenuHeader.innerHTML = `
             <div class="mobile-menu-logo">
-                <img src="imgs/Life-saver-united-logo.png" alt="Life Savers Donors Logo" class="h-8 w-auto">
+                <img src="imgs/Life-saver-united-logo.png" alt="LifeSavers United Logo" class="h-8 w-auto">
                 
             </div>
         `;

@@ -1,5 +1,5 @@
 @echo off
-echo Starting Life Savers Donors Local Server...
+echo Starting LifeSavers United Local Server...
 echo.
 
 REM Check if Python is available

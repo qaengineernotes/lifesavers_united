@@ -1,4 +1,4 @@
-# Life Savers Donors - Emergency Blood Request System
+# LifeSavers United - Emergency Blood Request System
 
 A comprehensive emergency blood donation platform that connects urgent blood needs with potential donors in real-time. Built with modern web technologies to save lives through community-driven blood donation.
 
@@ -52,7 +52,7 @@ A comprehensive emergency blood donation platform that connects urgent blood nee
 - **Intuitive Navigation**: Easy access to all system features
 - **Emergency Contact**: 24/7 emergency hotline integration
 - **Social Media Integration**: Community engagement features
-- **Professional Branding**: Life Savers Donors branding throughout
+- **Professional Branding**: LifeSavers United branding throughout
 
 ## 🛠️ Technical Features
 
