@@ -231,6 +231,7 @@ async function loadEmergencyRequests() {
 }
 
 // Function to create a request card
+// Function to create a request card
 function createRequestCard(request) {
     const card = document.createElement('div');
     card.className = 'emergency-request-card bg-white rounded-2xl p-6 shadow-card border-l-4';
@@ -243,8 +244,6 @@ function createRequestCard(request) {
 
     // Calculate time since request
     const timeSince = calculateTimeSince(request.inquiryDate);
-
-
 
     // Check stored button states and request status
     const cardKey = `${request.patientName}-${request.bloodType}`;
@@ -272,6 +271,9 @@ function createRequestCard(request) {
         closeButtonText = 'Closed';
         closeButtonDisabled = 'disabled';
     }
+
+    // Format patient age display
+    const patientAge = request.patientAge ? `, ${request.patientAge} years` : '';
 
     card.innerHTML = `
     <style>
@@ -372,7 +374,7 @@ function createRequestCard(request) {
             </div>
             <div class="mobile-text-container">
                 <h3 class="text-xl font-bold ${urgencyConfig.textColor} mobile-title">${request.bloodType} Blood Needed</h3>
-                <p class="text-text-secondary mobile-subtitle patient">Patient: ${request.patientName}</p>
+                <p class="text-text-secondary mobile-subtitle patient">Patient: ${request.patientName}${patientAge}</p>
                 <p class="text-text-secondary mobile-subtitle hospital">${request.hospitalName}${request.diagnosis ? ` - ${request.diagnosis}` : ''}</p>
             </div>
         </div>
