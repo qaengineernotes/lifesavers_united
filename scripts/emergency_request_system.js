@@ -37,6 +37,7 @@ let buttonStates = new Map(); // Store button states locally
 document.addEventListener('DOMContentLoaded', function () {
     // Load emergency requests directly (bypass test for now)
     loadEmergencyRequests();
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     // Add event listeners for verify and close buttons
     document.addEventListener('click', function (e) {
@@ -94,6 +95,25 @@ document.addEventListener('DOMContentLoaded', function () {
             const shareBtn = e.target.closest('.share-btn');
             const requestData = JSON.parse(shareBtn.getAttribute('data-request-data'));
             showShareOptions(requestData);
+        }
+
+        if (e.target.closest('.edit-btn')) {
+            const button = e.target.closest('.edit-btn');
+            const card = button.closest('.emergency-request-card');
+            const requestDataStr = card.getAttribute('data-request');
+            if (requestDataStr) {
+                try {
+                    // Decode the URI-encoded JSON string
+                    const decodedJson = decodeURIComponent(requestDataStr);
+                    const requestData = JSON.parse(decodedJson);
+                    editRequest(requestData, button);
+                } catch (error) {
+                    console.error('Error parsing request data:', error);
+                    showSuccessMessage('Error loading request data. Please refresh the page.');
+                }
+            } else {
+                showSuccessMessage('Request data not available. Please refresh the page.');
+            }
         }
     });
 
@@ -187,17 +207,22 @@ async function loadEmergencyRequests() {
 
             // Display each request and initialize button states
             data.requests.forEach((request, index) => {
-                const requestCard = createRequestCard(request);
-                container.appendChild(requestCard);
+                try {
+                    const requestCard = createRequestCard(request);
+                    container.appendChild(requestCard);
 
-                // Initialize button states based on request status
-                const cardKey = `${request.patientName}-${request.bloodType}`;
-                const requestStatus = request.status || 'Open';
+                    // Initialize button states based on request status
+                    const cardKey = `${request.patientName}-${request.bloodType}`;
+                    const requestStatus = request.status || 'Open';
 
-                if (requestStatus === 'Verified') {
-                    buttonStates.set(cardKey, { verifyStatus: 'verified' });
-                } else if (requestStatus === 'Closed') {
-                    buttonStates.set(cardKey, { closeStatus: 'closed' });
+                    if (requestStatus === 'Verified') {
+                        buttonStates.set(cardKey, { verifyStatus: 'verified' });
+                    } else if (requestStatus === 'Closed') {
+                        buttonStates.set(cardKey, { closeStatus: 'closed' });
+                    }
+                } catch (error) {
+                    console.error(`Error creating card for request ${index}:`, error, request);
+                    // Continue with next request even if one fails
                 }
             });
         } else {
@@ -274,6 +299,17 @@ function createRequestCard(request) {
 
     // Format patient age display
     const patientAge = request.patientAge ? `, ${request.patientAge} years` : '';
+
+    // Store full request data in the card for editing (with error handling)
+    try {
+        const requestDataJson = JSON.stringify(request);
+        // Encode the JSON string to safely store in HTML attribute
+        const encodedJson = encodeURIComponent(requestDataJson);
+        card.setAttribute('data-request', encodedJson);
+    } catch (error) {
+        console.error('Error storing request data:', error);
+        // Continue without storing - edit won't work but card will still display
+    }
 
     card.innerHTML = `
     <style>
@@ -408,6 +444,12 @@ function createRequestCard(request) {
     </div>
 
     <div class="btn-container mobile-buttons">
+        <button class="btn-outline edit-btn mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}">
+            <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            <span>Edit</span>
+        </button>
         <button class="${verifyButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}>
             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
@@ -1534,6 +1576,320 @@ function showCopyToast(message = 'Copied') {
         toast.remove();
         style.remove();
     }, 2000);
+}
+
+// Helper function to escape HTML (needs to be defined before use)
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Function to edit a blood request
+async function editRequest(requestData, button) {
+    // Check authorization first (same as close request)
+    const isAuthorized = await checkAuthorization();
+
+    if (!isAuthorized) {
+        return; // User is not authorized
+    }
+
+    // Show edit modal
+    const editedData = await showEditRequestModal(requestData);
+    if (!editedData) {
+        return; // User cancelled the edit
+    }
+
+    isButtonActionInProgress = true; // Set flag to prevent refresh
+
+    try {
+        // Show loading state
+        button.disabled = true;
+        const originalHTML = button.innerHTML;
+        button.innerHTML = `
+            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            Updating...
+        `;
+
+        // Prepare the data for the API call
+        const updateData = {
+            patientName: requestData.patientName, // Original identifier
+            bloodType: requestData.bloodType, // Original identifier
+            ...editedData // Updated fields
+        };
+
+        // Call the Google Apps Script directly
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+
+        // Create URL-encoded form data
+        const formData = new URLSearchParams();
+        formData.append('action', 'update_request');
+        formData.append('data', JSON.stringify(updateData));
+
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString(),
+            redirect: 'follow'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Show success message
+            showSuccessMessage('Request updated successfully!');
+
+            // Reset the flag to allow refresh
+            isButtonActionInProgress = false;
+
+            // Reload requests to show updated data
+            setTimeout(() => {
+                loadEmergencyRequests();
+            }, 1000);
+        } else {
+            // Reset button state on error
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+            showSuccessMessage(result.message || 'Failed to update request. Please try again.');
+            isButtonActionInProgress = false;
+        }
+    } catch (error) {
+        console.error('Error updating request:', error);
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+        showSuccessMessage('Error updating request. Please try again.');
+        isButtonActionInProgress = false;
+    }
+}
+
+// Function to show edit request modal
+function showEditRequestModal(requestData) {
+    return new Promise((resolve) => {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'editRequestModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            overflow-y: auto;
+            padding: 20px;
+        `;
+
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                </div>
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Edit Blood Request</h3>
+                <p style="color: #6b7280;">Update the request information below</p>
+            </div>
+            
+            <form id="editRequestForm" style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Patient Name *</label>
+                        <input type="text" id="editPatientName" value="${escapeHtml(requestData.patientName || '')}" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Patient Age</label>
+                        <input type="text" id="editPatientAge" value="${escapeHtml(requestData.patientAge || '')}"
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Blood Type *</label>
+                        <select id="editBloodType" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                            <option value="">Select Blood Type</option>
+                            <option value="A+" ${(requestData.bloodType || '') === 'A+' ? 'selected' : ''}>A+</option>
+                            <option value="A-" ${(requestData.bloodType || '') === 'A-' ? 'selected' : ''}>A-</option>
+                            <option value="B+" ${(requestData.bloodType || '') === 'B+' ? 'selected' : ''}>B+</option>
+                            <option value="B-" ${(requestData.bloodType || '') === 'B-' ? 'selected' : ''}>B-</option>
+                            <option value="AB+" ${(requestData.bloodType || '') === 'AB+' ? 'selected' : ''}>AB+</option>
+                            <option value="AB-" ${(requestData.bloodType || '') === 'AB-' ? 'selected' : ''}>AB-</option>
+                            <option value="O+" ${(requestData.bloodType || '') === 'O+' ? 'selected' : ''}>O+</option>
+                            <option value="O-" ${(requestData.bloodType || '') === 'O-' ? 'selected' : ''}>O-</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Units Required *</label>
+                        <input type="number" id="editUnitsRequired" value="${escapeHtml(requestData.unitsRequired || '')}" min="1" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Hospital Name *</label>
+                    <input type="text" id="editHospitalName" value="${escapeHtml(requestData.hospitalName || '')}" required
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Hospital Address</label>
+                    <input type="text" id="editHospitalAddress" value="${escapeHtml(requestData.hospitalAddress || '')}"
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">City *</label>
+                        <input type="text" id="editCity" value="${escapeHtml(requestData.city || '')}" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Urgency Level</label>
+                        <select id="editUrgency"
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                            <option value="Normal" ${(requestData.urgency || 'Normal') === 'Normal' ? 'selected' : ''}>Normal</option>
+                            <option value="Urgent" ${(requestData.urgency || '') === 'Urgent' ? 'selected' : ''}>Urgent</option>
+                            <option value="Critical" ${(requestData.urgency || '') === 'Critical' ? 'selected' : ''}>Critical</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Diagnosis / Suffering From</label>
+                    <input type="text" id="editDiagnosis" value="${escapeHtml(requestData.diagnosis || '')}"
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Person *</label>
+                        <input type="text" id="editContactPerson" value="${escapeHtml(requestData.contactPerson || '')}" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Number *</label>
+                        <input type="tel" id="editContactNumber" value="${escapeHtml(requestData.contactNumber || '')}" required
+                            style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Email</label>
+                    <input type="email" id="editContactEmail" value="${escapeHtml(requestData.contactEmail || '')}"
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Additional Information</label>
+                    <textarea id="editAdditionalInfo" rows="3"
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box; resize: vertical;">${escapeHtml(requestData.additionalInfo || '')}</textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 8px;">
+                    <button type="button" id="cancelEditBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="submitEditBtn" style="flex: 1; padding: 12px 16px; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                        Update
+                    </button>
+                </div>
+            </form>
+        `;
+
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        // Get form elements
+        const form = modalContent.querySelector('#editRequestForm');
+        const cancelBtn = modalContent.querySelector('#cancelEditBtn');
+        const submitBtn = modalContent.querySelector('#submitEditBtn');
+
+        // Handle form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            // Collect form data
+            const editedData = {
+                patientName: document.getElementById('editPatientName').value.trim(),
+                patientAge: document.getElementById('editPatientAge').value.trim(),
+                bloodType: document.getElementById('editBloodType').value,
+                unitsRequired: document.getElementById('editUnitsRequired').value,
+                hospitalName: document.getElementById('editHospitalName').value.trim(),
+                hospitalAddress: document.getElementById('editHospitalAddress').value.trim(),
+                city: document.getElementById('editCity').value.trim(),
+                urgency: document.getElementById('editUrgency').value,
+                diagnosis: document.getElementById('editDiagnosis').value.trim(),
+                contactPerson: document.getElementById('editContactPerson').value.trim(),
+                contactNumber: document.getElementById('editContactNumber').value.trim(),
+                contactEmail: document.getElementById('editContactEmail').value.trim(),
+                additionalInfo: document.getElementById('editAdditionalInfo').value.trim()
+            };
+
+            // Validate required fields
+            if (!editedData.patientName || !editedData.bloodType || !editedData.unitsRequired || 
+                !editedData.hospitalName || !editedData.city || !editedData.contactPerson || !editedData.contactNumber) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            modal.remove();
+            resolve(editedData);
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(null);
+        });
+
+        // Handle clicking outside modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(null);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                modal.remove();
+                resolve(null);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        });
+
+        // Focus on first input
+        setTimeout(() => {
+            document.getElementById('editPatientName').focus();
+        }, 100);
+    });
 }
 
 // Function to show share options modal
