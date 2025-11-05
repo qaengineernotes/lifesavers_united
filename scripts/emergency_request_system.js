@@ -1,5 +1,5 @@
-﻿// Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+// Local proxy URL to avoid CORS issues
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -623,7 +623,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -749,7 +749,7 @@ async function closeRequest(patientName, bloodType, button) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1450,7 +1450,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1588,84 +1588,79 @@ function escapeHtml(text) {
 
 // Function to edit a blood request
 async function editRequest(requestData, button) {
-    // Check authorization first (same as close request)
-    const isAuthorized = await checkAuthorization();
+  // Check authorization first
+  const isAuthorized = await checkAuthorization();
+  if (!isAuthorized) return;
 
-    if (!isAuthorized) {
-        return; // User is not authorized
+  // Show edit modal and collect changes
+  const editedData = await showEditRequestModal(requestData);
+  if (!editedData) return;
+
+  isButtonActionInProgress = true;
+
+  try {
+    // Button loading state
+    button.disabled = true;
+    const originalHTML = button.innerHTML;
+    button.innerHTML = `
+      <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
+        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+      </svg>
+      Updating.
+    `;
+
+    // Build update payload:
+    const updateData = {
+      // Use original number to find the row
+      originalContactNumber: requestData.contactNumber || '',
+      // If user changed it, send the new one; else keep original
+      contactNumber:
+        (editedData.contactNumber && editedData.contactNumber.trim() !== '')
+          ? editedData.contactNumber
+          : (requestData.contactNumber || ''),
+
+      // Keep these too (harmless on server; can be useful elsewhere)
+      patientName: (editedData.patientName ?? requestData.patientName) || '',
+      bloodType: (editedData.bloodType ?? requestData.bloodType) || '',
+
+      // Spread all edited fields
+      ...editedData
+    };
+
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+
+    const formData = new URLSearchParams();
+    formData.append('action', 'update_request');
+    formData.append('data', JSON.stringify(updateData));
+
+    const response = await fetch(scriptUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString(), // IMPORTANT: encode body as string
+      redirect: 'follow'
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      showSuccessMessage('Request updated successfully!');
+      isButtonActionInProgress = false;
+      setTimeout(() => loadEmergencyRequests(), 1000);
+    } else {
+      button.disabled = false;
+      button.innerHTML = originalHTML;
+      showSuccessMessage(result.message || 'Failed to update request. Please try again.');
+      isButtonActionInProgress = false;
     }
-
-    // Show edit modal
-    const editedData = await showEditRequestModal(requestData);
-    if (!editedData) {
-        return; // User cancelled the edit
-    }
-
-    isButtonActionInProgress = true; // Set flag to prevent refresh
-
-    try {
-        // Show loading state
-        button.disabled = true;
-        const originalHTML = button.innerHTML;
-        button.innerHTML = `
-            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-            </svg>
-            Updating...
-        `;
-
-        // Prepare the data for the API call
-        const updateData = {
-            patientName: requestData.patientName, // Original identifier
-            bloodType: requestData.bloodType, // Original identifier
-            ...editedData // Updated fields
-        };
-
-        // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
-
-        // Create URL-encoded form data
-        const formData = new URLSearchParams();
-        formData.append('action', 'update_request');
-        formData.append('data', JSON.stringify(updateData));
-
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData.toString(),
-            redirect: 'follow'
-        });
-
-        const result = await response.json();
-
-        if (result.success) {
-            // Show success message
-            showSuccessMessage('Request updated successfully!');
-
-            // Reset the flag to allow refresh
-            isButtonActionInProgress = false;
-
-            // Reload requests to show updated data
-            setTimeout(() => {
-                loadEmergencyRequests();
-            }, 1000);
-        } else {
-            // Reset button state on error
-            button.disabled = false;
-            button.innerHTML = originalHTML;
-            showSuccessMessage(result.message || 'Failed to update request. Please try again.');
-            isButtonActionInProgress = false;
-        }
-    } catch (error) {
-        console.error('Error updating request:', error);
-        button.disabled = false;
-        button.innerHTML = originalHTML;
-        showSuccessMessage('Error updating request. Please try again.');
-        isButtonActionInProgress = false;
-    }
+  } catch (error) {
+    console.error('Error updating request:', error);
+    button.disabled = false;
+    button.innerHTML = originalHTML;
+    showSuccessMessage('Error updating request. Please try again.');
+    isButtonActionInProgress = false;
+  }
 }
+
 
 // Function to show edit request modal
 function showEditRequestModal(requestData) {
@@ -1734,6 +1729,7 @@ function showEditRequestModal(requestData) {
                         <select id="editBloodType" required
                             style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                             <option value="">Select Blood Type</option>
+                            <option value="Any" ${(requestData.bloodType || '') === 'Any' ? 'selected' : ''}>Any Blood Type</option>
                             <option value="A+" ${(requestData.bloodType || '') === 'A+' ? 'selected' : ''}>A+</option>
                             <option value="A-" ${(requestData.bloodType || '') === 'A-' ? 'selected' : ''}>A-</option>
                             <option value="B+" ${(requestData.bloodType || '') === 'B+' ? 'selected' : ''}>B+</option>
@@ -1788,8 +1784,8 @@ function showEditRequestModal(requestData) {
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Person *</label>
-                        <input type="text" id="editContactPerson" value="${escapeHtml(requestData.contactPerson || '')}" required
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Person</label>
+                        <input type="text" id="editContactPerson" value="${escapeHtml(requestData.contactPerson || '')}"
                             style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                     <div>
@@ -1852,8 +1848,8 @@ function showEditRequestModal(requestData) {
             };
 
             // Validate required fields
-            if (!editedData.patientName || !editedData.bloodType || !editedData.unitsRequired || 
-                !editedData.hospitalName || !editedData.city || !editedData.contactPerson || !editedData.contactNumber) {
+            if (!editedData.patientName || !editedData.bloodType || !editedData.unitsRequired ||
+                !editedData.hospitalName || !editedData.city || !editedData.contactNumber) {
                 alert('Please fill in all required fields.');
                 return;
             }

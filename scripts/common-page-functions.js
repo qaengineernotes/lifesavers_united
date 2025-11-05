@@ -3,7 +3,7 @@
 // Features: smooth scrolling, counter animations, current year setting, etc.
 
 // API Configuration (can be overridden by individual pages)
-const COMMON_API_URL = 'https://script.google.com/macros/s/AKfycbzZuVZqReNkoNvR7tXYGRu_qi5GAKsaQRjTwmsb841Pwd5bWPzONwBLBCX95M1Kdp3I/exec';
+const COMMON_API_URL = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
 
 /**
  * Set the current year in elements with id="currentYear"

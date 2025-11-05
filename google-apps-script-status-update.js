@@ -189,6 +189,62 @@ function doPost(e) {
             return saveDonorToFormResponses(data, spreadsheet);
         }
 
+        // Check if this is an update request
+        if (e.parameter.action === 'update') {
+            const data = JSON.parse(e.parameter.data);
+
+            // Get all data from the sheet
+            const dataRange = sheet.getDataRange();
+            const values = dataRange.getValues();
+
+            // Find the row with the matching ID
+            let rowIndex = -1;
+            for (let i = 1; i < values.length; i++) {
+                if (values[i][0] === data.id) { // Assuming ID is in column A
+                    rowIndex = i;
+                    break;
+                }
+            }
+
+            if (rowIndex === -1) {
+                throw new Error('Request not found');
+            }
+
+            // Update the row with new data
+            const rowData = [
+                data.id, // Keep the original ID
+                values[rowIndex][1], // Keep the original inquiry date
+                data.patientName || values[rowIndex][2],
+                data.contactNumber || values[rowIndex][3],
+                data.unitsRequired || values[rowIndex][4],
+                data.bloodType || values[rowIndex][5],
+                values[rowIndex][6], // Keep original patient BG
+                data.patientAge || values[rowIndex][7],
+                data.hospitalName || values[rowIndex][8],
+                data.diagnosis || values[rowIndex][9],
+                values[rowIndex][10], // Keep original status
+                data.urgency || values[rowIndex][11],
+                data.hospitalAddress || values[rowIndex][12],
+                data.city || values[rowIndex][13],
+                data.contactPerson || values[rowIndex][14],
+                data.contactEmail || values[rowIndex][15],
+                values[rowIndex][16], // Keep original fulfilled date
+                values[rowIndex][17], // Keep original units fulfilled
+                values[rowIndex][18], // Keep original donors
+                values[rowIndex][19], // Keep original donor BG
+                data.additionalInfo || values[rowIndex][20] || ''
+            ];
+
+            // Update the row
+            sheet.getRange(rowIndex + 1, 1, 1, rowData.length).setValues([rowData]);
+
+            return ContentService.createTextOutput(JSON.stringify({
+                success: true,
+                message: 'Request updated successfully',
+                action: 'UPDATED'
+            })).setMimeType(ContentService.MimeType.JSON);
+        }
+
         // This is a new form submission (emergency blood request)
         const data = JSON.parse(e.parameter.data);
 
