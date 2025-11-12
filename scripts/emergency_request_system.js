@@ -1742,7 +1742,10 @@ function showEditRequestModal(requestData) {
                     </div>
                     <div>
                         <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Units Required *</label>
-                        <input type="number" id="editUnitsRequired" value="${escapeHtml(requestData.unitsRequired || '')}" min="1" required
+                        <input type="text" id="editUnitsRequired" value="${escapeHtml(requestData.unitsRequired || '')}" 
+                            inputmode="text"
+                            pattern=".*"
+                            required
                             style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                 </div>
@@ -1761,8 +1764,8 @@ function showEditRequestModal(requestData) {
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                     <div>
-                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">City *</label>
-                        <input type="text" id="editCity" value="${escapeHtml(requestData.city || '')}" required
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">City</label>
+                        <input type="text" id="editCity" value="${escapeHtml(requestData.city || '')}"
                             style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
                     <div>
@@ -1849,7 +1852,7 @@ function showEditRequestModal(requestData) {
 
             // Validate required fields
             if (!editedData.patientName || !editedData.bloodType || !editedData.unitsRequired ||
-                !editedData.hospitalName || !editedData.city || !editedData.contactNumber) {
+                !editedData.hospitalName || !editedData.contactNumber) {
                 alert('Please fill in all required fields.');
                 return;
             }
