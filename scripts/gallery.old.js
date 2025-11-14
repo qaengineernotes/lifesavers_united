@@ -24,42 +24,25 @@ document.addEventListener('DOMContentLoaded', function () {
     let galleryData = [];
 
     // Function to show error message
-    // Function to show error message
-    const showError = (message, isEmptyCategory = false) => {
+    const showError = (message) => {
         const loadingState = document.getElementById('loadingState');
         if (loadingState) {
             loadingState.classList.add('hidden');
         }
 
         const errorDiv = document.createElement('div');
-
-        if (isEmptyCategory) {
-            // Friendly message for empty categories
-            errorDiv.className = 'bg-blue-50 border-l-4 border-blue-400 text-blue-700 p-6 rounded col-span-full text-center';
-            errorDiv.innerHTML = `
-            <div class="flex flex-col items-center">
-                <svg class="w-16 h-16 mb-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                </svg>
-                <p class="font-bold text-xl mb-2">No Images Yet</p>
-                <p class="text-blue-600">${message}</p>
-            </div>
-        `;
-        } else {
-            // Error message for actual errors
-            errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded col-span-full';
-            errorDiv.role = 'alert';
-            errorDiv.innerHTML = `
-            <p class="font-bold">Error Loading Gallery</p>
-            <p>${message}</p>
-            <p class="text-sm mt-2">Please check:</p>
-            <ul class="text-sm list-disc ml-5">
-                <li>Google Drive folder is shared publicly</li>
-                <li>All images have public view access</li>
-                <li>Google Apps Script is deployed correctly</li>
-            </ul>
-        `;
-        }
+        errorDiv.className = 'bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded col-span-full';
+        errorDiv.role = 'alert';
+        errorDiv.innerHTML = `
+                    <p class="font-bold">Error Loading Gallery</p>
+                    <p>${message}</p>
+                    <p class="text-sm mt-2">Please check:</p>
+                    <ul class="text-sm list-disc ml-5">
+                        <li>Google Drive folder is shared publicly</li>
+                        <li>All images have public view access</li>
+                        <li>Google Apps Script is deployed correctly</li>
+                    </ul>
+                `;
 
         const galleryGrid = document.getElementById('gallery-grid');
         if (galleryGrid) {
@@ -71,35 +54,17 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // Function to load gallery data from Google Apps Script
-    const loadGalleryData = async (category = 'ALL') => {
+    const loadGalleryData = async () => {
         try {
-            // Show loading indicator
-            const galleryGrid = document.getElementById('gallery-grid');
-            if (galleryGrid) {
-                galleryGrid.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p class="text-text-secondary">Loading gallery images...</p>
-                </div>
-            `;
-            }
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzQFclRK_YZ9lzxYNkT1Y4wQBNNaqoZk6oTiZCQHu9_uTIbS9a0175wz6vkjsYhB69X1A/exec';
 
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqSr5tm8V9tp4v1Jsq9LPzOQDIr51g2iMPOd2liWyi4VfpBZB01P19HoJ-zm5IRF0W/exec';
-
-            console.log('Fetch URL:', `${scriptUrl}?category=${encodeURIComponent(category)}`);
-
-            const response = await fetch(`${scriptUrl}?category=${encodeURIComponent(category)}&t=${new Date().getTime()}`);
-
-            console.log('Fetch URL:', `${scriptUrl}?category=${encodeURIComponent(category)}`);
-            console.log('Response status:', response.status);
+            const response = await fetch(`${scriptUrl}?t=${new Date().getTime()}`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
-
             const responseText = await response.text();
-            console.log('Response text:', responseText);
 
             let data;
             try {
@@ -157,31 +122,72 @@ document.addEventListener('DOMContentLoaded', function () {
                 return url;
             };
 
-            // Process images
-            galleryData = data.map((img) => ({
-                id: img.id || Date.now() + Math.random(),
-                src: convertDriveUrlToViewable(img.url || ''),
-                category: img.category || 'gallery',
-                title: img.name ? img.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') : 'Gallery Image',
-                date: img.date ? new Date(img.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-            }));
 
+            // Process images to match gallery format
+            console.log('Raw data from server:', data);
+            galleryData = data.map((img) => {
+                // Log the original image data
+                console.log('Processing image:', img.name || 'unnamed');
+                
+                // Default values
+                let category = 'uncategorized';
+                let title = img.name ? img.name.replace(/\.[^/.]+$/, '') : 'Untitled';
+                let date = img.date ? new Date(img.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+
+                // Try to extract category from filename (format: category_title_YYYY-MM-DD.ext or category_rest_of_name.ext)
+                if (img.name) {
+                    console.log('Original filename:', img.name);
+                    
+                    // Split by underscore and log the parts
+                    const parts = img.name.split('_');
+                    console.log('Filename parts:', parts);
+                    
+                    if (parts.length >= 3) {
+                        // First part is category - normalize to use hyphens
+                        category = parts[0].toLowerCase().trim().replace(/_/g, '-');
+                        console.log('Extracted category (normalized):', category);
+                        
+                        // Middle parts are title
+                        title = parts.slice(1, -1).join(' ').replace(/[-_]/g, ' ').trim();
+                        
+                        // Last part might be a date (check if it matches YYYY-MM-DD pattern)
+                        const lastPart = parts[parts.length - 1].split('.')[0];
+                        const datePattern = /^\d{4}-\d{1,2}-\d{1,2}$/;
+                        
+                        if (datePattern.test(lastPart)) {
+                            date = lastPart;
+                            console.log('Extracted date:', date);
+                        } else {
+                            // If last part isn't a date, include it in the title
+                            title = parts.slice(1).join(' ').replace(/[-_]/g, ' ').trim();
+                        }
+                        
+                        console.log('Final title:', title);
+                    } else if (parts.length === 2) {
+                        // If only one underscore, first part is category, rest is title
+                        category = parts[0].toLowerCase().trim().replace(/_/g, '-');
+                        title = parts[1].split('.')[0].replace(/-/g, ' ').trim();
+                        console.log('Extracted from simple format - Category:', category, 'Title:', title);
+                    } else {
+                        // For files with no underscores, use the whole name as title
+                        title = img.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').trim();
+                        console.log('Using filename as title:', title);
+                    }
+                }
+
+                return {
+                    id: img.id || Date.now() + Math.random(),
+                    src: convertDriveUrlToViewable(img.url || ''),
+                    category: img.category || category,
+                    title: img.title || title,
+                    date: date
+                };
+            });
+            
             console.log('Processed gallery data:', galleryData);
-            console.log('Gallery data length:', galleryData.length);
 
             if (galleryData.length === 0) {
-                // Clear pagination when no images
-                const paginationContainer = document.getElementById('pagination');
-                if (paginationContainer) {
-                    paginationContainer.innerHTML = '';
-                }
-
-                // Check if this is ALL category or specific category
-                if (category === 'ALL') {
-                    showError('No images found in the gallery. Please upload some images to your Google Drive folder.', false);
-                } else {
-                    showError(`No images in the "${category}" category yet. Check back soon!`, true);
-                }
+                showError('No images found in the gallery. Please upload some images to your Google Drive folder.');
                 return;
             }
 
@@ -201,7 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Pagination variables
     let currentPage = 1;
     const itemsPerPage = 9;
-
+    let currentFilter = 'all';
 
     // DOM elements
     const galleryGrid = document.getElementById('gallery-grid');
@@ -217,9 +223,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentImageIndex = 0;
     let filteredGallery = [];
     let paginatedGallery = [];
-    let currentFilter = 'ALL'; // Track current category
 
-    // Initialize the gallery
     // Initialize the gallery
     function initGallery() {
 
@@ -254,16 +258,62 @@ document.addEventListener('DOMContentLoaded', function () {
             img.parentElement.innerHTML = '<div class="flex items-center justify-center h-full bg-gray-200 text-gray-500">Image not available</div>';
         };
 
-        // Set filteredGallery to all loaded data (no filtering here, done server-side)
-        filteredGallery = [...galleryData];
-        currentPage = 1;
-        updatePaginatedGallery();
+        filterGallery();
         renderGallery();
         renderPagination();
         setupEventListeners();
     }
 
-
+    // Filter gallery based on category
+    function filterGallery() {
+        console.log('=== FILTERING GALLERY ===');
+        console.log('Current filter:', currentFilter);
+        
+        // Log all available categories for debugging
+        const allCategories = [...new Set(galleryData.map(item => item.category))];
+        console.log('All available categories:', allCategories);
+        
+        if (currentFilter === 'all') {
+            console.log('Showing all items');
+            filteredGallery = [...galleryData];
+        } else {
+            console.log(`Filtering for category: '${currentFilter}'`);
+            filteredGallery = galleryData.filter(item => {
+                if (!item) return false;
+                
+                // Normalize categories for comparison (handle both hyphens and underscores)
+                const normalizeCategory = (cat) => {
+                    if (!cat) return '';
+                    return cat.trim().toLowerCase().replace(/_/g, '-');
+                };
+                
+                const itemCategory = normalizeCategory(item.category || 'uncategorized');
+                const filterCategory = normalizeCategory(currentFilter);
+                
+                console.log(`Comparing - Item: '${itemCategory}', Filter: '${filterCategory}'`);
+                
+                // Handle 'all' filter
+                if (filterCategory === 'all') return true;
+                
+                // Handle 'uncategorized' filter
+                if (filterCategory === 'uncategorized') {
+                    return itemCategory === 'uncategorized' || !itemCategory;
+                }
+                
+                // Check for exact match or partial match
+                const isMatch = itemCategory === filterCategory || 
+                               itemCategory.includes(filterCategory) || 
+                               filterCategory.includes(itemCategory);
+                
+                console.log(`Item: '${item.title}', Category: '${item.category}', Match: ${isMatch ? 'YES' : 'no'}`);
+                return isMatch;
+            });
+        }
+        
+        console.log(`Found ${filteredGallery.length} items for filter: ${currentFilter}`);
+        currentPage = 1;
+        updatePaginatedGallery();
+    }
 
     // Update paginated gallery based on current page
     function updatePaginatedGallery() {
@@ -517,26 +567,30 @@ document.addEventListener('DOMContentLoaded', function () {
         // Filter buttons
         filterButtons.forEach(button => {
             button.addEventListener('click', () => {
-                // Don't reload if already on this category
-                const clickedCategory = button.dataset.filter;
-                if (clickedCategory === currentFilter) {
-                    return;
-                }
-
-                // Update active filter button
+                // Update active filter button styles
                 filterButtons.forEach(btn => {
                     btn.classList.remove('bg-primary', 'text-white');
-                    btn.classList.add('bg-gray-200', 'text-gray-700');
+                    btn.classList.add('bg-gray-200', 'hover:bg-gray-300');
                 });
-
-                button.classList.remove('bg-gray-200', 'text-gray-700');
+                
+                button.classList.remove('bg-gray-200', 'hover:bg-gray-300');
                 button.classList.add('bg-primary', 'text-white');
 
-                currentFilter = clickedCategory;
+                // Update current filter and refresh the gallery
+                currentFilter = button.getAttribute('data-category');
+                console.log('Filter changed to:', currentFilter);
+                
+                // Reset to first page and update the gallery
+                currentPage = 1;
+                filterGallery();
+                renderGallery();
+                renderPagination();
 
-                // Fetch new data from server based on category
-                // Loading state will be handled inside loadGalleryData()
-                loadGalleryData(currentFilter);
+                // Smooth scroll to top of gallery
+                const gallerySection = document.querySelector('section.py-12');
+                if (gallerySection) {
+                    gallerySection.scrollIntoView({ behavior: 'smooth' });
+                }
             });
         });
 
@@ -560,15 +614,171 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Load gallery data when the page loads
-    loadGalleryData('ALL');
+    // Add a test image for debugging
+    const testImage = {
+        id: 'test-' + Date.now(),
+        src: 'https://via.placeholder.com/300',
+        category: 'blood-donation-camp', // Using hyphens for consistency
+        title: 'Test Blood Donation Camp',
+        date: new Date().toISOString().split('T')[0]
+    };
+    console.log('Test image category:', testImage.category);
+    
+    // Initialize the gallery when the page loads
+    document.addEventListener('DOMContentLoaded', () => {
+        // Set the 'All' filter as active by default
+        const allFilterButton = document.querySelector('.filter-btn[data-category="all"]');
+            filterGallery();
+            renderGallery();
+            renderPagination();
 
-    // Timeout fallback
-    setTimeout(() => {
-        const loadingState = document.getElementById('loadingState');
-        if (loadingState && !loadingState.classList.contains('hidden')) {
-            hideLoadingIndicator();
-            showError('Loading timed out. Please refresh the page.');
+            // Smooth scroll to top of gallery
+            const gallerySection = document.querySelector('section.py-12');
+            if (gallerySection) {
+                gallerySection.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // Lightbox navigation
+    if (closeButton) closeButton.addEventListener('click', closeLightbox);
+    if (prevButton) prevButton.addEventListener('click', (e) => { e.stopPropagation(); prevImage(); });
+    if (nextButton) nextButton.addEventListener('click', (e) => { e.stopPropagation(); nextImage(); });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', (e) => {
+        if (lightbox.style.display === 'flex') {
+            if (e.key === 'Escape') closeLightbox();
+            if (e.key === 'ArrowLeft') prevImage();
+            if (e.key === 'ArrowRight') nextImage();
         }
-    }, 15000);
+    });
+
+    // Close lightbox when clicking outside the image
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox) closeLightbox();
+    });
+}
+
+// Add a test image for debugging
+const testImage = {
+    id: 'test-' + Date.now(),
+    src: 'https://via.placeholder.com/300',
+    category: 'blood-donation-camp', // Using hyphens for consistency
+    title: 'Test Blood Donation Camp',
+    date: new Date().toISOString().split('T')[0]
+};
+console.log('Test image category:', testImage.category);
+
+// Function to load test data when Google Apps Script is not available
+const loadTestData = () => {
+    console.log('Loading test data...');
+    const testImages = [
+        {
+            id: 'test1',
+            src: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format',
+            category: 'blood-donation-camp',
+            title: 'Blood Donation Camp 2023',
+            date: '2023-10-15'
+        },
+        {
+            id: 'test2',
+            src: 'https://images.unsplash.com/photo-1579165466743-6daa6a6cf2eb?w=800&auto=format',
+            category: 'events',
+            title: 'Annual Health Checkup',
+            date: '2023-09-20'
+        },
+        {
+            id: 'test3',
+            src: 'https://images.unsplash.com/photo-1576091160399-112ba82b3f96?w=800&auto=format',
+            category: 'volunteers',
+            title: 'Volunteer Team',
+            date: '2023-08-10'
+        },
+        {
+            id: 'test4',
+            src: 'https://images.unsplash.com/photo-1530026186672-2cd00ffc50fe?w=800&auto=format',
+            category: 'awards',
+            title: 'Best Community Service Award',
+            date: '2023-07-05'
+        }
+    ];
+
+    galleryData = [...testImages, testImage]; // Include our test image too
+    console.log('Test data loaded:', galleryData);
+    
+    // Update the UI
+    filterGallery();
+    renderGallery();
+    renderPagination();
+    hideLoadingIndicator();
+};
+
+// Try to load from Google Apps Script, fallback to test data
+const scriptUrl = 'https://script.google.com/macros/s/AKfycbzQFclRK_YZ9lzxYNkT1Y4wQBNNaqoZk6oTiZCQHu9_uTIbS9a0175wz6vkjsYhB69X1A/exec';
+    
+// First try to load from Google Apps Script
+fetch(`${scriptUrl}?t=${new Date().getTime()}`)
+    .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+    })
+    .then(data => {
+        console.log('Data loaded from Google Apps Script:', data);
+        // Process the data as before
+        processGalleryData(data);
+    })
+    .catch(error => {
+        console.warn('Error loading from Google Apps Script, using test data:', error);
+        loadTestData();
+    });
+    
+function processGalleryData(data) {
+    if (data && Array.isArray(data)) {
+        galleryData = data.map(img => {
+            // Your existing image processing logic here
+            return {
+                id: img.id || Date.now() + Math.random(),
+                src: convertDriveUrlToViewable(img.url || ''),
+                category: img.category || 'uncategorized',
+                title: img.title || 'Untitled',
+        
+        console.log('Processed gallery data:', galleryData);
+        filterGallery();
+        renderGallery();
+        renderPagination();
+    } else {
+        console.warn('Invalid data format from server, using test data');
+        loadTestData();
+    }
+}
+
+// Initialize the gallery when the page loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Set the 'All' filter as active by default
+    const allFilterButton = document.querySelector('.filter-btn[data-category="all"]');
+    if (allFilterButton) {
+        allFilterButton.classList.remove('bg-gray-200', 'hover:bg-gray-300');
+        allFilterButton.classList.add('bg-primary', 'text-white');
+    }
+    
+    // Try to load from Google Apps Script with a timeout
+    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzQFclRK_YZ9lzxYNkT1Y4wQBNNaqoZk6oTiZCQHu9_uTIbS9a0175wz6vkjsYhB69X1A/exec';
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+    
+    fetch(`${scriptUrl}?t=${new Date().getTime()}`, { signal: controller.signal })
+        .then(response => {
+            clearTimeout(timeoutId);
+            if (!response.ok) throw new Error('Network response was not ok');
+            return response.json();
+        })
+        .then(data => {
+            console.log('Data loaded from Google Apps Script:', data);
+            processGalleryData(data);
+        })
+        .catch(error => {
+            console.warn('Error loading from Google Apps Script, using test data:', error);
+            loadTestData();
+        });
 });
