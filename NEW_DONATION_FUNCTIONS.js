@@ -37,7 +37,7 @@ async function logDonation(requestData, button) {
         };
 
         // Call the Google Apps Script
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
         const formData = new URLSearchParams();
         formData.append('action', 'log_donation');

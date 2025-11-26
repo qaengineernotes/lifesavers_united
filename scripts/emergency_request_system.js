@@ -1,5 +1,5 @@
 // Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -666,7 +666,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -796,7 +796,7 @@ async function logDonation(requestData, button) {
         };
 
         // Call the Google Apps Script
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
         const formData = new URLSearchParams();
         formData.append('action', 'log_donation');
@@ -1461,7 +1461,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1638,7 +1638,7 @@ async function editRequest(requestData, button) {
             ...editedData
         };
 
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
         const formData = new URLSearchParams();
         formData.append('action', 'update_request');

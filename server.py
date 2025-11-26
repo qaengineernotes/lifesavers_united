@@ -43,7 +43,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 data = json.loads(post_data.decode('utf-8'))
                 
                 # Prepare data for Google Apps Script
-                script_url = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
                 
                 # Create form data
                 form_data = urllib.parse.urlencode({
@@ -96,7 +96,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     raise ValueError("No data found in form submission")
                 
                 # Prepare data for Google Apps Script (donor registration)
-                script_url = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
                 
                 # Create form data for Google Apps Script
                 # Use the correct action for donor registration
@@ -166,7 +166,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 print(f"Received donor details: {data}")  # Debug log
                 
                 # Prepare data for Google Apps Script (donor details from emergency system)
-                script_url = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
                 
                 # Create form data for Google Apps Script
                 # Try action that might route to Form Responses 2
@@ -233,7 +233,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/api/fetch-requests':
             # Handle fetching emergency requests
             try:
-                script_url = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec'
+                script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
                 
                 with urllib.request.urlopen(script_url) as response:
                     result = response.read().decode('utf-8')

@@ -112,7 +112,7 @@ The frontend now correctly integrates with the backend API:
 
 ### **API Endpoint Used:**
 ```
-POST https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec
+POST https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec
 ```
 
 ### **Request Payload:**

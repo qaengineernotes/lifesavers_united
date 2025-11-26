@@ -100,7 +100,7 @@ H: Closure Reason (for "other" type)
 ### Step 5: Update Frontend
 The Web App URL should remain the same:
 ```
-https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec
+https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec
 ```
 
 If it changes, update it in:
