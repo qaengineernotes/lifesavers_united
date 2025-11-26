@@ -1,5 +1,5 @@
 // Local proxy URL to avoid CORS issues
-const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+const FETCH_URL = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 
 // Emergency request system script loaded
@@ -52,15 +52,28 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (e.target.closest('.close-btn')) {
-            const button = e.target.closest('.close-btn');
+        if (e.target.closest('.log-donation-btn')) {
+            const button = e.target.closest('.log-donation-btn');
 
             // Only allow clicking if button is not disabled
             if (!button.disabled) {
                 isButtonActionInProgress = true; // Set flag to prevent refresh
-                const patientName = button.getAttribute('data-patient-name');
-                const bloodType = button.getAttribute('data-blood-type');
-                closeRequest(patientName, bloodType, button);
+                const card = button.closest('.emergency-request-card');
+                const requestDataStr = card.getAttribute('data-request');
+                if (requestDataStr) {
+                    try {
+                        const decodedJson = decodeURIComponent(requestDataStr);
+                        const requestData = JSON.parse(decodedJson);
+                        logDonation(requestData, button);
+                    } catch (error) {
+                        console.error('Error parsing request data:', error);
+                        showSuccessMessage('Error loading request data. Please refresh the page.');
+                        isButtonActionInProgress = false;
+                    }
+                } else {
+                    showSuccessMessage('Request data not available. Please refresh the page.');
+                    isButtonActionInProgress = false;
+                }
             }
         }
 
@@ -205,26 +218,31 @@ async function loadEmergencyRequests() {
             // Calculate and update statistics
             updateStatistics(data.requests, data.statistics);
 
-            // Display each request and initialize button states
-            data.requests.forEach((request, index) => {
-                try {
-                    const requestCard = createRequestCard(request);
-                    container.appendChild(requestCard);
+            // Store requests for filtering/sorting
+            if (typeof storeRequests === 'function') {
+                storeRequests(data.requests);
+            } else {
+                // Fallback: Display requests directly if filter system not loaded
+                data.requests.forEach((request, index) => {
+                    try {
+                        const requestCard = createRequestCard(request);
+                        container.appendChild(requestCard);
 
-                    // Initialize button states based on request status
-                    const cardKey = `${request.patientName}-${request.bloodType}`;
-                    const requestStatus = request.status || 'Open';
+                        // Initialize button states based on request status
+                        const cardKey = `${request.patientName}-${request.bloodType}`;
+                        const requestStatus = request.status || 'Open';
 
-                    if (requestStatus === 'Verified') {
-                        buttonStates.set(cardKey, { verifyStatus: 'verified' });
-                    } else if (requestStatus === 'Closed') {
-                        buttonStates.set(cardKey, { closeStatus: 'closed' });
+                        if (requestStatus === 'Verified') {
+                            buttonStates.set(cardKey, { verifyStatus: 'verified' });
+                        } else if (requestStatus === 'Closed') {
+                            buttonStates.set(cardKey, { closeStatus: 'closed' });
+                        }
+                    } catch (error) {
+                        console.error(`Error creating card for request ${index}:`, error, request);
+                        // Continue with next request even if one fails
                     }
-                } catch (error) {
-                    console.error(`Error creating card for request ${index}:`, error, request);
-                    // Continue with next request even if one fails
-                }
-            });
+                });
+            }
         } else {
             // Show no requests state
             loadingState.classList.add('hidden');
@@ -279,8 +297,8 @@ function createRequestCard(request) {
     let verifyButtonClass = 'btn-verify btn-flex verify-btn';
     let verifyButtonText = 'Verify';
     let verifyButtonDisabled = '';
-    let closeButtonClass = 'btn-close btn-flex close-btn';
-    let closeButtonText = 'Close';
+    let closeButtonClass = 'btn-donation btn-flex log-donation-btn';
+    let closeButtonText = 'Log Donation';
     let closeButtonDisabled = '';
 
     // Check if request is already verified based on status or stored state
@@ -292,13 +310,21 @@ function createRequestCard(request) {
 
     // Check if request is already closed based on status or stored state
     if (requestStatus === 'Closed' || (storedState && storedState.closeStatus === 'closed')) {
-        closeButtonClass = 'btn-closed btn-flex close-btn';
+        closeButtonClass = 'btn-closed btn-flex log-donation-btn';
         closeButtonText = 'Closed';
         closeButtonDisabled = 'disabled';
     }
 
     // Format patient age display
     const patientAge = request.patientAge ? `, ${request.patientAge} years` : '';
+
+    // Get units information
+    const unitsRequired = parseInt(request.unitsRequired) || 0;
+    const unitsFulfilled = parseInt(request.unitsFulfilled) || 0;
+    const unitsRemaining = unitsRequired - unitsFulfilled;
+
+    // Calculate progress percentage (optional, for future progress bar)
+    const progressPercentage = unitsRequired > 0 ? Math.round((unitsFulfilled / unitsRequired) * 100) : 0;
 
     // Store full request data in the card for editing (with error handling)
     try {
@@ -317,9 +343,11 @@ function createRequestCard(request) {
             .emergency-request-card .mobile-header {
                 flex-direction: column !important;
                 gap: 12px !important;
+                align-items: stretch !important;
             }
             .emergency-request-card .mobile-icon-container {
                 align-items: flex-start !important;
+                width: 100% !important;
             }
             .emergency-request-card .mobile-icon {
                 padding: 8px !important;
@@ -333,6 +361,7 @@ function createRequestCard(request) {
             .emergency-request-card .mobile-text-container {
                 min-width: 0 !important;
                 flex: 1 !important;
+                width: 100% !important;
             }
             .emergency-request-card .mobile-title {
                 font-size: 1.125rem !important;
@@ -342,9 +371,9 @@ function createRequestCard(request) {
                 font-size: 0.875rem !important;
             }
             .emergency-request-card .mobile-subtitle.patient {
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-                white-space: nowrap !important;
+                /* Allow wrapping for long names on mobile */
+                white-space: normal !important;
+                word-wrap: break-word !important;
             }
             .emergency-request-card .mobile-subtitle.hospital {
                 word-wrap: break-word !important;
@@ -393,10 +422,17 @@ function createRequestCard(request) {
             }
             .emergency-request-card .mobile-copy-btn {
                 padding: 6px !important;
+                margin-left: auto !important;
             }
             .emergency-request-card .mobile-copy-btn svg {
                 width: 18px !important;
                 height: 18px !important;
+            }
+            /* Adjust q-container for mobile */
+            .emergency-request-card .mobile-q-container {
+                width: 100% !important;
+                justify-content: space-between !important;
+                margin-top: 4px !important;
             }
         }
     </style>
@@ -430,8 +466,16 @@ function createRequestCard(request) {
             <p class="font-bold text-lg mobile-grid-value">${request.bloodType}</p>
         </div>
         <div class="mobile-grid-item">
-            <span class="text-sm text-text-secondary">Quantity Needed</span>
-            <p class="font-bold text-lg mobile-grid-value">${request.unitsRequired} Units</p>
+            <span class="text-sm text-text-secondary">Units Required</span>
+            <p class="font-bold text-lg mobile-grid-value">${unitsRequired} Units</p>
+        </div>
+        <div class="mobile-grid-item">
+            <span class="text-sm text-text-secondary">Units Fulfilled</span>
+            <p class="font-bold text-lg mobile-grid-value ${unitsFulfilled >= unitsRequired ? 'text-green-600' : 'text-accent'}">${unitsFulfilled} / ${unitsRequired}</p>
+        </div>
+        <div class="mobile-grid-item">
+            <span class="text-sm text-text-secondary">${unitsFulfilled >= unitsRequired ? 'Status' : 'Units Remaining'}</span>
+            <p class="font-bold text-lg mobile-grid-value ${unitsFulfilled >= unitsRequired ? 'text-green-600' : 'text-warning'}">${unitsFulfilled >= unitsRequired ? 'Fulfilled ✓' : unitsRemaining + ' Units'}</p>
         </div>
         <div class="mobile-grid-item">
             <span class="text-sm text-text-secondary">Time Since Request</span>
@@ -458,8 +502,7 @@ function createRequestCard(request) {
         </button>
         <button class="${closeButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${closeButtonDisabled}>
             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </path>
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
             </svg>
             <span>${closeButtonText}</span>
         </button>
@@ -623,7 +666,7 @@ async function verifyRequest(patientName, bloodType, button) {
             };
 
             // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 
             // Create URL-encoded form data
             const formData = new URLSearchParams();
@@ -716,7 +759,8 @@ async function verifyRequest(patientName, bloodType, button) {
 }
 
 // Function to handle "Closed" button click
-async function closeRequest(patientName, bloodType, button) {
+// Function to handle "Log Donation" button click
+async function logDonation(requestData, button) {
     // Check authorization first
     const isAuthorized = await checkAuthorization();
 
@@ -724,9 +768,9 @@ async function closeRequest(patientName, bloodType, button) {
         return; // User is not authorized
     }
 
-    // Show custom popup for donor information
-    const donorInfo = await showDonorInfoPopup(patientName, bloodType);
-    if (!donorInfo) {
+    // Show custom popup for donation information
+    const donationInfo = await showDonationPopup(requestData);
+    if (!donationInfo) {
         return; // User cancelled the popup
     }
 
@@ -734,29 +778,29 @@ async function closeRequest(patientName, bloodType, button) {
         // Show loading state
         button.disabled = true;
         button.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                    </svg>
-                    Updating...
-                `;
+            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            Logging...
+        `;
 
         // Prepare the data for the API call
-        const requestData = {
-            patientName: patientName,
-            bloodType: bloodType,
-            status: 'Closed',
-            donorInfo: donorInfo
+        const donationData = {
+            patientName: requestData.patientName,
+            bloodType: requestData.bloodType,
+            unitsDonated: donationInfo.units,
+            donorType: donationInfo.donorType,
+            donorName: donationInfo.donorName || '',
+            donorContact: donationInfo.donorContact || '',
+            closureReason: donationInfo.closureReason || ''
         };
 
-        // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+        // Call the Google Apps Script
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 
-        // Create URL-encoded form data
         const formData = new URLSearchParams();
-        formData.append('action', 'update_status');
-        formData.append('data', JSON.stringify(requestData));
-
-
+        formData.append('action', 'log_donation');
+        formData.append('data', JSON.stringify(donationData));
 
         const response = await fetch(scriptUrl, {
             method: 'POST',
@@ -767,82 +811,82 @@ async function closeRequest(patientName, bloodType, button) {
             redirect: 'follow'
         });
 
-
-
         const result = await response.json();
 
         if (result.success) {
-            // If donor details were collected, save them to a different sheet
-            // Only save to Form Responses 2 if it's an actual donor (not Relative or Other)
-            if (donorInfo && donorInfo !== 'Relative' && !donorInfo.includes('Other')) {
-                await saveDonorDetailsToSheet(patientName, bloodType, donorInfo);
-            }
-
-            // Store reference to the card
             const card = button.closest('.emergency-request-card');
 
-            // Change button appearance to show closed status
-            button.innerHTML = `
-                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                            Closed
-                        `;
-            button.classList.remove('btn-close');
-            button.classList.add('btn-closed');
-            button.disabled = true;
+            if (result.autoClosed) {
+                // Request was auto-closed
+                button.innerHTML = `
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Closed
+                `;
+                button.classList.remove('btn-donation');
+                button.classList.add('btn-closed');
+                button.disabled = true;
 
+                showSuccessMessage('Donation logged and request closed successfully!');
 
+                // Refresh the page to show updated status
+                setTimeout(() => {
+                    loadEmergencyRequests();
+                }, 1500);
+            } else {
+                // Request still open, update units display
+                button.innerHTML = `
+                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                    </svg>
+                    Log Donation
+                `;
+                button.disabled = false;
 
-            // Store the button state locally
-            const cardKey = `${patientName}-${bloodType}`;
+                showSuccessMessage(`Donation logged! ${result.unitsRemaining} unit(s) remaining.`);
+
+                // Refresh the page to show updated units
+                setTimeout(() => {
+                    loadEmergencyRequests();
+                }, 1500);
+            }
+
+            // Store button state
+            const cardKey = `${requestData.patientName}-${requestData.bloodType}`;
             const existingState = buttonStates.get(cardKey) || {};
             const newState = {
                 ...existingState,
-                closeStatus: 'closed'
+                closeStatus: result.autoClosed ? 'closed' : 'open'
             };
             buttonStates.set(cardKey, newState);
 
-            // Statistics will be updated when the page refreshes or new data is loaded
-            // No need to update statistics here as it may cause incorrect calculations
-
-            // Show success message
-            showSuccessMessage('Request marked as CLOSED successfully!');
-
-            // Keep the card visible and don't refresh automatically
-            // The button state change is sufficient to show the action was completed
-
-            // Reset the flag to allow refresh button to work
             isButtonActionInProgress = false;
         } else {
-            // Reset button state on error
+            // Reset button on error
             button.disabled = false;
             button.innerHTML = `
-                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                            </svg>
-                            Close
-                        `;
-            button.classList.remove('btn-closed');
-            button.classList.add('btn-close');
-            showSuccessMessage('Failed to update status. Please try again.');
-            isButtonActionInProgress = false; // Reset flag on error
+                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                </svg>
+                Log Donation
+            `;
+            showSuccessMessage(result.message || 'Failed to log donation. Please try again.');
+            isButtonActionInProgress = false;
         }
     } catch (error) {
-        console.error('Error updating status:', error);
+        console.error('Error logging donation:', error);
 
-        // Reset button state on error
+        // Reset button on error
         button.disabled = false;
         button.innerHTML = `
-                        <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                        Close
-                    `;
-        button.classList.remove('btn-closed');
-        button.classList.add('btn-close');
-        showSuccessMessage('Error updating status. Please try again.');
-        isButtonActionInProgress = false; // Reset flag on error
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+            </svg>
+            Log Donation
+        `;
+        showSuccessMessage('Error logging donation. Please try again.');
+        isButtonActionInProgress = false;
     }
 }
 
@@ -1166,11 +1210,16 @@ function showVerificationPopup(patientName, bloodType) {
 }
 
 // Function to show custom popup for donor information
-function showDonorInfoPopup(patientName, bloodType) {
+// Function to show donation popup
+function showDonationPopup(requestData) {
     return new Promise((resolve) => {
-        // Create modal overlay with explicit inline styles
+        const unitsRequired = parseInt(requestData.unitsRequired) || 0;
+        const unitsFulfilled = parseInt(requestData.unitsFulfilled) || 0;
+        const unitsRemaining = unitsRequired - unitsFulfilled;
+
+        // Create modal overlay
         const modal = document.createElement('div');
-        modal.id = 'donorInfoModal';
+        modal.id = 'donationPopup';
         modal.style.cssText = `
             position: fixed;
             top: 0;
@@ -1184,230 +1233,192 @@ function showDonorInfoPopup(patientName, bloodType) {
             z-index: 999999;
         `;
 
-        // Create modal content with explicit inline styles
+        // Create modal content
         const modalContent = document.createElement('div');
         modalContent.style.cssText = `
             background-color: white;
             border-radius: 16px;
             padding: 32px;
-            max-width: 480px;
+            max-width: 500px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            position: relative;
-            z-index: 1000000;
         `;
+
         modalContent.innerHTML = `
-            <div style="text-align: center; margin-bottom: 24px;">
-                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Close Blood Request</h3>
-                <p style="color: #6b7280;">Patient: ${patientName} | Blood Type: ${bloodType}</p>
-            </div>
+            <h3 style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">Log Blood Donation</h3>
+            <p style="color: #6b7280; margin-bottom: 16px;">Patient: ${requestData.patientName} | Blood Type: ${requestData.bloodType}</p>
+            <p style="color: #059669; font-weight: 600; margin-bottom: 24px;">${unitsFulfilled} / ${unitsRequired} units fulfilled | ${unitsRemaining} remaining</p>
             
             <div style="margin-bottom: 24px;">
-                <p style="font-size: 18px; font-weight: 600; color: #374151; margin-bottom: 16px;">Who has donated the blood?</p>
-                
-                <div style="margin-bottom: 16px;">
-                    <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 12px;">
+                <label style="display: block; font-weight: 600; margin-bottom: 12px;">Who donated?</label>
+                <div>
+                    <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
                         <input type="radio" name="donorType" value="relative" style="width: 16px; height: 16px; margin-right: 12px;">
-                        <span style="color: #374151; font-weight: 500;">Relative</span>
+                        <span>Relative</span>
                     </label>
-                    
-                    <label style="display: flex; align-items: center; cursor: pointer; margin-bottom: 12px;">
+                    <label style="display: flex; align-items: center; margin-bottom: 12px; cursor: pointer;">
                         <input type="radio" name="donorType" value="donor" style="width: 16px; height: 16px; margin-right: 12px;">
-                        <span style="color: #374151; font-weight: 500;">Donor</span>
+                        <span>Donor (from database)</span>
                     </label>
-                    
                     <label style="display: flex; align-items: center; cursor: pointer;">
-                        <input type="radio" name="donorType" value="noDonation" style="width: 16px; height: 16px; margin-right: 12px;">
-                        <span style="color: #374151; font-weight: 500;">Other</span>
-                        <div style="position: relative; margin-left: 8px;">
-                            <svg class="info-icon" style="width: 16px; height: 16px; color: #6b7280; cursor: help;" fill="currentColor" viewBox="0 0 20 20" onmouseenter="this.parentElement.querySelector('.tooltip').style.opacity='1'; this.parentElement.querySelector('.tooltip').style.visibility='visible';" onmouseleave="this.parentElement.querySelector('.tooltip').style.opacity='0'; this.parentElement.querySelector('.tooltip').style.visibility='hidden';">
-                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                            </svg>
-                            <div class="tooltip" style="position: absolute; bottom: 100%; left: 0; margin-bottom: 8px; padding: 8px 12px; background-color: #1f2937; color: white; border-radius: 6px; font-size: 12px; white-space: normal; width: 350px; text-align: left; opacity: 0; visibility: hidden; transition: opacity 0.2s, visibility 0.2s; z-index: 1000001; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                                • Patient died<br>
-                                • Discharged<br>
-                                • Condition improved<br>
-                                • Transferred<br>
-                                • Medical reasons
-                                <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 5px solid #1f2937;"></div>
-                            </div>
-                        </div>
+                        <input type="radio" name="donorType" value="other" style="width: 16px; height: 16px; margin-right: 12px;">
+                        <span>Other (close request)</span>
                     </label>
                 </div>
             </div>
-            
+            <div id="unitsSection" style="margin-bottom: 24px; display: none;">
+                <div>
+                    <label style="display: block; font-size: 14px; margin-bottom: 4px;">Custom Amount:</label>
+                    <input type="number" id="customUnits" min="1" max="${unitsRemaining}" placeholder="Enter units" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+                </div>
+            </div>
             <div id="donorDetailsSection" style="display: none; margin-bottom: 24px;">
                 <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Donor Name *</label>
-                    <input type="text" id="donorName" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;" placeholder="Enter donor name" required>
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">This field is required when selecting 'Donor'</p>
+                    <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Donor Name *</label>
+                    <input type="text" id="donorName" placeholder="Enter donor name or 'Unknown'" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
                 <div>
-                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Contact Info (Optional)</label>
-                    <input type="text" id="donorContact" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px;" placeholder="Phone number or email">
-                    <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Phone number or email address</p>
+                    <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Contact (Optional)</label>
+                    <input type="text" id="donorContact" placeholder="Phone number or email" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
+            </div>
+            
+            <div id="closureReasonSection" style="display: none; margin-bottom: 24px;">
+                <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Closure Reason *</label>
+                <input type="text" id="closureReason" placeholder="e.g., Patient discharged, died, etc." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
             </div>
             
             <div style="display: flex; gap: 12px;">
-                <button id="cancelBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer;">
-                    Cancel
-                </button>
-                <button id="submitBtn" style="flex: 1; padding: 12px 16px; background-color: #dc2626; color: white; border-radius: 8px; font-weight: 500; cursor: pointer; opacity: 0.5;" disabled>
-                    Close Request
-                </button>
+                <button id="cancelBtn" style="flex: 1; padding: 12px; border: 1px solid #d1d5db; border-radius: 8px; font-weight: 600; cursor: pointer;">Cancel</button>
+                <button id="submitBtn" style="flex: 1; padding: 12px; background-color: #dc2626; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Log Donation</button>
             </div>
         `;
 
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
 
-        // Get elements
-        const donorTypeRadios = modal.querySelectorAll('input[name="donorType"]');
-        const donorDetailsSection = modal.querySelector('#donorDetailsSection');
-        const donorNameInput = modal.querySelector('#donorName');
-        const donorContactInput = modal.querySelector('#donorContact');
-        const submitBtn = modal.querySelector('#submitBtn');
-        const cancelBtn = modal.querySelector('#cancelBtn');
+        // Handle unit button clicks
+        let selectedUnits = null;
+        modalContent.querySelectorAll('.unit-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalContent.querySelectorAll('.unit-btn').forEach(b => {
+                    b.style.borderColor = '#d1d5db';
+                    b.style.backgroundColor = 'white';
+                });
+                btn.style.borderColor = '#dc2626';
+                btn.style.backgroundColor = '#fee2e2';
+                selectedUnits = parseInt(btn.getAttribute('data-units'));
+                document.getElementById('customUnits').value = '';
+            });
+        });
 
-        // Handle radio button changes
-        donorTypeRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                if (e.target.value === 'donor') {
+        // Handle custom units input
+        document.getElementById('customUnits').addEventListener('input', (e) => {
+            modalContent.querySelectorAll('.unit-btn').forEach(b => {
+                b.style.borderColor = '#d1d5db';
+                b.style.backgroundColor = 'white';
+            });
+            selectedUnits = parseInt(e.target.value) || null;
+        });
+
+        // Handle donor type selection
+        modalContent.querySelectorAll('input[name="donorType"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const donorDetailsSection = document.getElementById('donorDetailsSection');
+                const closureReasonSection = document.getElementById('closureReasonSection');
+                const unitsSection = document.getElementById('unitsSection');
+
+                if (radio.value === 'donor') {
                     donorDetailsSection.style.display = 'block';
-                    submitBtn.disabled = true; // Disable until name is entered
-                    submitBtn.style.opacity = '0.5';
-                    donorNameInput.focus(); // Focus on the name input
+                    closureReasonSection.style.display = 'none';
+                    unitsSection.style.display = 'block';
+                } else if (radio.value === 'other') {
+                    donorDetailsSection.style.display = 'none';
+                    closureReasonSection.style.display = 'block';
+                    unitsSection.style.display = 'none';
+                } else if (radio.value === 'relative') {
+                    donorDetailsSection.style.display = 'none';
+                    closureReasonSection.style.display = 'block'; // Show closure reason for relative too? Or just hide everything?
+                    // User said "directly close the request With Closer Reason" for BOTH.
+                    // So show closure reason for relative too.
+                    unitsSection.style.display = 'none';
                 } else {
                     donorDetailsSection.style.display = 'none';
-                    submitBtn.disabled = false;
-                    submitBtn.style.opacity = '1';
+                    closureReasonSection.style.display = 'none';
+                    unitsSection.style.display = 'block';
                 }
             });
         });
 
-        // Handle donor name input
-        donorNameInput.addEventListener('input', () => {
-            const hasName = donorNameInput.value.trim().length > 0;
-            const selectedType = modal.querySelector('input[name="donorType"]:checked')?.value;
-
-            if (selectedType === 'donor') {
-                submitBtn.disabled = !hasName;
-                submitBtn.style.opacity = hasName ? '1' : '0.5';
-            }
-        });
-
-        // Handle submit
-        submitBtn.addEventListener('click', () => {
-            const selectedType = modal.querySelector('input[name="donorType"]:checked')?.value;
-
-            if (!selectedType) {
-                showModalError('Please select who donated the blood.');
-                return;
-            }
-
-            let donorInfo = '';
-            if (selectedType === 'relative') {
-                donorInfo = 'Relative';
-            } else if (selectedType === 'donor') {
-                const donorName = donorNameInput.value.trim();
-                const donorContact = donorContactInput.value.trim();
-
-                if (!donorName) {
-                    showModalError('Please enter the donor name.');
-                    donorNameInput.focus();
-                    return;
-                }
-
-                // Validate donor name (basic validation)
-                if (donorName.length < 2) {
-                    showModalError('Donor name must be at least 2 characters long.');
-                    donorNameInput.focus();
-                    return;
-                }
-
-                donorInfo = donorContact ? `${donorName}, ${donorContact}` : donorName;
-            } else if (selectedType === 'noDonation') {
-                donorInfo = 'Other - No donation';
-            }
-
-            // Remove modal
-            modal.remove();
-            resolve(donorInfo);
-        });
-
         // Handle cancel
-        cancelBtn.addEventListener('click', () => {
-            modal.remove();
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            document.body.removeChild(modal);
             resolve(null);
         });
 
-        // Handle clicking outside modal
+        // Handle submit
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            const donorType = modalContent.querySelector('input[name="donorType"]:checked')?.value;
+
+            // Validation
+            // Validation
+            if (donorType === 'donor') {
+                if (!selectedUnits || selectedUnits <= 0) {
+                    alert('Please select or enter the number of units donated');
+                    return;
+                }
+
+                if (selectedUnits > unitsRemaining) {
+                    alert(`Cannot donate ${selectedUnits} units. Only ${unitsRemaining} units remaining.`);
+                    return;
+                }
+            } else if (donorType === 'relative') {
+                // For relative, assume they fulfilled the remaining requirement
+                selectedUnits = unitsRemaining;
+            } else if (donorType === 'other') {
+                // For other, assume 0 units (just closing)
+                selectedUnits = 0;
+            }
+
+            if (!donorType) {
+                alert('Please select who donated');
+                return;
+            }
+
+            const donorName = document.getElementById('donorName')?.value || '';
+            const donorContact = document.getElementById('donorContact')?.value || '';
+            const closureReason = document.getElementById('closureReason')?.value || '';
+
+            if (donorType === 'donor' && !donorName) {
+                alert('Please enter donor name or type "Unknown"');
+                return;
+            }
+
+            if ((donorType === 'other' || donorType === 'relative') && !closureReason) {
+                alert('Please enter a closure reason');
+                return;
+            }
+
+            document.body.removeChild(modal);
+            resolve({
+                units: selectedUnits,
+                donorType: donorType,
+                donorName: donorName,
+                donorContact: donorContact,
+                closureReason: closureReason
+            });
+        });
+
+        // Close on outside click
         modal.addEventListener('click', (e) => {
             if (e.target === modal) {
-                modal.remove();
+                document.body.removeChild(modal);
                 resolve(null);
             }
         });
-
-        // Handle escape key
-        document.addEventListener('keydown', function escapeHandler(e) {
-            if (e.key === 'Escape') {
-                modal.remove();
-                resolve(null);
-                document.removeEventListener('keydown', escapeHandler);
-            }
-        });
-
-        // Handle enter key in input fields
-        donorNameInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !submitBtn.disabled) {
-                submitBtn.click();
-            }
-        });
-
-        donorContactInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !submitBtn.disabled) {
-                submitBtn.click();
-            }
-        });
-
-        // Focus on first radio button initially
-        setTimeout(() => {
-            const firstRadio = modal.querySelector('input[name="donorType"]');
-            if (firstRadio) {
-                firstRadio.focus();
-            }
-        }, 100);
     });
-}
-
-// Function to show error messages in the modal
-function showModalError(message) {
-    // Remove any existing error messages
-    const existingError = document.querySelector('.modal-error');
-    if (existingError) {
-        existingError.remove();
-    }
-
-    // Create error message element
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'modal-error bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4 text-sm';
-    errorDiv.textContent = message;
-
-    // Insert error message before the buttons
-    const modal = document.getElementById('donorInfoModal');
-    const buttonsContainer = modal.querySelector('.flex.space-x-3');
-    buttonsContainer.parentNode.insertBefore(errorDiv, buttonsContainer);
-
-    // Auto-remove error after 5 seconds
-    setTimeout(() => {
-        if (errorDiv.parentNode) {
-            errorDiv.remove();
-        }
-    }, 5000);
 }
 
 // Function to save donor details to Form Responses 2 sheet
@@ -1450,7 +1461,7 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
         };
 
         // Call the Google Apps Script directly
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 
         // Create URL-encoded form data
         const formData = new URLSearchParams();
@@ -1588,77 +1599,77 @@ function escapeHtml(text) {
 
 // Function to edit a blood request
 async function editRequest(requestData, button) {
-  // Check authorization first
-  const isAuthorized = await checkAuthorization();
-  if (!isAuthorized) return;
+    // Check authorization first
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) return;
 
-  // Show edit modal and collect changes
-  const editedData = await showEditRequestModal(requestData);
-  if (!editedData) return;
+    // Show edit modal and collect changes
+    const editedData = await showEditRequestModal(requestData);
+    if (!editedData) return;
 
-  isButtonActionInProgress = true;
+    isButtonActionInProgress = true;
 
-  try {
-    // Button loading state
-    button.disabled = true;
-    const originalHTML = button.innerHTML;
-    button.innerHTML = `
+    try {
+        // Button loading state
+        button.disabled = true;
+        const originalHTML = button.innerHTML;
+        button.innerHTML = `
       <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
         <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
       </svg>
       Updating.
     `;
 
-    // Build update payload:
-    const updateData = {
-      // Use original number to find the row
-      originalContactNumber: requestData.contactNumber || '',
-      // If user changed it, send the new one; else keep original
-      contactNumber:
-        (editedData.contactNumber && editedData.contactNumber.trim() !== '')
-          ? editedData.contactNumber
-          : (requestData.contactNumber || ''),
+        // Build update payload:
+        const updateData = {
+            // Use original number to find the row
+            originalContactNumber: requestData.contactNumber || '',
+            // If user changed it, send the new one; else keep original
+            contactNumber:
+                (editedData.contactNumber && editedData.contactNumber.trim() !== '')
+                    ? editedData.contactNumber
+                    : (requestData.contactNumber || ''),
 
-      // Keep these too (harmless on server; can be useful elsewhere)
-      patientName: (editedData.patientName ?? requestData.patientName) || '',
-      bloodType: (editedData.bloodType ?? requestData.bloodType) || '',
+            // Keep these too (harmless on server; can be useful elsewhere)
+            patientName: (editedData.patientName ?? requestData.patientName) || '',
+            bloodType: (editedData.bloodType ?? requestData.bloodType) || '',
 
-      // Spread all edited fields
-      ...editedData
-    };
+            // Spread all edited fields
+            ...editedData
+        };
 
-    const scriptUrl = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+        const scriptUrl = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 
-    const formData = new URLSearchParams();
-    formData.append('action', 'update_request');
-    formData.append('data', JSON.stringify(updateData));
+        const formData = new URLSearchParams();
+        formData.append('action', 'update_request');
+        formData.append('data', JSON.stringify(updateData));
 
-    const response = await fetch(scriptUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData.toString(), // IMPORTANT: encode body as string
-      redirect: 'follow'
-    });
+        const response = await fetch(scriptUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: formData.toString(), // IMPORTANT: encode body as string
+            redirect: 'follow'
+        });
 
-    const result = await response.json();
+        const result = await response.json();
 
-    if (result.success) {
-      showSuccessMessage('Request updated successfully!');
-      isButtonActionInProgress = false;
-      setTimeout(() => loadEmergencyRequests(), 1000);
-    } else {
-      button.disabled = false;
-      button.innerHTML = originalHTML;
-      showSuccessMessage(result.message || 'Failed to update request. Please try again.');
-      isButtonActionInProgress = false;
+        if (result.success) {
+            showSuccessMessage('Request updated successfully!');
+            isButtonActionInProgress = false;
+            setTimeout(() => loadEmergencyRequests(), 1000);
+        } else {
+            button.disabled = false;
+            button.innerHTML = originalHTML;
+            showSuccessMessage(result.message || 'Failed to update request. Please try again.');
+            isButtonActionInProgress = false;
+        }
+    } catch (error) {
+        console.error('Error updating request:', error);
+        button.disabled = false;
+        button.innerHTML = originalHTML;
+        showSuccessMessage('Error updating request. Please try again.');
+        isButtonActionInProgress = false;
     }
-  } catch (error) {
-    console.error('Error updating request:', error);
-    button.disabled = false;
-    button.innerHTML = originalHTML;
-    showSuccessMessage('Error updating request. Please try again.');
-    isButtonActionInProgress = false;
-  }
 }
 
 

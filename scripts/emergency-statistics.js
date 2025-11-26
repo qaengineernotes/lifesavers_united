@@ -3,7 +3,7 @@
 // Used across multiple pages: index.html, emergency_request_system.html, etc.
 
 // API Configuration
-const EMERGENCY_API_URL = 'https://script.google.com/macros/s/AKfycbzUxWa0KgA0vkN_P3DB0DVRXQe8l4o5kJCc9zUmNYOqIHYq1aJjeWH3oRgA_w2sq-Re/exec';
+const EMERGENCY_API_URL = 'https://script.google.com/macros/s/AKfycbxojezkE43grgB_qBBTHXaP4YPYnNRoF8OML5edqL5hixtDbDRZuVWV553hFN2BoDXsuA/exec';
 
 /**
  * Load emergency statistics from the API
