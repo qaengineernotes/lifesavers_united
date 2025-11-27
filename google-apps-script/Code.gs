@@ -427,16 +427,19 @@ function logDonation(data, sheet, spreadsheet) {
         sheet.getRange(rowIndex, 17).setValue(newUnitsFulfilled); // Column Q: Units Fulfilled
         sheet.getRange(rowIndex, 19).setValue(updatedDonors);     // Column S: Donors
 
-        // Log to Donation Log sheet
-        logToDonationSheet(spreadsheet, {
-            patientName: patientName,
-            bloodType: bloodType,
-            unitsDonated: unitsDonated,
-            donorType: donorType,
-            donorName: donorName,
-            donorContact: donorContact,
-            closureReason: closureReason
-        });
+        // Log to Donation Log sheet ONLY if donor type is 'donor'
+        // Do NOT log for 'relative' or 'other' types
+        if (donorType === 'donor') {
+            logToDonationSheet(spreadsheet, {
+                patientName: patientName,
+                bloodType: bloodType,
+                unitsDonated: unitsDonated,
+                donorType: donorType,
+                donorName: donorName,
+                donorContact: donorContact,
+                closureReason: closureReason
+            });
+        }
 
         // Check if request should be auto-closed
         let shouldClose = false;
