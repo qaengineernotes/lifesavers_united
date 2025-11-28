@@ -197,7 +197,8 @@ function applyFiltersAndSort() {
     // If search term is less than 3 characters, show all results (don't filter)
 
     // Apply blood group filter
-    if (currentFilters.bloodGroup !== 'all') {
+    // Treat 'any' the same as 'all' - show all blood groups
+    if (currentFilters.bloodGroup !== 'all' && currentFilters.bloodGroup !== 'any') {
         filteredRequests = filteredRequests.filter(request =>
             request.bloodType === currentFilters.bloodGroup
         );
@@ -387,7 +388,7 @@ function updateActiveFiltersDisplay() {
     }
 
     // Blood group filter
-    if (currentFilters.bloodGroup !== 'all') {
+    if (currentFilters.bloodGroup !== 'all' && currentFilters.bloodGroup !== 'any') {
         filters.push({
             label: `Blood: ${currentFilters.bloodGroup}`,
             key: 'bloodGroup'
