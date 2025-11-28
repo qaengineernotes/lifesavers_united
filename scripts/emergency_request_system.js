@@ -323,6 +323,12 @@ function createRequestCard(request) {
     const unitsFulfilled = parseInt(request.unitsFulfilled) || 0;
     const unitsRemaining = unitsRequired - unitsFulfilled;
 
+    // Get the original text for units required (e.g., "2 Units", "3 Bags")
+    // If unitsRequiredText exists and is not just a number, use it; otherwise fall back to number + "Units"
+    const unitsRequiredDisplay = request.unitsRequiredText && String(request.unitsRequiredText).trim() !== String(unitsRequired)
+        ? request.unitsRequiredText
+        : `${unitsRequired} Units`;
+
     // Calculate progress percentage (optional, for future progress bar)
     const progressPercentage = unitsRequired > 0 ? Math.round((unitsFulfilled / unitsRequired) * 100) : 0;
 
@@ -467,7 +473,7 @@ function createRequestCard(request) {
         </div>
         <div class="mobile-grid-item">
             <span class="text-sm text-text-secondary">Units Required</span>
-            <p class="font-bold text-lg mobile-grid-value">${unitsRequired} Units</p>
+            <p class="font-bold text-lg mobile-grid-value">${unitsRequiredDisplay}</p>
         </div>
         <div class="mobile-grid-item">
             <span class="text-sm text-text-secondary">Units Fulfilled</span>

@@ -33,12 +33,16 @@ function doGet(e) {
             const unitsFulfilled = parseInt(row[16]) || 0;
             const unitsRequired = parseInt(row[4]) || 0;
             const unitsRemaining = unitsRequired - unitsFulfilled;
+            
+            // Keep the original text from the sheet (e.g., "2 Units", "3 Bags")
+            const unitsRequiredText = row[4] || '';
 
             const request = {
                 inquiryDate: row[1] || '',              // Column B
                 patientName: row[2] || '',              // Column C
                 contactNumber: row[3] || '',            // Column D
-                unitsRequired: unitsRequired,           // Column E
+                unitsRequired: unitsRequired,           // Column E - Parsed integer
+                unitsRequiredText: unitsRequiredText,   // Column E - Original text
                 bloodType: row[5] || '',                // Column F - Required BG
                 patientBloodType: row[6] || '',         // Column G - Patient BG
                 patientAge: row[7] || '',               // Column H - Age
