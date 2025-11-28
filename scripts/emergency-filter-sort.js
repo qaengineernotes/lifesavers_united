@@ -197,11 +197,15 @@ function applyFiltersAndSort() {
     // If search term is less than 3 characters, show all results (don't filter)
 
     // Apply blood group filter
-    // Treat 'any' the same as 'all' - show all blood groups
-    if (currentFilters.bloodGroup !== 'all' && currentFilters.bloodGroup !== 'any') {
-        filteredRequests = filteredRequests.filter(request =>
-            request.bloodType === currentFilters.bloodGroup
-        );
+    // Exact matching with case-insensitive comparison
+    // 'any' shows only requests with bloodType 'any' (case-insensitive)
+    // 'A+' shows only requests with bloodType 'A+', etc.
+    if (currentFilters.bloodGroup !== 'all') {
+        filteredRequests = filteredRequests.filter(request => {
+            const requestBloodType = (request.bloodType || '').toLowerCase();
+            const filterBloodGroup = currentFilters.bloodGroup.toLowerCase();
+            return requestBloodType === filterBloodGroup;
+        });
     }
 
     // Apply urgency filter
@@ -388,7 +392,7 @@ function updateActiveFiltersDisplay() {
     }
 
     // Blood group filter
-    if (currentFilters.bloodGroup !== 'all' && currentFilters.bloodGroup !== 'any') {
+    if (currentFilters.bloodGroup !== 'all') {
         filters.push({
             label: `Blood: ${currentFilters.bloodGroup}`,
             key: 'bloodGroup'
