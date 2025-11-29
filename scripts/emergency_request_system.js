@@ -128,6 +128,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 showSuccessMessage('Request data not available. Please refresh the page.');
             }
         }
+
+        if (e.target.closest('.close-request-btn')) {
+            const button = e.target.closest('.close-request-btn');
+            if (!button.disabled) {
+                isButtonActionInProgress = true;
+                const card = button.closest('.emergency-request-card');
+                const requestDataStr = card.getAttribute('data-request');
+                if (requestDataStr) {
+                    try {
+                        const decodedJson = decodeURIComponent(requestDataStr);
+                        const requestData = JSON.parse(decodedJson);
+                        closeRequestDirectly(requestData, button);
+                    } catch (error) {
+                        console.error('Error parsing request data:', error);
+                        showSuccessMessage('Error loading request data. Please refresh the page.');
+                        isButtonActionInProgress = false;
+                    }
+                } else {
+                    showSuccessMessage('Request data not available. Please refresh the page.');
+                    isButtonActionInProgress = false;
+                }
+            }
+        }
     });
 
 
@@ -308,20 +331,25 @@ function createRequestCard(request) {
         verifyButtonDisabled = 'disabled';
     }
 
+    // Get units information first (needed for the check below)
+    const unitsRequired = parseInt(request.unitsRequired) || 0;
+    const unitsFulfilled = parseInt(request.unitsFulfilled) || 0;
+    const unitsRemaining = unitsRequired - unitsFulfilled;
+
     // Check if request is already closed based on status or stored state
     if (requestStatus === 'Closed' || (storedState && storedState.closeStatus === 'closed')) {
         closeButtonClass = 'btn-closed btn-flex log-donation-btn';
         closeButtonText = 'Closed';
         closeButtonDisabled = 'disabled';
+    } else if (unitsFulfilled >= unitsRequired && unitsRequired > 0) {
+        // If all units are fulfilled but not yet closed, show Close Request button
+        closeButtonClass = 'btn-close-request btn-flex close-request-btn';
+        closeButtonText = 'Close Request';
+        closeButtonDisabled = '';
     }
 
     // Format patient age display
     const patientAge = request.patientAge ? `, ${request.patientAge} years` : '';
-
-    // Get units information
-    const unitsRequired = parseInt(request.unitsRequired) || 0;
-    const unitsFulfilled = parseInt(request.unitsFulfilled) || 0;
-    const unitsRemaining = unitsRequired - unitsFulfilled;
 
     // Get the original text for units required (e.g., "2 Units", "3 Bags")
     // If unitsRequiredText exists and is not just a number, use it; otherwise fall back to number + "Units"
@@ -892,6 +920,96 @@ async function logDonation(requestData, button) {
             Log Donation
         `;
         showSuccessMessage('Error logging donation. Please try again.');
+        isButtonActionInProgress = false;
+    }
+}
+
+// Function to close request directly when all units are fulfilled
+async function closeRequestDirectly(requestData, button) {
+    try {
+        // Show loading state
+        button.disabled = true;
+        button.innerHTML = `
+            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+            </svg>
+            Closing...
+        `;
+
+        // Prepare data to close the request
+        const updateData = {
+            patientName: requestData.patientName,
+            bloodType: requestData.bloodType,
+            status: 'Closed'
+        };
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'update_status');
+        formData.append('data', JSON.stringify(updateData));
+
+        const response = await fetch(FETCH_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString(),
+            redirect: 'follow'
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            // Update button to closed state
+            button.innerHTML = `
+                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                Closed
+            `;
+            button.classList.remove('btn-close-request');
+            button.classList.add('btn-closed');
+            button.disabled = true;
+
+            // Store button state
+            const cardKey = `${requestData.patientName}-${requestData.bloodType}`;
+            const existingState = buttonStates.get(cardKey) || {};
+            buttonStates.set(cardKey, {
+                ...existingState,
+                closeStatus: 'closed'
+            });
+
+            showSuccessMessage('Request closed successfully!');
+
+            // Refresh after delay
+            setTimeout(() => {
+                loadEmergencyRequests();
+            }, 1500);
+
+            isButtonActionInProgress = false;
+        } else {
+            // Reset button on error
+            button.disabled = false;
+            button.innerHTML = `
+                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+                </svg>
+                Close Request
+            `;
+            showSuccessMessage(result.message || 'Failed to close request. Please try again.');
+            isButtonActionInProgress = false;
+        }
+    } catch (error) {
+        console.error('Error closing request:', error);
+
+        // Reset button on error
+        button.disabled = false;
+        button.innerHTML = `
+            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
+            </svg>
+            Close Request
+        `;
+        showSuccessMessage('Error closing request. Please try again.');
         isButtonActionInProgress = false;
     }
 }

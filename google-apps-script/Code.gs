@@ -568,6 +568,13 @@ function updateRequestStatus(data, sheet) {
 
             if (rowPatientName === patientName.trim() && rowBloodType === bloodType.trim()) {
                 sheet.getRange(i + 1, 11).setValue(newStatus); // Column K: Status
+
+                // If status is Closed, update fulfilled date
+                if (newStatus === 'Closed') {
+                    const fulfilledDate = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd-MMM-yyyy HH:mm");
+                    sheet.getRange(i + 1, 18).setValue(fulfilledDate); // Column R: Fulfilled Date
+                }
+
                 console.log(`Status updated to ${newStatus} at row ${i + 1}`);
 
                 return ContentService.createTextOutput(JSON.stringify({
