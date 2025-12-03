@@ -149,6 +149,11 @@ async function generatePoster(requestData) {
     const units = requestData.unitsRequiredText || requestData.unitsRequired || '2';
     const urg = requestData.urgency || 'Normal';
 
+    // Smart logic: Add "Units" only if the value is purely numeric
+    // Examples: "2" -> "2 Units", "2 Units" -> "2 Units", "1 Blood - 1 SDP" -> "1 Blood - 1 SDP"
+    const isOnlyNumber = /^\d+$/.test(String(units).trim());
+    const unitsDisplay = isOnlyNumber ? `${units} Units` : units;
+
     // Calculate centered positions
     // Canvas width = 1080px
     // Units badge width = 240px, Urgency badge width = 200px
@@ -165,7 +170,7 @@ async function generatePoster(requestData) {
     ctx.fill();
     ctx.fillStyle = '#FFF';
     ctx.font = 'bold 22px "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
-    ctx.fillText(`${units}`, unitsX + 120, 726); // Center text in badge - show exact value from Excel
+    ctx.fillText(`${unitsDisplay}`, unitsX + 120, 726); // Center text in badge - smart display with "Units" for numbers only
 
     // Urgency Badge - Outlined style
     let urgColor = '#F59E0B';
