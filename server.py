@@ -260,30 +260,66 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
+def find_available_port(start_port=8000, max_attempts=10):
+    """Find an available port starting from start_port"""
+    import socket
+    for port in range(start_port, start_port + max_attempts):
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.bind(('', port))
+                return port
+        except OSError:
+            continue
+    return None
+
 def main():
     # Change to the project directory
     os.chdir(DIRECTORY)
     
-    # Create server
-    with socketserver.TCPServer(("", PORT), CORSHTTPRequestHandler) as httpd:
-        print(f"🚀 Server started at http://localhost:{PORT}")
-        print(f"📁 Serving files from: {DIRECTORY}")
-        print(f"🌐 Open your browser and go to: http://localhost:{PORT}")
-        print(f"📄 Emergency Blood Request Form: http://localhost:{PORT}/pages/emergency_blood_request.html")
-        print(f"📊 Emergency Request System: http://localhost:{PORT}/pages/emergency_request_system.html")
-        print("\nPress Ctrl+C to stop the server")
-        
-        # Try to open the main page in browser
-        try:
-            webbrowser.open(f'http://localhost:{PORT}')
-        except:
-            pass
-        
-        # Start serving
-        try:
-            httpd.serve_forever()
-        except KeyboardInterrupt:
-            print("\n🛑 Server stopped")
+    # Allow socket reuse to prevent "address already in use" errors
+    socketserver.TCPServer.allow_reuse_address = True
+    
+    port_to_use = PORT
+    
+    try:
+        # Create server
+        with socketserver.TCPServer(("", port_to_use), CORSHTTPRequestHandler) as httpd:
+            print(f"[*] Server started at http://localhost:{port_to_use}")
+            print(f"[*] Serving files from: {DIRECTORY}")
+            print(f"[*] Open your browser and go to: http://localhost:{port_to_use}")
+            print(f"[*] Emergency Blood Request Form: http://localhost:{port_to_use}/pages/emergency_blood_request.html")
+            print(f"[*] Emergency Request System: http://localhost:{port_to_use}/pages/emergency_request_system.html")
+            print("\nPress Ctrl+C to stop the server")
+            
+            # Try to open the main page in browser
+            try:
+                webbrowser.open(f'http://localhost:{port_to_use}')
+            except:
+                pass
+            
+            # Start serving
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print("\n[!] Server stopped")
+    
+    except OSError as e:
+        if e.errno == 10048:  # Port already in use on Windows
+            print(f"[X] Port {port_to_use} is already in use!")
+            print(f"[*] Looking for an available port...")
+            
+            available_port = find_available_port(PORT + 1)
+            if available_port:
+                print(f"[+] Found available port: {available_port}")
+                print(f"[!] You can either:")
+                print(f"   1. Stop the process using port {PORT} and run this script again")
+                print(f"   2. Change PORT in server.py to {available_port}")
+                print(f"\n[*] To find what's using port {PORT}, run:")
+                print(f"   netstat -ano | findstr :{PORT}")
+            else:
+                print(f"[X] Could not find an available port. Please stop other servers and try again.")
+        else:
+            raise
 
 if __name__ == "__main__":
     main()
