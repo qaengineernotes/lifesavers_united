@@ -9,7 +9,8 @@ let currentFilters = {
     bloodGroup: 'all',
     urgency: 'all',
     hospital: 'all',
-    status: 'open-verified' // Default to show Open & Verified
+    status: 'open-verified', // Default to show Open & Verified
+    verifiedBy: 'all' // Verified By filter
 };
 let currentSort = 'latest';
 
@@ -21,6 +22,7 @@ function initializeFilterSort() {
     const urgencyFilter = document.getElementById('urgencyFilter');
     const hospitalFilter = document.getElementById('hospitalFilter');
     const statusFilter = document.getElementById('statusFilter');
+    const verifiedByFilter = document.getElementById('verifiedByFilter');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
     const filterToggleBtn = document.getElementById('filterToggleBtn');
     const filterPanel = document.getElementById('filterPanel');
@@ -98,6 +100,13 @@ function initializeFilterSort() {
         });
     }
 
+    if (verifiedByFilter) {
+        verifiedByFilter.addEventListener('change', (e) => {
+            currentFilters.verifiedBy = e.target.value;
+            applyFiltersAndSort();
+        });
+    }
+
     // Clear all filters
     if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', () => {
@@ -107,7 +116,8 @@ function initializeFilterSort() {
                 bloodGroup: 'all',
                 urgency: 'all',
                 hospital: 'all',
-                status: 'open-verified'
+                status: 'open-verified',
+                verifiedBy: 'all'
             };
             currentSort = 'latest';
 
@@ -123,6 +133,7 @@ function initializeFilterSort() {
             if (urgencyFilter) urgencyFilter.value = 'all';
             if (hospitalFilter) hospitalFilter.value = 'all';
             if (statusFilter) statusFilter.value = 'open-verified';
+            if (verifiedByFilter) verifiedByFilter.value = 'all';
 
             applyFiltersAndSort();
         });
@@ -136,6 +147,9 @@ function storeRequests(requests) {
 
     // Populate hospital filter dropdown
     populateHospitalFilter();
+
+    // Populate verified by filter dropdown
+    populateVerifiedByFilter();
 
     // Apply default filters and sort
     applyFiltersAndSort();
@@ -159,6 +173,29 @@ function populateHospitalFilter() {
         option.value = hospital;
         option.textContent = hospital;
         hospitalFilter.appendChild(option);
+    });
+}
+
+// Populate verified by filter with unique verifier names
+function populateVerifiedByFilter() {
+    const verifiedByFilter = document.getElementById('verifiedByFilter');
+    if (!verifiedByFilter) return;
+
+    // Get unique verifier names from requests
+    const verifiers = [...new Set(allRequests
+        .map(r => r.verifiedBy)
+        .filter(name => name && name.trim() !== ''))]
+        .sort();
+
+    // Clear existing options except "All Verifiers"
+    verifiedByFilter.innerHTML = '<option value="all">All Verifiers</option>';
+
+    // Add verifier options
+    verifiers.forEach(verifier => {
+        const option = document.createElement('option');
+        option.value = verifier;
+        option.textContent = verifier;
+        verifiedByFilter.appendChild(option);
     });
 }
 
@@ -239,6 +276,13 @@ function applyFiltersAndSort() {
             }
             return true;
         });
+    }
+
+    // Apply verified by filter
+    if (currentFilters.verifiedBy !== 'all') {
+        filteredRequests = filteredRequests.filter(request =>
+            request.verifiedBy === currentFilters.verifiedBy
+        );
     }
 
     // Apply sorting
@@ -429,6 +473,14 @@ function updateActiveFiltersDisplay() {
         });
     }
 
+    // Verified By filter
+    if (currentFilters.verifiedBy !== 'all') {
+        filters.push({
+            label: `Verified By: ${currentFilters.verifiedBy}`,
+            key: 'verifiedBy'
+        });
+    }
+
     // Update filter count badge
     const activeFilterCount = filters.length;
     if (filterCountBadge) {
@@ -490,6 +542,10 @@ function removeFilter(filterKey) {
         case 'status':
             currentFilters.status = 'open-verified';
             document.getElementById('statusFilter').value = 'open-verified';
+            break;
+        case 'verifiedBy':
+            currentFilters.verifiedBy = 'all';
+            document.getElementById('verifiedByFilter').value = 'all';
             break;
     }
 

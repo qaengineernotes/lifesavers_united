@@ -25,6 +25,7 @@ function doGet(e) {
         let verifiedCount = 0;
         let closedCount = 0;
         let totalCount = 0;
+        const verifierNamesSet = new Set(); // Collect unique verifier names
 
         for (let i = 1; i < values.length; i++) {
             const row = values[i];
@@ -59,7 +60,9 @@ function doGet(e) {
                 unitsRemaining: unitsRemaining,         // Calculated
                 donors: row[18] || '',                  // Column S - Donors
                 donorBG: row[19] || '',                 // Column T - Donor BG
-                additionalInfo: row[20] || ''           // Column U - Additional Information
+                additionalInfo: row[20] || '',          // Column U - Additional Information
+                closureReason: row[21] || '',           // Column V - Closure Reason
+                verifiedBy: row[22] || ''               // Column W - Verified By
             };
 
             // Count all requests with valid patient names
@@ -79,6 +82,11 @@ function doGet(e) {
                         break;
                 }
 
+                // Collect verifier names for autocomplete
+                if (request.verifiedBy && request.verifiedBy.trim() !== '') {
+                    verifierNamesSet.add(request.verifiedBy.trim());
+                }
+
                 // Only include open and verified requests for display
                 if (request.status === 'Open' || request.status === 'Verified') {
                     requests.push(request);
@@ -88,6 +96,9 @@ function doGet(e) {
 
         console.log(`Found ${requests.length} valid open/verified requests`);
         console.log(`Statistics - Total: ${totalCount}, Open: ${openCount}, Verified: ${verifiedCount}, Closed: ${closedCount}`);
+
+        // Convert verifier names set to sorted array
+        const verifierNames = Array.from(verifierNamesSet).sort();
 
         // Return the data with statistics
         return ContentService
@@ -101,6 +112,7 @@ function doGet(e) {
                     verified: verifiedCount,
                     closed: closedCount
                 },
+                verifierNames: verifierNames, // Include unique verifier names for autocomplete
                 timestamp: new Date().toISOString()
             }))
             .setMimeType(ContentService.MimeType.JSON);
@@ -337,7 +349,9 @@ function handleNewRequest(e, sheet) {
         '',                             // Column R: Fulfilled Date
         '',                             // Column S: Donors
         '',                             // Column T: Donor BG
-        data.additionalInfo || ''       // Column U: Additional Information
+        data.additionalInfo || '',      // Column U: Additional Information
+        '',                             // Column V: Closure Reason
+        data.verifiedBy || '',          // Column W: Verified By
     ];
 
     sheet.appendRow(rowData);
@@ -553,6 +567,7 @@ function updateRequestStatus(data, sheet) {
         const patientName = data.patientName;
         const bloodType = data.bloodType;
         const newStatus = data.status;
+        const verifiedBy = data.verifiedBy || ''; // Get verifier name
 
         if (!patientName || !bloodType || !newStatus) {
             throw new Error(`Missing required fields - Patient: ${patientName}, Blood Type: ${bloodType}, Status: ${newStatus}`);
@@ -568,6 +583,12 @@ function updateRequestStatus(data, sheet) {
 
             if (rowPatientName === patientName.trim() && rowBloodType === bloodType.trim()) {
                 sheet.getRange(i + 1, 11).setValue(newStatus); // Column K: Status
+
+                // If status is Verified, update verifiedBy field
+                if (newStatus === 'Verified' && verifiedBy) {
+                    sheet.getRange(i + 1, 23).setValue(verifiedBy); // Column W: Verified By
+                    console.log(`Verified by ${verifiedBy} at row ${i + 1}`);
+                }
 
                 // If status is Closed, update fulfilled date
                 if (newStatus === 'Closed') {

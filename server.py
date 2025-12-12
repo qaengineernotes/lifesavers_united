@@ -258,6 +258,13 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(error_response.encode('utf-8'))
             return  # Important: return here to prevent fallback to super()
         else:
+            # Handle extensionless URLs
+            # If path doesn't have an extension and doesn't end with /, try adding .html
+            if '.' not in os.path.basename(self.path) and not self.path.endswith('/'):
+                html_path = self.path + '.html'
+                file_path = os.path.join(DIRECTORY, html_path.lstrip('/'))
+                if os.path.isfile(file_path):
+                    self.path = html_path
             super().do_GET()
 
 def find_available_port(start_port=8000, max_attempts=10):

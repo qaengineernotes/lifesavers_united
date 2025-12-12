@@ -1,6 +1,7 @@
 // Local proxy URL to avoid CORS issues
 const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
+let verifierNames = []; // Store unique verifier names for autocomplete
 
 // Emergency request system script loaded
 
@@ -237,6 +238,12 @@ async function loadEmergencyRequests() {
             // Hide loading and no requests states
             loadingState.classList.add('hidden');
             noRequestsState.classList.add('hidden');
+
+            // Store verifier names for autocomplete
+            if (data.verifierNames && Array.isArray(data.verifierNames)) {
+                verifierNames = data.verifierNames;
+                console.log('Loaded verifier names:', verifierNames);
+            }
 
             // Calculate and update statistics
             updateStatistics(data.requests, data.statistics);
@@ -675,9 +682,17 @@ function calculateTimeSince(inquiryDate) {
 
 // Function to handle "Verified" button click
 async function verifyRequest(patientName, bloodType, button) {
-    // Show custom verification popup
+    // First, ask for verifier name
+    const verifierName = await showVerifierNamePopup();
+    if (!verifierName) {
+        isButtonActionInProgress = false; // Reset flag if user cancels
+        return; // User cancelled the name input
+    }
+
+    // Then show custom verification popup
     const confirmed = await showVerificationPopup(patientName, bloodType);
     if (!confirmed) {
+        isButtonActionInProgress = false; // Reset flag if user cancels
         return; // User cancelled the verification
     }
 
@@ -696,7 +711,8 @@ async function verifyRequest(patientName, bloodType, button) {
             const requestData = {
                 patientName: patientName,
                 bloodType: bloodType,
-                status: 'Verified'
+                status: 'Verified',
+                verifiedBy: verifierName // Include verifier name
             };
 
             // Call the Google Apps Script directly
@@ -1210,6 +1226,214 @@ async function checkAuthorization() {
 }
 
 // Function to show custom verification popup
+// Function to show verifier name input popup with autocomplete
+function showVerifierNamePopup() {
+    return new Promise((resolve) => {
+        // Create modal overlay
+        const modal = document.createElement('div');
+        modal.id = 'verifierNameModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+        `;
+
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 450px;
+            width: 90%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+        `;
+
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #dc2626;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Enter Your Name</h3>
+                <p style="color: #6b7280;">Please enter your name to verify this request</p>
+            </div>
+            
+            <div style="margin-bottom: 24px; position: relative;">
+                <label for="verifierNameInput" style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">
+                    Your Name <span style="color: #dc2626;">*</span>
+                </label>
+                <input 
+                    type="text" 
+                    id="verifierNameInput" 
+                    placeholder="Enter your full name"
+                    autocomplete="off"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 16px; transition: all 0.2s ease; outline: none;"
+                />
+                <div id="autocompleteSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: white; border: 2px solid #dc2626; border-top: none; border-radius: 0 0 8px 8px; max-height: 200px; overflow-y: auto; display: none; z-index: 1000001; margin-top: -8px;"></div>
+                <p id="nameError" style="color: #dc2626; font-size: 14px; margin-top: 8px; display: none;">Please enter your name</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="cancelNameBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
+                    Cancel
+                </button>
+                <button id="confirmNameBtn" style="flex: 1; padding: 12px 16px; background-color: #16a34a; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                    Continue
+                </button>
+            </div>
+        `;
+
+        const nameInput = modalContent.querySelector('#verifierNameInput');
+        const nameError = modalContent.querySelector('#nameError');
+        const cancelBtn = modalContent.querySelector('#cancelNameBtn');
+        const confirmBtn = modalContent.querySelector('#confirmNameBtn');
+        const suggestionsDiv = modalContent.querySelector('#autocompleteSuggestions');
+
+        // Custom autocomplete functionality
+        nameInput.addEventListener('input', (e) => {
+            const value = e.target.value.toLowerCase();
+            if (!value) {
+                suggestionsDiv.style.display = 'none';
+                return;
+            }
+
+            const matches = verifierNames.filter(name =>
+                name.toLowerCase().includes(value)
+            );
+
+            if (matches.length > 0) {
+                suggestionsDiv.innerHTML = matches.map(name => `
+                    <div style="padding: 10px 16px; cursor: pointer; transition: background-color 0.2s;" 
+                         class="autocomplete-item" 
+                         data-name="${name}">
+                        ${name}
+                    </div>
+                `).join('');
+                suggestionsDiv.style.display = 'block';
+
+                // Add hover effect and click handler for suggestions
+                suggestionsDiv.querySelectorAll('.autocomplete-item').forEach(item => {
+                    item.addEventListener('mouseenter', () => {
+                        item.style.backgroundColor = '#fee2e2';
+                    });
+                    item.addEventListener('mouseleave', () => {
+                        item.style.backgroundColor = 'white';
+                    });
+                    item.addEventListener('click', () => {
+                        nameInput.value = item.getAttribute('data-name');
+                        suggestionsDiv.style.display = 'none';
+                        nameInput.focus();
+                    });
+                });
+            } else {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function hideSuggestions(e) {
+            if (!nameInput.contains(e.target) && !suggestionsDiv.contains(e.target)) {
+                suggestionsDiv.style.display = 'none';
+            }
+        });
+
+        // Add input focus effect
+        nameInput.addEventListener('focus', () => {
+            nameInput.style.borderColor = '#dc2626';
+            nameInput.style.boxShadow = '0 0 0 3px rgba(220, 38, 38, 0.1)';
+        });
+        nameInput.addEventListener('blur', () => {
+            nameInput.style.borderColor = '#d1d5db';
+            nameInput.style.boxShadow = 'none';
+        });
+
+        // Add hover effects
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.backgroundColor = '#f3f4f6';
+            cancelBtn.style.borderColor = '#9ca3af';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.backgroundColor = 'white';
+            cancelBtn.style.borderColor = '#d1d5db';
+        });
+
+        confirmBtn.addEventListener('mouseenter', () => {
+            confirmBtn.style.backgroundColor = '#15803d';
+        });
+        confirmBtn.addEventListener('mouseleave', () => {
+            confirmBtn.style.backgroundColor = '#16a34a';
+        });
+
+        // Handle cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(null);
+        });
+
+        // Handle confirm
+        const handleConfirm = () => {
+            const name = nameInput.value.trim();
+            if (!name) {
+                nameError.style.display = 'block';
+                nameInput.style.borderColor = '#dc2626';
+                nameInput.focus();
+                return;
+            }
+            modal.remove();
+            resolve(name);
+        };
+
+        confirmBtn.addEventListener('click', handleConfirm);
+
+        // Handle Enter key
+        nameInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleConfirm();
+            }
+        });
+
+        // Handle clicking outside modal
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.remove();
+                resolve(null);
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', function escapeHandler(e) {
+            if (e.key === 'Escape') {
+                modal.remove();
+                resolve(null);
+                document.removeEventListener('keydown', escapeHandler);
+            }
+        });
+
+        // Add modal content to modal
+        modal.appendChild(modalContent);
+
+        // Add modal to page
+        document.body.appendChild(modal);
+
+        // Focus on input initially
+        setTimeout(() => {
+            nameInput.focus();
+        }, 100);
+    });
+}
+
 function showVerificationPopup(patientName, bloodType) {
     return new Promise((resolve) => {
         // Create modal overlay with explicit inline styles
@@ -1242,8 +1466,8 @@ function showVerificationPopup(patientName, bloodType) {
         `;
         modalContent.innerHTML = `
             <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 64px; height: 64px; background-color: #dbeafe; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
-                    <svg style="width: 32px; height: 32px; color: #2563eb;" fill="currentColor" viewBox="0 0 20 20">
+                <div style="width: 64px; height: 64px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #dc2626;" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                     </svg>
                 </div>
@@ -1264,7 +1488,7 @@ function showVerificationPopup(patientName, bloodType) {
                 <button id="cancelVerifyBtn" style="flex: 1; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; color: #374151; font-weight: 500; background-color: white; cursor: pointer; transition: all 0.2s ease;">
                     Cancel
                 </button>
-                <button id="confirmVerifyBtn" style="flex: 1; padding: 12px 16px; background-color: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
+                <button id="confirmVerifyBtn" style="flex: 1; padding: 12px 16px; background-color: #16a34a; color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s ease;">
                     Verify Request
                 </button>
             </div>
@@ -1285,10 +1509,10 @@ function showVerificationPopup(patientName, bloodType) {
         });
 
         confirmBtn.addEventListener('mouseenter', () => {
-            confirmBtn.style.backgroundColor = '#1d4ed8';
+            confirmBtn.style.backgroundColor = '#15803d';
         });
         confirmBtn.addEventListener('mouseleave', () => {
-            confirmBtn.style.backgroundColor = '#2563eb';
+            confirmBtn.style.backgroundColor = '#16a34a';
         });
 
         // Handle cancel

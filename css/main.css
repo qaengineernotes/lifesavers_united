@@ -3233,3 +3233,121 @@ h6 {
     font-size: 20px;
   }
 }
+
+/* ========================================
+   Stories Page Specific Styles
+   ======================================== */
+
+/* Story Badge Styles */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+}
+
+.badge-patient {
+  background-color: #f59e0b;
+  color: white;
+}
+
+.badge-donor {
+  background-color: #dc2626;
+  color: white;
+}
+
+.badge-emergency {
+  background-color: #f97316;
+  color: white;
+}
+
+/* Filter Button Styles */
+.filter-btn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  border: 2px solid;
+}
+
+.filter-btn:not(.active) {
+  background-color: white;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+
+.filter-btn:not(.active):hover {
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.filter-btn.active {
+  background-color: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+/* Line Clamp Utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Prose Styles for Story Content */
+.prose {
+  max-width: 65ch;
+}
+
+.prose p {
+  margin-bottom: 1em;
+}
+
+/* Story Card Styles */
+.story-card {
+  transition: all 0.3s ease;
+}
+
+.story-card:hover {
+  transform: translateY(-2px);
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
