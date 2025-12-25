@@ -139,23 +139,57 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             captchaAnswer: formDataObj.get('captchaAnswer')
         };
 
-        // Submit to Google Apps Script
-        const submitData = new URLSearchParams();
-        submitData.append('data', JSON.stringify(data));
+        let firebaseResult = { success: false };
+        let sheetsResult = { success: false };
 
-        const response = await fetch(SUBMIT_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: submitData
-        });
+        // --- 1. ALWAYS Save to Firebase (Primary) ---
+        try {
 
-        const result = await response.json();
+            const firebaseModule = await import('./firebase-data-service.js');
 
-        if (result.success) {
+            // Get current logged-in user if available
+            const { auth } = await import('./firebase-config.js');
+            const currentUser = auth.currentUser;
+
+            // Track who created this request
+            if (currentUser) {
+                data.createdBy = currentUser.displayName || 'User';
+                data.createdByUid = currentUser.uid;
+            } else {
+                data.createdBy = data.patientName; // Use patient name if not logged in
+                data.createdByUid = null;
+            }
+
+            firebaseResult = await firebaseModule.createNewRequestInFirebase(data, currentUser);
+
+        } catch (firebaseError) {
+            console.error('❌ Firebase save failed:', firebaseError);
+            // If Firebase fails, we still try Sheets but we should warn the user
+        }
+
+        // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+        try {
+
+            const submitData = new URLSearchParams();
+            submitData.append('data', JSON.stringify(data));
+
+            const response = await fetch(SUBMIT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: submitData
+            });
+            sheetsResult = await response.json();
+
+        } catch (sheetsError) {
+            console.error('❌ Google Sheets sync failed:', sheetsError);
+        }
+
+        // --- Final Result Assessment (Prioritizing Firebase) ---
+        const finalResult = firebaseResult.success ? firebaseResult : sheetsResult;
+
+        if (finalResult.success) {
             // Check if this was a reopened request
-            if (result.action === 'REOPENED') {
+            if (finalResult.action === 'REOPENED') {
                 showSuccessMessage('Previous blood request reopened successfully with updated information! We will contact you soon.');
             } else {
                 showSuccessMessage('Blood request submitted successfully! We will contact you soon.');

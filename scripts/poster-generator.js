@@ -63,7 +63,7 @@ async function generatePoster(requestData) {
         ctx.fillRect(0, 220, 1080, 640);
     } catch (error) {
         // Fallback: Draw simple pattern if image fails to load
-        console.log('Background image not found, using fallback pattern');
+
         ctx.fillStyle = 'rgba(220,38,38,0.05)';
         for (let i = 0; i < 7; i++) {
             for (let j = 0; j < 4; j++) {
@@ -267,7 +267,7 @@ async function generatePoster(requestData) {
 
     } catch (error) {
         // Fallback to emoji if icons fail to load
-        console.log('Social icons not found, using emoji fallback');
+
         ctx.font = '18px "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif';
         ctx.fillStyle = '#555';
         ctx.textAlign = 'center';

@@ -71,6 +71,7 @@ function doGet(e) {
 
                 // Count by status
                 switch (request.status) {
+                    case 'Reopen':
                     case 'Open':
                         openCount++;
                         break;
@@ -88,7 +89,7 @@ function doGet(e) {
                 }
 
                 // Only include open and verified requests for display
-                if (request.status === 'Open' || request.status === 'Verified') {
+                if (request.status === 'Open' || request.status === 'Verified' || request.status === 'Reopen') {
                     requests.push(request);
                 }
             }
@@ -306,14 +307,27 @@ function handleNewRequest(e, sheet) {
     }
 
     // Check for existing requests
-    const existingRequest = checkExistingRequest(sheet, data.patientName, data.contactNumber);
+    // Check for existing requests (Name OR Contact)
+    const matchingRequests = findAllMatchingRequests(sheet, data.patientName, data.contactNumber);
 
-    if (existingRequest) {
+    if (matchingRequests.length > 1) {
+        return ContentService
+            .createTextOutput(JSON.stringify({
+                success: false,
+                message: 'Multiple requests found for this patient/contact. Please contact the admin.',
+                error: 'MULTIPLE_MATCHES',
+                timestamp: new Date().toISOString()
+            }))
+            .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    if (matchingRequests.length === 1) {
+        const existingRequest = matchingRequests[0];
         if (existingRequest.status === 'Open' || existingRequest.status === 'Verified') {
             return ContentService
                 .createTextOutput(JSON.stringify({
                     success: false,
-                    message: 'A blood request for this patient is already open. Please check the existing request or contact support.',
+                    message: 'A blood request for this patient is already open (Name or Contact match). Please check the existing request or contact support.',
                     error: 'DUPLICATE_ACTIVE_REQUEST',
                     existingRequest: existingRequest,
                     timestamp: new Date().toISOString()
@@ -684,6 +698,67 @@ function updateRequest(data, sheet) {
 }
 
 // ============================================================================
+// FUNCTION: Find All Matching Requests (Name OR Contact)
+// ============================================================================
+function findAllMatchingRequests(sheet, patientName, contactNumber) {
+    try {
+        const dataRange = sheet.getDataRange();
+        const values = dataRange.getValues();
+        const matches = [];
+
+        // Normalize inputs
+        const targetName = (patientName || '').toLowerCase().trim();
+        const targetContact = (contactNumber || '').toString().replace(/\D/g, ''); // Digits only
+
+        for (let i = 1; i < values.length; i++) {
+            const row = values[i];
+            const existingPatientName = (row[2] || '').toLowerCase().trim();
+            const existingContactNumberRaw = (row[3] || '').toString();
+            const existingContactNumber = existingContactNumberRaw.replace(/\D/g, '');
+
+            // Check match: Name OR Contact
+            // Only check if target values are not empty
+            const nameMatch = targetName && existingPatientName === targetName;
+            const contactMatch = targetContact && existingContactNumber === targetContact;
+
+            if (nameMatch || contactMatch) {
+                matches.push({
+                    rowIndex: i + 1,
+                    inquiryDate: row[1] || '',
+                    patientName: row[2] || '',
+                    contactNumber: row[3] || '',
+                    unitsRequired: row[4] || '',
+                    bloodType: row[5] || '',
+                    patientBloodType: row[6] || '',
+                    patientAge: row[7] || '',
+                    hospitalName: row[8] || '',
+                    diagnosis: row[9] || '',
+                    status: row[10] || 'Open',
+                    urgency: row[11] || '',
+                    hospitalAddress: row[12] || '',
+                    city: row[13] || '',
+                    contactPerson: row[14] || '',
+                    contactEmail: row[15] || '',
+                    unitsFulfilled: row[16] || '',
+                    fulfilledDate: row[17] || '',
+                    donors: row[18] || '',
+                    donorBloodType: row[19] || '',
+                    additionalInfo: row[20] || '',
+                    closureReason: row[21] || '',
+                    verifiedBy: row[22] || ''
+                });
+            }
+        }
+
+        return matches;
+
+    } catch (error) {
+        console.error(`Error in findAllMatchingRequests: ${error}`);
+        throw error;
+    }
+}
+
+// ============================================================================
 // FUNCTION: Check for Existing Request
 // ============================================================================
 function checkExistingRequest(sheet, patientName, contactNumber) {
@@ -747,7 +822,7 @@ function reopenClosedRequest(sheet, existingRequest, newData) {
         sheet.getRange(rowIndex, 8).setValue(newData.patientAge || '');
         sheet.getRange(rowIndex, 9).setValue(newData.hospitalName);
         sheet.getRange(rowIndex, 10).setValue(newData.diagnosis || '');
-        sheet.getRange(rowIndex, 11).setValue('Open');
+        sheet.getRange(rowIndex, 11).setValue('Reopen');
         sheet.getRange(rowIndex, 12).setValue(newData.urgency || '');
         sheet.getRange(rowIndex, 13).setValue(newData.hospitalAddress || '');
         sheet.getRange(rowIndex, 14).setValue(newData.city || '');

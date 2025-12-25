@@ -42,14 +42,18 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
     let openRequests, successRate, livesSaved;
 
     if (statistics) {
-        // Use statistics from Google Apps Script (more accurate)
-        openRequests = statistics.open + statistics.verified;
+        // Use statistics from Firebase (more accurate)
+        // Open Requests = Open + Reopened + Verified (all active statuses)
+        const reopenedCount = statistics.reopened || 0; // Handle if reopened is missing
+        openRequests = statistics.open + reopenedCount + statistics.verified;
+
         const totalRequests = statistics.total;
         const verifiedRequests = statistics.verified;
         const closedRequests = statistics.closed;
+        const fulfilledRequests = statistics.fulfilled || 0; // Only our donations
 
         successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = closedRequests; // Show actual closed count as lives saved
+        livesSaved = fulfilledRequests; // Only count fulfilled closures (our donations)
     } else {
         // Fallback to local calculation (for backward compatibility)
         openRequests = requests.filter(request => {

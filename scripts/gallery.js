@@ -86,12 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqSr5tm8V9tp4v1Jsq9LPzOQDIr51g2iMPOd2liWyi4VfpBZB01P19HoJ-zm5IRF0W/exec';
 
-            console.log('Fetch URL:', `${scriptUrl}?category=${encodeURIComponent(category)}`);
-
             const response = await fetch(`${scriptUrl}?category=${encodeURIComponent(category)}&t=${new Date().getTime()}`);
-
-            console.log('Fetch URL:', `${scriptUrl}?category=${encodeURIComponent(category)}`);
-            console.log('Response status:', response.status);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -99,7 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             const responseText = await response.text();
-            console.log('Response text:', responseText);
+
 
             let data;
             try {
@@ -166,8 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 date: img.date ? new Date(img.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
             }));
 
-            console.log('Processed gallery data:', galleryData);
-            console.log('Gallery data length:', galleryData.length);
+
 
             if (galleryData.length === 0) {
                 // Clear pagination when no images

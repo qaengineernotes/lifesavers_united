@@ -69,7 +69,7 @@ function initializeSearch(selector = 'input[type="text"]') {
         const searchTerm = this.value.toLowerCase();
         // Simple search implementation - can be customized per page
         if (searchTerm.length > 2) {
-            console.log('Searching for:', searchTerm);
+
             // Here you would implement actual search functionality
             // This can be overridden by individual pages
         }

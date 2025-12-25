@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Helper: Check if user is approved by admin
+    function isApproved() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
+    }
+
+    // Helper: Check if user is a superuser
+    function isSuperuser() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superuser';
+    }
+
+    // Users collection: 
+    // Users can read their own profile. Admin can read all.
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperuser());
+      allow write: if isSuperuser(); // Only superuser can change roles/status
+      
+      // Allow user to set their own name during initial setup if not already set
+      allow update: if isAuthenticated() && request.auth.uid == userId 
+                    && (!exists(/databases/$(database)/documents/users/$(userId)) 
+                        || (resource.data.displayName == null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName', 'lastLogin'])));
+    }
+
+    // Emergency Requests collection
+    match /emergency_requests/{requestId} {
+      allow read: if isAuthenticated();
+      allow create, update, delete: if isApproved();
+    }
+
+    // Donors collection
+    match /donors/{donorId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isApproved();
+      allow delete: if isSuperuser();
+    }
+
+    // Requests collection (for Telegram bot and web app)
+    match /requests/{requestId} {
+      allow read: if true; // Public read for now
+      allow create, update: if isApproved() || request.auth == null; // Allow unauthenticated writes from Cloud Functions
+      allow delete: if isSuperuser();
+    }
+
+    // Donation Logs collection
+    match /donation_logs/{logId} {
+      allow read: if isAuthenticated();
+      allow create: if isApproved();
+      allow update, delete: if isSuperuser();
+    }
+  }
+}

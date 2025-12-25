@@ -3,7 +3,36 @@ const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfd
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
 let verifierNames = []; // Store unique verifier names for autocomplete
 
+// Data Source Configuration
+const FETCH_FROM_FIREBASE = true; // LOCKED: Always fetch from Firebase
+const USE_FIREBASE = true;      // For backward compatibility
+
+// Import Firebase data service
+let firebaseDataService = null;
+import('./firebase-data-service.js').then(module => {
+    firebaseDataService = module;
+
+
+    // --- NEW: User Approval Workflow ---
+    import('./firebase-auth-service.js').then(authModule => {
+        authModule.onAuthChange((user) => {
+            updateUIForUserStatus(user);
+        });
+    });
+}).catch(error => {
+    console.error('Failed to load Firebase data service:', error);
+});
+
+// Initialize user profile UI (always try to load if authenticated)
+import('./user-profile-ui.js').then(module => {
+    module.initializeUserProfileUI();
+
+}).catch(error => {
+    console.error('Failed to load user profile UI:', error);
+});
+
 // Emergency request system script loaded
+
 
 // Test function to check if Google Apps Script is accessible
 async function testGoogleAppsScript() {
@@ -35,26 +64,55 @@ Element.prototype.remove = function () {
 let buttonStates = new Map(); // Store button states locally
 
 // Emergency system functionality
-document.addEventListener('DOMContentLoaded', function () {
-    // Load emergency requests directly (bypass test for now)
+document.addEventListener('DOMContentLoaded', async function () {
+    // Set current year
+    const yearEl = document.getElementById('currentYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Trigger load (it will wait for Firebase service inside the function)
     loadEmergencyRequests();
-    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
     // Add event listeners for verify and close buttons
     document.addEventListener('click', function (e) {
         if (e.target.closest('.verify-btn')) {
             const button = e.target.closest('.verify-btn');
+
+            // Re-check approval status
+            if (button.hasAttribute('data-pending')) {
+                showSuccessMessage('Your account is awaiting admin approval.', 'warning');
+                return;
+            }
+
             // Only allow clicking if button is not disabled
             if (!button.disabled) {
                 isButtonActionInProgress = true; // Set flag to prevent refresh
-                const patientName = button.getAttribute('data-patient-name');
-                const bloodType = button.getAttribute('data-blood-type');
-                verifyRequest(patientName, bloodType, button);
+                const card = button.closest('.emergency-request-card');
+                const requestDataStr = card.getAttribute('data-request');
+                if (requestDataStr) {
+                    try {
+                        const decodedJson = decodeURIComponent(requestDataStr);
+                        const requestData = JSON.parse(decodedJson);
+                        verifyRequest(requestData, button);
+                    } catch (error) {
+                        console.error('Error parsing request data:', error);
+                        verifyRequest({ patientName: button.getAttribute('data-patient-name'), bloodType: button.getAttribute('data-blood-type') }, button);
+                    }
+                } else {
+                    const patientName = button.getAttribute('data-patient-name');
+                    const bloodType = button.getAttribute('data-blood-type');
+                    verifyRequest({ patientName, bloodType }, button);
+                }
             }
         }
 
         if (e.target.closest('.log-donation-btn')) {
             const button = e.target.closest('.log-donation-btn');
+
+            // Re-check approval status
+            if (button.hasAttribute('data-pending')) {
+                showSuccessMessage('Your account is awaiting admin approval.', 'warning');
+                return;
+            }
 
             // Only allow clicking if button is not disabled
             if (!button.disabled) {
@@ -113,6 +171,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (e.target.closest('.edit-btn')) {
             const button = e.target.closest('.edit-btn');
+
+            // Re-check approval status
+            if (button.hasAttribute('data-pending')) {
+                showSuccessMessage('Your account is awaiting admin approval.', 'warning');
+                return;
+            }
+
             const card = button.closest('.emergency-request-card');
             const requestDataStr = card.getAttribute('data-request');
             if (requestDataStr) {
@@ -221,17 +286,32 @@ async function loadEmergencyRequests() {
             return; // Don't proceed with the rest of the function
         }
 
-        // Fetch data from Google Apps Script
+        let data;
 
-        const response = await fetch(FETCH_URL, {
-            method: 'GET',
-            mode: 'cors',
-            cache: 'no-cache'
-        });
+        // Wait for firebaseDataService if it's not ready yet but we expect it
+        if (!firebaseDataService && FETCH_FROM_FIREBASE) {
 
+            // Wait up to 5 seconds (10 * 500ms)
+            let retries = 0;
+            while (!firebaseDataService && retries < 10) {
+                await new Promise(resolve => setTimeout(resolve, 500));
+                retries++;
+            }
+        }
 
+        // ALWAYS Fetch data from Firebase (Google Sheets remains as backup write-only)
+        if (firebaseDataService) {
 
-        const data = await response.json();
+            data = await firebaseDataService.fetchEmergencyRequestsFromFirebase();
+        } else {
+            console.warn('⚠️ Firebase service not ready, attempting fallback to Google Sheets...');
+            const response = await fetch(FETCH_URL, {
+                method: 'GET',
+                mode: 'cors',
+                cache: 'no-cache'
+            });
+            data = await response.json();
+        }
 
         if (data.success && data.requests && data.requests.length > 0) {
 
@@ -242,7 +322,7 @@ async function loadEmergencyRequests() {
             // Store verifier names for autocomplete
             if (data.verifierNames && Array.isArray(data.verifierNames)) {
                 verifierNames = data.verifierNames;
-                console.log('Loaded verifier names:', verifierNames);
+
             }
 
             // Calculate and update statistics
@@ -492,12 +572,15 @@ function createRequestCard(request) {
             </div>
         </div>
         <div class="flex items-center space-x-2 mobile-q-container">
+            <div class="flex items-center space-x-2">
+                ${requestStatus === 'Reopened' ? '<span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">REOPENED ↻</span>' : ''}
+                <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">${urgencyConfig.badgeText}</span>
+            </div>
             <button class="share-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Share request details">
                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
                 </svg>
             </button>
-            <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">${urgencyConfig.badgeText}</span>
         </div>
     </div>
 
@@ -516,7 +599,9 @@ function createRequestCard(request) {
         </div>
         <div class="mobile-grid-item">
             <span class="text-sm text-text-secondary">${unitsFulfilled >= unitsRequired ? 'Status' : 'Units Remaining'}</span>
-            <p class="font-bold text-lg mobile-grid-value ${unitsFulfilled >= unitsRequired ? 'text-green-600' : 'text-warning'}">${unitsFulfilled >= unitsRequired ? 'Fulfilled ✓' : unitsRemaining + ' Units'}</p>
+            <p class="font-bold text-lg mobile-grid-value ${unitsFulfilled >= unitsRequired ? 'text-green-600' : 'text-warning'}">
+                ${unitsFulfilled >= unitsRequired ? 'Fulfilled ✓' : unitsRemaining + ' Units'}
+            </p>
         </div>
         <div class="mobile-grid-item">
             <span class="text-sm text-text-secondary">Time Since Request</span>
@@ -657,6 +742,9 @@ function calculateTimeSince(inquiryDate) {
                 }
             }
         }
+    } else if (inquiryDate && typeof inquiryDate === 'object' && inquiryDate.seconds) {
+        // Handle Firebase Timestamp
+        requestDate = new Date(inquiryDate.seconds * 1000);
     } else {
         requestDate = new Date(inquiryDate);
     }
@@ -681,15 +769,33 @@ function calculateTimeSince(inquiryDate) {
 }
 
 // Function to handle "Verified" button click
-async function verifyRequest(patientName, bloodType, button) {
-    // First, ask for verifier name
-    const verifierName = await showVerifierNamePopup();
-    if (!verifierName) {
-        isButtonActionInProgress = false; // Reset flag if user cancels
-        return; // User cancelled the name input
+async function verifyRequest(requestData, button) {
+    const patientName = requestData.patientName;
+    const bloodType = requestData.bloodType;
+    // Check authorization first (phone auth for Firebase, password for Google Sheets)
+    const isAuthorized = await checkAuthorization();
+    if (!isAuthorized) {
+        isButtonActionInProgress = false;
+        return; // User is not authorized
     }
 
-    // Then show custom verification popup
+    // Get verifier name from logged-in user (Firebase) or ask for it (Google Sheets)
+    let verifierName;
+    const authModule = await import('./firebase-auth-service.js');
+    const currentUser = authModule.getCurrentUser();
+
+    if (currentUser) {
+        verifierName = currentUser.displayName || 'Unknown';
+    } else {
+        // Fallback to popup if no user is logged in (legacy mode)
+        verifierName = await showVerifierNamePopup();
+        if (!verifierName) {
+            isButtonActionInProgress = false;
+            return;
+        }
+    }
+
+    // Show custom verification popup
     const confirmed = await showVerificationPopup(patientName, bloodType);
     if (!confirmed) {
         isButtonActionInProgress = false; // Reset flag if user cancels
@@ -715,28 +821,56 @@ async function verifyRequest(patientName, bloodType, button) {
                 verifiedBy: verifierName // Include verifier name
             };
 
-            // Call the Google Apps Script directly
-            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+            let result = { success: false };
 
-            // Create URL-encoded form data
-            const formData = new URLSearchParams();
-            formData.append('action', 'update_status');
-            formData.append('data', JSON.stringify(requestData));
+            // --- 1. ALWAYS Update Firebase (Primary) ---
+            if (firebaseDataService) {
+                try {
+                    const authModule = await import('./firebase-auth-service.js');
+                    const currentUser = authModule.getCurrentUser();
+
+                    result = await firebaseDataService.updateRequestStatusInFirebase(
+                        patientName,
+                        bloodType,
+                        'Verified',
+                        verifierName,
+                        currentUser,
+                        requestData.contactNumber
+                    );
+                } catch (err) {
+                    console.error('❌ Firebase verification failed:', err);
+                }
+            }
+
+            // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+            try {
+
+                const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+                const formData = new URLSearchParams();
+                formData.append('action', 'update_status');
+                formData.append('data', JSON.stringify({
+                    patientName,
+                    bloodType,
+                    status: 'Verified',
+                    verifiedBy: verifierName
+                }));
+
+                const sheetsResponse = await fetch(scriptUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString(),
+                    redirect: 'follow'
+                });
+                const sheetsResult = await sheetsResponse.json();
 
 
-
-            const response = await fetch(scriptUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: formData.toString(),
-                redirect: 'follow'
-            });
-
-
-
-            const result = await response.json();
+                if (!result.success && sheetsResult.success) {
+                    console.warn('⚠️ Firebase update failed, but Sheets succeeded. Dashboard may be out of sync.');
+                    // We don't override result.success here because Firebase is the source of truth for display
+                }
+            } catch (err) {
+                console.error('❌ Google Sheets sync failed:', err);
+            }
 
             if (result.success) {
                 // Store reference to the card
@@ -845,23 +979,47 @@ async function logDonation(requestData, button) {
             closureReason: donationInfo.closureReason || ''
         };
 
-        // Call the Google Apps Script
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+        let result = { success: false };
 
-        const formData = new URLSearchParams();
-        formData.append('action', 'log_donation');
-        formData.append('data', JSON.stringify(donationData));
+        // --- 1. ALWAYS Update Firebase (Primary) ---
+        if (firebaseDataService) {
+            try {
+                const authModule = await import('./firebase-auth-service.js');
+                const currentUser = authModule.getCurrentUser();
 
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData.toString(),
-            redirect: 'follow'
-        });
+                result = await firebaseDataService.logDonationToFirebase(
+                    requestData,
+                    donationInfo,
+                    currentUser
+                );
+            } catch (err) {
+                console.error('❌ Firebase donation logging failed:', err);
+            }
+        }
 
-        const result = await response.json();
+        // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+        try {
+
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+            const formData = new URLSearchParams();
+            formData.append('action', 'log_donation');
+            formData.append('data', JSON.stringify(donationData));
+
+            const sheetsResponse = await fetch(scriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString(),
+                redirect: 'follow'
+            });
+            const sheetsResult = await sheetsResponse.json();
+
+
+            if (!result.success && sheetsResult.success) {
+                console.warn('⚠️ Firebase update failed, but Sheets succeeded. Dashboard may be out of sync.');
+            }
+        } catch (err) {
+            console.error('❌ Google Sheets sync failed:', err);
+        }
 
         if (result.success) {
             const card = button.closest('.emergency-request-card');
@@ -963,16 +1121,45 @@ async function closeRequestDirectly(requestData, button) {
         formData.append('action', 'update_status');
         formData.append('data', JSON.stringify(updateData));
 
-        const response = await fetch(FETCH_URL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData.toString(),
-            redirect: 'follow'
-        });
+        let result = { success: false };
 
-        const result = await response.json();
+        // --- 1. ALWAYS Update Firebase (Primary) ---
+        if (firebaseDataService) {
+            try {
+                const authModule = await import('./firebase-auth-service.js');
+                const currentUser = authModule.getCurrentUser();
+
+                result = await firebaseDataService.updateRequestStatusInFirebase(
+                    requestData.patientName,
+                    requestData.bloodType,
+                    'Closed',
+                    'Admin', // Closure is usually an admin/system action
+                    currentUser,
+                    requestData.contactNumber
+                );
+            } catch (err) {
+                console.error('❌ Firebase closure failed:', err);
+            }
+        }
+
+        // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+        try {
+
+            const sheetsResponse = await fetch(FETCH_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString(),
+                redirect: 'follow'
+            });
+            const sheetsResult = await sheetsResponse.json();
+
+
+            if (!result.success && sheetsResult.success) {
+                console.warn('⚠️ Firebase update failed, but Sheets succeeded. Dashboard may be out of sync.');
+            }
+        } catch (err) {
+            console.error('❌ Google Sheets sync failed:', err);
+        }
 
         if (result.success) {
             // Update button to closed state
@@ -1033,14 +1220,14 @@ async function closeRequestDirectly(requestData, button) {
 // updateStatistics function is now imported from emergency-statistics.js
 
 // Function to show success message without using alert
-function showSuccessMessage(message) {
+function showSuccessMessage(message, type = 'success') {
     // Create a temporary success message element
     const successDiv = document.createElement('div');
     successDiv.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: #10B981;
+                background: ${type === 'warning' ? '#F59E0B' : (type === 'error' ? '#EF4444' : '#10B981')};
                 color: white;
                 padding: 1rem 1.5rem;
                 border-radius: 0.5rem;
@@ -1070,22 +1257,72 @@ function showSuccessMessage(message) {
     }, 3000);
 }
 
-// Function to check user authorization
+// Function to check user authorization (NEW: Firebase Phone Auth)
 async function checkAuthorization() {
-
-
-    // Check if user has access via URL parameter
+    // Check if user has access via URL parameter (backward compatibility)
     const urlParams = new URLSearchParams(window.location.search);
     const hasAccess = urlParams.get('closeAccess');
 
-
     if (hasAccess === 'true') {
-
         return true; // User has access via URL
     }
 
-    // Show custom password popup
+    // If using Firebase, use phone authentication
+    if (firebaseDataService) {
+        try {
+            // Dynamically import auth service
+            const authModule = await import('./firebase-auth-service.js');
 
+            // Check if user is already authenticated
+            if (authModule.isAuthenticated()) {
+                const user = authModule.getCurrentUser();
+                // Allow approved users, superusers, OR legacy users (undefined status)
+                // Strictly block 'pending' users
+                const isApproved = user && (user.status === 'approved' || !user.status || user.role === 'superuser');
+
+                if (isApproved) {
+
+                    return true;
+                } else {
+
+                    updateUIForUserStatus(user);
+                    showSuccessMessage('Action Restricted: Your account is awaiting admin approval.', 'warning');
+                    return false;
+                }
+            }
+
+            // Show phone login modal
+
+            const user = await authModule.showPhoneLoginModal();
+
+            if (user) {
+                // Allow approved users, superusers, OR legacy users (undefined status)
+                const isApproved = user.status === 'approved' || !user.status || user.role === 'superuser';
+                if (!isApproved) {
+
+                    updateUIForUserStatus(user);
+                    showSuccessMessage('Account Created! Please wait for admin approval to perform this action.', 'warning');
+                    return false;
+                }
+
+                return true;
+            } else {
+
+                return false;
+            }
+        } catch (error) {
+            console.error('Error with Firebase authentication:', error);
+            // Fall back to password system
+            return await showPasswordModal();
+        }
+    }
+
+    // Fall back to old password system for Google Sheets
+    return await showPasswordModal();
+}
+
+// Old password modal (kept for backward compatibility)
+async function showPasswordModal() {
     return new Promise((resolve) => {
         // Create modal overlay with explicit inline styles
         const modal = document.createElement('div');
@@ -1124,7 +1361,7 @@ async function checkAuthorization() {
                     </svg>
                 </div>
                 <h3 style="font-size: 24px; font-weight: bold; color: #1f2937; margin-bottom: 8px;">Authorization Required</h3>
-                <p style="color: #6b7280;">Enter password to close blood requests</p>
+                <p style="color: #6b7280;">Enter password to perform this action</p>
             </div>
             
             <div style="margin-bottom: 24px;">
@@ -1214,14 +1451,11 @@ async function checkAuthorization() {
         // Add modal content to modal
         modal.appendChild(modalContent);
 
-
         // Focus on password input
         passwordInput.focus();
 
         // Add modal to page
-
         document.body.appendChild(modal);
-
     });
 }
 
@@ -1635,7 +1869,7 @@ function showDonationPopup(requestData) {
             
             <div id="closureReasonSection" style="display: none; margin-bottom: 24px;">
                 <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Closure Reason *</label>
-                <input type="text" id="closureReason" placeholder="e.g., Patient discharged, died, etc." style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+                <input type="text" id="closureReason" placeholder="e.g., Relative donated directly at hospital / Patient no longer needs blood / Recovered / Died" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
             </div>
             
             <div style="display: flex; gap: 12px;">
@@ -1808,28 +2042,38 @@ async function saveDonorDetailsToSheet(patientName, bloodType, donorInfo) {
             relatedPatientName: patientName
         };
 
-        // Call the Google Apps Script directly
+        // --- 1. ALWAYS Update Google Sheets (Primary) ---
         const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
-
-        // Create URL-encoded form data
         const formData = new URLSearchParams();
         formData.append('action', 'submit_emergency_donor');
         formData.append('data', JSON.stringify(donorData));
 
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: formData
-        });
+        try {
+            const response = await fetch(scriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            const result = await response.json();
+            if (result.success) {
 
-        const result = await response.json();
+            }
+        } catch (err) {
+            console.error('❌ Google Sheets donor save failed:', err);
+        }
 
-        if (result.success) {
-            console.log('✅ Donor details saved to Form Responses 2 successfully');
-        } else {
-            console.error('❌ Failed to save donor details:', result.message);
+        // --- 2. ALSO Update Firebase (Secondary/Sync) ---
+        if (firebaseDataService) {
+            try {
+
+                await firebaseDataService.registerDonorInFirebase({
+                    ...donorData,
+                    source: 'emergency_request_system'
+                });
+
+            } catch (firebaseError) {
+                console.error('❌ Firebase donor mirroring failed:', firebaseError);
+            }
         }
 
     } catch (error) {
@@ -1986,20 +2230,47 @@ async function editRequest(requestData, button) {
             ...editedData
         };
 
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+        let result = { success: false };
 
-        const formData = new URLSearchParams();
-        formData.append('action', 'update_request');
-        formData.append('data', JSON.stringify(updateData));
+        // --- 1. ALWAYS Update Firebase (Primary) ---
+        if (firebaseDataService) {
+            try {
+                const authModule = await import('./firebase-auth-service.js');
+                const currentUser = authModule.getCurrentUser();
 
-        const response = await fetch(scriptUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: formData.toString(), // IMPORTANT: encode body as string
-            redirect: 'follow'
-        });
+                result = await firebaseDataService.updateRequestInFirebase(
+                    requestData.contactNumber,
+                    editedData,
+                    currentUser
+                );
+            } catch (err) {
+                console.error('❌ Firebase update failed:', err);
+            }
+        }
 
-        const result = await response.json();
+        // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+        try {
+
+            const scriptUrl = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
+            const formData = new URLSearchParams();
+            formData.append('action', 'update_request');
+            formData.append('data', JSON.stringify(updateData));
+
+            const sheetsResponse = await fetch(scriptUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData.toString(),
+                redirect: 'follow'
+            });
+            const sheetsResult = await sheetsResponse.json();
+
+
+            if (!result.success && sheetsResult.success) {
+                console.warn('⚠️ Firebase update failed, but Sheets succeeded. Dashboard may be out of sync.');
+            }
+        } catch (err) {
+            console.error('❌ Google Sheets sync failed:', err);
+        }
 
         if (result.success) {
             showSuccessMessage('Request updated successfully!');
@@ -2628,4 +2899,81 @@ https://lifesaversunited.org
 #BloodDonation #SaveLives #lifesaversUnited #Gujarat`;
 
     return message;
+}
+
+/**
+ * UI Helper: Updates buttons and shows notifications based on user approval status
+ */
+function updateUIForUserStatus(user) {
+    const isApproved = user && (user.status === 'approved' || user.role === 'superuser');
+    const isPending = user && user.status === 'pending' && !isApproved;
+
+    // Find all action buttons
+    const actionButtons = document.querySelectorAll('.verify-btn, .log-donation-btn, .edit-btn');
+
+    actionButtons.forEach(btn => {
+        if (isPending) {
+            btn.disabled = true;
+            btn.title = "Awaiting admin approval";
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+            btn.setAttribute('data-pending', 'true');
+        } else {
+            // Restore if previously disabled by pending status
+            if (btn.hasAttribute('data-pending')) {
+                btn.disabled = false;
+                btn.title = "";
+                btn.style.opacity = '1';
+                btn.style.cursor = 'pointer';
+                btn.removeAttribute('data-pending');
+            }
+        }
+    });
+
+    // Show/hide approval notice
+    const existingMsg = document.getElementById('approvalNoticeContainer');
+    if (isPending) {
+        if (!existingMsg) {
+            const container = document.createElement('div');
+            container.id = 'approvalNoticeContainer';
+            container.className = 'max-w-7xl mx-auto px-4 sm:px-6 lg:px-8';
+            container.style.marginTop = '24px';
+            container.style.marginBottom = '24px';
+
+            const msg = document.createElement('div');
+            msg.id = 'approvalNotice';
+            // Custom CSS to match dashboard style
+            msg.style.cssText = `
+                background: #fffbeb;
+                border-left: 4px solid #f59e0b;
+                padding: 16px;
+                border-radius: 8px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                color: #92400e;
+                animation: slideDown 0.4s ease-out;
+            `;
+            msg.innerHTML = `
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                    <svg style="width: 24px; height: 24px; color: #f59e0b; flex-shrink: 0;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div>
+                        <p style="font-weight: bold; margin: 0 0 4px 0;">Account Awaiting Approval</p>
+                        <p style="font-size: 14px; margin: 0;">Your account is awaiting manual approval by an admin. You can browse requests, but editing and verification are temporarily restricted.</p>
+                    </div>
+                </div>
+            `;
+            container.appendChild(msg);
+
+            const heroSection = document.querySelector('.bg-gradient-hero') || document.querySelector('section');
+            if (heroSection && heroSection.parentNode) {
+                heroSection.parentNode.insertBefore(container, heroSection.nextSibling);
+            } else {
+                const mainContainer = document.querySelector('main .max-w-7xl') || document.querySelector('.max-w-7xl');
+                if (mainContainer) mainContainer.insertBefore(container, mainContainer.firstChild);
+            }
+        }
+    } else {
+        if (existingMsg) existingMsg.remove();
+    }
 }

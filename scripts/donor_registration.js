@@ -413,43 +413,58 @@ async function handleFormSubmission(e) {
             registrationDate: new Date().toISOString()
         };
 
-        // Submit to appropriate API based on environment
-        let response;
+        // --- 1. ALWAYS Save to Firebase (Primary) ---
+        let firebaseResult = { success: false };
+        try {
 
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            // Local development - use local server
-            const submitData = new URLSearchParams();
-            submitData.append('data', JSON.stringify(data));
+            // Get current logged-in user if available
+            const { auth } = await import('./firebase-config.js');
+            const currentUser = auth.currentUser;
 
-            response = await fetch(SUBMIT_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: submitData
-            });
-        } else {
-            // Production - submit directly to Google Apps Script
+            // Track who registered
+            if (currentUser) {
+                data.registeredBy = currentUser.displayName || 'User';
+                data.registeredByUid = currentUser.uid;
+            } else {
+                data.registeredBy = data.fullName; // Use donor name if not logged in
+                data.registeredByUid = null;
+            }
+
+            const firebaseModule = await import('./firebase-data-service.js');
+            await firebaseModule.registerDonorInFirebase(data);
+            firebaseResult = { success: true };
+
+        } catch (firebaseError) {
+            console.error('❌ Firebase donor registration failed:', firebaseError);
+        }
+
+        // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
+        let sheetsResult = { success: false };
+        try {
+
             const submitData = new URLSearchParams();
             submitData.append('action', 'submit_donor_registration');
             submitData.append('data', JSON.stringify(data));
 
-            response = await fetch(SUBMIT_URL, {
+            const sheetsResponse = await fetch(SUBMIT_URL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: submitData
             });
+            sheetsResult = await sheetsResponse.json();
+
+        } catch (sheetsError) {
+            console.error('❌ Google Sheets sync failed:', sheetsError);
         }
 
-        const result = await response.json();
+        // --- Final Result Assessment (Prioritizing Firebase) ---
+        const finalResult = firebaseResult.success ? firebaseResult : sheetsResult;
 
-        if (result.success) {
-            // Show success message
+        if (finalResult.success) {
             showSuccessMessage();
+            e.target.reset(); // Reset form on success
         } else {
-            showErrorMessage(result.message || 'Failed to register. Please try again.');
+            showErrorMessage(finalResult.message || 'Failed to register. Please try again.');
         }
 
     } catch (error) {
@@ -503,7 +518,7 @@ function showSuccessMessage() {
 
     // Reset the form
     const form = document.getElementById('donorRegistrationForm');
-    form.reset();
+    if (form) form.reset();
     generateCaptcha(); // Generate new CAPTCHA
 
     // Remove the message after 5 seconds

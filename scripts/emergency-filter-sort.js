@@ -9,7 +9,7 @@ let currentFilters = {
     bloodGroup: 'all',
     urgency: 'all',
     hospital: 'all',
-    status: 'open-verified', // Default to show Open & Verified
+    status: 'open-verified-reopened', // Default to show Open, Verified & Reopened
     verifiedBy: 'all' // Verified By filter
 };
 let currentSort = 'latest';
@@ -29,7 +29,7 @@ function initializeFilterSort() {
     const filterCountBadge = document.getElementById('filterCountBadge');
 
     if (!searchInput || !sortChips.length) {
-        console.log('Filter/Sort elements not found, skipping initialization');
+
         return;
     }
 
@@ -39,7 +39,7 @@ function initializeFilterSort() {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
             currentFilters.search = e.target.value.toLowerCase().trim();
-            console.log('🔍 Search input changed to:', currentFilters.search);
+
             applyFiltersAndSort();
         }, 300);
     });
@@ -116,7 +116,7 @@ function initializeFilterSort() {
                 bloodGroup: 'all',
                 urgency: 'all',
                 hospital: 'all',
-                status: 'open-verified',
+                status: 'open-verified-reopened',
                 verifiedBy: 'all'
             };
             currentSort = 'latest';
@@ -132,7 +132,7 @@ function initializeFilterSort() {
             if (bloodGroupFilter) bloodGroupFilter.value = 'all';
             if (urgencyFilter) urgencyFilter.value = 'all';
             if (hospitalFilter) hospitalFilter.value = 'all';
-            if (statusFilter) statusFilter.value = 'open-verified';
+            if (statusFilter) statusFilter.value = 'open-verified-reopened';
             if (verifiedByFilter) verifiedByFilter.value = 'all';
 
             applyFiltersAndSort();
@@ -142,7 +142,7 @@ function initializeFilterSort() {
 
 // Store requests when loaded
 function storeRequests(requests) {
-    console.log('🔍 storeRequests called with', requests.length, 'requests');
+
     allRequests = requests || [];
 
     // Populate hospital filter dropdown
@@ -201,37 +201,29 @@ function populateVerifiedByFilter() {
 
 // Apply filters and sorting
 function applyFiltersAndSort() {
-    console.log('🔍 applyFiltersAndSort called. Total requests:', allRequests.length);
-    console.log('🔍 Current search filter:', currentFilters.search);
+
 
     let filteredRequests = [...allRequests];
 
-    // Apply search filter (minimum 3 characters)
-    if (currentFilters.search && currentFilters.search.length >= 3) {
-        console.log('🔍 Applying search filter for:', currentFilters.search);
+    // Apply search filter (works immediately, no minimum length)
+    if (currentFilters.search) {
+
 
         filteredRequests = filteredRequests.filter(request => {
             const searchTerm = currentFilters.search;
             const patientName = (request.patientName || '').toLowerCase();
             const contactNumber = String(request.contactNumber || '').toLowerCase();
-            const contactPerson = (request.contactPerson || '').toLowerCase();
 
             const matches = patientName.includes(searchTerm) ||
-                contactNumber.includes(searchTerm) ||
-                contactPerson.includes(searchTerm);
+                contactNumber.includes(searchTerm);
 
-            if (matches) {
-                console.log('✅ Match found:', request.patientName, request.contactNumber);
-            }
+
 
             return matches;
         });
 
-        console.log('🔍 Filtered to', filteredRequests.length, 'requests');
-    } else if (currentFilters.search) {
-        console.log('⚠️ Search term too short (< 3 chars):', currentFilters.search);
+
     }
-    // If search term is less than 3 characters, show all results (don't filter)
 
     // Apply blood group filter
     // Exact matching with case-insensitive comparison
@@ -265,10 +257,13 @@ function applyFiltersAndSort() {
         filteredRequests = filteredRequests.filter(request => {
             const status = (request.status || 'Open').toLowerCase();
 
-            if (currentFilters.status === 'open-verified') {
-                return status === 'open' || status === 'verified';
+            if (currentFilters.status === 'open-verified-reopened') {
+                // Default view: Show all active requests (Open, Reopened, Verified)
+                return status === 'open' || status === 'verified' || status === 'reopened';
             } else if (currentFilters.status === 'open') {
                 return status === 'open';
+            } else if (currentFilters.status === 'reopened') {
+                return status === 'reopened';
             } else if (currentFilters.status === 'verified') {
                 return status === 'verified';
             } else if (currentFilters.status === 'closed') {
@@ -427,8 +422,8 @@ function updateActiveFiltersDisplay() {
 
     const filters = [];
 
-    // Search filter (only show if 3+ characters)
-    if (currentFilters.search && currentFilters.search.length >= 3) {
+    // Search filter (show immediately when user types)
+    if (currentFilters.search) {
         filters.push({
             label: `Search: "${currentFilters.search}"`,
             key: 'search'
@@ -460,15 +455,18 @@ function updateActiveFiltersDisplay() {
     }
 
     // Status filter (only show if not default)
-    if (currentFilters.status !== 'open-verified') {
+    if (currentFilters.status !== 'open-verified-reopened') {
         const statusLabels = {
             'all': 'All Status',
+            'open-reopened': 'Open & Reopened',
             'open': 'Open Only',
+            'reopened': 'Reopened Only',
             'verified': 'Verified Only',
             'closed': 'Closed Only'
         };
+        const label = statusLabels[currentFilters.status] || currentFilters.status;
         filters.push({
-            label: `Status: ${statusLabels[currentFilters.status]}`,
+            label: `Status: ${label}`,
             key: 'status'
         });
     }
@@ -540,8 +538,8 @@ function removeFilter(filterKey) {
             document.getElementById('hospitalFilter').value = 'all';
             break;
         case 'status':
-            currentFilters.status = 'open-verified';
-            document.getElementById('statusFilter').value = 'open-verified';
+            currentFilters.status = 'open-verified-reopened';
+            document.getElementById('statusFilter').value = 'open-verified-reopened';
             break;
         case 'verifiedBy':
             currentFilters.verifiedBy = 'all';

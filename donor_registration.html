@@ -138,6 +138,15 @@
         }
     }
     </script>
+
+    <!-- User Profile UI -->
+    <script type="module">
+        import('./scripts/user-profile-ui.js').then(module => {
+            module.initializeUserProfileUI();
+        }).catch(error => {
+            console.error('Failed to load user profile UI:', error);
+        });
+    </script>
 </head>
 
 <body class="donor-form-page">

@@ -32,6 +32,14 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/main.css" />
     <script src="scripts/mobile-menu.js"></script>
+    <!-- User Profile UI -->
+    <script type="module">
+        import('./scripts/user-profile-ui.js').then(module => {
+            module.initializeUserProfileUI();
+        }).catch(error => {
+            console.error('Failed to load user profile UI:', error);
+        });
+    </script>
 </head>
 
 <body class="bg-gray-50">
