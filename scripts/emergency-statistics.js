@@ -50,10 +50,9 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
         const totalRequests = statistics.total;
         const verifiedRequests = statistics.verified;
         const closedRequests = statistics.closed;
-        const fulfilledRequests = statistics.fulfilled || 0; // Only our donations
 
         successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = fulfilledRequests; // Only count fulfilled closures (our donations)
+        livesSaved = closedRequests; // Count all closed requests as lives saved
     } else {
         // Fallback to local calculation (for backward compatibility)
         openRequests = requests.filter(request => {
