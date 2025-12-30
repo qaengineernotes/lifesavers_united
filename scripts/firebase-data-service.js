@@ -496,23 +496,91 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 
             await updateDoc(doc(db, 'emergency_requests', requestId), updateData);
 
-            // Generate donor ID for linking
+            // Generate donor ID for linking with duplicate detection
             let donorId = null;
             if (donationInfo.donorName && donationInfo.donorContact) {
-                donorId = generateDonorId(donationInfo.donorName, donationInfo.donorContact);
+                // --- DUPLICATE DETECTION: Search by Name OR Contact Number ---
+                const donorsRef = collection(db, 'donors');
+                let existingDonor = null;
+
+                const searchName = (donationInfo.donorName || '').trim().toLowerCase();
+                const searchContact = (donationInfo.donorContact || '').toString().trim();
+
+                // 1. Search by Contact Number (most reliable)
+                if (searchContact) {
+                    const q = query(donorsRef, where('contactNumber', '==', searchContact));
+                    const snapshot = await getDocs(q);
+                    if (!snapshot.empty) {
+                        existingDonor = snapshot.docs[0];
+                        donorId = existingDonor.id;
+                        console.log(`🔍 Found existing donor by contact number: ${donorId}`);
+                    }
+                }
+
+                // 2. Search by Name (if not found by contact)
+                if (!existingDonor && searchName) {
+                    // Query all donors and filter by case-insensitive name match
+                    const allDonorsSnapshot = await getDocs(donorsRef);
+                    allDonorsSnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const existingName = (data.fullName || '').trim().toLowerCase();
+                        if (existingName === searchName) {
+                            existingDonor = doc;
+                            donorId = doc.id;
+                            console.log(`🔍 Found existing donor by name: ${donorId}`);
+                        }
+                    });
+                }
+
+                // Generate ID if new donor
+                if (!donorId) {
+                    donorId = generateDonorId(donationInfo.donorName, donationInfo.donorContact);
+                }
 
                 // Update donor master record
                 try {
                     const donorRef = doc(db, 'donors', donorId);
+
+                    // Check if donor already exists (for blood group logic)
+                    const existingDonorDoc = await getDoc(donorRef);
+                    const donorExists = existingDonorDoc.exists();
+                    const existingDonorData = donorExists ? existingDonorDoc.data() : null;
+
+                    // Determine blood group to store
+                    let bloodGroupToStore = '';
+
+                    if (requestData.bloodType === 'Any') {
+                        // Patient required blood group is "Any"
+                        if (donorExists && existingDonorData.bloodGroup) {
+                            // Existing donor - keep their existing blood group
+                            bloodGroupToStore = existingDonorData.bloodGroup;
+                        } else {
+                            // New donor - keep empty (don't set to "Any")
+                            bloodGroupToStore = '';
+                        }
+                    } else {
+                        // Patient required specific blood group
+                        if (donorExists && existingDonorData.bloodGroup) {
+                            // Existing donor - keep their existing blood group
+                            bloodGroupToStore = existingDonorData.bloodGroup;
+                        } else {
+                            // New donor - set to the specific blood group
+                            bloodGroupToStore = requestData.bloodType;
+                        }
+                    }
+
                     const donorData = {
                         fullName: donationInfo.donorName,
                         contactNumber: donationInfo.donorContact,
-                        bloodGroup: requestData.bloodType,
+                        bloodGroup: bloodGroupToStore,
                         lastDonatedAt: serverTimestamp(),
                         updatedAt: serverTimestamp(),
                         updatedBy: currentUser?.displayName || 'System'
                     };
+
                     await setDoc(donorRef, donorData, { merge: true });
+
+                    console.log(`✅ Donor record updated: ${donorId}, Blood Group: "${bloodGroupToStore}" (Patient required: "${requestData.bloodType}", Donor ${donorExists ? 'existed' : 'new'})`);
 
                 } catch (donorErr) {
                     console.error('❌ Failed to sync donor to master list:', donorErr);
@@ -914,8 +982,39 @@ function generateRequestId(patientName, contactNumber) {
 // ============================================================================
 export async function registerDonorInFirebase(donorData) {
     try {
-        // Generate unique ID
-        const donorId = generateDonorId(donorData.fullName, donorData.contactNumber);
+        const donorsRef = collection(db, 'donors');
+        let existingDonor = null;
+        let donorId = null;
+
+        // --- DUPLICATE DETECTION: Search by Name OR Contact Number ---
+        const searchName = (donorData.fullName || '').trim().toLowerCase();
+        const searchContact = (donorData.contactNumber || '').toString().trim();
+
+        // 1. Search by Contact Number (most reliable)
+        if (searchContact) {
+            const q = query(donorsRef, where('contactNumber', '==', searchContact));
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
+                existingDonor = snapshot.docs[0];
+                donorId = existingDonor.id;
+                console.log(`🔍 Found existing donor by contact number: ${donorId}`);
+            }
+        }
+
+        // 2. Search by Name (if not found by contact)
+        if (!existingDonor && searchName) {
+            // Query all donors and filter by case-insensitive name match
+            const allDonorsSnapshot = await getDocs(donorsRef);
+            allDonorsSnapshot.forEach((doc) => {
+                const data = doc.data();
+                const existingName = (data.fullName || '').trim().toLowerCase();
+                if (existingName === searchName) {
+                    existingDonor = doc;
+                    donorId = doc.id;
+                    console.log(`🔍 Found existing donor by name: ${donorId}`);
+                }
+            });
+        }
 
         // Calculate age from date of birth if provided
         let age = 0;
@@ -931,7 +1030,7 @@ export async function registerDonorInFirebase(donorData) {
 
         // Prepare Firestore data
         const firestoreData = {
-            registeredAt: serverTimestamp(),
+            registeredAt: existingDonor ? existingDonor.data().registeredAt : serverTimestamp(),
             fullName: donorData.fullName || '',
             contactNumber: donorData.contactNumber || '',
             bloodGroup: donorData.bloodGroup || '',
@@ -950,22 +1049,32 @@ export async function registerDonorInFirebase(donorData) {
             email: donorData.email || '',
 
             // Audit - Use provided registration info or defaults
-            createdAt: serverTimestamp(),
-            createdBy: donorData.registeredBy || 'System (Public Registration)',
-            createdByUid: donorData.registeredByUid || null,
+            createdAt: existingDonor ? existingDonor.data().createdAt : serverTimestamp(),
+            createdBy: existingDonor ? existingDonor.data().createdBy : (donorData.registeredBy || 'System (Public Registration)'),
+            createdByUid: existingDonor ? existingDonor.data().createdByUid : (donorData.registeredByUid || null),
             updatedAt: serverTimestamp(),
             updatedBy: donorData.registeredBy || 'System',
 
             // Metadata
-            source: 'public_registration',
-            registrationDate: donorData.registrationDate || new Date().toISOString()
+            source: existingDonor ? existingDonor.data().source : 'public_registration',
+            registrationDate: existingDonor ? existingDonor.data().registrationDate : (donorData.registrationDate || new Date().toISOString())
         };
 
-        // Save to Firestore
-        await setDoc(doc(db, 'donors', donorId), firestoreData);
+        // Generate ID if new donor
+        if (!donorId) {
+            donorId = generateDonorId(donorData.fullName, donorData.contactNumber);
+        }
 
-        console.log('✅ Donor registered successfully in Firebase:', donorId);
-        return { success: true, donorId: donorId };
+        // Save to Firestore (merge if existing, create if new)
+        await setDoc(doc(db, 'donors', donorId), firestoreData, { merge: true });
+
+        if (existingDonor) {
+            console.log('✅ Existing donor updated in Firebase:', donorId);
+            return { success: true, donorId: donorId, action: 'UPDATED' };
+        } else {
+            console.log('✅ New donor registered in Firebase:', donorId);
+            return { success: true, donorId: donorId, action: 'CREATED' };
+        }
 
     } catch (error) {
         console.error('❌ Error registering donor in Firebase:', error);
