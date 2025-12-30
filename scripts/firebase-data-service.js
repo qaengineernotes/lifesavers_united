@@ -917,6 +917,18 @@ export async function registerDonorInFirebase(donorData) {
         // Generate unique ID
         const donorId = generateDonorId(donorData.fullName, donorData.contactNumber);
 
+        // Calculate age from date of birth if provided
+        let age = 0;
+        if (donorData.dateOfBirth) {
+            const birthDate = new Date(donorData.dateOfBirth);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+        }
+
         // Prepare Firestore data
         const firestoreData = {
             registeredAt: serverTimestamp(),
@@ -925,34 +937,38 @@ export async function registerDonorInFirebase(donorData) {
             bloodGroup: donorData.bloodGroup || '',
             area: donorData.area || '',
             city: donorData.city || '',
-            isEmergencyAvailable: donorData.isEmergencyAvailable || '',
+            // Handle both field names for emergency availability
+            isEmergencyAvailable: donorData.emergencyAvailable || donorData.isEmergencyAvailable || '',
             dateOfBirth: donorData.dateOfBirth || '',
             gender: donorData.gender || '',
             preferredContact: donorData.preferredContact || '',
-            age: parseInt(donorData.age) || 0,
+            age: age,
             weight: donorData.weight || '',
-            lastDonatedAt: donorData.lastDonatedAt || '',
+            // Handle both field names for last donation
+            lastDonatedAt: donorData.lastDonation || donorData.lastDonatedAt || '',
             medicalHistory: donorData.medicalHistory || '',
             email: donorData.email || '',
 
-            // Audit
+            // Audit - Use provided registration info or defaults
             createdAt: serverTimestamp(),
-            createdBy: 'System (Public Registration)',
+            createdBy: donorData.registeredBy || 'System (Public Registration)',
+            createdByUid: donorData.registeredByUid || null,
             updatedAt: serverTimestamp(),
-            updatedBy: 'System',
+            updatedBy: donorData.registeredBy || 'System',
 
             // Metadata
-            source: 'public_registration'
+            source: 'public_registration',
+            registrationDate: donorData.registrationDate || new Date().toISOString()
         };
 
         // Save to Firestore
         await setDoc(doc(db, 'donors', donorId), firestoreData);
 
-
+        console.log('✅ Donor registered successfully in Firebase:', donorId);
         return { success: true, donorId: donorId };
 
     } catch (error) {
-        console.error('Error registering donor in Firebase:', error);
+        console.error('❌ Error registering donor in Firebase:', error);
         throw error;
     }
 }
