@@ -1030,7 +1030,6 @@ export async function registerDonorInFirebase(donorData) {
 
         // Prepare Firestore data
         const firestoreData = {
-            registeredAt: existingDonor ? existingDonor.data().registeredAt : serverTimestamp(),
             fullName: donorData.fullName || '',
             contactNumber: donorData.contactNumber || '',
             bloodGroup: donorData.bloodGroup || '',
@@ -1047,18 +1046,59 @@ export async function registerDonorInFirebase(donorData) {
             lastDonatedAt: donorData.lastDonation || donorData.lastDonatedAt || '',
             medicalHistory: donorData.medicalHistory || '',
             email: donorData.email || '',
-
-            // Audit - Use provided registration info or defaults
-            createdAt: existingDonor ? existingDonor.data().createdAt : serverTimestamp(),
-            createdBy: existingDonor ? existingDonor.data().createdBy : (donorData.registeredBy || 'System (Public Registration)'),
-            createdByUid: existingDonor ? existingDonor.data().createdByUid : (donorData.registeredByUid || null),
             updatedAt: serverTimestamp(),
-            updatedBy: donorData.registeredBy || 'System',
-
-            // Metadata
-            source: existingDonor ? existingDonor.data().source : 'public_registration',
-            registrationDate: existingDonor ? existingDonor.data().registrationDate : (donorData.registrationDate || new Date().toISOString())
+            updatedBy: donorData.registeredBy || 'System'
         };
+
+        // Add fields that should only be set if they don't exist (for existing donors)
+        // or always set for new donors
+        if (existingDonor) {
+            const existingData = existingDonor.data();
+            // Only set these fields if they don't already exist (preserve original values)
+            if (existingData.registeredAt) {
+                firestoreData.registeredAt = existingData.registeredAt;
+            } else {
+                firestoreData.registeredAt = serverTimestamp();
+            }
+
+            if (existingData.createdAt) {
+                firestoreData.createdAt = existingData.createdAt;
+            } else {
+                firestoreData.createdAt = serverTimestamp();
+            }
+
+            if (existingData.createdBy) {
+                firestoreData.createdBy = existingData.createdBy;
+            } else {
+                firestoreData.createdBy = donorData.registeredBy || 'System (Public Registration)';
+            }
+
+            if (existingData.createdByUid !== undefined) {
+                firestoreData.createdByUid = existingData.createdByUid;
+            } else {
+                firestoreData.createdByUid = donorData.registeredByUid || null;
+            }
+
+            if (existingData.source) {
+                firestoreData.source = existingData.source;
+            } else {
+                firestoreData.source = 'public_registration';
+            }
+
+            if (existingData.registrationDate) {
+                firestoreData.registrationDate = existingData.registrationDate;
+            } else {
+                firestoreData.registrationDate = donorData.registrationDate || new Date().toISOString();
+            }
+        } else {
+            // New donor - set all fields
+            firestoreData.registeredAt = serverTimestamp();
+            firestoreData.createdAt = serverTimestamp();
+            firestoreData.createdBy = donorData.registeredBy || 'System (Public Registration)';
+            firestoreData.createdByUid = donorData.registeredByUid || null;
+            firestoreData.source = 'public_registration';
+            firestoreData.registrationDate = donorData.registrationDate || new Date().toISOString();
+        }
 
         // Generate ID if new donor
         if (!donorId) {

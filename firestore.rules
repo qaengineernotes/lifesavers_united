@@ -38,12 +38,11 @@ service cloud.firestore {
     }
 
     // Donors collection
-    // Allow public registration (anyone can register as a donor)
-    // Read and update require authentication and approval
+    // Allow public registration and updates (anyone can register/update as a donor)
+    // This enables duplicate detection to update existing donors
     match /donors/{donorId} {
       allow read: if isAuthenticated();
-      allow create: if true; // Allow public donor registration
-      allow update: if isApproved();
+      allow create, update: if true; // Allow public donor registration and updates
       allow delete: if isSuperuser();
     }
 
