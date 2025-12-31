@@ -162,6 +162,37 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
             firebaseResult = await firebaseModule.createNewRequestInFirebase(data, currentUser);
 
+            // Post to Twitter if Firebase save was successful
+            if (firebaseResult.success && firebaseResult.action === 'CREATED') {
+                try {
+                    console.log('📤 Posting to Twitter...');
+                    const { functions, httpsCallable } = await import('./firebase-config.js');
+                    const postToTwitter = httpsCallable(functions, 'postRequestToTwitter');
+
+                    // Prepare data for Twitter (map field names)
+                    const twitterData = {
+                        patientName: data.patientName,
+                        patientAge: data.patientAge,
+                        requiredBloodGroup: data.bloodType,
+                        unitsRequired: data.unitsRequired,
+                        hospitalName: data.hospitalName,
+                        hospitalCity: data.city,
+                        contactNumber: data.contactNumber
+                    };
+
+                    const twitterResult = await postToTwitter({ requestData: twitterData });
+
+                    if (twitterResult.data.success) {
+                        console.log('✅ Posted to Twitter:', twitterResult.data.tweetLink);
+                    } else {
+                        console.warn('⚠️ Twitter posting failed:', twitterResult.data.error);
+                    }
+                } catch (twitterError) {
+                    console.error('⚠️ Twitter posting error:', twitterError);
+                    // Don't fail the whole submission if Twitter fails
+                }
+            }
+
         } catch (firebaseError) {
             console.error('❌ Firebase save failed:', firebaseError);
             // If Firebase fails, we still try Sheets but we should warn the user

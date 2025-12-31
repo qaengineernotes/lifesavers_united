@@ -32,9 +32,20 @@ service cloud.firestore {
     }
 
     // Emergency Requests collection
+    // Allow public to create requests (for web form submissions)
+    // Allow authenticated users to read
+    // Allow approved users to update/delete
     match /emergency_requests/{requestId} {
       allow read: if isAuthenticated();
-      allow create, update, delete: if isApproved();
+      allow create: if true; // Allow public submissions via web form
+      allow update, delete: if isApproved();
+      
+      // Allow access to subcollections (updates/history)
+      match /updates/{updateId} {
+        allow read: if isAuthenticated();
+        allow create: if true; // Allow history entries for public submissions
+        allow update, delete: if isApproved();
+      }
     }
 
     // Donors collection

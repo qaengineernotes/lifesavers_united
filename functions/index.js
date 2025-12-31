@@ -20,6 +20,39 @@ const twitterClient = new TwitterApi({
     accessSecret: functions.config().twitter.access_secret,
 });
 
+// --- SHARED TWITTER POSTING FUNCTION ---
+
+/**
+ * Post a blood request to Twitter
+ * @param {Object} requestData - The blood request data
+ * @returns {Object} - { success: boolean, tweetLink?: string, error?: string }
+ */
+const postBloodRequestToTwitter = async (requestData) => {
+    try {
+        // Format: URGENT: [Name], [Age], needs [Units] units [Blood Group] blood RIGHT NOW...
+        const tweetText = `URGENT: ${requestData.patientName}, ${requestData.patientAge || 'N/A'}, needs ${requestData.unitsRequired} units ${requestData.requiredBloodGroup} blood RIGHT NOW at ${requestData.hospitalName}, ${requestData.hospitalCity || 'N/A'}!
+Your donation can save a life today. Please come forward!
+Call: ${requestData.contactNumber}
+https://lifesaversunited.org
+#LifeSaversUnited #BloodDonation #SaveLives #${requestData.hospitalCity?.replace(/\s/g, "") || "India"} #Emergency`;
+
+        console.log("📤 Posting to Twitter...");
+        const { data: tweet } = await twitterClient.v2.tweet(tweetText);
+        const tweetLink = `https://twitter.com/user/status/${tweet.id}`;
+
+        console.log("✅ Tweet posted successfully:", tweetLink);
+        return { success: true, tweetLink };
+
+    } catch (error) {
+        console.error("❌ Twitter posting failed:", error);
+        return {
+            success: false,
+            error: error.message || "Unknown error",
+            tweetLink: "(Twitter posting failed - check logs)"
+        };
+    }
+};
+
 // --- HELPER FUNCTIONS ---
 
 // Parse the "One-Shot" Text
@@ -454,18 +487,8 @@ bot.on("text", async (ctx) => {
         }
 
         // 2. Post to Twitter (only after database confirmation)
-        // Format: 🚨 URGENT: [Group] needed at [Hospital]. Patient: [Name]. Contact: [Number]
-        const tweetText = `🚨 URGENT: ${requestData.requiredBloodGroup} needed at ${requestData.hospitalName}.\n\nPatient: ${requestData.patientName}\nLocation: ${requestData.hospitalCity || "N/A"}\nContact: ${requestData.contactNumber}\n\n#BloodRequest #LifesaversUnited #${requestData.hospitalCity?.replace(/\s/g, "") || "India"}`;
-
-        let tweetLink = "N/A";
-        try {
-            const { data: tweet } = await twitterClient.v2.tweet(tweetText);
-            tweetLink = `https://twitter.com/user/status/${tweet.id}`;
-        } catch (twError) {
-            console.error("Twitter Post Error:", twError);
-            // Don't fail the whole request just because Twitter failed, but notify admin/log
-            tweetLink = "(Twitter posting failed - check logs)";
-        }
+        const twitterResult = await postBloodRequestToTwitter(requestData);
+        const tweetLink = twitterResult.tweetLink || "N/A";
 
         // 3. Reply to User ONLY after database confirmation
         await ctx.reply(`✅ **Request Created & Saved**\n\n✅ Database confirmed!\nPatient: ${requestData.patientName}\nDocument ID: ${customDocId}\nTweet: ${tweetLink}\n\nWe will notify donors immediately.`);
@@ -519,5 +542,56 @@ exports.telegramBot = functions.https.onRequest(async (req, res) => {
     } catch (err) {
         console.error("❌ Bot Handle Error:", err);
         res.status(200).send('OK'); // Still return 200 to Telegram to avoid retries
+    }
+});
+
+// Export HTTP Callable Function for Web Form Twitter Posting
+// This allows the web form to post blood requests to Twitter
+// URL will be called via Firebase SDK: functions.httpsCallable('postRequestToTwitter')
+exports.postRequestToTwitter = functions.https.onCall(async (data, context) => {
+    try {
+        console.log("📥 Web form Twitter posting request received");
+
+        // Validate request data
+        if (!data || !data.requestData) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'Request data is required'
+            );
+        }
+
+        const requestData = data.requestData;
+
+        // Validate required fields
+        const requiredFields = ['patientName', 'requiredBloodGroup', 'unitsRequired', 'hospitalName', 'contactNumber'];
+        const missingFields = requiredFields.filter(field => !requestData[field]);
+
+        if (missingFields.length > 0) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                `Missing required fields: ${missingFields.join(', ')}`
+            );
+        }
+
+        // Post to Twitter using shared function
+        const result = await postBloodRequestToTwitter(requestData);
+
+        console.log("📤 Twitter posting result:", result.success ? "Success" : "Failed");
+
+        return result;
+
+    } catch (error) {
+        console.error("❌ Error in postRequestToTwitter:", error);
+
+        // If it's already an HttpsError, rethrow it
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+
+        // Otherwise, wrap it in an HttpsError
+        throw new functions.https.HttpsError(
+            'internal',
+            error.message || 'Failed to post to Twitter'
+        );
     }
 });
