@@ -5,7 +5,8 @@ import {
     auth,
     RecaptchaVerifier,
     signInWithPhoneNumber,
-    onAuthStateChanged
+    onAuthStateChanged,
+    updateProfile
 } from './firebase-config.js';
 
 import { db, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from './firebase-config.js';
@@ -145,6 +146,12 @@ async function getUserProfile(uid, phoneNumber) {
 // ============================================================================
 export async function createUserProfile(uid, displayName) {
     try {
+        // 1. Update Firebase Auth profile
+        await updateProfile(auth.currentUser, {
+            displayName: displayName
+        });
+
+        // 2. Store in Firestore users collection
         const userRef = doc(db, 'users', uid);
         await setDoc(userRef, {
             displayName: displayName,
@@ -155,14 +162,14 @@ export async function createUserProfile(uid, displayName) {
             status: 'pending' // New users start as pending
         });
 
-        // Update current user
+        // 3. Update current user state
         currentUser = {
             ...currentUser,
             displayName: displayName,
             isNewUser: false
         };
 
-
+        console.log('✅ User profile created successfully with displayName:', displayName);
         return true;
     } catch (error) {
         console.error('Error creating user profile:', error);

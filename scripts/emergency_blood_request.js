@@ -153,11 +153,18 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
             // Track who created this request
             if (currentUser) {
-                data.createdBy = currentUser.displayName || 'User';
+                // For logged-in users: use displayName, or phone number, or email, or 'User' as last resort
+                const userName = currentUser.displayName || currentUser.phoneNumber || currentUser.email || 'User';
+                data.createdBy = userName;
+                data.createdByName = userName; // Alias for compatibility
                 data.createdByUid = currentUser.uid;
+                data.source = 'web_form';
             } else {
-                data.createdBy = data.patientName; // Use patient name if not logged in
+                // For public submissions: use patient's name
+                data.createdBy = data.patientName;
+                data.createdByName = data.patientName; // Alias for compatibility
                 data.createdByUid = null;
+                data.source = 'web_form_public';
             }
 
             firebaseResult = await firebaseModule.createNewRequestInFirebase(data, currentUser);
@@ -259,7 +266,10 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
 // Function to initialize duplicate checking
 function initializeDuplicateChecking() {
-    const patientNameInput = document.getElementById('patientName');
+    // DISABLED: Real-time duplicate checking removed for better UX
+    // Duplicate checking now happens only on form submission via Firebase
+
+    /* const patientNameInput = document.getElementById('patientName');
     const contactNumberInput = document.getElementById('contactNumber');
 
     if (patientNameInput && contactNumberInput) {
@@ -270,7 +280,7 @@ function initializeDuplicateChecking() {
         // Also check when both fields have values
         patientNameInput.addEventListener('input', debounce(checkForExistingRequest, 500));
         contactNumberInput.addEventListener('input', debounce(checkForExistingRequest, 500));
-    }
+    } */
 }
 
 // Debounce function to limit API calls

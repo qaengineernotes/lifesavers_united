@@ -203,15 +203,62 @@ bot.on("text", async (ctx) => {
         return ctx.reply(`❌ **Missing details!**\n\nThe following mandatory fields are missing:\n👉 ${missingFields.join(", ")}\n\nPlease copy-paste the template and try again.`);
     }
 
-    // Add submitter info
+    // Add submitter info - standardized fields
     const userData = userDoc.data();
-    requestData.submittedBy = {
-        telegramId: telegramId,
-        username: userData.username,
-        phoneNumber: userData.phoneNumber
-    };
+    const createdByName = `${userData.firstName || ''} ${userData.lastName || ''}`.trim() || userData.username || 'Telegram User';
+
+    requestData.createdBy = createdByName;
+    requestData.createdByName = createdByName; // Alias for compatibility
+    requestData.createdByUid = `telegram_${telegramId}`;
     requestData.source = "telegram_bot";
     requestData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+
+    // Add optional fields with default/empty values to match web form structure
+    // This ensures all database documents have identical field structure
+    requestData.contactEmail = requestData.contactEmail || "";
+    requestData.urgencyLevel = requestData.urgencyLevel || "Normal";
+    requestData.hospitalAddress = requestData.hospitalAddress || "";
+    requestData.additionalInfo = requestData.additionalInfo || "";
+
+    // Initialize ALL tracking and system fields to match web form structure exactly
+    // Donation Tracking Fields
+    requestData.donationLogIds = [];
+    requestData.allDonationLogIds = [];
+    requestData.unitsFulfilled = 0;
+    requestData.donorSummary = "";
+    requestData.fulfilledAt = "";
+    requestData.lastDonationAt = null;
+
+    // Closure Tracking Fields
+    requestData.closedAt = null;
+    requestData.closedBy = "";
+    requestData.closedByUid = "";
+    requestData.closureReason = "";
+    requestData.closureType = "";
+    requestData.closureHistory = [];
+    requestData.totalClosures = 0;
+
+    // Reopen Tracking Fields
+    requestData.reopenedAt = null;
+    requestData.reopenCount = 0;
+
+    // Verification Fields
+    requestData.verifiedAt = null;
+    requestData.verifiedByName = "";
+    requestData.verifiedByUid = "";
+
+    // Update Tracking Fields
+    requestData.updatedAt = admin.firestore.FieldValue.serverTimestamp();
+    requestData.updatedBy = "";
+    requestData.updatedByUid = "";
+    requestData.lastUpdatedAt = admin.firestore.FieldValue.serverTimestamp();
+    requestData.lastUpdatedByName = "";
+    requestData.lastUpdatedByUid = "";
+
+    // Store Telegram metadata separately for audit trail
+    requestData.telegramUserId = telegramId;
+    requestData.telegramUsername = userData.username || '';
+    requestData.telegramPhone = userData.phoneNumber || '';
 
     console.log("✅ Validation passed, proceeding with submission...");
 
@@ -290,9 +337,9 @@ bot.on("text", async (ctx) => {
                         await historyRef.add({
                             timestamp: admin.firestore.FieldValue.serverTimestamp(),
                             type: 'REOPENED',
-                            userName: userData.username || `Telegram User ${telegramId}`,
+                            userName: createdByName,
                             userUid: `telegram_${telegramId}`,
-                            note: `Request reopened via Telegram by ${userData.username || 'user'}. Previous status: ${existingData.status}`,
+                            note: `Request reopened via Telegram by ${createdByName}. Previous status: ${existingData.status}`,
                             telegramId: telegramId,
                             phoneNumber: userData.phoneNumber || ''
                         });
@@ -393,11 +440,11 @@ bot.on("text", async (ctx) => {
                 const historyEntry = {
                     timestamp: admin.firestore.FieldValue.serverTimestamp(),
                     type: wasClosed ? 'REOPENED' : 'UPDATED',
-                    userName: userData.username || `Telegram User ${telegramId}`,
+                    userName: createdByName,
                     userUid: `telegram_${telegramId}`,
                     note: wasClosed
-                        ? `Request reopened via Telegram by ${userData.username || 'user'}. Changes: ${changesSummary}`
-                        : `Request updated via Telegram by ${userData.username || 'user'}. Changes: ${changesSummary}`,
+                        ? `Request reopened via Telegram by ${createdByName}. Changes: ${changesSummary}`
+                        : `Request updated via Telegram by ${createdByName}. Changes: ${changesSummary}`,
                     changedFields: changedFields.map(field => field.replace('• ', '')),
                     telegramId: telegramId,
                     phoneNumber: userData.phoneNumber || ''
@@ -465,9 +512,9 @@ bot.on("text", async (ctx) => {
                 await historyRef.add({
                     timestamp: admin.firestore.FieldValue.serverTimestamp(),
                     type: 'CREATED',
-                    userName: userData.username || `Telegram User ${telegramId}`,
+                    userName: createdByName,
                     userUid: `telegram_${telegramId}`,
-                    note: `Request created via Telegram by ${userData.username || 'user'}`,
+                    note: `Request created via Telegram by ${createdByName}`,
                     telegramId: telegramId,
                     phoneNumber: userData.phoneNumber || ''
                 });

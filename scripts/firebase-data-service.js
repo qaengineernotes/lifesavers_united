@@ -299,6 +299,7 @@ export async function updateRequestStatusInFirebase(patientName, bloodType, newS
         if (newStatus === 'Verified') {
             updateData.verifiedByName = verifiedBy;
             updateData.verifiedByUid = currentUser?.uid || 'legacy';
+            updateData.verifiedAt = serverTimestamp();
         }
 
         await updateDoc(doc(db, 'emergency_requests', requestId), updateData);
@@ -863,25 +864,33 @@ export async function createNewRequestInFirebase(requestData, currentUser = null
 
                 hospitalName: requestData.hospitalName || currentData.hospitalName || '',
                 hospitalAddress: requestData.hospitalAddress || currentData.hospitalAddress || '',
-                hospitalCity: requestData.city || currentData.hospitalCity || '',
+                hospitalCity: requestData.city || requestData.hospitalCity || currentData.hospitalCity || '',
 
                 contactPerson: requestData.contactPerson || currentData.contactPerson || '',
                 contactNumber: searchContact || currentData.contactNumber || '',
+                contactEmail: requestData.contactEmail || currentData.contactEmail || '',
 
                 // Status Update
                 status: 'Reopened',
-                urgencyLevel: requestData.urgency || currentData.urgencyLevel || 'Normal',
+                urgencyLevel: requestData.urgency || requestData.urgencyLevel || currentData.urgencyLevel || 'Normal',
                 additionalInfo: requestData.additionalInfo || currentData.additionalInfo || '',
 
                 // Audit - Track who reopened
-                updatedBy: currentUser?.displayName || requestData.patientName || 'Public',
-                updatedByUid: currentUser?.uid || 'public',
+                updatedBy: currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Public',
+                updatedByUid: currentUser?.uid || requestData.createdByUid || 'public',
                 updatedAt: serverTimestamp(),
-                lastUpdatedByName: currentUser?.displayName || requestData.patientName || 'Public',
+                lastUpdatedByName: currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Public',
                 lastUpdatedAt: serverTimestamp(),
                 createdAt: serverTimestamp(), // Bring to top of list
-                source: currentUser ? 'user_reopen' : 'public_submission_reopened',
-                reopenedAt: serverTimestamp()
+                source: requestData.source || currentData.source || (currentUser ? 'web_form' : 'web_form_public'),
+                reopenedAt: serverTimestamp(),
+
+                // Store Telegram metadata if present
+                ...(requestData.telegramUserId && {
+                    telegramUserId: requestData.telegramUserId,
+                    telegramUsername: requestData.telegramUsername,
+                    telegramPhone: requestData.telegramPhone
+                })
             };
 
             // PRESERVE donation history
@@ -897,13 +906,17 @@ export async function createNewRequestInFirebase(requestData, currentUser = null
             await updateDoc(doc(db, 'emergency_requests', requestId), updateData);
 
             // Add history entry for reopen
+            const reopenedByName = currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Public';
+
             await addHistoryEntry(requestId, {
                 type: 'REOPENED',
-                createdBy: currentUser?.displayName || requestData.patientName || 'Public',
-                createdById: currentUser?.uid || 'public',
+                createdBy: reopenedByName,
+                createdById: currentUser?.uid || requestData.createdByUid || 'public',
                 note: currentUser
-                    ? `Request reopened by ${currentUser.displayName}`
-                    : 'Request reopened via public form'
+                    ? `Request reopened by ${reopenedByName} via ${requestData.source || 'web form'}`
+                    : requestData.createdBy
+                        ? `Request reopened by ${requestData.createdBy} via ${requestData.source || 'form'}`
+                        : 'Request reopened via public form'
             });
 
 
@@ -923,35 +936,78 @@ export async function createNewRequestInFirebase(requestData, currentUser = null
             unitsFulfilled: 0,
             hospitalName: requestData.hospitalName || '',
             hospitalAddress: requestData.hospitalAddress || '',
-            hospitalCity: requestData.city || '',
+            hospitalCity: requestData.city || requestData.hospitalCity || '',
             contactPerson: requestData.contactPerson || '',
             contactNumber: requestData.contactNumber || '',
-            urgencyLevel: requestData.urgency || 'Normal',
+            contactEmail: requestData.contactEmail || '',
+            urgencyLevel: requestData.urgency || requestData.urgencyLevel || 'Normal',
             status: 'Open',
             additionalInfo: requestData.additionalInfo || '',
 
             // Track who created - logged in user or public
-            createdByName: currentUser?.displayName || requestData.patientName || 'Unknown',
-            createdByUid: currentUser?.uid || 'public',
+            createdByName: currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Unknown',
+            createdByUid: currentUser?.uid || requestData.createdByUid || 'public',
 
+            // Verification fields
             verifiedByName: '',
             verifiedByUid: '',
-            donorSummary: '',
+            verifiedAt: null,
+
+            // Closure fields
+            closedBy: '',
+            closedByUid: '',
+            closedAt: null,
             closureReason: '',
+            closureType: '',
             fulfilledAt: '',
-            source: currentUser ? 'user_submission' : 'public_submission'
+
+            // Reopen fields
+            reopenedAt: null,
+            reopenCount: 0,
+
+            // Donation tracking fields
+            donorSummary: '',
+            donationLogIds: [],
+            allDonationLogIds: [],
+            lastDonationAt: null,
+
+            // Update tracking fields
+            updatedBy: '',
+            updatedByUid: '',
+            updatedAt: null,
+            lastUpdatedByName: '',
+            lastUpdatedByUid: '',
+            lastUpdatedAt: null,
+
+            // Closure history
+            closureHistory: [],
+            totalClosures: 0,
+
+            // Source tracking
+            source: requestData.source || (currentUser ? 'web_form' : 'web_form_public'),
+
+            // Store Telegram metadata if present
+            ...(requestData.telegramUserId && {
+                telegramUserId: requestData.telegramUserId,
+                telegramUsername: requestData.telegramUsername,
+                telegramPhone: requestData.telegramPhone
+            })
         };
 
         await setDoc(doc(db, 'emergency_requests', requestId), firestoreData);
 
         // Add history entry for creation
+        const createdByName = currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Unknown';
+
         await addHistoryEntry(requestId, {
             type: 'CREATED',
-            createdBy: currentUser?.displayName || requestData.patientName || 'Unknown',
-            createdById: currentUser?.uid || 'public',
+            createdBy: createdByName,
+            createdById: currentUser?.uid || requestData.createdByUid || 'public',
             note: currentUser
-                ? `Request created by ${currentUser.displayName}`
-                : 'Request submitted via public form'
+                ? `Request created by ${createdByName} via ${requestData.source || 'web form'}`
+                : requestData.createdBy
+                    ? `Request created by ${requestData.createdBy} via ${requestData.source || 'form'}`
+                    : 'Request submitted via public form'
         });
 
 
