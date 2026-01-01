@@ -53,7 +53,7 @@ export async function fetchEmergencyRequestsFromFirebase() {
                 hospitalName: data.hospitalName || '',
                 diagnosis: data.patientSufferingFrom || '',
                 status: data.status || 'Open',
-                urgency: data.urgencyLevel || '',
+                urgency: data.urgencyLevel || 'Normal',
                 hospitalAddress: data.hospitalAddress || '',
                 city: data.hospitalCity || '',
                 contactPerson: data.contactPerson || '',
@@ -62,6 +62,7 @@ export async function fetchEmergencyRequestsFromFirebase() {
                 donors: data.donorSummary || '',
                 additionalInfo: data.additionalInfo || '',
                 verifiedBy: data.verifiedByName || '',
+                createdBy: data.createdByName || 'Unknown',
                 closureReason: data.closureReason || '',
                 fulfilledDate: data.fulfilledAt || ''
             });
@@ -513,7 +514,6 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                     if (!snapshot.empty) {
                         existingDonor = snapshot.docs[0];
                         donorId = existingDonor.id;
-                        console.log(`🔍 Found existing donor by contact number: ${donorId}`);
                     }
                 }
 
@@ -527,7 +527,6 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                         if (existingName === searchName) {
                             existingDonor = doc;
                             donorId = doc.id;
-                            console.log(`🔍 Found existing donor by name: ${donorId}`);
                         }
                     });
                 }
@@ -580,10 +579,7 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 
                     await setDoc(donorRef, donorData, { merge: true });
 
-                    console.log(`✅ Donor record updated: ${donorId}, Blood Group: "${bloodGroupToStore}" (Patient required: "${requestData.bloodType}", Donor ${donorExists ? 'existed' : 'new'})`);
-
                 } catch (donorErr) {
-                    console.error('❌ Failed to sync donor to master list:', donorErr);
                 }
             }
 
@@ -650,7 +646,6 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                     note: `${donationInfo.units} unit(s) donated by ${donationInfo.donorName || 'Unknown'}`
                 });
             } catch (historyError) {
-                console.error('⚠️ Failed to add history entry (donation still logged):', historyError);
             }
 
             return {
@@ -776,7 +771,6 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
         }
 
     } catch (error) {
-        console.error('Error logging donation to Firebase:', error);
         throw error;
     }
 }
@@ -809,7 +803,6 @@ async function addHistoryEntry(requestId, data) {
         await addDoc(historyRef, historyEntry);
 
     } catch (error) {
-        console.error('❌ Error adding history entry:', error);
         // Don't throw - let the caller decide how to handle
     }
 }
@@ -965,7 +958,6 @@ export async function createNewRequestInFirebase(requestData, currentUser = null
         return { success: true, requestId: requestId, action: 'CREATED' };
 
     } catch (error) {
-        console.error('Error in createNewRequestInFirebase:', error);
         throw error;
     }
 }
@@ -997,7 +989,6 @@ export async function registerDonorInFirebase(donorData) {
             if (!snapshot.empty) {
                 existingDonor = snapshot.docs[0];
                 donorId = existingDonor.id;
-                console.log(`🔍 Found existing donor by contact number: ${donorId}`);
             }
         }
 
@@ -1011,7 +1002,6 @@ export async function registerDonorInFirebase(donorData) {
                 if (existingName === searchName) {
                     existingDonor = doc;
                     donorId = doc.id;
-                    console.log(`🔍 Found existing donor by name: ${donorId}`);
                 }
             });
         }
@@ -1109,15 +1099,12 @@ export async function registerDonorInFirebase(donorData) {
         await setDoc(doc(db, 'donors', donorId), firestoreData, { merge: true });
 
         if (existingDonor) {
-            console.log('✅ Existing donor updated in Firebase:', donorId);
             return { success: true, donorId: donorId, action: 'UPDATED' };
         } else {
-            console.log('✅ New donor registered in Firebase:', donorId);
             return { success: true, donorId: donorId, action: 'CREATED' };
         }
 
     } catch (error) {
-        console.error('❌ Error registering donor in Firebase:', error);
         throw error;
     }
 }

@@ -11,8 +11,11 @@ export function initializeUserProfileUI() {
     onAuthChange((user) => {
         if (user) {
             showUserProfile(user);
+            // Show/hide All Requests button based on user status
+            toggleAllRequestsButton(user);
         } else {
             hideUserProfile();
+            toggleAllRequestsButton(null);
         }
     });
 
@@ -20,6 +23,35 @@ export function initializeUserProfileUI() {
     const currentUser = getCurrentUser();
     if (currentUser) {
         showUserProfile(currentUser);
+        toggleAllRequestsButton(currentUser);
+    }
+}
+
+// ============================================================================
+// TOGGLE ALL REQUESTS BUTTON VISIBILITY
+// ============================================================================
+function toggleAllRequestsButton(user) {
+    // Try to find the button container (in emergency_request_system.html)
+    const allRequestsButtonContainer = document.getElementById('allRequestsButtonContainer');
+
+    if (allRequestsButtonContainer) {
+        if (user && user.status === 'approved') {
+            allRequestsButtonContainer.style.display = 'inline-flex';
+            allRequestsButtonContainer.style.visibility = 'visible';
+            allRequestsButtonContainer.style.opacity = '1';
+        } else {
+            allRequestsButtonContainer.style.display = 'none';
+        }
+    }
+
+    // Also handle the old navigation link if it exists (for backward compatibility)
+    const allRequestsLink = document.getElementById('allRequestsLink');
+    if (allRequestsLink) {
+        if (user && user.status === 'approved') {
+            allRequestsLink.style.display = 'inline';
+        } else {
+            allRequestsLink.style.display = 'none';
+        }
     }
 }
 

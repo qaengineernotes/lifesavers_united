@@ -165,7 +165,6 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             // Post to Twitter if Firebase save was successful
             if (firebaseResult.success && firebaseResult.action === 'CREATED') {
                 try {
-                    console.log('📤 Posting to Twitter...');
                     const { functions, httpsCallable } = await import('./firebase-config.js');
                     const postToTwitter = httpsCallable(functions, 'postRequestToTwitter');
 
@@ -183,7 +182,7 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
                     const twitterResult = await postToTwitter({ requestData: twitterData });
 
                     if (twitterResult.data.success) {
-                        console.log('✅ Posted to Twitter:', twitterResult.data.tweetLink);
+                        // Twitter post successful
                     } else {
                         console.warn('⚠️ Twitter posting failed:', twitterResult.data.error);
                     }
@@ -195,7 +194,8 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
         } catch (firebaseError) {
             console.error('❌ Firebase save failed:', firebaseError);
-            // If Firebase fails, we still try Sheets but we should warn the user
+            firebaseResult.success = false;
+            firebaseResult.error = firebaseError.message || 'Firebase save failed';
         }
 
         // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---
@@ -213,14 +213,15 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
         } catch (sheetsError) {
             console.error('❌ Google Sheets sync failed:', sheetsError);
+            sheetsResult.success = false;
+            sheetsResult.error = sheetsError.message || 'Google Sheets sync failed';
         }
 
-        // --- Final Result Assessment (Prioritizing Firebase) ---
-        const finalResult = firebaseResult.success ? firebaseResult : sheetsResult;
-
-        if (finalResult.success) {
+        // --- Final Result Assessment (ONLY Firebase determines success) ---
+        // We MUST have Firebase success to show success message
+        if (firebaseResult.success) {
             // Check if this was a reopened request
-            if (finalResult.action === 'REOPENED') {
+            if (firebaseResult.action === 'REOPENED') {
                 showSuccessMessage('Previous blood request reopened successfully with updated information! We will contact you soon.');
             } else {
                 showSuccessMessage('Blood request submitted successfully! We will contact you soon.');
@@ -237,10 +238,12 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             }
         } else {
             // Handle specific error cases
-            if (result.error === 'DUPLICATE_ACTIVE_REQUEST') {
+            if (firebaseResult.error === 'DUPLICATE_ACTIVE_REQUEST') {
                 showErrorMessage('A blood request for this patient is already open. Please check the existing request or contact support.');
+            } else if (firebaseResult.error) {
+                showErrorMessage(`Failed to submit blood request: ${firebaseResult.error}. Please try again or contact support.`);
             } else {
-                showErrorMessage(result.message || 'Failed to submit blood request. Please try again.');
+                showErrorMessage('Failed to submit blood request to database. Please try again or contact support.');
             }
         }
 

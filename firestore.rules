@@ -32,11 +32,10 @@ service cloud.firestore {
     }
 
     // Emergency Requests collection
-    // Allow public to create requests (for web form submissions)
-    // Allow authenticated users to read
+    // Allow public to read and create requests (for web form submissions and duplicate detection)
     // Allow approved users to update/delete
     match /emergency_requests/{requestId} {
-      allow read: if isAuthenticated();
+      allow read: if true; // Allow public read for duplicate detection
       allow create: if true; // Allow public submissions via web form
       allow update, delete: if isApproved();
       
