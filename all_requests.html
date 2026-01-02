@@ -108,10 +108,29 @@
             </div>
         </div>
 
-        <!-- Loading State -->
+        <!-- Loading State with Heartbeat/EKG Loader -->
         <div id="loadingState" class="loading-state">
-            <div class="spinner"></div>
-            <p>Loading requests...</p>
+            <div class="loader-container">
+                <div class="heartbeat-loader">
+                    <div>
+                        <!-- Heartbeat/EKG Line -->
+                        <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                            <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
+                                fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
+                        </svg>
+
+                        <!-- Loading Text with Animation -->
+                        <p class="loading-text text-text-secondary text-lg font-medium">
+                            <span class="loading-message">Loading requests</span>
+                            <span class="loading-dots">
+                                <span class="dot">.</span>
+                                <span class="dot">.</span>
+                                <span class="dot">.</span>
+                            </span>
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Access Denied -->

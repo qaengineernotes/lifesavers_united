@@ -148,17 +148,7 @@
     }
     </script>
 
-    <style>
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
 
-            to {
-                transform: rotate(360deg);
-            }
-        }
-    </style>
     <!-- User Profile UI -->
     <script type="module">
         import('./scripts/user-profile-ui.js').then(module => {
@@ -284,68 +274,6 @@
     <section class="py-12 bg-surface">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between mb-8 mobile-header-section">
-                <style>
-                    @media (max-width: 639px) {
-                        .mobile-header-section {
-                            flex-direction: column !important;
-                            align-items: flex-start !important;
-                            gap: 16px !important;
-                            margin-bottom: 24px !important;
-                        }
-
-                        .mobile-header-section .mobile-title-section {
-                            width: 100% !important;
-                        }
-
-                        .mobile-header-section .mobile-title {
-                            font-size: 1.5rem !important;
-                            line-height: 1.33 !important;
-                            margin-bottom: 8px !important;
-                        }
-
-                        .mobile-header-section .mobile-count-badge {
-                            margin-left: 8px !important;
-                            padding: 4px 8px !important;
-                            font-size: 0.75rem !important;
-                        }
-
-                        .mobile-header-section .mobile-subtitle {
-                            font-size: 0.875rem !important;
-                            line-height: 1.25 !important;
-                        }
-
-                        .mobile-header-section .mobile-controls {
-                            width: 100% !important;
-                            justify-content: space-between !important;
-                            gap: 12px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-indicator {
-                            gap: 6px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-dot {
-                            width: 10px !important;
-                            height: 10px !important;
-                            margin-right: 6px !important;
-                        }
-
-                        .mobile-header-section .mobile-live-text {
-                            font-size: 0.75rem !important;
-                        }
-
-                        .mobile-header-section .mobile-refresh-btn {
-                            font-size: 0.75rem !important;
-                            padding: 6px 12px !important;
-                        }
-
-                        .mobile-header-section .mobile-refresh-btn svg {
-                            width: 14px !important;
-                            height: 14px !important;
-                            margin-right: 4px !important;
-                        }
-                    }
-                </style>
 
                 <div class="mobile-title-section">
                     <h2 class="text-section mb-2 mobile-title">
@@ -361,7 +289,7 @@
                 <div class="flex items-center space-x-4 mobile-controls">
                     <!-- View All Requests Button (for approved users) -->
                     <a href="/all_requests" id="allRequestsButtonContainer"
-                        class="btn-outline text-sm mobile-refresh-btn" style="display: none; text-decoration: none;">
+                        class="btn-outline text-sm mobile-refresh-btn hidden" style="text-decoration: none;">
                         <svg class="w-4 h-4 mr-1 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -532,135 +460,35 @@
                 </div>
             </div>
 
-            <style>
-                /* Sort and Filter Chips */
-                .sort-chip {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.625rem 1.25rem;
-                    font-size: 0.875rem;
-                    font-weight: 500;
-                    color: #6b7280;
-                    background-color: #f3f4f6;
-                    border: 2px solid transparent;
-                    border-radius: 9999px;
-                    transition: all 0.2s ease;
-                    cursor: pointer;
-                }
 
-                .sort-chip:hover {
-                    background-color: #e5e7eb;
-                    color: #374151;
-                    transform: translateY(-1px);
-                }
 
-                .sort-chip.active {
-                    background-color: #dc2626;
-                    color: white;
-                    border-color: #dc2626;
-                    box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-                }
+            <!-- Loading state with Heartbeat/EKG Loader (Outside grid for proper centering) -->
+            <div id="loadingState">
+                <div class="loader-container">
+                    <div class="heartbeat-loader">
+                        <div>
+                            <!-- Heartbeat/EKG Line -->
+                            <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                                <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
+                                    fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
+                            </svg>
 
-                .filter-toggle-btn {
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 0.5rem;
-                    padding: 0.625rem 1.25rem;
-                    font-size: 0.875rem;
-                    font-weight: 600;
-                    color: #374151;
-                    background-color: #f9fafb;
-                    border: 2px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    transition: all 0.2s ease;
-                    cursor: pointer;
-                }
-
-                .filter-toggle-btn:hover {
-                    background-color: #f3f4f6;
-                    border-color: #d1d5db;
-                    transform: translateY(-1px);
-                }
-
-                .filter-toggle-btn.active {
-                    background-color: #fef2f2;
-                    border-color: #dc2626;
-                    color: #dc2626;
-                }
-
-                .filter-select {
-                    width: 100%;
-                    padding: 0.75rem 1rem;
-                    font-size: 0.875rem;
-                    border: 2px solid #e5e7eb;
-                    border-radius: 0.5rem;
-                    background-color: white;
-                    transition: all 0.2s ease;
-                }
-
-                .filter-select:focus {
-                    outline: none;
-                    border-color: #dc2626;
-                    box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-                }
-
-                #activeFiltersDisplay:empty {
-                    display: none;
-                }
-
-                /* Better spacing for filter controls */
-                .bg-white.rounded-2xl.shadow-card.p-5 {
-                    padding: 1.25rem !important;
-                }
-
-                /* Add spacing between sort/filter sections */
-                .flex.flex-wrap.items-center.gap-3 {
-                    gap: 1rem !important;
-                }
-
-                /* Divider spacing */
-                .h-6.w-px.bg-gray-300.mx-2 {
-                    margin-left: 1rem !important;
-                    margin-right: 1rem !important;
-                }
-
-                /* Active filter tags spacing */
-                #activeFiltersDisplay {
-                    gap: 0.625rem !important;
-                    margin-top: 1rem !important;
-                }
-
-                @media (max-width: 768px) {
-
-                    .sort-chip,
-                    .filter-toggle-btn {
-                        font-size: 0.8125rem;
-                        padding: 0.5rem 1rem;
-                    }
-
-                    .bg-white.rounded-2xl.shadow-card.p-5 {
-                        padding: 1rem !important;
-                    }
-
-                    .flex.flex-wrap.items-center.gap-3 {
-                        gap: 0.75rem !important;
-                    }
-
-                    .h-6.w-px.bg-gray-300.mx-2 {
-                        margin-left: 0.5rem !important;
-                        margin-right: 0.5rem !important;
-                    }
-                }
-            </style>
-
-            <div id="emergencyRequestsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Loading state -->
-                <div id="loadingState" class="col-span-2 text-center py-12">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p class="text-text-secondary">Loading emergency requests...</p>
+                            <!-- Loading Text with Animation -->
+                            <p class="loading-text text-text-secondary text-lg font-medium">
+                                <span class="loading-message"></span>
+                                <span class="loading-dots">
+                                    <span class="dot">.</span>
+                                    <span class="dot">.</span>
+                                    <span class="dot">.</span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
+            </div>
 
+            <!-- Emergency Requests Grid Container -->
+            <div id="emergencyRequestsContainer" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <!-- No requests state -->
                 <div id="noRequestsState" class="col-span-2 text-center py-12 hidden">
                     <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
@@ -769,6 +597,51 @@
             </div>
         </div>
     </footer>
+
+    <!-- Loading Message Rotation Script -->
+    <script>
+        // Rotating loading messages for better UX
+        (function () {
+            const messages = [
+                'Searching for urgent requests',
+                'Connecting to emergency network',
+                'Loading life-saving opportunities',
+                'Fetching active blood requests'
+            ];
+            let currentIndex = 0;
+
+            function updateLoadingMessage() {
+                const messageElement = document.querySelector('.loading-message');
+                if (messageElement) {
+                    messageElement.textContent = messages[currentIndex];
+                    currentIndex = (currentIndex + 1) % messages.length;
+                }
+            }
+
+            // Initialize first message
+            updateLoadingMessage();
+
+            // Rotate messages every 2 seconds
+            const messageInterval = setInterval(updateLoadingMessage, 2000);
+
+            // Clear interval when loading is complete
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach((mutation) => {
+                    const loadingState = document.getElementById('loadingState');
+                    if (loadingState && loadingState.classList.contains('hidden')) {
+                        clearInterval(messageInterval);
+                        observer.disconnect();
+                    }
+                });
+            });
+
+            // Observe changes to loading state
+            const loadingState = document.getElementById('loadingState');
+            if (loadingState) {
+                observer.observe(loadingState, { attributes: true, attributeFilter: ['class'] });
+            }
+        })();
+    </script>
 
     <script src="scripts/emergency-statistics.js"></script>
     <script src="scripts/emergency-filter-sort.js"></script>

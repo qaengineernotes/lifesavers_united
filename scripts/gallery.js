@@ -73,15 +73,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to load gallery data from Google Apps Script
     const loadGalleryData = async (category = 'ALL') => {
         try {
-            // Show loading indicator
+            // Show loading indicator (external heartbeat loader)
+            const loadingState = document.getElementById('loadingState');
+            if (loadingState) {
+                loadingState.classList.remove('hidden');
+            }
+
+            // Clear gallery grid
             const galleryGrid = document.getElementById('gallery-grid');
             if (galleryGrid) {
-                galleryGrid.innerHTML = `
-                <div class="col-span-full text-center py-12">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p class="text-text-secondary">Loading gallery images...</p>
-                </div>
-            `;
+                galleryGrid.innerHTML = '';
             }
 
             const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqSr5tm8V9tp4v1Jsq9LPzOQDIr51g2iMPOd2liWyi4VfpBZB01P19HoJ-zm5IRF0W/exec';

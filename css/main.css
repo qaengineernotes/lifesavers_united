@@ -3865,3 +3865,305 @@ html {
 footer .flex.items-center.mb-3 img {
   height: 65px;
 }
+
+/* ============================================
+   Heartbeat/EKG Loader Styles
+   ============================================ */
+
+/* Outer container for absolute centering */
+.loader-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 300px;
+  padding: 2rem 0;
+}
+
+/* Loader container - using CSS Grid for perfect centering */
+.heartbeat-loader {
+  display: block;
+  text-align: center;
+  margin: 0 auto;
+}
+
+/* SVG heartbeat line - centered using auto margins */
+.heartbeat-svg {
+  width: 200px;
+  height: 60px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Heartbeat line path animation */
+.heartbeat-line {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 300;
+  animation: heartbeatDraw 2s ease-in-out infinite;
+}
+
+/* Pulse dot that moves along the heartbeat line */
+.heartbeat-pulse {
+  display: none;
+  /* Hidden for now - can be enabled if needed */
+}
+
+/* Heartbeat line drawing animation */
+@keyframes heartbeatDraw {
+  0% {
+    stroke-dashoffset: 300;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Loading text styling - centered */
+.loading-text {
+  margin-top: 1.5rem;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+/* Animated dots after loading message */
+.loading-dots .dot {
+  animation: dotPulse 1.4s ease-in-out infinite;
+  opacity: 0;
+}
+
+.loading-dots .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loading-dots .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+/* Dot pulse animation */
+@keyframes dotPulse {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Responsive adjustments for mobile */
+@media (max-width: 640px) {
+  .heartbeat-svg {
+    width: 160px;
+    height: 50px;
+  }
+
+  .loading-text {
+    font-size: 0.875rem;
+  }
+}
+
+/* ============================================
+   Emergency Request System Page Styles
+   ============================================ */
+
+/* Spin animation (used for generic loaders) */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile header section responsive styles */
+@media (max-width: 639px) {
+  .mobile-header-section {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 24px !important;
+  }
+
+  .mobile-header-section .mobile-title-section {
+    width: 100% !important;
+  }
+
+  .mobile-header-section .mobile-title {
+    font-size: 1.5rem !important;
+    line-height: 1.33 !important;
+    margin-bottom: 8px !important;
+  }
+
+  .mobile-header-section .mobile-count-badge {
+    margin-left: 8px !important;
+    padding: 4px 8px !important;
+    font-size: 0.75rem !important;
+  }
+
+  .mobile-header-section .mobile-subtitle {
+    font-size: 0.875rem !important;
+    line-height: 1.25 !important;
+  }
+
+  .mobile-header-section .mobile-controls {
+    width: 100% !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+  }
+
+  .mobile-header-section .mobile-live-indicator {
+    gap: 6px !important;
+  }
+
+  .mobile-header-section .mobile-live-dot {
+    width: 10px !important;
+    height: 10px !important;
+    margin-right: 6px !important;
+  }
+
+  .mobile-header-section .mobile-live-text {
+    font-size: 0.75rem !important;
+  }
+
+  .mobile-header-section .mobile-refresh-btn {
+    font-size: 0.75rem !important;
+    padding: 6px 12px !important;
+  }
+
+  .mobile-header-section .mobile-refresh-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 4px !important;
+  }
+}
+
+/* Sort and Filter Chips */
+.sort-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #6b7280;
+  background-color: #f3f4f6;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.sort-chip:hover {
+  background-color: #e5e7eb;
+  color: #374151;
+  transform: translateY(-1px);
+}
+
+.sort-chip.active {
+  background-color: #dc2626;
+  color: white;
+  border-color: #dc2626;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
+}
+
+.filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  background-color: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.filter-toggle-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  transform: translateY(-1px);
+}
+
+.filter-toggle-btn.active {
+  background-color: #fef2f2;
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  background-color: white;
+  transition: all 0.2s ease;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+}
+
+#activeFiltersDisplay:empty {
+  display: none;
+}
+
+/* Better spacing for filter controls */
+.bg-white.rounded-2xl.shadow-card.p-5 {
+  padding: 1.25rem !important;
+}
+
+/* Add spacing between sort/filter sections */
+.flex.flex-wrap.items-center.gap-3 {
+  gap: 1rem !important;
+}
+
+/* Divider spacing */
+.h-6.w-px.bg-gray-300.mx-2 {
+  margin-left: 1rem !important;
+  margin-right: 1rem !important;
+}
+
+/* Active filter tags spacing */
+#activeFiltersDisplay {
+  gap: 0.625rem !important;
+  margin-top: 1rem !important;
+}
+
+@media (max-width: 768px) {
+
+  .sort-chip,
+  .filter-toggle-btn {
+    font-size: 0.8125rem;
+    padding: 0.5rem 1rem;
+  }
+
+  .bg-white.rounded-2xl.shadow-card.p-5 {
+    padding: 1rem !important;
+  }
+
+  .flex.flex-wrap.items-center.gap-3 {
+    gap: 0.75rem !important;
+  }
+
+  .h-6.w-px.bg-gray-300.mx-2 {
+    margin-left: 0.5rem !important;
+    margin-right: 0.5rem !important;
+  }
+}

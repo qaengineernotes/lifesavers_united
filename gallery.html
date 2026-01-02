@@ -111,13 +111,33 @@
                     data-filter="Awards & Recognition">Awards & Recognition</button>
             </div>
 
+            <!-- Loading state with Heartbeat/EKG Loader (Outside grid for proper centering) -->
+            <div id="loadingState">
+                <div class="loader-container">
+                    <div class="heartbeat-loader">
+                        <div>
+                            <!-- Heartbeat/EKG Line -->
+                            <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                                <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
+                                    fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
+                            </svg>
+
+                            <!-- Loading Text with Animation -->
+                            <p class="loading-text text-text-secondary text-lg font-medium">
+                                <span class="loading-message">Loading gallery images</span>
+                                <span class="loading-dots">
+                                    <span class="dot">.</span>
+                                    <span class="dot">.</span>
+                                    <span class="dot">.</span>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Gallery Grid -->
             <div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Loading state -->
-                <div id="loadingState" class="col-span-full text-center py-12">
-                    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-                    <p class="text-text-secondary">Loading gallery images...</p>
-                </div>
             </div>
 
             <!-- Pagination -->
