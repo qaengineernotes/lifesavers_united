@@ -783,6 +783,24 @@ footer h6 {
   color: #ffffff !important;
 }
 
+/* Hero section headings and text - ensure they're white on gradient background */
+.bg-gradient-hero h1,
+.bg-gradient-hero h2,
+.bg-gradient-hero h3,
+.bg-gradient-hero h4,
+.bg-gradient-hero h5,
+.bg-gradient-hero h6,
+.bg-gradient-hero p,
+.page-header h1,
+.page-header h2,
+.page-header h3,
+.page-header h4,
+.page-header h5,
+.page-header h6,
+.page-header p {
+  color: #ffffff !important;
+}
+
 .static {
   position: static;
 }
@@ -3008,22 +3026,62 @@ footer h6 {
   height: 250px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
     0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  position: relative;
 }
 
-.gallery-item img {
+.gallery-item-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 0.5s ease;
 }
 
-.gallery-item:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+.gallery-item-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top,
+      rgba(220, 38, 38, 0.95) 0%,
+      rgba(220, 38, 38, 0.85) 50%,
+      rgba(220, 38, 38, 0.4) 80%,
+      transparent 100%);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1.5rem 1rem 1rem;
+  display: flex;
+  align-items: flex-end;
+  min-height: 40%;
 }
 
-.gallery-item:hover img {
-  transform: scale(1.05);
+.gallery-item-caption {
+  color: white;
+  text-align: center;
+  width: 100%;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.gallery-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.gallery-item:hover .gallery-item-image {
+  transform: scale(1.1);
+}
+
+.gallery-item:hover .gallery-item-overlay {
+  transform: translateY(0);
+}
+
+.gallery-item:hover .gallery-item-caption {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 /* Pagination Container */

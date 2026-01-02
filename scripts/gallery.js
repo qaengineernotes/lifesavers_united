@@ -317,16 +317,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         <div class="gallery-item relative group" data-id="${item.id}" data-category="${item.category}">
                             <img src="${item.src}" 
                                  alt="${item.title}" 
-                                 class="w-full h-full object-cover"
+                                 class="gallery-item-image w-full h-full object-cover"
                                  loading="lazy"
                                  data-primary-url="${item.src}"
                                  data-fallbacks='${JSON.stringify(fallbackUrls)}'
                                 data-item-index="${index}"
                                 onerror="handleImageError(this)">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                                <div class="text-white text-center p-4">
+                            <div class="gallery-item-overlay">
+                                <div class="gallery-item-caption">
                                     <h3 class="font-bold text-lg mb-1">${item.title}</h3>
-                                    <p class="text-sm">${formatDate(item.date)}</p>
+                                    <p class="text-sm opacity-90">${formatDate(item.date)}</p>
                                 </div>
                             </div>
                         </div>
