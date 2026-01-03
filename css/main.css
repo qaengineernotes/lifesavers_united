@@ -4225,3 +4225,29 @@ footer .flex.items-center.mb-3 img {
     margin-right: 0.5rem !important;
   }
 }
+
+/* ============================================================================
+   FIX: Mobile Navigation - Profile Icon and Hamburger Menu Overlap
+   ============================================================================ */
+
+/* Adjust user profile indicator position on mobile to avoid overlap with hamburger menu */
+@media (max-width: 768px) {
+  #userProfileIndicator {
+    top: 8px !important;
+    right: 70px !important;
+    /* Move left to avoid hamburger menu */
+  }
+
+  /* Reduce profile button size on mobile for better fit */
+  #userProfileIndicator>div:first-child {
+    width: 40px !important;
+    height: 40px !important;
+    font-size: 16px !important;
+  }
+
+  /* Adjust dropdown position on mobile */
+  #userDropdown {
+    top: 52px !important;
+    right: 0 !important;
+  }
+}
