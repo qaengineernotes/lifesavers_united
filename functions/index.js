@@ -555,15 +555,24 @@ bot.on("text", async (ctx) => {
 });
 
 
-// Existing Auth Trigger (Keeping it as requested to maintain existing file logic)
+// Existing Auth Trigger (Modified to prevent race conditions)
 exports.processNewUser = functions.auth.user().onCreate(async (user) => {
-    const { uid, email, phoneNumber } = user;
+    const { uid, email, phoneNumber, displayName } = user;
     try {
+        // Only create user document if displayName is already set (e.g., from OAuth providers)
+        // For phone auth, let the client-side code create the profile with displayName
+        if (!displayName) {
+            console.log(`⏭️ Skipping auto-creation for user ${uid} - waiting for client to set displayName`);
+            return null;
+        }
+
         const userRef = admin.firestore().collection("users").doc(uid);
         const usersSnapshot = await admin.firestore().collection("users").limit(1).get();
         const isFirstUser = usersSnapshot.empty;
+
         await userRef.set({
             uid: uid,
+            displayName: displayName,
             email: email || null,
             phoneNumber: phoneNumber || null,
             status: isFirstUser ? "approved" : "pending",
@@ -571,8 +580,11 @@ exports.processNewUser = functions.auth.user().onCreate(async (user) => {
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             lastLogin: admin.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
+
+        console.log(`✅ User profile created for ${uid} with displayName: ${displayName}`);
         return null;
     } catch (error) {
+        console.error(`❌ Error in processNewUser for ${uid}:`, error);
         return null;
     }
 });

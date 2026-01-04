@@ -132,10 +132,17 @@ async function getUserProfile(uid, phoneNumber) {
         }
     } catch (error) {
         console.error('Error fetching user profile:', error);
+
+        // If it's a permission error, throw it so we can handle it properly
+        if (error.code === 'permission-denied') {
+            throw new Error('Permission denied. Please ensure Firestore rules are deployed correctly.');
+        }
+
+        // For other errors, treat as new user (fallback)
         return {
             uid: uid,
             phoneNumber: phoneNumber,
-            displayName: phoneNumber,
+            displayName: null,
             isNewUser: true
         };
     }
@@ -259,13 +266,16 @@ export function showPhoneLoginModal() {
                 // Check if new user needs to enter name
                 const userProfile = await getUserProfile(user.uid, user.phoneNumber);
 
-                if (userProfile.isNewUser || !userProfile.displayName) {
-                    // Show name input
+                if (userProfile.isNewUser) {
+                    // Show name input only for truly new users
                     const displayName = await showNameInputModal();
                     if (displayName) {
                         await createUserProfile(user.uid, displayName);
                         currentUser = await getUserProfile(user.uid, user.phoneNumber);
                     }
+                } else {
+                    // Existing user - update currentUser
+                    currentUser = userProfile;
                 }
 
                 modal.remove();
@@ -273,9 +283,17 @@ export function showPhoneLoginModal() {
 
             } catch (error) {
                 console.error('Error verifying OTP:', error);
-                alert('Invalid OTP. Please try again.');
-                verifyOtpBtn.disabled = false;
-                verifyOtpBtn.textContent = 'Verify OTP';
+
+                // Check if it's a permission error
+                if (error.message && error.message.includes('Permission denied')) {
+                    alert('Authentication successful, but there was a permission error. Please contact support.');
+                    modal.remove();
+                    resolve(null);
+                } else {
+                    alert('Invalid OTP. Please try again.');
+                    verifyOtpBtn.disabled = false;
+                    verifyOtpBtn.textContent = 'Verify OTP';
+                }
             }
         });
 
