@@ -106,6 +106,30 @@
                     <div class="stat-label">Fulfilled</div>
                 </div>
             </div>
+
+            <!-- Search Bar -->
+            <div class="search-container" id="searchContainer" style="display: none;">
+                <div class="search-wrapper-row">
+                    <div class="search-wrapper">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="searchInput" class="search-input"
+                            placeholder="Search by patient name, mobile number, or hospital name..."
+                            autocomplete="off" />
+                        <button id="clearSearch" class="clear-search-btn" style="display: none;" title="Clear search">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div id="searchResults" class="search-results-info"></div>
+                </div>
+            </div>
         </div>
 
         <!-- Loading State with Heartbeat/EKG Loader -->

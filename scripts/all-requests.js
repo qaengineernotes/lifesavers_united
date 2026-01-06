@@ -8,8 +8,11 @@ import { db, collection, getDocs, query, where, orderBy } from '/scripts/firebas
 // Global state
 let currentUser = null;
 let allRequests = [];
+let filteredRequests = []; // For search results
+let searchQuery = ''; // Current search query
 let currentPage = 1;
 const requestsPerPage = 20;
+
 
 // ============================================================================
 // INITIALIZE PAGE
@@ -83,6 +86,9 @@ async function loadAllRequests() {
             // Show table
             document.getElementById('loadingState').style.display = 'none';
             document.getElementById('tableContainer').style.display = 'block';
+
+            // Initialize search functionality
+            initializeSearch();
         } else {
             throw new Error('Failed to load requests');
         }
@@ -118,16 +124,22 @@ function renderTable() {
     const tbody = document.getElementById('requestsTableBody');
     tbody.innerHTML = '';
 
+    // Use filtered requests if search is active, otherwise use all requests
+    const requestsToDisplay = searchQuery ? filteredRequests : allRequests;
+
     // Calculate pagination
     const startIndex = (currentPage - 1) * requestsPerPage;
     const endIndex = startIndex + requestsPerPage;
-    const pageRequests = allRequests.slice(startIndex, endIndex);
+    const pageRequests = requestsToDisplay.slice(startIndex, endIndex);
 
     if (pageRequests.length === 0) {
+        const message = searchQuery
+            ? `No requests found matching "${searchQuery}"`
+            : 'No requests found';
         tbody.innerHTML = `
             <tr>
                 <td colspan="12" style="text-align: center; padding: 40px; color: #6b7280;">
-                    No requests found
+                    ${message}
                 </td>
             </tr>
         `;
@@ -246,7 +258,8 @@ function createTableRow(request, index) {
 // ============================================================================
 window.viewRequest = function (index) {
     const actualIndex = (currentPage - 1) * requestsPerPage + index;
-    const request = allRequests[actualIndex];
+    const requestsToDisplay = searchQuery ? filteredRequests : allRequests;
+    const request = requestsToDisplay[actualIndex];
 
     if (!request) {
         console.error('Request not found:', index);
@@ -711,9 +724,11 @@ document.getElementById('viewModal').addEventListener('click', function (e) {
 // ============================================================================
 function updatePagination() {
     const paginationContainer = document.getElementById('pagination');
-    const totalPages = Math.ceil(allRequests.length / requestsPerPage);
+    const requestsToDisplay = searchQuery ? filteredRequests : allRequests;
+    const totalPages = Math.ceil(requestsToDisplay.length / requestsPerPage);
 
     if (totalPages <= 1) {
+
         paginationContainer.innerHTML = '';
         return;
     }
@@ -939,3 +954,119 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// ============================================================================
+// SEARCH FUNCTIONALITY
+// ============================================================================
+
+/**
+ * Initialize search functionality
+ */
+function initializeSearch() {
+    const searchContainer = document.getElementById('searchContainer');
+    const searchInput = document.getElementById('searchInput');
+    const clearSearchBtn = document.getElementById('clearSearch');
+    const searchResults = document.getElementById('searchResults');
+
+    if (!searchContainer || !searchInput || !clearSearchBtn) {
+        console.error('Search elements not found');
+        return;
+    }
+
+    // Show search container
+    searchContainer.style.display = 'block';
+
+    // Debounce timer
+    let debounceTimer = null;
+
+    // Search input event
+    searchInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+
+        // Show/hide clear button
+        clearSearchBtn.style.display = value ? 'flex' : 'none';
+
+        // Debounce search
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            performSearch(value);
+        }, 300); // 300ms debounce
+    });
+
+    // Clear search button
+    clearSearchBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearSearchBtn.style.display = 'none';
+        performSearch('');
+        searchInput.focus();
+    });
+
+    // Enter key to search
+    searchInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            clearTimeout(debounceTimer);
+            performSearch(searchInput.value.trim());
+        }
+    });
+}
+
+/**
+ * Perform search on requests
+ * @param {string} query - Search query
+ */
+function performSearch(query) {
+    searchQuery = query.toLowerCase();
+    const searchResults = document.getElementById('searchResults');
+
+    if (!searchQuery) {
+        // No search query - show all requests and hide results
+        filteredRequests = [];
+        currentPage = 1;
+        renderTable();
+        searchResults.textContent = '';
+        searchResults.className = 'search-results-info';
+        searchResults.style.display = 'none';
+        return;
+    }
+
+    // Filter requests by patient name, mobile number, or hospital name
+    filteredRequests = allRequests.filter(request => {
+        // Search in patient name
+        const patientName = String(request.patientName || '').toLowerCase();
+        if (patientName.includes(searchQuery)) {
+            return true;
+        }
+
+        // Search in contact number (mobile) - convert to string first
+        const contactNumber = String(request.contactNumber || '').toLowerCase();
+        if (contactNumber.includes(searchQuery)) {
+            return true;
+        }
+
+        // Search in hospital name
+        const hospitalName = String(request.hospitalName || '').toLowerCase();
+        if (hospitalName.includes(searchQuery)) {
+            return true;
+        }
+
+        return false;
+    });
+
+    // Reset to first page
+    currentPage = 1;
+
+    // Update results display
+    if (filteredRequests.length > 0) {
+        searchResults.textContent = `Found ${filteredRequests.length} request${filteredRequests.length === 1 ? '' : 's'}`;
+        searchResults.className = 'search-results-info has-results';
+        searchResults.style.display = 'block';
+    } else {
+        searchResults.textContent = `No results found`;
+        searchResults.className = 'search-results-info no-results';
+        searchResults.style.display = 'block';
+    }
+
+    // Re-render table with filtered results
+    renderTable();
+}
+
