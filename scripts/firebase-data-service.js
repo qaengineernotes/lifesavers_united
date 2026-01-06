@@ -43,7 +43,10 @@ export async function fetchEmergencyRequestsFromFirebase() {
             requests.push({
                 id: doc.id,
                 // Map Firebase fields back to the format expected by the UI
-                inquiryDate: data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date(),
+                // Use reopenedAt for reopened requests, otherwise use createdAt
+                inquiryDate: data.status === 'Reopened' && data.reopenedAt
+                    ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
+                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
@@ -200,7 +203,10 @@ export function listenToEmergencyRequests(callback) {
             const data = doc.data();
             requests.push({
                 id: doc.id,
-                inquiryDate: data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date(),
+                // Use reopenedAt for reopened requests, otherwise use createdAt
+                inquiryDate: data.status === 'Reopened' && data.reopenedAt
+                    ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
+                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,

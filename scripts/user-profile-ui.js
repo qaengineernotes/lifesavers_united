@@ -28,10 +28,10 @@ export function initializeUserProfileUI() {
 }
 
 // ============================================================================
-// TOGGLE ALL REQUESTS BUTTON VISIBILITY
+// TOGGLE ALL REQUESTS AND ALL DONORS BUTTON VISIBILITY
 // ============================================================================
 function toggleAllRequestsButton(user) {
-    // Try to find the button container (in emergency_request_system.html)
+    // Try to find the All Requests button container (in emergency_request_system.html)
     const allRequestsButtonContainer = document.getElementById('allRequestsButtonContainer');
 
     if (allRequestsButtonContainer) {
@@ -41,6 +41,19 @@ function toggleAllRequestsButton(user) {
             allRequestsButtonContainer.style.opacity = '1';
         } else {
             allRequestsButtonContainer.style.display = 'none';
+        }
+    }
+
+    // Try to find the All Donors button container (in emergency_request_system.html)
+    const allDonorsButtonContainer = document.getElementById('allDonorsButtonContainer');
+
+    if (allDonorsButtonContainer) {
+        if (user && user.status === 'approved') {
+            allDonorsButtonContainer.style.display = 'inline-flex';
+            allDonorsButtonContainer.style.visibility = 'visible';
+            allDonorsButtonContainer.style.opacity = '1';
+        } else {
+            allDonorsButtonContainer.style.display = 'none';
         }
     }
 
