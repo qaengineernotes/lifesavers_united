@@ -576,13 +576,47 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                     }
 
                     const donorData = {
+                        // Core identity fields
                         fullName: donationInfo.donorName,
                         contactNumber: donationInfo.donorContact,
                         bloodGroup: bloodGroupToStore,
+
+                        // Donation tracking
                         lastDonatedAt: serverTimestamp(),
+
+                        // Update tracking
                         updatedAt: serverTimestamp(),
                         updatedBy: currentUser?.displayName || 'System'
                     };
+
+                    // Add ALL fields for new donors (standardized structure)
+                    if (!donorExists) {
+                        // Creation tracking
+                        donorData.createdAt = serverTimestamp();
+                        donorData.registeredAt = serverTimestamp();
+                        donorData.createdBy = currentUser?.displayName || 'System';
+                        donorData.createdByUid = currentUser?.uid || null;
+                        donorData.source = 'donation_logging';
+                        donorData.registrationDate = new Date().toISOString();
+
+                        // Personal details (empty defaults)
+                        donorData.dateOfBirth = '';
+                        donorData.age = 0;
+                        donorData.gender = '';
+                        donorData.weight = '';
+                        donorData.email = '';
+
+                        // Location (empty defaults)
+                        donorData.city = '';
+                        donorData.area = '';
+
+                        // Preferences (empty defaults)
+                        donorData.isEmergencyAvailable = '';
+                        donorData.preferredContact = '';
+
+                        // Medical history (empty default)
+                        donorData.medicalHistory = '';
+                    }
 
                     await setDoc(donorRef, donorData, { merge: true });
 

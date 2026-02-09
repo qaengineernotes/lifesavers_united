@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Donor Import - Lifesavers United</title>
+    <link rel="stylesheet" href="css/main.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .import-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .stat-card h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            background: #f8f9fa;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .upload-area:hover {
+            background: #e9ecef;
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: #e3f2fd;
+            border-color: #2196F3;
+        }
+
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .log-container {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-left: 3px solid transparent;
+        }
+
+        .log-entry.info {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .log-entry.success {
+            border-left-color: #00ff00;
+            color: #00ff00;
+        }
+
+        .log-entry.warning {
+            border-left-color: #ffaa00;
+            color: #ffaa00;
+        }
+
+        .log-entry.error {
+            border-left-color: #ff0000;
+            color: #ff0000;
+        }
+
+        .preview-container {
+            margin: 30px 0;
+            display: none;
+        }
+
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: block;
+        }
+
+        .preview-table thead {
+            background: #667eea;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .preview-table tbody {
+            display: block;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .preview-table thead,
+        .preview-table tbody tr {
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .warning-box {
+            background: #fff3e0;
+            border-left: 4px solid #ff9800;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .success-box {
+            background: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            display: none;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="import-container">
+        <h1>📥 CSV Donor Import Tool</h1>
+        <p class="subtitle">Import donors from CSV file to Firebase Database</p>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>CSV Donors</h3>
+                <div class="number" id="csvCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Firebase (Before)</h3>
+                <div class="number" id="firebaseCount">-</div>
+            </div>
+            <div class="stat-card">
+                <h3>New Donors</h3>
+                <div class="number" id="newCount">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Merged/Updated</h3>
+                <div class="number" id="mergedCount">0</div>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <strong>📋 CSV Format Requirements:</strong>
+            <ul style="margin: 10px 0 0 20px;">
+                <li>First row must contain column headers</li>
+                <li><strong>Required columns:</strong> Name (or Full Name), Phone (or Contact Number), Blood Group</li>
+                <li><strong>Optional columns:</strong> Email, City, Area, Age, Gender, Emergency Available, Last
+                    Donation</li>
+                <li>Phone numbers will be used to detect duplicates</li>
+            </ul>
+        </div>
+
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📄</div>
+            <h2>Drop CSV file here or click to browse</h2>
+            <p style="color: #666; margin-top: 10px;">Supported format: .csv</p>
+            <input type="file" id="fileInput" accept=".csv" />
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+            <h2>📊 Preview Data (First 10 rows)</h2>
+            <div style="overflow-x: auto;">
+                <table class="preview-table" id="previewTable">
+                    <thead id="previewHead"></thead>
+                    <tbody id="previewBody"></tbody>
+                </table>
+            </div>
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="startImport()">🚀 Start Import</button>
+                <button class="btn btn-secondary" onclick="resetUpload()">🔄 Upload Different File</button>
+            </div>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+        </div>
+
+        <div class="log-container" id="logContainer"></div>
+
+        <div class="success-box" id="successBox">
+            <h3>✅ Import Completed Successfully!</h3>
+            <p id="successMessage"></p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db, collection, getDocs, doc, setDoc, updateDoc, serverTimestamp, auth, onAuthStateChanged } from './scripts/firebase-config.js';
+
+        let currentUser = null;
+        let csvData = [];
+        let firebaseDonors = {};
+        let columnMapping = {};
+
+        const stats = {
+            csvTotal: 0,
+            firebaseTotal: 0,
+            newDonors: 0,
+            merged: 0
+        };
+
+        // Check authentication on page load
+        onAuthStateChanged(auth, (user) => {
+            currentUser = user;
+
+            if (!user) {
+                // User not logged in - show warning
+                document.getElementById('uploadArea').innerHTML = `
+                    <div class="upload-icon" style="color: #dc2626;">🔒</div>
+                    <h2 style="color: #dc2626;">Authentication Required</h2>
+                    <p style="color: #666; margin: 20px 0;">You must be logged in to import donors.</p>
+                    <button class="btn" onclick="window.location.href='emergency_request_system.html'">
+                        Go to Login
+                    </button>
+                `;
+                document.getElementById('uploadArea').style.cursor = 'default';
+                document.getElementById('uploadArea').onclick = null;
+                log('⚠ Please log in to use the import tool', 'warning');
+            }
+        });
+
+
+        function log(message, type = 'info') {
+            const logContainer = document.getElementById('logContainer');
+            logContainer.style.display = 'block';
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString();
+            entry.textContent = `[${timestamp}] ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateStats() {
+            document.getElementById('csvCount').textContent = stats.csvTotal;
+            document.getElementById('firebaseCount').textContent = stats.firebaseTotal;
+            document.getElementById('newCount').textContent = stats.newDonors;
+            document.getElementById('mergedCount').textContent = stats.merged;
+        }
+
+        function updateProgress(current, total) {
+            const percentage = Math.round((current / total) * 100);
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = percentage + '%';
+            progressFill.textContent = percentage + '%';
+        }
+
+        // Setup drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.name.endsWith('.csv')) {
+                alert('Please upload a CSV file');
+                return;
+            }
+
+            log(`Reading file: ${file.name}`, 'info');
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const text = e.target.result;
+                parseCSV(text);
+            };
+            reader.readAsText(file);
+        }
+
+        function parseCSV(text) {
+            const lines = text.split('\n').filter(line => line.trim());
+            if (lines.length < 2) {
+                alert('CSV file must have at least a header row and one data row');
+                return;
+            }
+
+            // Parse headers
+            const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+
+            // Auto-detect column mapping
+            columnMapping = detectColumns(headers);
+
+            if (!columnMapping.name || !columnMapping.phone || !columnMapping.bloodGroup) {
+                alert('CSV must contain Name, Phone, and Blood Group columns');
+                log('Missing required columns', 'error');
+                return;
+            }
+
+            // Parse data rows
+            csvData = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseCSVLine(lines[i]);
+                if (values.length > 0) {
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header] = values[index] || '';
+                    });
+                    csvData.push(row);
+                }
+            }
+
+            stats.csvTotal = csvData.length;
+            updateStats();
+
+            log(`✓ Parsed ${csvData.length} donors from CSV`, 'success');
+            displayPreview();
+        }
+
+        function parseCSVLine(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    result.push(current.trim().replace(/^"|"$/g, ''));
+                    current = '';
+                } else {
+                    current += char;
+                }
+            }
+
+            result.push(current.trim().replace(/^"|"$/g, ''));
+            return result;
+        }
+
+        function detectColumns(headers) {
+            const mapping = {};
+
+            headers.forEach((header, index) => {
+                const lower = header.toLowerCase();
+
+                // Name variations
+                if (lower.includes('name') || lower === 'full name' || lower === 'fullname') {
+                    mapping.name = header;
+                }
+                // Phone variations
+                if (lower.includes('phone') || lower.includes('contact') || lower.includes('mobile')) {
+                    mapping.phone = header;
+                }
+                // Blood Group
+                if (lower.includes('blood')) {
+                    mapping.bloodGroup = header;
+                }
+                // Email
+                if (lower.includes('email')) {
+                    mapping.email = header;
+                }
+                // City
+                if (lower.includes('city')) {
+                    mapping.city = header;
+                }
+                // Area
+                if (lower.includes('area') || lower.includes('locality')) {
+                    mapping.area = header;
+                }
+                // Age
+                if (lower.includes('age')) {
+                    mapping.age = header;
+                }
+                // Gender
+                if (lower.includes('gender') || lower.includes('sex')) {
+                    mapping.gender = header;
+                }
+                // Emergency
+                if (lower.includes('emergency')) {
+                    mapping.emergency = header;
+                }
+                // Last Donation
+                if (lower.includes('last') && lower.includes('donation')) {
+                    mapping.lastDonation = header;
+                }
+            });
+
+            log(`Detected columns: ${JSON.stringify(mapping)}`, 'info');
+            return mapping;
+        }
+
+        function displayPreview() {
+            const previewContainer = document.getElementById('previewContainer');
+            const previewHead = document.getElementById('previewHead');
+            const previewBody = document.getElementById('previewBody');
+
+            // Show preview
+            previewContainer.style.display = 'block';
+            uploadArea.style.display = 'none';
+
+            // Create header
+            const headerRow = document.createElement('tr');
+            Object.values(columnMapping).forEach(col => {
+                const th = document.createElement('th');
+                th.textContent = col;
+                headerRow.appendChild(th);
+            });
+            previewHead.innerHTML = '';
+            previewHead.appendChild(headerRow);
+
+            // Create preview rows (first 10)
+            previewBody.innerHTML = '';
+            const previewData = csvData.slice(0, 10);
+            previewData.forEach(row => {
+                const tr = document.createElement('tr');
+                Object.values(columnMapping).forEach(col => {
+                    const td = document.createElement('td');
+                    td.textContent = row[col] || '-';
+                    tr.appendChild(td);
+                });
+                previewBody.appendChild(tr);
+            });
+
+            log('Preview displayed. Review data and click "Start Import" to proceed.', 'info');
+        }
+
+        window.resetUpload = function () {
+            document.getElementById('previewContainer').style.display = 'none';
+            document.getElementById('uploadArea').style.display = 'block';
+            document.getElementById('logContainer').innerHTML = '';
+            csvData = [];
+            stats.csvTotal = 0;
+            stats.newDonors = 0;
+            stats.merged = 0;
+            updateStats();
+        };
+
+        async function fetchFirebaseDonors() {
+            log('Fetching existing donors from Firebase...', 'info');
+            try {
+                const donorsRef = collection(db, 'donors');
+                const snapshot = await getDocs(donorsRef);
+
+                firebaseDonors = {};
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const phone = (data.contactNumber || data.phone || '').replace(/\D/g, '');
+                    if (phone) {
+                        firebaseDonors[phone] = {
+                            id: doc.id,
+                            ...data
+                        };
+                    }
+                });
+
+                stats.firebaseTotal = Object.keys(firebaseDonors).length;
+                updateStats();
+                log(`✓ Found ${stats.firebaseTotal} existing donors in Firebase`, 'success');
+            } catch (error) {
+                log(`✗ Error fetching Firebase donors: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
+        function normalizeDonorData(csvRow) {
+            const phone = (csvRow[columnMapping.phone] || '').replace(/\D/g, '');
+
+            return {
+                fullName: csvRow[columnMapping.name] || '',
+                contactNumber: phone,
+                bloodGroup: csvRow[columnMapping.bloodGroup] || '',
+                email: csvRow[columnMapping.email] || '',
+                city: csvRow[columnMapping.city] || '',
+                area: csvRow[columnMapping.area] || '',
+                age: csvRow[columnMapping.age] || '',
+                gender: csvRow[columnMapping.gender] || '',
+                isEmergencyAvailable: csvRow[columnMapping.emergency] || 'No',
+                lastDonation: csvRow[columnMapping.lastDonation] || '',
+                registeredAt: serverTimestamp(),
+                updatedAt: serverTimestamp(),
+                createdBy: 'CSV Import',
+                availability: true
+            };
+        }
+
+        async function importDonor(csvRow) {
+            const donorData = normalizeDonorData(csvRow);
+            const normalizedPhone = donorData.contactNumber;
+
+            if (!normalizedPhone) {
+                log(`⚠ Skipping ${donorData.fullName} - no phone number`, 'warning');
+                return;
+            }
+
+            try {
+                if (firebaseDonors[normalizedPhone]) {
+                    // Donor exists - update
+                    const existingDonor = firebaseDonors[normalizedPhone];
+                    const docRef = doc(db, 'donors', existingDonor.id);
+
+                    await updateDoc(docRef, {
+                        ...donorData,
+                        updatedAt: serverTimestamp()
+                    });
+
+                    stats.merged++;
+                    log(`✓ Updated: ${donorData.fullName} (${normalizedPhone})`, 'success');
+                } else {
+                    // New donor - create
+                    const docRef = doc(collection(db, 'donors'));
+                    await setDoc(docRef, donorData);
+
+                    stats.newDonors++;
+                    log(`✓ Created: ${donorData.fullName} (${normalizedPhone})`, 'success');
+                }
+                updateStats();
+            } catch (error) {
+                log(`✗ Error importing ${donorData.fullName}: ${error.message}`, 'error');
+            }
+        }
+
+        window.startImport = async function () {
+            const progressContainer = document.getElementById('progressContainer');
+            const successBox = document.getElementById('successBox');
+
+            progressContainer.style.display = 'block';
+            successBox.style.display = 'none';
+
+            try {
+                log('🚀 Starting import process...', 'info');
+
+                // Fetch existing Firebase donors
+                await fetchFirebaseDonors();
+
+                // Import each donor
+                log('Importing donors...', 'info');
+                for (let i = 0; i < csvData.length; i++) {
+                    await importDonor(csvData[i]);
+                    updateProgress(i + 1, csvData.length);
+                }
+
+                // Show success
+                log('✅ Import completed successfully!', 'success');
+                successBox.style.display = 'block';
+                document.getElementById('successMessage').innerHTML = `
+                    <strong>Import Summary:</strong><br>
+                    • Total donors in CSV: ${stats.csvTotal}<br>
+                    • Existing donors in Firebase: ${stats.firebaseTotal}<br>
+                    • New donors created: ${stats.newDonors}<br>
+                    • Donors merged/updated: ${stats.merged}<br>
+                    • Final total in Firebase: ${stats.firebaseTotal + stats.newDonors}
+                `;
+
+            } catch (error) {
+                log(`✗ Import failed: ${error.message}`, 'error');
+                alert('Import failed. Please check the logs for details.');
+            }
+        };
+    </script>
+</body>
+
+</html>

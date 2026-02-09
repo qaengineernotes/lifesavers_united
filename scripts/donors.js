@@ -64,8 +64,9 @@ async function loadAllDonors() {
         document.getElementById('tableContainer').style.display = 'none';
 
         const donorsRef = collection(db, 'donors');
-        const q = query(donorsRef, orderBy('registeredAt', 'desc'));
-        const snapshot = await getDocs(q);
+        // Don't use orderBy in query - it excludes documents without that field
+        // We'll sort in memory instead to include all donors
+        const snapshot = await getDocs(donorsRef);
 
         allDonors = [];
         snapshot.forEach((doc) => {
@@ -73,6 +74,23 @@ async function loadAllDonors() {
                 id: doc.id,
                 ...doc.data()
             });
+        });
+
+        // Sort in memory by registeredAt or createdAt (fallback)
+        allDonors.sort((a, b) => {
+            const getTimestamp = (donor) => {
+                const regAt = donor.registeredAt;
+                const createdAt = donor.createdAt;
+
+                if (regAt) {
+                    return regAt.seconds ? regAt.seconds : new Date(regAt).getTime() / 1000;
+                } else if (createdAt) {
+                    return createdAt.seconds ? createdAt.seconds : new Date(createdAt).getTime() / 1000;
+                }
+                return 0;
+            };
+
+            return getTimestamp(b) - getTimestamp(a); // Descending order (newest first)
         });
 
         // Update statistics
@@ -131,11 +149,13 @@ function updateStatistics() {
     thisMonth.setDate(1);
     thisMonth.setHours(0, 0, 0, 0);
     const newThisMonth = allDonors.filter(d => {
-        if (!d.registeredAt) return false;
-        const regDate = d.registeredAt.seconds
-            ? new Date(d.registeredAt.seconds * 1000)
-            : new Date(d.registeredAt);
-        return regDate >= thisMonth;
+        // Use registeredAt if available, otherwise use createdAt
+        const regDate = d.registeredAt || d.createdAt;
+        if (!regDate) return false;
+        const dateObj = regDate.seconds
+            ? new Date(regDate.seconds * 1000)
+            : new Date(regDate);
+        return dateObj >= thisMonth;
     }).length;
 
     // Most common blood group
@@ -293,9 +313,10 @@ function createTableRow(donor, index) {
         ? '<span class="status-badge open">✓ YES</span>'
         : '<span class="status-badge closed">✗ NO</span>';
 
-    // 10. Registered Date
-    const registered = donor.registeredAt
-        ? `<div>${formatDateTime(donor.registeredAt)}<br><small style="color: #6b7280;">${getTimeAgo(donor.registeredAt)}</small></div>`
+    // 10. Registered Date (use registeredAt or createdAt as fallback)
+    const regDate = donor.registeredAt || donor.createdAt;
+    const registered = regDate
+        ? `\u003cdiv\u003e${formatDateTime(regDate)}\u003cbr\u003e\u003csmall style=\"color: #6b7280;\"\u003e${getTimeAgo(regDate)}\u003c/small\u003e\u003c/div\u003e`
         : 'N/A';
 
     // 11. Registered By
@@ -386,7 +407,7 @@ function createOverviewTab(donor) {
             </div>
             <div class="info-row">
                 <div class="info-label">Registered:</div>
-                <div class="info-value">${formatDateTime(donor.registeredAt)}</div>
+                <div class="info-value">${formatDateTime(donor.registeredAt || donor.createdAt)}</div>
             </div>
         </div>
 
