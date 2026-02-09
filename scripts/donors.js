@@ -76,9 +76,16 @@ async function loadAllDonors() {
             });
         });
 
-        // Sort in memory by registeredAt or createdAt (fallback)
+        // Sort in memory by lastDonatedAt first, then registeredAt/createdAt (fallback)
         allDonors.sort((a, b) => {
             const getTimestamp = (donor) => {
+                // Priority 1: Last donation date (most important - shows active donors first)
+                const lastDonated = donor.lastDonatedAt;
+                if (lastDonated) {
+                    return lastDonated.seconds ? lastDonated.seconds : new Date(lastDonated).getTime() / 1000;
+                }
+
+                // Priority 2: Registration date (for donors who haven't donated yet)
                 const regAt = donor.registeredAt;
                 const createdAt = donor.createdAt;
 
