@@ -163,13 +163,12 @@ document.addEventListener('DOMContentLoaded', async function () {
                 refreshBtn.disabled = false;
             });
         }
-        if (e.target.closest('.share-btn')) {
-            const shareBtn = e.target.closest('.share-btn');
+        if (e.target.closest('.request-share-btn')) {
+            const shareBtn = e.target.closest('.request-share-btn');
             const requestData = JSON.parse(shareBtn.getAttribute('data-request-data'));
             showShareOptions(requestData);
-        }
-
-        if (e.target.closest('.edit-btn')) {
+            return;
+        } if (e.target.closest('.edit-btn')) {
             const button = e.target.closest('.edit-btn');
 
             // Re-check approval status
@@ -576,7 +575,7 @@ function createRequestCard(request) {
                 ${requestStatus === 'Reopened' ? '<span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">REOPENED ↻</span>' : ''}
                 <span class="${urgencyConfig.badgeBg} text-white px-3 py-1 rounded-full text-sm font-semibold mobile-badge">${urgencyConfig.badgeText}</span>
             </div>
-            <button class="share-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Share request details">
+            <button class="request-share-btn p-2 rounded-full hover:bg-gray-100 transition-colors mobile-copy-btn" data-request-data='${JSON.stringify(request)}' title="Share request details">
                 <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
                 </svg>

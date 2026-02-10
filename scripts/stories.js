@@ -145,7 +145,7 @@ function createStoryCard(story) {
                 
                 ${getStoryMetrics(story)}
                 
-                <div class="prose max-w-none mt-4 mb-4">
+                <div class="max-w-none mt-4 mb-4">
                     <p class="text-gray-700 leading-relaxed">${story.fullStory}</p>
                 </div>
                 
