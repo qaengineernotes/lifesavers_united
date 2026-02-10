@@ -230,7 +230,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Do you weigh at least 50 kg (110 lbs)?</label>
+                            <label class="block font-medium mb-1">Do you weigh at least 45 kg (110 lbs)?</label>
                             <div class="flex space-x-4">
                                 <label><input type="radio" name="weight" value="yes" required> Yes</label>
                                 <label><input type="radio" name="weight" value="no"> No</label>
@@ -244,11 +244,25 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Have you donated blood in the last 8 weeks?</label>
+                            <label class="block font-medium mb-1">Gender</label>
                             <div class="flex space-x-4">
-                                <label><input type="radio" name="recent_donation" value="no" required> No</label>
-                                <label><input type="radio" name="recent_donation" value="yes"> Yes</label>
+                                <label><input type="radio" name="eligibility_gender" value="male" required> Male</label>
+                                <label><input type="radio" name="eligibility_gender" value="female"> Female</label>
                             </div>
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">What type of donation did you last make?</label>
+                            <div class="flex space-x-4">
+                                <label><input type="radio" name="donation_type" value="none" required> Never
+                                    Donated</label>
+                                <label><input type="radio" name="donation_type" value="whole"> Whole Blood</label>
+                                <label><input type="radio" name="donation_type" value="sdp"> SDP (Platelets)</label>
+                            </div>
+                        </div>
+                        <div id="donation-date-section" style="display: none;">
+                            <label class="block font-medium mb-1">When was your last donation?</label>
+                            <input type="date" id="last-donation-date" name="last_donation_date"
+                                class="form-input w-full">
                         </div>
                         <div>
                             <label class="block font-medium mb-1">Are you currently taking antibiotics or feeling
@@ -259,7 +273,7 @@
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Have you had a tattoo or piercing in the last 4
+                            <label class="block font-medium mb-1">Have you had a tattoo or piercing in the last 12
                                 months?</label>
                             <div class="flex space-x-4">
                                 <label><input type="radio" name="tattoo" value="no" required> No</label>
@@ -268,7 +282,7 @@
                         </div>
                         <div>
                             <label class="block font-medium mb-1">Are you pregnant or have you been pregnant in the last
-                                6 weeks?</label>
+                                12 months (1 year)?</label>
                             <div class="flex space-x-4">
                                 <label><input type="radio" name="pregnant" value="no" required> No</label>
                                 <label><input type="radio" name="pregnant" value="yes"> Yes</label>
@@ -278,6 +292,21 @@
                     </form>
                     <div id="eligibility-result" class="mt-6 text-lg font-semibold"></div>
                     <script>
+                        // Show/hide donation date field based on donation type
+                        document.querySelectorAll('input[name="donation_type"]').forEach(radio => {
+                            radio.addEventListener('change', function () {
+                                const dateSection = document.getElementById('donation-date-section');
+                                if (this.value !== 'none') {
+                                    dateSection.style.display = 'block';
+                                    document.getElementById('last-donation-date').required = true;
+                                } else {
+                                    dateSection.style.display = 'none';
+                                    document.getElementById('last-donation-date').required = false;
+                                    document.getElementById('last-donation-date').value = '';
+                                }
+                            });
+                        });
+
                         document.getElementById('eligibility-form').onsubmit = function (e) {
                             e.preventDefault();
                             const form = e.target;
@@ -285,20 +314,71 @@
                                 age: form.age.value,
                                 weight: form.weight.value,
                                 well: form.well.value,
-                                recent_donation: form.recent_donation.value,
+                                gender: form.eligibility_gender.value,
+                                donation_type: form.donation_type.value,
+                                last_donation_date: form.last_donation_date.value,
                                 antibiotics: form.antibiotics.value,
                                 tattoo: form.tattoo.value,
                                 pregnant: form.pregnant.value
                             };
+
+                            const gender = answers.gender;
+
                             let eligible = true;
                             let reasons = [];
-                            if (answers.age !== 'yes') { eligible = false; reasons.push('You must be at least 18 years old.'); }
-                            if (answers.weight !== 'yes') { eligible = false; reasons.push('You must weigh at least 50 kg (110 lbs).'); }
-                            if (answers.well !== 'yes') { eligible = false; reasons.push('You must feel healthy and well today.'); }
-                            if (answers.recent_donation !== 'no') { eligible = false; reasons.push('You must wait at least 8 weeks between donations.'); }
-                            if (answers.antibiotics !== 'no') { eligible = false; reasons.push('You should not donate while taking antibiotics or feeling unwell.'); }
-                            if (answers.tattoo !== 'no') { eligible = false; reasons.push('Wait at least 4 months after a tattoo or piercing.'); }
-                            if (answers.pregnant !== 'no') { eligible = false; reasons.push('You cannot donate while pregnant or within 6 weeks after pregnancy.'); }
+
+                            if (answers.age !== 'yes') {
+                                eligible = false;
+                                reasons.push('You must be at least 18 years old.');
+                            }
+                            if (answers.weight !== 'yes') {
+                                eligible = false;
+                                reasons.push('You must weigh at least 45 kg.');
+                            }
+                            if (answers.well !== 'yes') {
+                                eligible = false;
+                                reasons.push('You must feel healthy and well today.');
+                            }
+
+                            // Check donation waiting period
+                            if (answers.donation_type !== 'none' && answers.last_donation_date) {
+                                const lastDonation = new Date(answers.last_donation_date);
+                                const today = new Date();
+                                const daysSinceLastDonation = Math.floor((today - lastDonation) / (1000 * 60 * 60 * 24));
+
+                                if (answers.donation_type === 'whole') {
+                                    // Whole Blood: 90 days for males, 120 days for females
+                                    const requiredDays = gender === 'male' ? 90 : 120;
+                                    const requiredMonths = gender === 'male' ? 3 : 4;
+
+                                    if (daysSinceLastDonation < requiredDays) {
+                                        eligible = false;
+                                        const daysRemaining = requiredDays - daysSinceLastDonation;
+                                        reasons.push(`As a ${gender}, you must wait ${requiredDays} days (${requiredMonths} months) between whole blood donations. You have ${daysRemaining} days remaining.`);
+                                    }
+                                } else if (answers.donation_type === 'sdp') {
+                                    // SDP (Platelet): 72 hours (3 days)
+                                    if (daysSinceLastDonation < 3) {
+                                        eligible = false;
+                                        const daysRemaining = 3 - daysSinceLastDonation;
+                                        reasons.push(`You must wait 72 hours (3 days) between SDP (platelet) donations. ${daysRemaining} days remaining.`);
+                                    }
+                                }
+                            }
+
+                            if (answers.antibiotics !== 'no') {
+                                eligible = false;
+                                reasons.push('You should not donate while taking antibiotics or feeling unwell.');
+                            }
+                            if (answers.tattoo !== 'no') {
+                                eligible = false;
+                                reasons.push('Wait at least 12 months after a tattoo or piercing.');
+                            }
+                            if (answers.pregnant !== 'no') {
+                                eligible = false;
+                                reasons.push('You cannot donate while pregnant or within 12 months (1 year) after pregnancy.');
+                            }
+
                             const resultDiv = document.getElementById('eligibility-result');
                             if (eligible) {
                                 resultDiv.textContent = 'You are likely eligible to donate blood today!';
@@ -441,16 +521,29 @@
                             }
                             const heightM = heightCm / 100;
                             const bmi = weight / (heightM * heightM);
-                            let message = `Your BMI is ${bmi.toFixed(1)}.`;
-                            if (bmi < 18.5) {
-                                message += ' This is below the minimum for blood donation.';
+                            let message = `Your BMI is ${bmi.toFixed(1)}. `;
+
+                            // Check weight eligibility (45 kg minimum for donation)
+                            if (weight < 45) {
+                                message += 'You need to weigh at least 45 kg to donate blood. ';
                                 document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-error';
-                            } else if (bmi >= 18.5 && bmi <= 24.9) {
-                                message += ' This is a healthy range for donation!';
-                                document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-accent';
                             } else {
-                                message += ' This is above the healthy range, but you may still be eligible to donate.';
-                                document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-warning';
+                                message += 'You meet the weight requirement for donation! ';
+
+                                // Add BMI category information
+                                if (bmi < 18.5) {
+                                    message += 'Your BMI indicates you are underweight. Consider consulting a healthcare provider.';
+                                    document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-warning';
+                                } else if (bmi >= 18.5 && bmi <= 24.9) {
+                                    message += 'Your BMI is in a healthy range.';
+                                    document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-accent';
+                                } else if (bmi >= 25 && bmi <= 29.9) {
+                                    message += 'Your BMI indicates you are overweight.';
+                                    document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-warning';
+                                } else {
+                                    message += 'Your BMI indicates obesity. Consider consulting a healthcare provider.';
+                                    document.getElementById('bmi-result').className = 'mt-6 text-lg font-semibold text-warning';
+                                }
                             }
                             document.getElementById('bmi-result').textContent = message;
                         };
@@ -490,7 +583,7 @@
                                 document.getElementById('iron-result').className = 'mt-6 text-lg font-semibold text-error';
                                 return;
                             }
-                            const minLevel = gender === 'male' ? 13.0 : 12.5;
+                            const minLevel = 12.5; // Minimum hemoglobin level for both males and females
                             let message = `Your hemoglobin level is ${hemoglobin} g/dL.`;
                             if (hemoglobin >= minLevel) {
                                 message += ' Your iron levels are good for donation!';
@@ -552,7 +645,7 @@
                         <li>• Include vitamin C to enhance iron absorption</li>
                         <li>• Avoid coffee/tea with meals (reduces absorption)</li>
                         <li>• Consider iron supplements if recommended by doctor</li>
-                        <li>• Wait 8 weeks between donations to replenish</li>
+                        <li>• Wait 90 days (males) or 120 days (females) between whole blood donations to replenish</li>
                     </ul>
                 </div>
 
@@ -593,9 +686,9 @@
                         <p><strong>Medical Questions:</strong><br>
                             Contact your local blood donation center</p>
                         <p><strong>24/7 Emergency:</strong><br>
-                            (555) 123-LIFE</p>
+                            9979260393</p>
                         <p><strong>General Info:</strong><br>
-                            info@lifesaversdonors.org</p>
+                            lifesaversunited.india@gmail.com</p>
                         <div class="pt-2">
                             <a href="blood_information_center.html"
                                 class="text-primary hover:text-primary-700 font-semibold">Learn More About Blood Types
