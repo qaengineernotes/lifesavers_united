@@ -33,12 +33,29 @@
             "image": "/imgs/Nikunj-Mistri.JPG",
             "featured": true,
             "testimonial": "From silent observer to active donor - LifeSavers United didn't just inspire me to give blood, it inspired me to give back in every way I can."
+        },
+        {
+            "id": 3,
+            "type": "donor",
+            "title": "Turning Fear into Hope: A Journey of 16 Lifelines",
+            "name": "Utsav Gupte",
+            "donationCount": 16,
+            "donationType": "Blood & SDP",
+            "yearsActive": 3,
+            "location": "Karamsad",
+            "date": "2026-02-15",
+            "excerpt": "On his 18th birthday, Utsav chose to make a difference instead of having a party. What started with fear and a 160/100 blood pressure reading became a lifelong mission of 16+ donations and advocacy.",
+            "fullStory": "On my 18th birthday, I didn't want a party; I wanted to make a difference. I walked into the blood bank at Krushna Hospital, Karamsad, with a 51kg frame and a heart full of good intentions. But the mind is a funny thing—even though I wanted to help, my nerves took over. My blood pressure spiked to 160/100, fueled by the mystery of the unknown. The staff didn't turn me away. Instead, a kind technician took me behind the scenes, explaining the life-saving journey of a single blood bag. Two coffees, a packet of Parle-G, and some truly inspiring words from the team later, my fear faded. That day, I didn't just celebrate a birthday; I gave the gift of life for the very first time. What started as a nervous first step became a lifelong mission. Since that day, I have donated blood more than 16 times and completed my first SDP (Single Donor Platelet) donation. My journey took a pivotal turn when I met Moxesh Shah. He invited me to join <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>, and I accepted without hesitation. Working alongside Moxeshbhai has taught me the most vital lesson in this mission: the power of a calm heart. I've learned to answer every emergency call with the same calmness and sympathy that the hospital staff once showed me. Today, I don't just donate blood; I advocate for the quiet strength it takes to show up for someone in their darkest hour.",
+            "motivation": "Every donation is a chance to be the calm, compassionate presence that someone desperately needs in their darkest moment.",
+            "image": "/imgs/Utsav-Gupte.png",
+            "featured": true,
+            "testimonial": "Fear is temporary, but the life you save is forever. Two coffees and a packet of Parle-G taught me that courage isn't the absence of fear—it's showing up anyway."
         }
     ],
     "stats": {
-        "totalStories": 2,
+        "totalStories": 3,
         "totalLivesSaved": 0,
-        "totalDonors": 2,
+        "totalDonors": 3,
         "totalPatients": 0,
         "totalEmergencies": 0
     }
