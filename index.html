@@ -399,6 +399,53 @@
             </div>
         </section>
 
+        <!-- Recent Donors in Action -->
+        <section class="py-16">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h2 class="text-section mb-4">Recent Donors in Action</h2>
+                    <p class="text-text-secondary max-w-2xl mx-auto">
+                        Celebrating our heroes who recently stepped forward to save lives through blood donation.
+                    </p>
+                </div>
+
+                <!-- Loading state with Heartbeat Loader (Outside grid for proper centering) -->
+                <div id="recent-donors-loading">
+                    <div class="loader-container">
+                        <div class="heartbeat-loader">
+                            <div>
+                                <!-- Heartbeat/EKG Line -->
+                                <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+                                    <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
+                                        fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
+                                </svg>
+
+                                <!-- Loading Text with Animation -->
+                                <p class="loading-text text-text-secondary text-lg font-medium">
+                                    <span class="loading-message">Loading recent donors</span>
+                                    <span class="loading-dots">
+                                        <span class="dot">.</span>
+                                        <span class="dot">.</span>
+                                        <span class="dot">.</span>
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Donors Gallery Grid -->
+                <div id="recent-donors-gallery" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                </div>
+
+                <div class="text-center mt-8">
+                    <a href="/gallery" class="btn-secondary">
+                        View Full Gallery
+                    </a>
+                </div>
+            </div>
+        </section>
+
         <!-- Quick Access Tools -->
         <section class="py-16">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -683,6 +730,7 @@
     <script src="scripts/common-page-functions.js"></script>
     <script src="scripts/emergency-statistics.js"></script>
     <script src="scripts/featured-stories.js"></script>
+    <script src="scripts/recent-donors-gallery.js"></script>
     <script id="dhws-dataInjector" src="public/dhws-data-injector.js"></script>
     <script src="scripts/mobile-menu.js"></script>
 </body>

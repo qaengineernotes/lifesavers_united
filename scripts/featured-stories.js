@@ -20,8 +20,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         const data = await response.json();
         const stories = data.stories || [];
 
-        // Filter only featured stories
-        const featuredStories = stories.filter(story => story.featured === true);
+        // Get the first 3 stories (not the most recent, but the first ones in the array)
+        const featuredStories = stories.slice(0, 3);
 
         if (featuredStories.length === 0) {
             storiesContainer.innerHTML = '<p class="text-center text-text-secondary col-span-full">No featured stories available at this time.</p>';

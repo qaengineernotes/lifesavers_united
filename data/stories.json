@@ -50,12 +50,29 @@
             "image": "/imgs/Utsav-Gupte.png",
             "featured": true,
             "testimonial": "Fear is temporary, but the life you save is forever. Two coffees and a packet of Parle-G taught me that courage isn't the absence of fear—it's showing up anyway."
+        },
+        {
+            "id": 4,
+            "type": "donor",
+            "title": "The Quiet Mission: 25 Donations and Counting",
+            "name": "Naman Kothari",
+            "donationCount": 25,
+            "donationType": "Whole Blood",
+            "yearsActive": 0.6,
+            "location": "Ahmedabad",
+            "date": "2026-02-16",
+            "excerpt": "While others celebrated adulthood differently, Naman marked his 18th birthday by donating blood. Since then, he's donated 25+ times with a clear goal: 100 donations by age 50.",
+            "fullStory": "I started donating blood the day I turned 18. While others were celebrating adulthood in different ways, I chose to mark it by giving blood for the first time. That decision quietly shaped who I am. Since then, I've donated more than 25 times. I closely track every three-month cycle, and the moment I'm eligible again, I go back. Blood cannot be manufactured. It cannot be replaced by machines or technology. It can only come from one human being to another. I am not a doctor. I cannot perform surgeries or treat patients. But by donating blood, I can still help save lives. For me, it is the simplest and most powerful way an ordinary person can make an extraordinary difference. My goal is to cross 100 whole blood donations by the age of 50. Not for recognition, but for the quiet satisfaction of knowing that I did my part. I joined <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> when a friend's father urgently needed blood. The team helped connect us with a donor within just a few hours, and that experience made me realize the incredible impact this community can have. Since joining, I've experienced firsthand how selfless and dedicated the members and volunteers are. Being part of this initiative has made me more aware of the importance of timely blood donation and how a small effort from one person can save lives. In a few words, LifeSavers United is an inspiring initiative where people come together with compassion and commitment to make a real difference in the lives of those in need.",
+            "motivation": "Blood cannot be manufactured or replaced by technology. It can only come from one human being to another.",
+            "image": "/imgs/Naman-Kothari.jpeg",
+            "featured": true,
+            "testimonial": "You don't need a medical degree to save lives — sometimes, you just need the courage to give."
         }
     ],
     "stats": {
-        "totalStories": 3,
+        "totalStories": 4,
         "totalLivesSaved": 0,
-        "totalDonors": 3,
+        "totalDonors": 4,
         "totalPatients": 0,
         "totalEmergencies": 0
     }
