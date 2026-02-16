@@ -55,6 +55,35 @@ https://lifesaversunited.org
 
 // --- HELPER FUNCTIONS ---
 
+/**
+ * Normalize phone number to 10-digit format
+ * Removes country code (+91 or 91), spaces, and special characters
+ * Examples: "94283 54534" → "9428354534", "+91 94283 54534" → "9428354534"
+ */
+const normalizePhoneNumber = (phoneNumber) => {
+    if (!phoneNumber) {
+        return '';
+    }
+
+    // Convert to string and trim whitespace
+    let normalized = String(phoneNumber).trim();
+
+    // Remove all non-digit characters (spaces, +, -, (, ), etc.)
+    normalized = normalized.replace(/\D/g, '');
+
+    // Remove country code if present (91 for India)
+    if (normalized.startsWith('91') && normalized.length > 10) {
+        normalized = normalized.substring(2);
+    }
+
+    // If the number still has more than 10 digits, take the last 10 digits
+    if (normalized.length > 10) {
+        normalized = normalized.slice(-10);
+    }
+
+    return normalized;
+};
+
 // Parse the "One-Shot" Text
 const parseRequestText = (text) => {
     // Map Telegram field names to Firestore database field names
@@ -83,6 +112,11 @@ const parseRequestText = (text) => {
             data[mapping[cleanKey]] = cleanValue;
         }
     });
+
+    // Normalize contact number if present
+    if (data.contactNumber) {
+        data.contactNumber = normalizePhoneNumber(data.contactNumber);
+    }
 
     return data;
 };

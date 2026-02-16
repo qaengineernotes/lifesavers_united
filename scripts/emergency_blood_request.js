@@ -1,6 +1,9 @@
 // Local proxy URL to avoid CORS issues
 const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
+// Import phone normalizer utility
+import { normalizePhoneNumber } from './phone-normalizer.js';
+
 // Initialize form validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     initializeFormValidation();
@@ -125,7 +128,7 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
         const data = {
             patientName: formDataObj.get('patientName'),
             contactPerson: formDataObj.get('contactPerson'),
-            contactNumber: formDataObj.get('contactNumber'),
+            contactNumber: normalizePhoneNumber(formDataObj.get('contactNumber')), // Normalize phone number
             contactEmail: formDataObj.get('contactEmail'),
             bloodType: formDataObj.get('bloodType'),
             unitsRequired: formDataObj.get('unitsRequired'),

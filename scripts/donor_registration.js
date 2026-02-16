@@ -4,6 +4,8 @@ const SUBMIT_URL = window.location.hostname === 'localhost' || window.location.h
     ? '/api/submit-donor-registration'  // Local development
     : 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';  // Production
 
+// Import phone normalizer utility
+import { normalizePhoneNumber } from './phone-normalizer.js';
 
 // CAPTCHA variables
 let captchaAnswer = 0;
@@ -397,7 +399,7 @@ async function handleFormSubmission(e) {
             fullName: formDataObj.get('fullName'),
             dateOfBirth: formDataObj.get('dateOfBirth'),
             gender: formDataObj.get('gender'),
-            contactNumber: formDataObj.get('contactNumber'),
+            contactNumber: normalizePhoneNumber(formDataObj.get('contactNumber')), // Normalize phone number
             email: formDataObj.get('email'),
             weight: formDataObj.get('weight'),
             bloodGroup: formDataObj.get('bloodGroup'),

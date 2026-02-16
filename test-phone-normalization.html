@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Number Normalization Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .test-section {
+            margin-bottom: 30px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #dc2626;
+        }
+
+        .result {
+            padding: 15px;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .result.invalid {
+            background: #fef2f2;
+            border-color: #fca5a5;
+        }
+
+        .result-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-size: 18px;
+            color: #16a34a;
+            font-family: monospace;
+        }
+
+        .result.invalid .result-value {
+            color: #dc2626;
+        }
+
+        .test-cases {
+            margin-top: 30px;
+        }
+
+        .test-case {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            margin-bottom: 5px;
+            background: #f9fafb;
+            border-radius: 5px;
+        }
+
+        .test-case:hover {
+            background: #f3f4f6;
+        }
+
+        .test-input {
+            font-family: monospace;
+            color: #666;
+        }
+
+        .test-output {
+            font-family: monospace;
+            color: #16a34a;
+            font-weight: bold;
+        }
+
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #b91c1c;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>📱 Phone Number Normalization Test</h1>
+        <p class="subtitle">Test the phone number normalization utility</p>
+
+        <div class="test-section">
+            <div class="input-group">
+                <label for="phoneInput">Enter Phone Number:</label>
+                <input type="text" id="phoneInput" placeholder="Try: 94283 54534, +91 94283 54534, +919428354534"
+                    oninput="testNormalization()">
+            </div>
+
+            <div id="result" style="display: none;">
+                <div class="result-label">Normalized Output:</div>
+                <div class="result-value" id="normalizedOutput"></div>
+            </div>
+
+            <div id="validation" style="display: none;">
+                <div class="result-label">Validation:</div>
+                <div class="result-value" id="validationOutput"></div>
+            </div>
+
+            <div id="formatted" style="display: none;">
+                <div class="result-label">Formatted for Display:</div>
+                <div class="result-value" id="formattedOutput"></div>
+            </div>
+        </div>
+
+        <div class="test-cases">
+            <h3>Test Cases (Click to try):</h3>
+            <div class="test-case" onclick="tryExample('94283 54534')">
+                <span class="test-input">"94283 54534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('+91 94283 54534')">
+                <span class="test-input">"+91 94283 54534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('+919428354534')">
+                <span class="test-input">"+919428354534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('919428354534')">
+                <span class="test-input">"919428354534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('9428354534')">
+                <span class="test-input">"9428354534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('94283-54534')">
+                <span class="test-input">"94283-54534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('(94283) 54534')">
+                <span class="test-input">"(94283) 54534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+            <div class="test-case" onclick="tryExample('0091 94283 54534')">
+                <span class="test-input">"0091 94283 54534"</span>
+                <span class="test-output">→ 9428354534</span>
+            </div>
+        </div>
+
+        <button onclick="runAllTests()">Run All Tests</button>
+        <div id="testResults" style="margin-top: 20px;"></div>
+    </div>
+
+    <script type="module">
+        import { normalizePhoneNumber, isValidPhoneNumber, formatPhoneNumberForDisplay } from './scripts/phone-normalizer.js';
+
+        // Make functions available globally
+        window.normalizePhoneNumber = normalizePhoneNumber;
+        window.isValidPhoneNumber = isValidPhoneNumber;
+        window.formatPhoneNumberForDisplay = formatPhoneNumberForDisplay;
+    </script>
+
+    <script>
+        function testNormalization() {
+            const input = document.getElementById('phoneInput').value;
+            const resultDiv = document.getElementById('result');
+            const validationDiv = document.getElementById('validation');
+            const formattedDiv = document.getElementById('formatted');
+
+            if (!input) {
+                resultDiv.style.display = 'none';
+                validationDiv.style.display = 'none';
+                formattedDiv.style.display = 'none';
+                return;
+            }
+
+            const normalized = window.normalizePhoneNumber(input);
+            const isValid = window.isValidPhoneNumber(input);
+            const formatted = window.formatPhoneNumberForDisplay(input);
+
+            // Show normalized result
+            resultDiv.style.display = 'block';
+            resultDiv.className = isValid ? 'result' : 'result invalid';
+            document.getElementById('normalizedOutput').textContent = normalized || '(empty)';
+
+            // Show validation result
+            validationDiv.style.display = 'block';
+            validationDiv.className = isValid ? 'result' : 'result invalid';
+            document.getElementById('validationOutput').textContent = isValid ? '✅ Valid Indian mobile number' : '❌ Invalid mobile number';
+
+            // Show formatted result
+            formattedDiv.style.display = 'block';
+            formattedDiv.className = 'result';
+            document.getElementById('formattedOutput').textContent = formatted || '(empty)';
+        }
+
+        function tryExample(example) {
+            document.getElementById('phoneInput').value = example;
+            testNormalization();
+        }
+
+        function runAllTests() {
+            const testCases = [
+                { input: '94283 54534', expected: '9428354534' },
+                { input: '+91 94283 54534', expected: '9428354534' },
+                { input: '+919428354534', expected: '9428354534' },
+                { input: '919428354534', expected: '9428354534' },
+                { input: '9428354534', expected: '9428354534' },
+                { input: '94283-54534', expected: '9428354534' },
+                { input: '(94283) 54534', expected: '9428354534' },
+                { input: '0091 94283 54534', expected: '9428354534' },
+            ];
+
+            let results = '<h3>Test Results:</h3>';
+            let passed = 0;
+            let failed = 0;
+
+            testCases.forEach((test, index) => {
+                const normalized = window.normalizePhoneNumber(test.input);
+                const success = normalized === test.expected;
+
+                if (success) {
+                    passed++;
+                    results += `<div class="test-case" style="background: #f0fdf4; border: 1px solid #86efac;">
+                        <span>✅ Test ${index + 1}: "${test.input}" → ${normalized}</span>
+                    </div>`;
+                } else {
+                    failed++;
+                    results += `<div class="test-case" style="background: #fef2f2; border: 1px solid #fca5a5;">
+                        <span>❌ Test ${index + 1}: "${test.input}" → ${normalized} (expected: ${test.expected})</span>
+                    </div>`;
+                }
+            });
+
+            results += `<div style="margin-top: 20px; padding: 15px; background: ${failed === 0 ? '#f0fdf4' : '#fef2f2'}; border-radius: 5px;">
+                <strong>Summary: ${passed} passed, ${failed} failed</strong>
+            </div>`;
+
+            document.getElementById('testResults').innerHTML = results;
+        }
+    </script>
+</body>
+
+</html>

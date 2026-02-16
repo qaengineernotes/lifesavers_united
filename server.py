@@ -17,6 +17,33 @@ DIRECTORY = Path(__file__).parent
 import urllib.request
 import urllib.parse
 import json
+import re
+
+def normalize_phone_number(phone_number):
+    """
+    Normalize phone number to 10-digit format
+    Removes country code (+91 or 91), spaces, and special characters
+    Examples: "94283 54534" → "9428354534", "+91 94283 54534" → "9428354534"
+    """
+    if not phone_number:
+        return ''
+    
+    # Convert to string and trim whitespace
+    normalized = str(phone_number).strip()
+    
+    # Remove all non-digit characters (spaces, +, -, (, ), etc.)
+    normalized = re.sub(r'\D', '', normalized)
+    
+    # Remove country code if present (91 for India)
+    if normalized.startswith('91') and len(normalized) > 10:
+        normalized = normalized[2:]
+    
+    # If the number still has more than 10 digits, take the last 10 digits
+    if len(normalized) > 10:
+        normalized = normalized[-10:]
+    
+    return normalized
+
 
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -106,7 +133,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         'fullName': data.get('fullName'),
                         'dateOfBirth': data.get('dateOfBirth'),
                         'gender': data.get('gender'),
-                        'contactNumber': data.get('contactNumber'),
+                        'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
                         'email': data.get('email'),
                         'weight': data.get('weight'),
                         'bloodGroup': data.get('bloodGroup'),
@@ -176,7 +203,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         'fullName': data.get('fullName'),
                         'dateOfBirth': data.get('dateOfBirth'),
                         'gender': data.get('gender'),
-                        'contactNumber': data.get('contactNumber'),
+                        'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
                         'email': data.get('email'),
                         'weight': data.get('weight'),
                         'bloodGroup': data.get('bloodGroup'),
