@@ -43,8 +43,10 @@ export async function fetchEmergencyRequestsFromFirebase() {
             requests.push({
                 id: doc.id,
                 // Map Firebase fields back to the format expected by the UI
-                // Use reopenedAt for reopened requests, otherwise use createdAt
-                inquiryDate: data.status === 'Reopened' && data.reopenedAt
+                // Use reopenedAt if it exists (request was ever reopened), otherwise use createdAt
+                // This ensures "Time Since Request" always counts from the most recent reopen date,
+                // even if the request was subsequently verified or changed to another status.
+                inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
                     : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
                 patientName: data.patientName || '',
@@ -67,7 +69,8 @@ export async function fetchEmergencyRequestsFromFirebase() {
                 verifiedBy: data.verifiedByName || '',
                 createdBy: data.createdByName || 'Unknown',
                 closureReason: data.closureReason || '',
-                fulfilledDate: data.fulfilledAt || ''
+                fulfilledDate: data.fulfilledAt || '',
+                reopenCount: data.reopenCount || 0
             });
         });
 
@@ -203,8 +206,10 @@ export function listenToEmergencyRequests(callback) {
             const data = doc.data();
             requests.push({
                 id: doc.id,
-                // Use reopenedAt for reopened requests, otherwise use createdAt
-                inquiryDate: data.status === 'Reopened' && data.reopenedAt
+                // Use reopenedAt if it exists (request was ever reopened), otherwise use createdAt
+                // This ensures "Time Since Request" always counts from the most recent reopen date,
+                // even if the request was subsequently verified or changed to another status.
+                inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
                     : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
                 patientName: data.patientName || '',

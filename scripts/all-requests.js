@@ -681,11 +681,11 @@ async function fetchRequestHistory(request) {
             });
         });
 
-        // Sort by timestamp (newest first)
+        // Sort by timestamp (oldest first = chronological order)
         history.sort((a, b) => {
             const timeA = a.timestamp?.seconds || 0;
             const timeB = b.timestamp?.seconds || 0;
-            return timeB - timeA;
+            return timeA - timeB;
         });
 
         return history;
