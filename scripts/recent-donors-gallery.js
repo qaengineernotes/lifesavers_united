@@ -153,11 +153,15 @@ function createImageCard(image) {
 function formatImageDate(date) {
     if (!date) return 'Recently';
 
+    // Compare calendar dates at midnight to avoid time-of-day skewing the result
     const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
-    if (diffDays === 0) {
+    const diffMs = todayMidnight - dateMidnight;
+    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffDays <= 0) {
         return 'Today';
     } else if (diffDays === 1) {
         return 'Yesterday';

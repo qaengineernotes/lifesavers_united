@@ -903,6 +903,9 @@ async function verifyRequest(requestData, button) {
                 // Show success message
                 showSuccessMessage('Request marked as VERIFIED successfully!');
 
+                // Show available donors popup
+                await showAvailableDonorsPopup(requestData);
+
                 // Keep the card visible and don't refresh automatically
                 // The button state change is sufficient to show the action was completed
 
@@ -2975,4 +2978,532 @@ function updateUIForUserStatus(user) {
     } else {
         if (existingMsg) existingMsg.remove();
     }
+}
+
+// ============================================================================
+// AVAILABLE DONORS POPUP FEATURE
+// ============================================================================
+
+/**
+ * Show available donors popup after successful verification
+ * @param {Object} requestData - The verified request data
+ */
+async function showAvailableDonorsPopup(requestData) {
+    try {
+        // Fetch eligible donors
+        const eligibleDonors = await fetchEligibleDonors(requestData);
+
+        // Create and show popup
+        displayDonorsPopup(eligibleDonors, requestData);
+    } catch (error) {
+        console.error('Error showing available donors:', error);
+        // Don't show error to user - this is a bonus feature
+    }
+}
+
+/**
+ * Fetch eligible donors from Firebase based on request criteria
+ * @param {Object} requestData - The request data containing blood type and units required
+ * @returns {Array} Array of eligible donors
+ */
+async function fetchEligibleDonors(requestData) {
+    try {
+        // Import Firebase modules
+        const { db, collection, getDocs, query, where } = await import('./firebase-config.js');
+
+        const bloodType = requestData.bloodType;
+        const unitsRequiredText = requestData.unitsRequiredText || '';
+
+        // Determine donation type (Units or SDP)
+        const isDonationTypeSDP = unitsRequiredText.toUpperCase().includes('SDP');
+        const eligibilityDays = isDonationTypeSDP ? 28 : 90;
+
+        // Calculate eligibility date
+        const eligibilityDate = new Date();
+        eligibilityDate.setDate(eligibilityDate.getDate() - eligibilityDays);
+
+        // Fetch all donors from Firebase
+        const donorsRef = collection(db, 'donors');
+        let donorsQuery;
+
+        // Filter by blood group if specific blood group is mentioned
+        if (bloodType && bloodType.toLowerCase() !== 'any') {
+            donorsQuery = query(donorsRef, where('bloodGroup', '==', bloodType));
+        } else {
+            donorsQuery = donorsRef;
+        }
+
+        const snapshot = await getDocs(donorsQuery);
+
+        const eligibleDonors = [];
+
+        snapshot.forEach((doc) => {
+            const donor = {
+                id: doc.id,
+                ...doc.data()
+            };
+
+            // Check if donor has contact number
+            if (!donor.contactNumber) {
+                return; // Skip donors without contact
+            }
+
+            // Check last donation date eligibility
+            if (donor.lastDonatedAt) {
+                const lastDonationDate = donor.lastDonatedAt.seconds
+                    ? new Date(donor.lastDonatedAt.seconds * 1000)
+                    : new Date(donor.lastDonatedAt);
+
+                // Skip if donor hasn't completed the eligibility period
+                if (lastDonationDate > eligibilityDate) {
+                    return;
+                }
+            }
+
+            // Donor is eligible
+            eligibleDonors.push(donor);
+        });
+
+        // Sort by last donated date (donors who haven't donated recently first)
+        eligibleDonors.sort((a, b) => {
+            const getTimestamp = (donor) => {
+                if (!donor.lastDonatedAt) return 0; // Never donated - highest priority
+                return donor.lastDonatedAt.seconds || new Date(donor.lastDonatedAt).getTime() / 1000;
+            };
+            return getTimestamp(a) - getTimestamp(b); // Ascending (oldest donation first)
+        });
+
+        // Return top 10 donors
+        return eligibleDonors.slice(0, 10);
+
+    } catch (error) {
+        console.error('Error fetching eligible donors:', error);
+        return [];
+    }
+}
+
+/**
+ * Display donors in a mobile-responsive popup
+ * @param {Array} donors - Array of eligible donors
+ * @param {Object} requestData - The request data
+ */
+function displayDonorsPopup(donors, requestData) {
+    // Remove existing popup if any
+    const existingPopup = document.getElementById('availableDonorsPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup container
+    const popup = document.createElement('div');
+    popup.id = 'availableDonorsPopup';
+    popup.className = 'donors-popup-overlay';
+
+    // Determine donation type for display
+    const unitsRequiredText = requestData.unitsRequiredText || '';
+    const donationType = unitsRequiredText.toUpperCase().includes('SDP') ? 'SDP' : 'Units';
+    const eligibilityDays = donationType === 'SDP' ? 28 : 90;
+
+    // Create popup content
+    popup.innerHTML = `
+        <div class="donors-popup-content">
+            <!-- Close button -->
+            <button class="donors-popup-close" onclick="closeDonorsPopup()" aria-label="Close">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+            
+            <!-- Header -->
+            <div class="donors-popup-header">
+                <h2>🩸 Available Donors</h2>
+                <p>For ${requestData.patientName} - ${requestData.bloodType} Blood (${donationType})</p>
+                <small>Showing donors eligible for ${donationType} donation (${eligibilityDays}+ days since last donation)</small>
+            </div>
+            
+            <!-- Donors table -->
+            <div class="donors-table-container">
+                ${donors.length > 0 ? createDonorsTable(donors) : createNoDonorsMessage()}
+            </div>
+        </div>
+        
+        <style>
+            .donors-popup-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                padding: 16px;
+                animation: fadeIn 0.3s ease-out;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            .donors-popup-content {
+                background: white;
+                border-radius: 16px;
+                max-width: 1000px;
+                width: 100%;
+                max-height: 90vh;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                animation: slideUp 0.3s ease-out;
+            }
+            
+            @keyframes slideUp {
+                from {
+                    transform: translateY(30px);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateY(0);
+                    opacity: 1;
+                }
+            }
+            
+            .donors-popup-close {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                background: #f3f4f6;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s;
+                z-index: 1;
+            }
+            
+            .donors-popup-close:hover {
+                background: #dc2626;
+                color: white;
+                transform: rotate(90deg);
+            }
+            
+            .donors-popup-header {
+                padding: 24px;
+                border-bottom: 2px solid #f3f4f6;
+            }
+            
+            .donors-popup-header h2 {
+                margin: 0 0 8px 0;
+                font-size: 24px;
+                color: #1f2937;
+            }
+            
+            .donors-popup-header p {
+                margin: 0 0 4px 0;
+                color: #6b7280;
+                font-size: 16px;
+            }
+            
+            .donors-popup-header small {
+                color: #9ca3af;
+                font-size: 13px;
+            }
+            
+            .donors-table-container {
+                overflow-y: auto;
+                flex: 1;
+                padding: 16px 24px 24px;
+            }
+            
+            .donors-table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            
+            .donors-table thead {
+                background: #f9fafb;
+                position: sticky;
+                top: 0;
+                z-index: 1;
+            }
+            
+            .donors-table th {
+                padding: 12px;
+                text-align: left;
+                font-weight: 600;
+                color: #374151;
+                font-size: 14px;
+                border-bottom: 2px solid #e5e7eb;
+            }
+            
+            .donors-table td {
+                padding: 12px;
+                border-bottom: 1px solid #f3f4f6;
+                color: #1f2937;
+                font-size: 14px;
+            }
+            
+            .donors-table tbody tr:hover {
+                background: #f9fafb;
+            }
+            
+            .donor-blood-group {
+                font-weight: 700;
+                color: #dc2626;
+                font-size: 16px;
+            }
+            
+            .donor-contact {
+                font-family: monospace;
+                color: #059669;
+                font-weight: 500;
+            }
+            
+            .donor-last-donated {
+                font-size: 13px;
+                color: #6b7280;
+            }
+            
+            .no-donors-message {
+                text-align: center;
+                padding: 60px 20px;
+                color: #6b7280;
+            }
+            
+            .no-donors-message svg {
+                width: 64px;
+                height: 64px;
+                margin: 0 auto 16px;
+                color: #d1d5db;
+            }
+            
+            /* Mobile Responsive Styles */
+            @media (max-width: 768px) {
+                .donors-popup-overlay {
+                    padding: 0;
+                    align-items: flex-end;
+                }
+                
+                .donors-popup-content {
+                    max-height: 95vh;
+                    border-radius: 16px 16px 0 0;
+                    max-width: 100%;
+                }
+                
+                .donors-popup-header {
+                    padding: 20px 16px;
+                }
+                
+                .donors-popup-header h2 {
+                    font-size: 20px;
+                    padding-right: 40px;
+                }
+                
+                .donors-popup-header p {
+                    font-size: 14px;
+                }
+                
+                .donors-popup-header small {
+                    font-size: 12px;
+                }
+                
+                .donors-table-container {
+                    padding: 12px 16px 16px;
+                }
+                
+                /* Convert table to cards on mobile */
+                .donors-table thead {
+                    display: none;
+                }
+                
+                .donors-table,
+                .donors-table tbody,
+                .donors-table tr,
+                .donors-table td {
+                    display: block;
+                }
+                
+                .donors-table tr {
+                    background: #f9fafb;
+                    border-radius: 12px;
+                    margin-bottom: 12px;
+                    padding: 16px;
+                    border: 1px solid #e5e7eb;
+                }
+                
+                .donors-table tr:hover {
+                    background: #f3f4f6;
+                }
+                
+                .donors-table td {
+                    padding: 6px 0;
+                    border: none;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+                
+                .donors-table td:before {
+                    content: attr(data-label);
+                    font-weight: 600;
+                    color: #6b7280;
+                    font-size: 13px;
+                    flex-shrink: 0;
+                    margin-right: 12px;
+                }
+                
+                .donor-blood-group {
+                    font-size: 18px;
+                }
+            }
+            
+            @media (max-width: 480px) {
+                .donors-popup-close {
+                    width: 36px;
+                    height: 36px;
+                    top: 12px;
+                    right: 12px;
+                }
+                
+                .donors-popup-header h2 {
+                    font-size: 18px;
+                }
+            }
+        </style>
+    `;
+
+    // Add to body
+    document.body.appendChild(popup);
+
+    // Close on overlay click
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) {
+            closeDonorsPopup();
+        }
+    });
+
+    // Close on Escape key
+    const escapeHandler = (e) => {
+        if (e.key === 'Escape') {
+            closeDonorsPopup();
+            document.removeEventListener('keydown', escapeHandler);
+        }
+    };
+    document.addEventListener('keydown', escapeHandler);
+}
+
+/**
+ * Create donors table HTML
+ * @param {Array} donors - Array of donors
+ * @returns {string} HTML string
+ */
+function createDonorsTable(donors) {
+    const rows = donors.map(donor => {
+        const lastDonated = donor.lastDonatedAt
+            ? formatDateTime(donor.lastDonatedAt)
+            : 'Never';
+
+        return `
+            <tr>
+                <td data-label="Donor Name">${escapeHtml(donor.fullName || 'Unknown')}</td>
+                <td data-label="Blood Group"><span class="donor-blood-group">🩸 ${donor.bloodGroup || 'N/A'}</span></td>
+                <td data-label="Contact"><span class="donor-contact">${donor.contactNumber}</span></td>
+                <td data-label="City">${escapeHtml(donor.city || 'N/A')}</td>
+                <td data-label="Last Donated"><span class="donor-last-donated">${lastDonated}</span></td>
+            </tr>
+        `;
+    }).join('');
+
+    return `
+        <table class="donors-table">
+            <thead>
+                <tr>
+                    <th>Donor Name</th>
+                    <th>Blood Group</th>
+                    <th>Contact</th>
+                    <th>City</th>
+                    <th>Last Donated</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
+    `;
+}
+
+/**
+ * Create no donors message HTML
+ * @returns {string} HTML string
+ */
+function createNoDonorsMessage() {
+    return `
+        <div class="no-donors-message">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <h3 style="margin: 0 0 8px 0; color: #374151;">No Eligible Donors Found</h3>
+            <p style="margin: 0; font-size: 14px;">
+                No donors currently meet the eligibility criteria for this request.
+            </p>
+        </div>
+    `;
+}
+
+/**
+ * Close the donors popup
+ */
+window.closeDonorsPopup = function () {
+    const popup = document.getElementById('availableDonorsPopup');
+    if (popup) {
+        popup.style.animation = 'fadeOut 0.2s ease-out';
+        setTimeout(() => popup.remove(), 200);
+    }
+};
+
+/**
+ * Format date time for display
+ * @param {*} timestamp - Firebase timestamp or date string
+ * @returns {string} Formatted date string
+ */
+function formatDateTime(timestamp) {
+    if (!timestamp) return 'N/A';
+
+    let date;
+    if (timestamp.seconds) {
+        date = new Date(timestamp.seconds * 1000);
+    } else {
+        date = new Date(timestamp);
+    }
+
+    if (isNaN(date.getTime())) return 'Invalid Date';
+
+    const options = {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    };
+
+    return date.toLocaleDateString('en-US', options);
+}
+
+/**
+ * Escape HTML to prevent XSS
+ * @param {string} text - Text to escape
+ * @returns {string} Escaped text
+ */
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
