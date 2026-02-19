@@ -93,6 +93,57 @@
     <link rel="manifest" href="imgs/favicon/manifest.json">
 
     <link rel="stylesheet" href="css/main.css" />
+
+    <!-- Mobile Controls Responsive Fix -->
+    <style>
+        @media (max-width: 639px) {
+
+            /* Stack title + controls vertically */
+            .mobile-header-section {
+                flex-direction: column !important;
+                align-items: flex-start !important;
+                gap: 10px !important;
+                margin-bottom: 16px !important;
+            }
+
+            /* Controls: column layout — each item on its own row */
+            #emergencyControlsRow {
+                flex-direction: column !important;
+                align-items: stretch !important;
+                width: 100% !important;
+                gap: 8px !important;
+            }
+
+            /* All Requests & All Donors & Refresh buttons — full width */
+            #emergencyControlsRow a.mobile-refresh-btn,
+            #emergencyControlsRow button.mobile-refresh-btn {
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                padding: 10px 14px !important;
+                font-size: 0.8125rem !important;
+                font-weight: 600 !important;
+                border-width: 1.5px !important;
+                box-sizing: border-box !important;
+                text-align: center !important;
+            }
+
+            /* LIVE indicator — full width pill */
+            #emergencyControlsRow .mobile-live-indicator {
+                width: 100% !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: flex-start !important;
+                gap: 6px !important;
+                padding: 8px 14px !important;
+                background-color: #fef2f2 !important;
+                border: 1.5px solid #fecaca !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+            }
+        }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <script type="module"
@@ -287,7 +338,7 @@
                     <p class="text-text-secondary mobile-subtitle">Real-time critical blood needs requiring immediate
                         response</p>
                 </div>
-                <div class="flex items-center space-x-4 mobile-controls">
+                <div id="emergencyControlsRow" class="flex items-center mobile-controls" style="gap: 12px;">
                     <!-- View All Requests Button (for approved users) -->
                     <a href="/all_requests" id="allRequestsButtonContainer"
                         class="btn-outline text-sm mobile-refresh-btn hidden" style="text-decoration: none;">

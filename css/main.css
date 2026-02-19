@@ -4052,63 +4052,89 @@ footer .flex.items-center.mb-3 img {
 
 /* Mobile header section responsive styles */
 @media (max-width: 639px) {
+
+  /* Stack the entire header section vertically */
   .mobile-header-section {
     flex-direction: column !important;
     align-items: flex-start !important;
-    gap: 16px !important;
-    margin-bottom: 24px !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
   }
 
+  /* Title section takes full width */
   .mobile-header-section .mobile-title-section {
     width: 100% !important;
   }
 
   .mobile-header-section .mobile-title {
-    font-size: 1.5rem !important;
-    line-height: 1.33 !important;
-    margin-bottom: 8px !important;
+    font-size: 1.375rem !important;
+    line-height: 1.3 !important;
+    margin-bottom: 6px !important;
   }
 
   .mobile-header-section .mobile-count-badge {
-    margin-left: 8px !important;
-    padding: 4px 8px !important;
-    font-size: 0.75rem !important;
+    margin-left: 6px !important;
+    padding: 3px 7px !important;
+    font-size: 0.7rem !important;
   }
 
   .mobile-header-section .mobile-subtitle {
-    font-size: 0.875rem !important;
-    line-height: 1.25 !important;
+    font-size: 0.8125rem !important;
+    line-height: 1.4 !important;
   }
 
+  /* ---------------------------------------------------------------
+     Controls: stack ALL items vertically on mobile
+     --------------------------------------------------------------- */
   .mobile-header-section .mobile-controls {
     width: 100% !important;
-    justify-content: space-between !important;
-    gap: 12px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
   }
 
-  .mobile-header-section .mobile-live-indicator {
-    gap: 6px !important;
-  }
-
-  .mobile-header-section .mobile-live-dot {
-    width: 10px !important;
-    height: 10px !important;
-    margin-right: 6px !important;
-  }
-
-  .mobile-header-section .mobile-live-text {
-    font-size: 0.75rem !important;
-  }
-
+  /* Each button (All Requests, All Donors, Refresh) fills the row */
   .mobile-header-section .mobile-refresh-btn {
-    font-size: 0.75rem !important;
-    padding: 6px 12px !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.8125rem !important;
+    padding: 9px 14px !important;
+    border-width: 1.5px !important;
+    font-weight: 600;
+    box-sizing: border-box;
   }
 
   .mobile-header-section .mobile-refresh-btn svg {
     width: 14px !important;
     height: 14px !important;
-    margin-right: 4px !important;
+    margin-right: 5px !important;
+  }
+
+  /* LIVE indicator: display as a compact pill row */
+  .mobile-header-section .mobile-live-indicator {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    gap: 6px !important;
+    padding: 7px 14px;
+    background-color: #fef2f2;
+    border-radius: 8px;
+    border: 1.5px solid #fecaca;
+    box-sizing: border-box;
+  }
+
+  .mobile-header-section .mobile-live-dot {
+    width: 9px !important;
+    height: 9px !important;
+    margin-right: 0 !important;
+    flex-shrink: 0;
+  }
+
+  .mobile-header-section .mobile-live-text {
+    font-size: 0.8125rem !important;
+    font-weight: 700;
+    letter-spacing: 0.05em;
   }
 }
 
@@ -5143,6 +5169,7 @@ article.py-16 {
     grid-template-columns: 1fr;
   }
 }
+
 /* Request Share Button - Icon Only */
 .request-share-btn {
   background: transparent;

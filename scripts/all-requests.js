@@ -523,22 +523,50 @@ function createHospitalDetailsCard(request) {
 function createDonationHistoryContent(request, donations) {
     const unitsRequired = parseInt(request.unitsRequired) || 0;
     const unitsFulfilled = parseInt(request.unitsFulfilled) || 0;
-    const unitsRemaining = unitsRequired - unitsFulfilled;
+    const reopenCount = parseInt(request.reopenCount) || 0;
+
+    // Total cycles = current cycle + all previous reopen cycles
+    const totalCycles = reopenCount + 1;
+
+    // Total units required across ALL cycles
+    // e.g. if 1 unit was needed and request was reopened 2 times = 3 total cycles → 3 units required total
+    const totalUnitsRequired = unitsRequired * totalCycles;
+
+    // Total units donated across ALL cycles = sum of unitsDonated in every donation_log entry
+    // This is the source of truth — donation_logs are never reset on reopen
+    const totalUnitsDonated = donations.reduce((sum, d) => sum + (parseInt(d.unitsDonated) || 0), 0);
+
+    // Remaining = total required across all cycles minus total actually donated
+    const totalUnitsRemaining = totalUnitsRequired - totalUnitsDonated;
+
+    // Show reopen cycle info only if this request was ever reopened
+    const cycleNote = reopenCount > 0
+        ? `<div class="info-row" style="grid-template-columns: 1fr;">
+                <div style="font-size: 12px; color: #6b7280; background: #f3f4f6; padding: 8px 12px; border-radius: 6px; margin-top: 4px;">
+                    ℹ️ This request was <strong>reopened ${reopenCount} time${reopenCount > 1 ? 's' : ''}</strong> 
+                    (${totalCycles} total cycle${totalCycles > 1 ? 's' : ''}). 
+                    Totals below include all cycles.
+                </div>
+           </div>`
+        : '';
 
     let html = `
         <div class="info-card">
             <h3>🩸 Donation Summary</h3>
+            ${cycleNote}
             <div class="info-row">
                 <div class="info-label">Total Units Required:</div>
-                <div class="info-value"><strong>${unitsRequired}</strong></div>
+                <div class="info-value"><strong>${totalUnitsRequired}</strong>
+                    ${reopenCount > 0 ? `<small style="color:#6b7280;"> (${unitsRequired} × ${totalCycles} cycles)</small>` : ''}
+                </div>
             </div>
             <div class="info-row">
                 <div class="info-label">Total Units Donated:</div>
-                <div class="info-value"><strong>${unitsFulfilled}</strong></div>
+                <div class="info-value"><strong>${totalUnitsDonated}</strong></div>
             </div>
             <div class="info-row">
                 <div class="info-label">Remaining Units:</div>
-                <div class="info-value"><strong style="color: ${unitsRemaining > 0 ? '#dc2626' : '#059669'};">${unitsRemaining}</strong></div>
+                <div class="info-value"><strong style="color: ${totalUnitsRemaining > 0 ? '#dc2626' : '#059669'};">${totalUnitsRemaining}</strong></div>
             </div>
             <div class="info-row">
                 <div class="info-label">Number of Donors:</div>
@@ -547,7 +575,7 @@ function createDonationHistoryContent(request, donations) {
             ${request.donors ? `
                 <div class="info-row" style="grid-template-columns: 1fr;">
                     <div>
-                        <div class="info-label">Donor Summary:</div>
+                        <div class="info-label">Latest Cycle Donors:</div>
                         <div class="info-value">${escapeHtml(request.donors)}</div>
                     </div>
                 </div>
@@ -557,9 +585,19 @@ function createDonationHistoryContent(request, donations) {
 
     if (donations.length > 0) {
         donations.forEach((donation, index) => {
+            // reopenCycle is stored on each donation_log (0 = first cycle, 1 = second cycle, etc.)
+            const cycle = donation.reopenCycle !== undefined ? donation.reopenCycle + 1 : '?';
+            const cycleLabel = reopenCount > 0
+                ? `<div class="info-row">
+                        <div class="info-label">Reopen Cycle:</div>
+                        <div class="info-value"><span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:4px;font-size:12px;">Cycle ${cycle}</span></div>
+                   </div>`
+                : '';
+
             html += `
                 <div class="info-card">
                     <h3>🩸 Donation #${index + 1}</h3>
+                    ${cycleLabel}
                     <div class="info-row">
                         <div class="info-label">Donor Name:</div>
                         <div class="info-value"><strong>${escapeHtml(donation.donorName || 'Anonymous')}</strong></div>
