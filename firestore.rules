@@ -28,17 +28,29 @@ service cloud.firestore {
 
     // Users collection: 
     // Users can read their own profile. Admin can read all.
+    // A user can also read a document where phoneNumber matches their own — required for
+    // the deduplication query that prevents duplicate accounts when Auth UID changes.
     match /users/{userId} {
-      allow read: if isAuthenticated() && (request.auth.uid == userId || isSuperuser());
+      allow read: if isAuthenticated() && (
+                    request.auth.uid == userId ||
+                    isSuperuser() ||
+                    resource.data.phoneNumber == request.auth.token.phone_number
+                  );
       allow write: if isSuperuser(); // Only superuser can change roles/status
       
       // Allow user to create their own profile during registration
       allow create: if isAuthenticated() && request.auth.uid == userId;
       
       // Allow user to update their own profile (displayName during setup, lastLogin on login)
-      allow update: if isAuthenticated() && request.auth.uid == userId 
-                    && (resource.data.displayName == null 
-                        || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin']));
+      // Also allow update if phoneNumber matches — so lastLogin can be updated on phone-matched docs
+      allow update: if isAuthenticated() && (
+                      (request.auth.uid == userId 
+                        && (resource.data.displayName == null 
+                            || request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin'])))
+                      ||
+                      (resource.data.phoneNumber == request.auth.token.phone_number
+                        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['lastLogin']))
+                    );
     }
 
     // Emergency Requests collection

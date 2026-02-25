@@ -201,17 +201,20 @@ function showUserProfile(user) {
 
     // Logout functionality
     logoutBtn.addEventListener('click', async () => {
-        if (confirm('Are you sure you want to logout?')) {
-            const success = await signOut();
-            if (success) {
-                hideUserProfile();
-                showSuccessToast('Logged out successfully');
-                // Optionally reload the page
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+        showConfirmPopup({
+            title: 'Confirm Logout',
+            message: 'Are you sure you want to log out?',
+            confirmLabel: 'Yes, Logout',
+            cancelLabel: 'Cancel',
+            onConfirm: async () => {
+                const success = await signOut();
+                if (success) {
+                    hideUserProfile();
+                    showSuccessToast('Logged out successfully');
+                    setTimeout(() => { location.reload(); }, 1000);
+                }
             }
-        }
+        });
     });
 
     // Assemble components
@@ -248,6 +251,115 @@ function getInitials(name) {
     } else {
         return parts[0].substring(0, 2).toUpperCase();
     }
+}
+
+// ============================================================================
+// CUSTOM CONFIRM POPUP
+// ============================================================================
+function showConfirmPopup({ title, message, confirmLabel = 'Confirm', cancelLabel = 'Cancel', onConfirm }) {
+    // Remove any existing popup
+    const existing = document.getElementById('customConfirmPopup');
+    if (existing) existing.remove();
+
+    const overlay = document.createElement('div');
+    overlay.id = 'customConfirmPopup';
+    overlay.style.cssText = `
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        animation: fadeInOverlay 0.2s ease;
+    `;
+
+    overlay.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 16px;
+            max-width: 380px;
+            width: 90%;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.35);
+            animation: popIn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+        ">
+            <!-- Header with gradient -->
+            <div style="
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                padding: 20px 24px;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+            ">
+                <div style="
+                    width: 40px; height: 40px;
+                    background: rgba(255,255,255,0.2);
+                    border-radius: 50%;
+                    display: flex; align-items: center; justify-content: center;
+                    flex-shrink: 0;
+                ">
+                    <svg style="width:20px;height:20px;color:white;" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                    </svg>
+                </div>
+                <h3 style="margin:0; font-size:18px; font-weight:700; color:white;">${escapeHtml(title)}</h3>
+            </div>
+
+            <!-- Body -->
+            <div style="padding: 24px;">
+                <p style="margin: 0 0 24px; color: #4b5563; font-size: 15px; line-height: 1.6;">${escapeHtml(message)}</p>
+
+                <div style="display: flex; gap: 12px;">
+                    <button id="confirmPopupCancel" style="
+                        flex: 1; padding: 11px 16px;
+                        border: 1.5px solid #d1d5db;
+                        border-radius: 8px;
+                        background: white;
+                        color: #374151;
+                        font-size: 14px;
+                        font-weight: 500;
+                        cursor: pointer;
+                        transition: background 0.2s;
+                    ">${escapeHtml(cancelLabel)}</button>
+
+                    <button id="confirmPopupOk" style="
+                        flex: 1; padding: 11px 16px;
+                        border: none;
+                        border-radius: 8px;
+                        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+                        color: white;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+                        transition: opacity 0.2s;
+                    ">${escapeHtml(confirmLabel)}</button>
+                </div>
+            </div>
+        </div>
+        <style>
+            @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
+            @keyframes popIn { from { transform: scale(0.85); opacity:0; } to { transform: scale(1); opacity:1; } }
+            #confirmPopupCancel:hover { background: #f3f4f6 !important; }
+            #confirmPopupOk:hover { opacity: 0.9 !important; }
+        </style>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cancelBtn = overlay.querySelector('#confirmPopupCancel');
+    const okBtn = overlay.querySelector('#confirmPopupOk');
+
+    function close() { overlay.remove(); }
+
+    cancelBtn.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+    okBtn.addEventListener('click', () => {
+        close();
+        if (typeof onConfirm === 'function') onConfirm();
+    });
 }
 
 // ============================================================================

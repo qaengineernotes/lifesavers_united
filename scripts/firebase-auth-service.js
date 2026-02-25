@@ -271,9 +271,24 @@ export function showPhoneLoginModal() {
 
         let confirmationResult = null;
 
+        // Helper: show inline error in the given container
+        function showInlineError(boxId, textId, message) {
+            const box = modal.querySelector('#' + boxId);
+            const txt = modal.querySelector('#' + textId);
+            if (box && txt) {
+                txt.textContent = message;
+                box.style.display = 'flex';
+            }
+        }
+        function hideInlineError(boxId) {
+            const box = modal.querySelector('#' + boxId);
+            if (box) box.style.display = 'none';
+        }
+
         // Send OTP
         phoneForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideInlineError('phoneError');
 
             let phoneNumber = phoneInput.value.trim();
 
@@ -293,10 +308,12 @@ export function showPhoneLoginModal() {
                 phoneForm.style.display = 'none';
                 otpForm.style.display = 'block';
 
-
             } catch (error) {
                 console.error('Error sending OTP:', error);
-                alert('Failed to send OTP. Please try again.');
+                const msg = error.code === 'auth/too-many-requests'
+                    ? 'Too many attempts. Please wait a few minutes and try again.'
+                    : 'Failed to send OTP. Please check the number and try again.';
+                showInlineError('phoneError', 'phoneErrorText', msg);
                 sendOtpBtn.disabled = false;
                 sendOtpBtn.textContent = 'Send OTP';
 
@@ -310,11 +327,12 @@ export function showPhoneLoginModal() {
         // Verify OTP
         otpForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideInlineError('otpError');
 
             const otp = otpInput.value.trim();
 
             if (otp.length !== 6) {
-                alert('Please enter a valid 6-digit OTP');
+                showInlineError('otpError', 'otpErrorText', 'Please enter a valid 6-digit OTP.');
                 return;
             }
 
@@ -324,8 +342,6 @@ export function showPhoneLoginModal() {
             try {
                 const result = await confirmationResult.confirm(otp);
                 const user = result.user;
-
-
 
                 // Check if new user needs to enter name
                 const userProfile = await getUserProfile(user.uid, user.phoneNumber);
@@ -350,11 +366,18 @@ export function showPhoneLoginModal() {
 
                 // Check if it's a permission error
                 if (error.message && error.message.includes('Permission denied')) {
-                    alert('Authentication successful, but there was a permission error. Please contact support.');
-                    modal.remove();
-                    resolve(null);
+                    showInlineError('otpError', 'otpErrorText', 'Authentication successful, but a permission error occurred. Please contact support.');
+                    setTimeout(() => { modal.remove(); resolve(null); }, 3000);
+                } else if (error.code === 'auth/invalid-verification-code') {
+                    showInlineError('otpError', 'otpErrorText', 'Incorrect OTP. Please check and try again.');
+                    verifyOtpBtn.disabled = false;
+                    verifyOtpBtn.textContent = 'Verify OTP';
+                } else if (error.code === 'auth/code-expired') {
+                    showInlineError('otpError', 'otpErrorText', 'OTP has expired. Please go back and request a new one.');
+                    verifyOtpBtn.disabled = false;
+                    verifyOtpBtn.textContent = 'Verify OTP';
                 } else {
-                    alert('Invalid OTP. Please try again.');
+                    showInlineError('otpError', 'otpErrorText', 'Verification failed. Please try again.');
                     verifyOtpBtn.disabled = false;
                     verifyOtpBtn.textContent = 'Verify OTP';
                 }
@@ -418,6 +441,12 @@ function createLoginModal() {
                         style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Enter 10-digit mobile number</p>
                 </div>
+
+                <!-- Inline error for phone step -->
+                <div id="phoneError" style="display:none; align-items: center; gap: 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+                    <svg style="width:16px;height:16px;flex-shrink:0;color:#dc2626;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    <span id="phoneErrorText" style="font-size:13px;color:#dc2626;font-weight:500;"></span>
+                </div>
                 
                 <div id="recaptcha-container" style="margin-bottom: 20px;"></div>
                 
@@ -440,6 +469,12 @@ function createLoginModal() {
                     <input type="text" id="otpCode" placeholder="123456" maxlength="6" required
                         style="width: 100%; padding: 12px 16px; border: 2px solid #d1d5db; border-radius: 8px; font-size: 20px; letter-spacing: 4px; text-align: center; box-sizing: border-box;">
                     <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">Enter the 6-digit code sent to your phone</p>
+                </div>
+
+                <!-- Inline error for OTP step -->
+                <div id="otpError" style="display:none; align-items: center; gap: 8px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px;">
+                    <svg style="width:16px;height:16px;flex-shrink:0;color:#dc2626;" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                    <span id="otpErrorText" style="font-size:13px;color:#dc2626;font-weight:500;"></span>
                 </div>
                 
                 <button type="submit" id="verifyOtpBtn" style="width: 100%; padding: 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-weight: 500; cursor: pointer;">
