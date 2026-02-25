@@ -9,7 +9,7 @@ import {
     updateProfile
 } from './firebase-config.js';
 
-import { db, doc, setDoc, getDoc, onSnapshot, serverTimestamp } from './firebase-config.js';
+import { db, doc, setDoc, getDoc, getDocs, onSnapshot, serverTimestamp, collection, query, where, updateDoc } from './firebase-config.js';
 
 // Current user state
 let currentUser = null;
@@ -31,20 +31,65 @@ export function initializeAuth() {
         if (user) {
             // User is signed in
 
-            // Set up real-time listener for the user's Firestore document
+            // First, try to find the user's Firestore document by UID
             const userRef = doc(db, 'users', user.uid);
-            userDocUnsubscribe = onSnapshot(userRef, async (docSnap) => {
-                if (docSnap.exists()) {
-                    // Update current user state with Firestore data
-                    const userData = docSnap.data();
-                    currentUser = {
-                        uid: user.uid,
-                        phoneNumber: user.phoneNumber,
-                        ...userData
-                    };
+            const uidSnap = await getDoc(userRef);
 
+            if (uidSnap.exists()) {
+                // Document found by UID — set up real-time listener on it
+                userDocUnsubscribe = onSnapshot(userRef, async (docSnap) => {
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        currentUser = {
+                            uid: user.uid,
+                            phoneNumber: user.phoneNumber,
+                            ...userData
+                        };
+                    } else {
+                        currentUser = {
+                            uid: user.uid,
+                            phoneNumber: user.phoneNumber,
+                            displayName: null,
+                            status: 'pending',
+                            role: 'volunteer',
+                            isNewUser: true
+                        };
+                    }
+                    authStateListeners.forEach(callback => callback(currentUser));
+                }, (error) => {
+                    console.error('Error listening to user doc:', error);
+                });
+            } else {
+                // No document found by UID — try to find by phoneNumber
+                const phoneNorm = user.phoneNumber;
+                const q = query(collection(db, 'users'), where('phoneNumber', '==', phoneNorm));
+                const phoneSnap = await getDocs(q);
+
+                if (!phoneSnap.empty) {
+                    // Found an existing document with this phone number
+                    const existingDoc = phoneSnap.docs[0];
+                    const existingRef = existingDoc.ref;
+
+                    // Update lastLogin on the existing document
+                    await updateDoc(existingRef, { lastLogin: serverTimestamp() });
+
+                    // Set up real-time listener on the EXISTING document
+                    userDocUnsubscribe = onSnapshot(existingRef, async (docSnap) => {
+                        if (docSnap.exists()) {
+                            const userData = docSnap.data();
+                            currentUser = {
+                                uid: user.uid,
+                                firestoreDocId: existingDoc.id,
+                                phoneNumber: user.phoneNumber,
+                                ...userData
+                            };
+                        }
+                        authStateListeners.forEach(callback => callback(currentUser));
+                    }, (error) => {
+                        console.error('Error listening to user doc (phone-matched):', error);
+                    });
                 } else {
-                    // Document doesn't exist yet (new user awaiting profile creation)
+                    // Truly new user — no document by UID or phone number
                     currentUser = {
                         uid: user.uid,
                         phoneNumber: user.phoneNumber,
@@ -53,14 +98,9 @@ export function initializeAuth() {
                         role: 'volunteer',
                         isNewUser: true
                     };
-
+                    authStateListeners.forEach(callback => callback(currentUser));
                 }
-
-                // Notify all listeners of the updated user state
-                authStateListeners.forEach(callback => callback(currentUser));
-            }, (error) => {
-                console.error('Error listening to user doc:', error);
-            });
+            }
         } else {
             // User is signed out
             currentUser = null;
@@ -107,11 +147,12 @@ export function isAuthenticated() {
 // ============================================================================
 async function getUserProfile(uid, phoneNumber) {
     try {
+        // Step 1: Try to find document by Firebase Auth UID
         const userRef = doc(db, 'users', uid);
         const userDoc = await getDoc(userRef);
 
         if (userDoc.exists()) {
-            // Update last login
+            // Found by UID — update last login and return
             await setDoc(userRef, {
                 lastLogin: serverTimestamp()
             }, { merge: true });
@@ -121,15 +162,38 @@ async function getUserProfile(uid, phoneNumber) {
                 phoneNumber: phoneNumber,
                 ...userDoc.data()
             };
-        } else {
-            // User doesn't exist - will be created after name input
+        }
+
+        // Step 2: Not found by UID — search by phone number to avoid creating duplicates
+        console.log('No user doc found by UID, searching by phone number:', phoneNumber);
+        const q = query(collection(db, 'users'), where('phoneNumber', '==', phoneNumber));
+        const phoneSnap = await getDocs(q);
+
+        if (!phoneSnap.empty) {
+            // Existing user found by phone number (UID may have changed)
+            const existingDoc = phoneSnap.docs[0];
+            const existingRef = existingDoc.ref;
+
+            // Update lastLogin on the original document
+            await updateDoc(existingRef, { lastLogin: serverTimestamp() });
+
+            console.log('✅ Found existing user by phone number, doc ID:', existingDoc.id);
             return {
                 uid: uid,
+                firestoreDocId: existingDoc.id,
                 phoneNumber: phoneNumber,
-                displayName: null,
-                isNewUser: true
+                ...existingDoc.data()
             };
         }
+
+        // Step 3: Truly new user — no document by UID or phone
+        return {
+            uid: uid,
+            phoneNumber: phoneNumber,
+            displayName: null,
+            isNewUser: true
+        };
+
     } catch (error) {
         console.error('Error fetching user profile:', error);
 
