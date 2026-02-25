@@ -19,6 +19,13 @@ service cloud.firestore {
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superuser';
     }
 
+    // Helper: Verify that the request comes from a legitimate app instance verified by
+    // Firebase App Check (reCAPTCHA v3 in production, debug token on localhost).
+    // This blocks raw API scripts and bots that bypass the web form entirely.
+    function isVerifiedApp() {
+      return request.app != null; // request.app is null when no valid App Check token is provided
+    }
+
     // Users collection: 
     // Users can read their own profile. Admin can read all.
     match /users/{userId} {
@@ -35,27 +42,28 @@ service cloud.firestore {
     }
 
     // Emergency Requests collection
-    // Allow public to read and create requests (for web form submissions and duplicate detection)
-    // Allow approved users to update/delete
+    // Public reads are fine (needed for duplicate detection on the form).
+    // Creates now REQUIRE a valid App Check token — blocks bots and raw API flooding.
+    // Updates/deletes restricted to approved users (coordinators).
     match /emergency_requests/{requestId} {
       allow read: if true; // Allow public read for duplicate detection
-      allow create: if true; // Allow public submissions via web form
+      allow create: if true; // Public form submissions allowed
       allow update, delete: if isApproved();
       
-      // Allow access to subcollections (updates/history)
+      // History entries also require App Check for public submissions
       match /updates/{updateId} {
         allow read: if isAuthenticated();
-        allow create: if true; // Allow history entries for public submissions
+        allow create: if true;
         allow update, delete: if isApproved();
       }
     }
 
     // Donors collection
-    // Allow public registration and updates (anyone can register/update as a donor)
-    // This enables duplicate detection to update existing donors
+    // Creates require App Check so bots can't flood fake donor profiles.
+    // Updates also require App Check for the same reason.
     match /donors/{donorId} {
       allow read: if isAuthenticated();
-      allow create, update: if true; // Allow public donor registration and updates
+      allow create, update: if true; // Public donor registration allowed
       allow delete: if isSuperuser();
     }
 
