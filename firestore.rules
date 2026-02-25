@@ -63,7 +63,8 @@ service cloud.firestore {
     // Updates also require App Check for the same reason.
     match /donors/{donorId} {
       allow read: if isAuthenticated();
-      allow create, update: if true; // Public donor registration allowed
+      allow create: if true; // Public donor registration allowed
+      allow update: if isSuperuser(); // Only superuser can edit donor profiles
       allow delete: if isSuperuser();
     }
 

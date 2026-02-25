@@ -1859,15 +1859,34 @@ function showDonationPopup(requestData) {
                 </div>
             </div>
             <div id="donorDetailsSection" style="display: none; margin-bottom: 24px;">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Donor Name *</label>
-                    <input type="text" id="donorName" placeholder="Enter donor name or 'Unknown'" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
+                <div style="margin-bottom: 16px; position: relative;">
+                    <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">
+                        Donor Name *
+                        <span style="font-weight: 400; color: #6b7280; font-size: 11px; margin-left: 4px;">(type to search from donor list)</span>
+                    </label>
+                    <input type="text" id="donorName"
+                        placeholder="Type name to search donors, or enter manually..."
+                        autocomplete="off"
+                        style="width: 100%; box-sizing: border-box; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; outline: none; transition: border-color 0.2s;">
+                    <!-- Autocomplete dropdown -->
+                    <div id="donorNameDropdown" style="
+                        display: none; position: absolute; top: 100%; left: 0; right: 0;
+                        background: #fff; border: 1.5px solid #dc2626; border-top: none;
+                        border-radius: 0 0 8px 8px; max-height: 220px; overflow-y: auto;
+                        z-index: 1000002; box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+                    "></div>
+                    <!-- Linked donor badge -->
+                    <div id="donorLinkedBadge" style="display:none; margin-top:6px; font-size:12px; font-weight:600; color:#059669;">
+                        ✅ <span id="donorLinkedBadgeText"></span>
+                    </div>
+                    <input type="hidden" id="donorLinkedId">
                 </div>
                 <div>
                     <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Contact (Optional)</label>
                     <input type="text" id="donorContact" placeholder="Phone number or email" style="width: 100%; padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 8px;">
                 </div>
             </div>
+
             
             <div id="closureReasonSection" style="display: none; margin-bottom: 24px;">
                 <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Closure Reason *</label>
@@ -1883,7 +1902,100 @@ function showDonationPopup(requestData) {
         modal.appendChild(modalContent);
         document.body.appendChild(modal);
 
+        // ── Donor Name Live Search ────────────────────────────────────────────
+        (function initDonorNameSearch() {
+            const nameInput = document.getElementById('donorName');
+            const dropdown = document.getElementById('donorNameDropdown');
+            const contactInput = document.getElementById('donorContact');
+            const badge = document.getElementById('donorLinkedBadge');
+            const badgeText = document.getElementById('donorLinkedBadgeText');
+            const linkedId = document.getElementById('donorLinkedId');
+            if (!nameInput || !dropdown) return;
+
+            let _timer = null;
+            let _cache = null;
+
+            async function getDonors() {
+                if (_cache) return _cache;
+                try {
+                    if (firebaseDataService && typeof firebaseDataService.getAllDonors === 'function') {
+                        _cache = await firebaseDataService.getAllDonors();
+                    } else {
+                        // firebase-config.js re-exports db, collection, getDocs at the correct version
+                        const cfg = await import('./firebase-config.js');
+                        const snap = await cfg.getDocs(cfg.collection(cfg.db, 'donors'));
+                        _cache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    }
+                } catch (e) {
+                    console.error('Donor search error:', e);
+                    _cache = [];
+                }
+                return _cache;
+            }
+
+
+            function closeDropdown() {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+            }
+
+            function pickDonor(d) {
+                nameInput.value = d.fullName || '';
+                contactInput.value = d.contactNumber || '';
+                if (linkedId) linkedId.value = d.id || '';
+                const info = [d.fullName, d.bloodGroup, d.city].filter(Boolean).join(' · ');
+                if (badgeText) badgeText.textContent = 'Linked: ' + info;
+                if (badge) badge.style.display = 'block';
+                closeDropdown();
+            }
+
+            nameInput.addEventListener('input', () => {
+                if (badge) badge.style.display = 'none';
+                if (linkedId) linkedId.value = '';
+                clearTimeout(_timer);
+                const term = nameInput.value.trim().toLowerCase();
+                if (term.length < 2) { closeDropdown(); return; }
+
+                _timer = setTimeout(async () => {
+                    const all = await getDonors();
+                    const hits = all.filter(d => (d.fullName || '').toLowerCase().includes(term)).slice(0, 8);
+
+                    if (hits.length === 0) {
+                        dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:13px;">No donor found — you can still type the name manually</div>';
+                        dropdown.style.display = 'block';
+                        return;
+                    }
+
+                    dropdown.innerHTML = hits.map((d, i) =>
+                        '<div data-idx="' + i + '" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;background:#fff" onmouseover="this.style.background=\'#fef2f2\'" onmouseout="this.style.background=\'#fff\'">' +
+                        '<div style="width:32px;height:32px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">' + (d.bloodGroup || '?') + '</div>' +
+                        '<div>' +
+                        '<div style="font-weight:600;font-size:14px;color:#1f2937;">' + escapeHtml(d.fullName || 'Unknown') + '</div>' +
+                        '<div style="font-size:11px;color:#6b7280;">' + (d.contactNumber ? '📞 ' + escapeHtml(d.contactNumber) : '') + (d.city ? ' · 📍 ' + escapeHtml(d.city) : '') + '</div>' +
+                        '</div></div>'
+                    ).join('');
+
+                    dropdown.querySelectorAll('[data-idx]').forEach(el => {
+                        el.addEventListener('click', () => pickDonor(hits[+el.getAttribute('data-idx')]));
+                    });
+                    dropdown.style.display = 'block';
+                }, 300);
+            });
+
+            document.addEventListener('click', function outsideClick(e) {
+                if (!nameInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    closeDropdown();
+                    document.removeEventListener('click', outsideClick);
+                }
+            });
+
+            nameInput.addEventListener('focus', () => nameInput.style.borderColor = '#dc2626');
+            nameInput.addEventListener('blur', () => nameInput.style.borderColor = '#d1d5db');
+        })();
+        // ── End Donor Name Live Search ─────────────────────────────────────────
+
         // Handle unit button clicks
+
         let selectedUnits = null;
         modalContent.querySelectorAll('.unit-btn').forEach(btn => {
             btn.addEventListener('click', () => {
