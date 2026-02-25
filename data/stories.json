@@ -66,14 +66,31 @@
             "motivation": "Blood cannot be manufactured or replaced by technology. It can only come from one human being to another.",
             "image": "/imgs/Naman-Kothari.jpeg",
             "featured": true,
-            "testimonial": "You don't need a medical degree to save lives — sometimes, you just need the courage to give."
+            "testimonial": "You don't need a medical degree to save lives, sometimes, you just need the courage to give."
+        },
+        {
+            "id": 5,
+            "type": "patient",
+            "title": "A Patient's Gratitude: How LifeSavers United Stood by Me During Bypass Surgery",
+            "name": "Ashish Trivedi",
+            "donationCount": null,
+            "donationType": "Whole Blood",
+            "yearsActive": null,
+            "location": "Ahmedabad",
+            "date": "2026-02-25",
+            "excerpt": "When I needed bypass surgery at EPIC Hospital, <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> arranged blood within hours through a stranger's kindness, letting my family focus on what mattered most: my recovery.",
+            "fullStory": "When I had to undergo bypass surgery at EPIC Hospital, it was a challenging and emotional time for me and my family. Along with preparing for the surgery, we were informed about the hospital policy requiring two bottles of blood to be arranged.\n\nMy daughter reached out to her friend Naman, and the request was immediately shared in the <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> WhatsApp group. Within a very short time, Gopan bhai stepped forward and helped arrange the blood donation. I was deeply touched by the kindness and prompt support shown by someone who didn't even know me personally.\n\nBecause of this timely help, everything was managed smoothly, and my family could focus on my recovery without additional stress. What makes this experience even more meaningful is that I have been a regular blood donor myself.\n\nI have always believed that donating blood is a small act that can save lives, and this time, I experienced that truth personally.\n\n<a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> is truly a blessing for people in need. It is not just a group, but a community built on compassion and humanity. I will always remain grateful for the support I received during one of the most critical moments of my life.\n\nThank you once again, <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>.",
+            "motivation": "I have always believed that donating blood is a small act that can save lives, and this time, I experienced that truth personally.",
+            "image": "/imgs/Ashish Trivedi.jpeg",
+            "featured": true,
+            "testimonial": "<a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> is not just a group, but a community built on compassion and humanity. I will always remain grateful for the support I received during one of the most critical moments of my life."
         }
     ],
     "stats": {
-        "totalStories": 4,
+        "totalStories": 5,
         "totalLivesSaved": 0,
         "totalDonors": 4,
-        "totalPatients": 0,
+        "totalPatients": 1,
         "totalEmergencies": 0
     }
 }
