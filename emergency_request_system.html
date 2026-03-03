@@ -209,6 +209,7 @@
             console.error('Failed to load user profile UI:', error);
         });
     </script>
+    <link rel="stylesheet" href="css/premium-filters.css" />
 </head>
 
 <body class="bg-background">
@@ -372,153 +373,132 @@
                 </div>
             </div>
 
-            <!-- Search and Filter Controls -->
-            <div class="mb-8">
-                <!-- Main Search Bar -->
-                <div class="bg-white rounded-2xl shadow-card p-5 mb-4">
-                    <div class="relative">
-                        <input type="text" id="searchInput" placeholder="🔍 Search by patient name or contact number..."
-                            class="w-full px-6 py-4 text-lg border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all placeholder-gray-400">
+            <!-- Premium Search & Filter Bar -->
+            <div class="search-filters-combined">
+                <div class="search-filters-row">
+                    <!-- Search Input -->
+                    <div class="search-wrapper">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="searchInput" class="search-input-premium"
+                            placeholder="Search by name or contact..." autocomplete="off" />
+                        <button id="clearSearchBtn" class="clear-search-btn" title="Clear search">✕</button>
                     </div>
+
+                    <!-- Blood Group custom dropdown -->
+                    <div class="custom-dropdown" id="dropBloodGroup" data-filter="bloodGroup">
+                        <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="cdd-label">All Blood Groups</span>
+                            <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+                        <ul class="cdd-panel" role="listbox">
+                            <li class="cdd-option selected" data-value="all" role="option">All Blood Groups</li>
+                            <li class="cdd-option" data-value="A+" role="option">🩸 A+</li>
+                            <li class="cdd-option" data-value="A-" role="option">🩸 A−</li>
+                            <li class="cdd-option" data-value="B+" role="option">🩸 B+</li>
+                            <li class="cdd-option" data-value="B-" role="option">🩸 B−</li>
+                            <li class="cdd-option" data-value="AB+" role="option">🩸 AB+</li>
+                            <li class="cdd-option" data-value="AB-" role="option">🩸 AB−</li>
+                            <li class="cdd-option" data-value="O+" role="option">🩸 O+</li>
+                            <li class="cdd-option" data-value="O-" role="option">🩸 O−</li>
+                            <li class="cdd-option" data-value="any" role="option">🩸 Any</li>
+                        </ul>
+                        <select id="bloodGroupFilter" style="display:none;" aria-hidden="true">
+                            <option value="all">All Blood Groups</option>
+                            <option value="A+">A+</option>
+                            <option value="A-">A-</option>
+                            <option value="B+">B+</option>
+                            <option value="B-">B-</option>
+                            <option value="AB+">AB+</option>
+                            <option value="AB-">AB-</option>
+                            <option value="O+">O+</option>
+                            <option value="O-">O-</option>
+                            <option value="any">Any</option>
+                        </select>
+                    </div>
+
+                    <!-- Urgency custom dropdown -->
+                    <div class="custom-dropdown" id="dropUrgency" data-filter="urgency">
+                        <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="cdd-label">All Urgency</span>
+                            <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+                        <ul class="cdd-panel" role="listbox">
+                            <li class="cdd-option selected" data-value="all" role="option">All Urgency</li>
+                            <li class="cdd-option" data-value="critical" role="option">🚨 Critical</li>
+                            <li class="cdd-option" data-value="urgent" role="option">⚡ Urgent</li>
+                            <li class="cdd-option" data-value="normal" role="option">📅 Normal</li>
+                        </ul>
+                        <select id="urgencyFilter" style="display:none;" aria-hidden="true">
+                            <option value="all">All Urgency</option>
+                            <option value="critical">Critical</option>
+                            <option value="urgent">Urgent</option>
+                            <option value="normal">Normal</option>
+                        </select>
+                    </div>
+
+                    <!-- Hospital custom dropdown -->
+                    <div class="custom-dropdown" id="dropHospital" data-filter="hospital">
+                        <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                            <span class="cdd-label">All Hospitals</span>
+                            <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5">
+                                <polyline points="6 9 12 15 18 9" />
+                            </svg>
+                        </button>
+                        <ul class="cdd-panel" role="listbox">
+                            <li class="cdd-option selected" data-value="all" role="option">All Hospitals</li>
+                        </ul>
+                        <select id="hospitalFilter" style="display:none;" aria-hidden="true">
+                            <option value="all">All Hospitals</option>
+                        </select>
+                    </div>
+
+                    <button id="clearFiltersBtn" class="clear-filters-btn-premium">
+                        Clear All
+                    </button>
                 </div>
 
-                <!-- Quick Filters & Sort -->
-                <div class="bg-white rounded-2xl shadow-card p-5">
-                    <div class="flex flex-wrap items-center gap-3">
-                        <!-- Sort Indicator -->
-                        <div class="flex items-center gap-2 text-sm text-gray-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" />
-                            </svg>
-                            <span class="font-medium">Sort:</span>
-                        </div>
+                <!-- Results info Display -->
+                <div id="activeFiltersDisplay" class="flex flex-wrap gap-2 mt-4 empty:hidden"></div>
+            </div>
 
-                        <!-- Sort Buttons -->
-                        <button class="sort-chip active" data-sort="latest">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Latest
-                        </button>
-                        <button class="sort-chip" data-sort="oldest">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Oldest
-                        </button>
-                        <button class="sort-chip" data-sort="urgency">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
-                            Urgency
-                        </button>
-
-                        <div class="h-6 w-px bg-gray-300 mx-2"></div>
-
-                        <!-- Filter Toggle Button -->
-                        <button id="filterToggleBtn" class="filter-toggle-btn">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                            </svg>
-                            Filters
-                            <span id="filterCountBadge"
-                                class="hidden ml-1 px-2 py-0.5 bg-primary text-white text-xs rounded-full">0</span>
-                        </button>
-
-                        <!-- Clear All -->
-                        <button id="clearFiltersBtn"
-                            class="ml-auto text-sm text-gray-500 hover:text-primary transition-colors flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                            Clear All
-                        </button>
-                    </div>
-
-                    <!-- Active Filters Display -->
-                    <div id="activeFiltersDisplay" class="flex flex-wrap gap-3 mt-4 empty:hidden">
-                        <!-- Active filter tags will be inserted here -->
-                    </div>
-
-                    <!-- Collapsible Filter Panel -->
-                    <div id="filterPanel" class="hidden mt-4 pt-4 border-t border-gray-200">
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                            <!-- Blood Group Filter -->
-                            <div>
-                                <label
-                                    class="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Blood
-                                    Group</label>
-                                <select id="bloodGroupFilter" class="filter-select">
-                                    <option value="all">All Blood Groups</option>
-                                    <option value="A+">A+</option>
-                                    <option value="A-">A-</option>
-                                    <option value="B+">B+</option>
-                                    <option value="B-">B-</option>
-                                    <option value="AB+">AB+</option>
-                                    <option value="AB-">AB-</option>
-                                    <option value="O+">O+</option>
-                                    <option value="O-">O-</option>
-                                    <option value="any">Any</option>
-                                </select>
-                            </div>
-
-                            <!-- Urgency Filter -->
-                            <div>
-                                <label
-                                    class="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Urgency</label>
-                                <select id="urgencyFilter" class="filter-select">
-                                    <option value="all">All Urgency Levels</option>
-                                    <option value="critical">Critical</option>
-                                    <option value="urgent">Urgent</option>
-                                    <option value="normal">Normal</option>
-                                </select>
-                            </div>
-
-                            <!-- Hospital Filter -->
-                            <div>
-                                <label
-                                    class="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Hospital</label>
-                                <select id="hospitalFilter" class="filter-select">
-                                    <option value="all">All Hospitals</option>
-                                    <!-- Will be populated dynamically -->
-                                </select>
-                            </div>
-
-                            <!-- Status Filter -->
-                            <div>
-                                <label
-                                    class="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Status</label>
-                                <select id="statusFilter" class="filter-select">
-                                    <option value="open-verified-reopened">Active (Open, Reopened & Verified)</option>
-                                    <option value="all">All Status</option>
-                                    <option value="open">Open Only</option>
-                                    <option value="reopened">Reopened Only</option>
-                                    <option value="verified">Verified Only</option>
-                                </select>
-                            </div>
-
-                            <!-- Verified By Filter -->
-                            <div>
-                                <label
-                                    class="block text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wide">Verified
-                                    By</label>
-                                <select id="verifiedByFilter" class="filter-select">
-                                    <option value="all">All Verifiers</option>
-                                    <!-- Will be populated dynamically -->
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <!-- Sort Section (Refined Chips) -->
+            <div class="sort-section-premium">
+                <span class="sort-label-premium">Sort By:</span>
+                <button class="sort-chip-premium active" data-sort="latest">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Latest
+                </button>
+                <button class="sort-chip-premium" data-sort="oldest">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Oldest
+                </button>
+                <button class="sort-chip-premium" data-sort="urgency">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    Urgency
+                </button>
             </div>
 
 

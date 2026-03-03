@@ -1,5 +1,5 @@
 // ==========================================
-// EMERGENCY REQUEST FILTER, SORT & SEARCH
+// EMERGENCY REQUEST FILTER, SORT & SEARCH (PREMIUM REDESIGN)
 // ==========================================
 
 // Store all requests for filtering/sorting
@@ -8,70 +8,62 @@ let currentFilters = {
     search: '',
     bloodGroup: 'all',
     urgency: 'all',
-    hospital: 'all',
-    status: 'open-verified-reopened', // Default to show Open, Verified & Reopened
-    verifiedBy: 'all' // Verified By filter
+    hospital: 'all'
 };
 let currentSort = 'latest';
 
 // Initialize filter/sort system
 function initializeFilterSort() {
     const searchInput = document.getElementById('searchInput');
-    const sortChips = document.querySelectorAll('.sort-chip');
+    const clearSearchBtn = document.getElementById('clearSearchBtn');
+    const sortChips = document.querySelectorAll('.sort-chip-premium');
     const bloodGroupFilter = document.getElementById('bloodGroupFilter');
     const urgencyFilter = document.getElementById('urgencyFilter');
     const hospitalFilter = document.getElementById('hospitalFilter');
-    const statusFilter = document.getElementById('statusFilter');
-    const verifiedByFilter = document.getElementById('verifiedByFilter');
-    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
-    const filterToggleBtn = document.getElementById('filterToggleBtn');
-    const filterPanel = document.getElementById('filterPanel');
-    const filterCountBadge = document.getElementById('filterCountBadge');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn'); // Clear All
 
     if (!searchInput || !sortChips.length) {
-
+        console.warn('Search or Sort elements not found');
         return;
     }
 
     // Search input with debounce
     let searchTimeout;
     searchInput.addEventListener('input', (e) => {
+        const value = e.target.value.trim();
+        if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('show', value.length > 0);
+        }
+
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            currentFilters.search = e.target.value.toLowerCase().trim();
-
+            currentFilters.search = value.toLowerCase();
             applyFiltersAndSort();
         }, 300);
     });
 
+    // Clear search button
+    if (clearSearchBtn) {
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearchBtn.classList.remove('show');
+            currentFilters.search = '';
+            applyFiltersAndSort();
+            searchInput.focus();
+        });
+    }
+
     // Sort chip buttons
     sortChips.forEach(chip => {
         chip.addEventListener('click', () => {
-            // Remove active class from all chips
             sortChips.forEach(c => c.classList.remove('active'));
-            // Add active class to clicked chip
             chip.classList.add('active');
-            // Update sort
             currentSort = chip.dataset.sort;
             applyFiltersAndSort();
         });
     });
 
-    // Filter toggle button
-    if (filterToggleBtn && filterPanel) {
-        filterToggleBtn.addEventListener('click', () => {
-            const isHidden = filterPanel.classList.contains('hidden');
-            if (isHidden) {
-                filterPanel.classList.remove('hidden');
-                filterToggleBtn.classList.add('active');
-            } else {
-                filterPanel.classList.add('hidden');
-                filterToggleBtn.classList.remove('active');
-            }
-        });
-    }
-
-    // Filter dropdowns
+    // Native Filter sync event listeners
     if (bloodGroupFilter) {
         bloodGroupFilter.addEventListener('change', (e) => {
             currentFilters.bloodGroup = e.target.value;
@@ -93,142 +85,190 @@ function initializeFilterSort() {
         });
     }
 
-    if (statusFilter) {
-        statusFilter.addEventListener('change', (e) => {
-            currentFilters.status = e.target.value;
-            applyFiltersAndSort();
-        });
-    }
-
-    if (verifiedByFilter) {
-        verifiedByFilter.addEventListener('change', (e) => {
-            currentFilters.verifiedBy = e.target.value;
-            applyFiltersAndSort();
-        });
-    }
-
     // Clear all filters
     if (clearFiltersBtn) {
         clearFiltersBtn.addEventListener('click', () => {
-            // Reset all filters
-            currentFilters = {
-                search: '',
-                bloodGroup: 'all',
-                urgency: 'all',
-                hospital: 'all',
-                status: 'open-verified-reopened',
-                verifiedBy: 'all'
-            };
-            currentSort = 'latest';
-
-            // Reset UI
-            searchInput.value = '';
-
-            // Reset sort chips
-            sortChips.forEach(c => c.classList.remove('active'));
-            document.querySelector('[data-sort="latest"]')?.classList.add('active');
-
-            // Reset filters
-            if (bloodGroupFilter) bloodGroupFilter.value = 'all';
-            if (urgencyFilter) urgencyFilter.value = 'all';
-            if (hospitalFilter) hospitalFilter.value = 'all';
-            if (statusFilter) statusFilter.value = 'open-verified-reopened';
-            if (verifiedByFilter) verifiedByFilter.value = 'all';
-
-            applyFiltersAndSort();
+            resetAllFilters();
         });
     }
+
+    setupCustomDropdowns();
+}
+
+/**
+ * Resets all filters to their default states
+ */
+function resetAllFilters() {
+    currentFilters = {
+        search: '',
+        bloodGroup: 'all',
+        urgency: 'all',
+        hospital: 'all'
+    };
+    currentSort = 'latest';
+
+    // Reset UI
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        document.getElementById('clearSearchBtn')?.classList.remove('show');
+    }
+
+    // Reset sort chips
+    const sortChips = document.querySelectorAll('.sort-chip-premium');
+    sortChips.forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-sort="latest"]')?.classList.add('active');
+
+    // Reset native selects
+    if (document.getElementById('bloodGroupFilter')) document.getElementById('bloodGroupFilter').value = 'all';
+    if (document.getElementById('urgencyFilter')) document.getElementById('urgencyFilter').value = 'all';
+    if (document.getElementById('hospitalFilter')) document.getElementById('hospitalFilter').value = 'all';
+
+    // Reset Custom Dropdowns UI
+    syncCustomDropdownsFromNative();
+
+    applyFiltersAndSort();
+}
+
+/**
+ * Custom Dropdown Logic Implementation
+ */
+function setupCustomDropdowns() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.cdd-trigger');
+        const nativeSelect = dropdown.querySelector('select');
+        const labelEl = dropdown.querySelector('.cdd-label');
+
+        if (!trigger || !nativeSelect || !labelEl) return;
+
+        // Sync initial state
+        const initialText = nativeSelect.options[nativeSelect.selectedIndex]?.text;
+        labelEl.textContent = initialText || 'Select';
+
+        // Toggle dropdown
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Close others
+            dropdowns.forEach(other => {
+                if (other !== dropdown) {
+                    other.classList.remove('active');
+                    const otherTrigger = other.querySelector('.cdd-trigger');
+                    if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            const isActive = dropdown.classList.toggle('active');
+            trigger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        });
+
+        // Option selection
+        dropdown.addEventListener('click', (e) => {
+            const option = e.target.closest('.cdd-option');
+            if (!option) return;
+
+            const value = option.dataset.value;
+            const text = option.textContent;
+
+            // Update custom UI
+            labelEl.textContent = text;
+            dropdown.querySelectorAll('.cdd-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+
+            // Sync with native select
+            if (nativeSelect.value !== value) {
+                nativeSelect.value = value;
+                nativeSelect.dispatchEvent(new Event('change'));
+            }
+
+            // Close dropdown
+            dropdown.classList.remove('active');
+            trigger.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', () => {
+        dropdowns.forEach(dropdown => {
+            dropdown.classList.remove('active');
+            const trigger = dropdown.querySelector('.cdd-trigger');
+            if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        });
+    });
+}
+
+function syncCustomDropdownsFromNative() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+    dropdowns.forEach(dropdown => {
+        const nativeSelect = dropdown.querySelector('select');
+        const labelEl = dropdown.querySelector('.cdd-label');
+        if (!nativeSelect || !labelEl) return;
+
+        const val = nativeSelect.value;
+        const text = nativeSelect.options[nativeSelect.selectedIndex]?.text;
+
+        labelEl.textContent = text;
+        dropdown.querySelectorAll('.cdd-option').forEach(opt => {
+            opt.classList.toggle('selected', opt.dataset.value === val);
+        });
+    });
 }
 
 // Store requests when loaded
 function storeRequests(requests) {
-
     allRequests = requests || [];
-
-    // Populate hospital filter dropdown
     populateHospitalFilter();
-
-    // Populate verified by filter dropdown
-    populateVerifiedByFilter();
-
-    // Apply default filters and sort
     applyFiltersAndSort();
 }
 
-// Populate hospital filter with unique hospitals
+// Populate hospital filter with unique hospitals from active requests
 function populateHospitalFilter() {
     const hospitalFilter = document.getElementById('hospitalFilter');
-    if (!hospitalFilter) return;
+    const hospitalPanel = document.querySelector('#dropHospital .cdd-panel');
+    if (!hospitalFilter || !hospitalPanel) return;
 
-    // Get unique hospitals
+    // Get unique hospitals from active requests (allRequests is now pre-filtered by the data service)
     const hospitals = [...new Set(allRequests.map(r => r.hospitalName).filter(Boolean))];
     hospitals.sort();
 
-    // Clear existing options except "All Hospitals"
+    // Clear existing
     hospitalFilter.innerHTML = '<option value="all">All Hospitals</option>';
+    hospitalPanel.innerHTML = '<li class="cdd-option selected" data-value="all" role="option">All Hospitals</li>';
 
-    // Add hospital options
     hospitals.forEach(hospital => {
+        // Native option
         const option = document.createElement('option');
         option.value = hospital;
         option.textContent = hospital;
         hospitalFilter.appendChild(option);
-    });
-}
 
-// Populate verified by filter with unique verifier names
-function populateVerifiedByFilter() {
-    const verifiedByFilter = document.getElementById('verifiedByFilter');
-    if (!verifiedByFilter) return;
-
-    // Get unique verifier names from requests
-    const verifiers = [...new Set(allRequests
-        .map(r => r.verifiedBy)
-        .filter(name => name && name.trim() !== ''))]
-        .sort();
-
-    // Clear existing options except "All Verifiers"
-    verifiedByFilter.innerHTML = '<option value="all">All Verifiers</option>';
-
-    // Add verifier options
-    verifiers.forEach(verifier => {
-        const option = document.createElement('option');
-        option.value = verifier;
-        option.textContent = verifier;
-        verifiedByFilter.appendChild(option);
+        // Custom option
+        const li = document.createElement('li');
+        li.className = 'cdd-option';
+        li.dataset.value = hospital;
+        li.setAttribute('role', 'option');
+        li.textContent = `📍 ${hospital}`;
+        hospitalPanel.appendChild(li);
     });
 }
 
 // Apply filters and sorting
 function applyFiltersAndSort() {
-
-
     let filteredRequests = [...allRequests];
 
-    // Apply search filter (works immediately, no minimum length)
+    // Apply search filter
     if (currentFilters.search) {
-
-
         filteredRequests = filteredRequests.filter(request => {
             const searchTerm = currentFilters.search;
             const patientName = (request.patientName || '').toLowerCase();
             const contactNumber = String(request.contactNumber || '').toLowerCase();
-
-            const matches = patientName.includes(searchTerm) ||
-                contactNumber.includes(searchTerm);
-
-
-
-            return matches;
+            return patientName.includes(searchTerm) || contactNumber.includes(searchTerm);
         });
-
-
     }
 
     // Apply blood group filter
-    // Exact matching with case-insensitive comparison
-    // 'any' shows only requests with bloodType 'any' (case-insensitive)
-    // 'A+' shows only requests with bloodType 'A+', etc.
     if (currentFilters.bloodGroup !== 'all') {
         filteredRequests = filteredRequests.filter(request => {
             const requestBloodType = (request.bloodType || '').toLowerCase();
@@ -252,38 +292,10 @@ function applyFiltersAndSort() {
         );
     }
 
-    // Apply status filter
-    if (currentFilters.status !== 'all') {
-        filteredRequests = filteredRequests.filter(request => {
-            const status = (request.status || 'Open').toLowerCase();
-
-            if (currentFilters.status === 'open-verified-reopened') {
-                // Default view: Show all active requests (Open, Reopened, Verified)
-                return status === 'open' || status === 'verified' || status === 'reopened';
-            } else if (currentFilters.status === 'open') {
-                return status === 'open';
-            } else if (currentFilters.status === 'reopened') {
-                return status === 'reopened';
-            } else if (currentFilters.status === 'verified') {
-                return status === 'verified';
-            } else if (currentFilters.status === 'closed') {
-                return status === 'closed';
-            }
-            return true;
-        });
-    }
-
-    // Apply verified by filter
-    if (currentFilters.verifiedBy !== 'all') {
-        filteredRequests = filteredRequests.filter(request =>
-            request.verifiedBy === currentFilters.verifiedBy
-        );
-    }
-
     // Apply sorting
     filteredRequests = sortRequests(filteredRequests, currentSort);
 
-    // Display filtered and sorted requests
+    // Display
     displayFilteredRequests(filteredRequests);
 
     // Update active filters display
@@ -293,55 +305,23 @@ function applyFiltersAndSort() {
 // Sort requests based on selected option
 function sortRequests(requests, sortType) {
     const sorted = [...requests];
-
     switch (sortType) {
         case 'latest':
-            // Sort by date (newest first)
-            sorted.sort((a, b) => {
-                const dateA = new Date(a.inquiryDate);
-                const dateB = new Date(b.inquiryDate);
-                return dateB - dateA;
-            });
+            sorted.sort((a, b) => new Date(b.inquiryDate) - new Date(a.inquiryDate));
             break;
-
         case 'oldest':
-            // Sort by date (oldest first)
-            sorted.sort((a, b) => {
-                const dateA = new Date(a.inquiryDate);
-                const dateB = new Date(b.inquiryDate);
-                return dateA - dateB;
-            });
+            sorted.sort((a, b) => new Date(a.inquiryDate) - new Date(b.inquiryDate));
             break;
-
         case 'urgency':
-            // Sort by urgency (Critical > Urgent > Normal)
             const urgencyOrder = { 'critical': 0, 'urgent': 1, 'normal': 2 };
             sorted.sort((a, b) => {
-                const urgencyA = (a.urgency || 'normal').toLowerCase();
-                const urgencyB = (b.urgency || 'normal').toLowerCase();
-                const orderA = urgencyOrder[urgencyA] ?? 2;
-                const orderB = urgencyOrder[urgencyB] ?? 2;
-
-                if (orderA !== orderB) {
-                    return orderA - orderB;
-                }
-
-                // If same urgency, sort by date (newest first)
-                const dateA = new Date(a.inquiryDate);
-                const dateB = new Date(b.inquiryDate);
-                return dateB - dateA;
+                const orderA = urgencyOrder[(a.urgency || 'normal').toLowerCase()] ?? 2;
+                const orderB = urgencyOrder[(b.urgency || 'normal').toLowerCase()] ?? 2;
+                if (orderA !== orderB) return orderA - orderB;
+                return new Date(b.inquiryDate) - new Date(a.inquiryDate);
             });
             break;
-
-        default:
-            // Default to latest
-            sorted.sort((a, b) => {
-                const dateA = new Date(a.inquiryDate);
-                const dateB = new Date(b.inquiryDate);
-                return dateB - dateA;
-            });
     }
-
     return sorted;
 }
 
@@ -353,202 +333,104 @@ function displayFilteredRequests(requests) {
 
     if (!container) return;
 
-    // Clear existing cards (except loading/no requests states)
+    // Clear existing cards
     const existingCards = container.querySelectorAll('.emergency-request-card');
     existingCards.forEach(card => card.remove());
 
-    // Hide loading state
     if (loadingState) loadingState.classList.add('hidden');
 
     if (requests.length === 0) {
-        // Show no requests state
         if (noRequestsState) {
             noRequestsState.classList.remove('hidden');
             noRequestsState.innerHTML = `
-                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                </svg>
-                <h3 class="text-xl font-semibold text-text-primary mb-2">No Matching Requests</h3>
-                <p class="text-text-secondary">No requests match your current filters. Try adjusting your search criteria.</p>
+                <div class="flex flex-col items-center justify-center py-12 px-4 text-center">
+                    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">No Matching Requests</h3>
+                    <p class="text-gray-500 max-w-xs mx-auto">Try adjusting your filters or search terms to find what you're looking for.</p>
+                </div>
             `;
         }
     } else {
-        // Hide no requests state
         if (noRequestsState) noRequestsState.classList.add('hidden');
-
-        // Display each filtered request
-        requests.forEach((request, index) => {
+        requests.forEach(request => {
             try {
-                const requestCard = createRequestCard(request);
-                container.appendChild(requestCard);
-
-                // Initialize button states based on request status
-                const cardKey = `${request.patientName}-${request.bloodType}`;
-                const requestStatus = request.status || 'Open';
-
-                if (requestStatus === 'Verified') {
-                    buttonStates.set(cardKey, { verifyStatus: 'verified' });
-                } else if (requestStatus === 'Closed') {
-                    buttonStates.set(cardKey, { closeStatus: 'closed' });
+                if (typeof createRequestCard === 'function') {
+                    const card = createRequestCard(request);
+                    container.appendChild(card);
                 }
             } catch (error) {
-                console.error(`Error creating card for request ${index}:`, error, request);
+                console.error('Error creating request card:', error, request);
             }
         });
     }
 
-    // Update active requests count
     updateActiveRequestsCount(requests.length);
 }
 
-// Update active requests count badge
 function updateActiveRequestsCount(count) {
-    const activeRequestsNumber = document.getElementById('activeRequestsNumber');
-    if (activeRequestsNumber) {
-        activeRequestsNumber.textContent = count;
-    }
+    const el = document.getElementById('activeRequestsNumber');
+    if (el) el.textContent = count;
 }
 
-// Update active filters display
 function updateActiveFiltersDisplay() {
-    const activeFiltersDisplay = document.getElementById('activeFiltersDisplay');
-    const filterCountBadge = document.getElementById('filterCountBadge');
-    const filterToggleBtn = document.getElementById('filterToggleBtn');
-    const filterPanel = document.getElementById('filterPanel');
-
-    if (!activeFiltersDisplay) return;
-
-    activeFiltersDisplay.innerHTML = '';
+    const display = document.getElementById('activeFiltersDisplay');
+    if (!display) return;
+    display.innerHTML = '';
 
     const filters = [];
+    if (currentFilters.search) filters.push({ label: `Search: "${currentFilters.search}"`, key: 'search' });
+    if (currentFilters.bloodGroup !== 'all') filters.push({ label: `Blood: ${currentFilters.bloodGroup}`, key: 'bloodGroup' });
+    if (currentFilters.urgency !== 'all') filters.push({ label: `Urgency: ${currentFilters.urgency}`, key: 'urgency' });
+    if (currentFilters.hospital !== 'all') filters.push({ label: `Hospital: ${currentFilters.hospital}`, key: 'hospital' });
 
-    // Search filter (show immediately when user types)
-    if (currentFilters.search) {
-        filters.push({
-            label: `Search: "${currentFilters.search}"`,
-            key: 'search'
-        });
-    }
-
-    // Blood group filter
-    if (currentFilters.bloodGroup !== 'all') {
-        filters.push({
-            label: `Blood: ${currentFilters.bloodGroup}`,
-            key: 'bloodGroup'
-        });
-    }
-
-    // Urgency filter
-    if (currentFilters.urgency !== 'all') {
-        filters.push({
-            label: `Urgency: ${currentFilters.urgency.charAt(0).toUpperCase() + currentFilters.urgency.slice(1)}`,
-            key: 'urgency'
-        });
-    }
-
-    // Hospital filter
-    if (currentFilters.hospital !== 'all') {
-        filters.push({
-            label: `Hospital: ${currentFilters.hospital}`,
-            key: 'hospital'
-        });
-    }
-
-    // Status filter (only show if not default)
-    if (currentFilters.status !== 'open-verified-reopened') {
-        const statusLabels = {
-            'all': 'All Status',
-            'open-reopened': 'Open & Reopened',
-            'open': 'Open Only',
-            'reopened': 'Reopened Only',
-            'verified': 'Verified Only',
-            'closed': 'Closed Only'
-        };
-        const label = statusLabels[currentFilters.status] || currentFilters.status;
-        filters.push({
-            label: `Status: ${label}`,
-            key: 'status'
-        });
-    }
-
-    // Verified By filter
-    if (currentFilters.verifiedBy !== 'all') {
-        filters.push({
-            label: `Verified By: ${currentFilters.verifiedBy}`,
-            key: 'verifiedBy'
-        });
-    }
-
-    // Update filter count badge
-    const activeFilterCount = filters.length;
-    if (filterCountBadge) {
-        if (activeFilterCount > 0) {
-            filterCountBadge.textContent = activeFilterCount;
-            filterCountBadge.classList.remove('hidden');
-        } else {
-            filterCountBadge.classList.add('hidden');
-        }
-    }
-
-    // Auto-open filter panel if filters are active
-    if (activeFilterCount > 0 && filterPanel && filterToggleBtn) {
-        filterPanel.classList.remove('hidden');
-        filterToggleBtn.classList.add('active');
-    }
-
-    // Create filter tags
-    filters.forEach(filter => {
-        const tag = document.createElement('span');
-        tag.className = 'inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary text-white';
+    filters.forEach(f => {
+        const tag = document.createElement('div');
+        tag.className = 'inline-flex items-center gap-2 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-bold border border-red-100 transition-all hover:bg-red-100';
         tag.innerHTML = `
-            ${filter.label}
-            <button class="ml-2 hover:text-gray-200" data-filter-key="${filter.key}">
-                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
+            <span>${f.label}</span>
+            <button class="hover:text-red-800" onclick="removeFilter('${f.key}')">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
         `;
-
-        // Add click handler to remove individual filter
-        tag.querySelector('button').addEventListener('click', () => {
-            removeFilter(filter.key);
-        });
-
-        activeFiltersDisplay.appendChild(tag);
+        display.appendChild(tag);
     });
 }
 
-// Remove individual filter
-function removeFilter(filterKey) {
-    switch (filterKey) {
-        case 'search':
-            currentFilters.search = '';
-            document.getElementById('searchInput').value = '';
-            break;
-        case 'bloodGroup':
-            currentFilters.bloodGroup = 'all';
-            document.getElementById('bloodGroupFilter').value = 'all';
-            break;
-        case 'urgency':
-            currentFilters.urgency = 'all';
-            document.getElementById('urgencyFilter').value = 'all';
-            break;
-        case 'hospital':
-            currentFilters.hospital = 'all';
-            document.getElementById('hospitalFilter').value = 'all';
-            break;
-        case 'status':
-            currentFilters.status = 'open-verified-reopened';
-            document.getElementById('statusFilter').value = 'open-verified-reopened';
-            break;
-        case 'verifiedBy':
-            currentFilters.verifiedBy = 'all';
-            document.getElementById('verifiedByFilter').value = 'all';
-            break;
+function removeFilter(key) {
+    if (key === 'search') {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('clearSearchBtn')?.classList.remove('show');
+        currentFilters.search = '';
+    } else {
+        const selectMap = {
+            'bloodGroup': 'bloodGroupFilter',
+            'urgency': 'urgencyFilter',
+            'hospital': 'hospitalFilter'
+        };
+        const defaultVals = {
+            'bloodGroup': 'all',
+            'urgency': 'all',
+            'hospital': 'all'
+        };
+        const elId = selectMap[key];
+        if (elId) {
+            const select = document.getElementById(elId);
+            if (select) {
+                select.value = defaultVals[key];
+                currentFilters[key] = defaultVals[key];
+                syncCustomDropdownsFromNative();
+            }
+        }
     }
-
     applyFiltersAndSort();
 }
+
+// Global scope expose for inline onclick
+window.removeFilter = removeFilter;
 
 // Initialize on DOM load
 document.addEventListener('DOMContentLoaded', () => {

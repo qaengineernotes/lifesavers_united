@@ -16,36 +16,44 @@ import {
     orderBy,
     onSnapshot,
     serverTimestamp,
-    arrayUnion
+    arrayUnion,
+    getCountFromServer
 } from './firebase-config.js';
 
-// Flag to determine data source (can be toggled)
-let USE_FIREBASE = true; // Set to true to use Firebase, false to use Google Sheets
+// ... existing code ...
 
 // ============================================================================
 // FETCH EMERGENCY REQUESTS FROM FIREBASE
 // ============================================================================
 export async function fetchEmergencyRequestsFromFirebase() {
     try {
-
-        // Query all requests - ONLY 4 statuses: Open, Reopened, Verified, Closed
         const requestsRef = collection(db, 'emergency_requests');
+
+        // 1. Efficient Count Queries for Statistics (Server-side)
+        const countsPromise = Promise.all([
+            getCountFromServer(query(requestsRef, where('status', '==', 'Open'))),
+            getCountFromServer(query(requestsRef, where('status', '==', 'Reopened'))),
+            getCountFromServer(query(requestsRef, where('status', '==', 'Verified'))),
+            getCountFromServer(query(requestsRef, where('status', '==', 'Closed'))),
+            getCountFromServer(query(requestsRef, where('status', '==', 'Closed'), where('closureType', '==', 'fulfilled')))
+        ]);
+
+        // 2. Query ONLY active records (for Display)
         const q = query(
             requestsRef,
-            where('status', 'in', ['Open', 'Reopened', 'Verified', 'Closed'])
+            where('status', 'in', ['Open', 'Reopened', 'Verified'])
         );
 
-        const querySnapshot = await getDocs(q);
-        const requests = [];
+        const fetchPromise = getDocs(q);
 
+        // Run both in parallel for speed
+        const [counts, querySnapshot] = await Promise.all([countsPromise, fetchPromise]);
+
+        const requests = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             requests.push({
                 id: doc.id,
-                // Map Firebase fields back to the format expected by the UI
-                // Use reopenedAt if it exists (request was ever reopened), otherwise use createdAt
-                // This ensures "Time Since Request" always counts from the most recent reopen date,
-                // even if the request was subsequently verified or changed to another status.
                 inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
                     : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
@@ -74,38 +82,17 @@ export async function fetchEmergencyRequestsFromFirebase() {
             });
         });
 
-        // Sort by createdAt desc in memory to avoid needing a composite index
-        requests.sort((a, b) => {
-            const dateA = a.inquiryDate instanceof Date ? a.inquiryDate.getTime() : new Date(a.inquiryDate).getTime();
-            const dateB = b.inquiryDate instanceof Date ? b.inquiryDate.getTime() : new Date(b.inquiryDate).getTime();
-            return dateB - dateA;
-        });
+        // Sort by date desc
+        requests.sort((a, b) => b.inquiryDate - a.inquiryDate);
 
-
-
-        // Calculate statistics from the fetched data (Optimized)
-        let open = 0, reopened = 0, verified = 0, closed = 0, fulfilled = 0;
-        requests.forEach(req => {
-            const status = req.status;
-            if (status === 'Open') open++;
-            else if (status === 'Reopened') reopened++;
-            else if (status === 'Verified') verified++;
-            else if (status === 'Closed') {
-                closed++;
-                // Count only fulfilled closures (our donations) for "Lives Saved"
-                if (req.closureType === 'fulfilled') {
-                    fulfilled++;
-                }
-            }
-        });
-
+        // Assign statistics from count results
         const statistics = {
-            total: requests.length,
-            open,
-            reopened,
-            verified,
-            closed,
-            fulfilled // Only closures where we donated blood
+            total: counts[0].data().count + counts[1].data().count + counts[2].data().count + counts[3].data().count,
+            open: counts[0].data().count,
+            reopened: counts[1].data().count,
+            verified: counts[2].data().count,
+            closed: counts[3].data().count,
+            fulfilled: counts[4].data().count
         };
 
         return {
