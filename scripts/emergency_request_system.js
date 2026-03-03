@@ -144,23 +144,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
             const refreshBtn = e.target.closest('.refresh-btn');
 
-            // Add loading state to refresh button
-            const originalText = refreshBtn.innerHTML;
-            refreshBtn.innerHTML = `
-                        <svg class="w-4 h-4 mr-1 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z"
-                                clip-rule="evenodd" />
-                        </svg>
-                        Refreshing...
-                    `;
-            refreshBtn.disabled = true;
+            // Add loading state with heartbeat animation
+            setButtonLoading(refreshBtn);
 
             // Load emergency requests
             loadEmergencyRequests().finally(() => {
                 // Restore button state after loading completes
-                refreshBtn.innerHTML = originalText;
-                refreshBtn.disabled = false;
+                resetButtonLoading(refreshBtn);
             });
         }
         if (e.target.closest('.request-share-btn')) {
@@ -803,14 +793,8 @@ async function verifyRequest(requestData, button) {
 
     if (true) { // Always proceed if user confirmed
         try {
-            // Show loading state
-            button.disabled = true;
-            button.innerHTML = `
-                        <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-                        </svg>
-                        Updating...
-                    `;
+            // Show loading state with heartbeat animation
+            setButtonLoading(button);
 
             // Prepare the data for the API call
             const requestData = {
@@ -911,17 +895,10 @@ async function verifyRequest(requestData, button) {
 
                 // Reset the flag to allow refresh button to work
                 isButtonActionInProgress = false;
-            } else {
-                // Reset button state on error
+                button.classList.remove('btn-loading'); // Clean up loading class on success
                 button.disabled = false;
-                button.innerHTML = `
-                            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                            </svg>
-                            Verify
-                        `;
-                button.classList.remove('btn-verified');
-                button.classList.add('btn-verify');
+            } else {
+                resetButtonLoading(button);
                 showSuccessMessage('Failed to update status. Please try again.');
                 isButtonActionInProgress = false; // Reset flag on error
             }
@@ -929,15 +906,7 @@ async function verifyRequest(requestData, button) {
             console.error('Error updating status:', error);
 
             // Reset button state on error
-            button.disabled = false;
-            button.innerHTML = `
-                        <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                        </svg>
-                        Verify
-                    `;
-            button.classList.remove('btn-verified');
-            button.classList.add('btn-verify');
+            resetButtonLoading(button);
             showSuccessMessage('Error updating status. Please try again.');
             isButtonActionInProgress = false; // Reset flag on error
         }
@@ -961,14 +930,8 @@ async function logDonation(requestData, button) {
     }
 
     try {
-        // Show loading state
-        button.disabled = true;
-        button.innerHTML = `
-            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-            </svg>
-            Logging...
-        `;
+        // Show loading state with heartbeat animation
+        setButtonLoading(button);
 
         // Prepare the data for the API call
         const donationData = {
@@ -1034,8 +997,7 @@ async function logDonation(requestData, button) {
                     </svg>
                     Closed
                 `;
-                button.classList.remove('btn-donation');
-                button.classList.add('btn-closed');
+                button.classList.remove('btn-loading'); // Clean up loading class on success
                 button.disabled = true;
 
                 showSuccessMessage('Donation logged and request closed successfully!');
@@ -1046,13 +1008,7 @@ async function logDonation(requestData, button) {
                 }, 1500);
             } else {
                 // Request still open, update units display
-                button.innerHTML = `
-                    <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    Log Donation
-                `;
-                button.disabled = false;
+                resetButtonLoading(button);
 
                 showSuccessMessage(`Donation logged! ${result.unitsRemaining} unit(s) remaining.`);
 
@@ -1074,13 +1030,7 @@ async function logDonation(requestData, button) {
             isButtonActionInProgress = false;
         } else {
             // Reset button on error
-            button.disabled = false;
-            button.innerHTML = `
-                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-                Log Donation
-            `;
+            resetButtonLoading(button);
             showSuccessMessage(result.message || 'Failed to log donation. Please try again.');
             isButtonActionInProgress = false;
         }
@@ -1088,13 +1038,7 @@ async function logDonation(requestData, button) {
         console.error('Error logging donation:', error);
 
         // Reset button on error
-        button.disabled = false;
-        button.innerHTML = `
-            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-            </svg>
-            Log Donation
-        `;
+        resetButtonLoading(button);
         showSuccessMessage('Error logging donation. Please try again.');
         isButtonActionInProgress = false;
     }
@@ -1103,14 +1047,8 @@ async function logDonation(requestData, button) {
 // Function to close request directly when all units are fulfilled
 async function closeRequestDirectly(requestData, button) {
     try {
-        // Show loading state
-        button.disabled = true;
-        button.innerHTML = `
-            <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-            </svg>
-            Closing...
-        `;
+        // Show loading state with heartbeat animation
+        setButtonLoading(button);
 
         // Prepare data to close the request
         const updateData = {
@@ -1171,6 +1109,7 @@ async function closeRequestDirectly(requestData, button) {
                 </svg>
                 Closed
             `;
+            button.classList.remove('btn-loading'); // Clean up loading class on success
             button.classList.remove('btn-close-request');
             button.classList.add('btn-closed');
             button.disabled = true;
@@ -1193,13 +1132,7 @@ async function closeRequestDirectly(requestData, button) {
             isButtonActionInProgress = false;
         } else {
             // Reset button on error
-            button.disabled = false;
-            button.innerHTML = `
-                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
-                </svg>
-                Close Request
-            `;
+            resetButtonLoading(button);
             showSuccessMessage(result.message || 'Failed to close request. Please try again.');
             isButtonActionInProgress = false;
         }
@@ -1207,13 +1140,7 @@ async function closeRequestDirectly(requestData, button) {
         console.error('Error closing request:', error);
 
         // Reset button on error
-        button.disabled = false;
-        button.innerHTML = `
-            <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v3.586L7.707 9.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 10.586V7z" clip-rule="evenodd" />
-            </svg>
-            Close Request
-        `;
+        resetButtonLoading(button);
         showSuccessMessage('Error closing request. Please try again.');
         isButtonActionInProgress = false;
     }
@@ -2316,15 +2243,8 @@ async function editRequest(requestData, button) {
     isButtonActionInProgress = true;
 
     try {
-        // Button loading state
-        button.disabled = true;
-        const originalHTML = button.innerHTML;
-        button.innerHTML = `
-      <svg class="w-5 h-5 mr-2 inline animate-spin" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
-      </svg>
-      Updating.
-    `;
+        // Show loading state with heartbeat animation
+        setButtonLoading(button);
 
         // Build update payload:
         const updateData = {
@@ -2389,17 +2309,16 @@ async function editRequest(requestData, button) {
         if (result.success) {
             showSuccessMessage('Request updated successfully!');
             isButtonActionInProgress = false;
+            button.classList.remove('btn-loading'); // Clean up on success
             setTimeout(() => loadEmergencyRequests(), 1000);
         } else {
-            button.disabled = false;
-            button.innerHTML = originalHTML;
+            resetButtonLoading(button);
             showSuccessMessage(result.message || 'Failed to update request. Please try again.');
             isButtonActionInProgress = false;
         }
     } catch (error) {
         console.error('Error updating request:', error);
-        button.disabled = false;
-        button.innerHTML = originalHTML;
+        resetButtonLoading(button);
         showSuccessMessage('Error updating request. Please try again.');
         isButtonActionInProgress = false;
     }
@@ -3619,3 +3538,55 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+/**
+ * Sets a button to its loading state with a Heartbeat/EKG animation.
+ * Maintains the original button dimensions using visibility:hidden on content.
+ * @param {HTMLElement} button - The button element
+ */
+function setButtonLoading(button) {
+    if (!button || button.classList.contains('btn-loading')) return;
+
+    // Save original HTML if NOT already saved (fallback)
+    if (!button.getAttribute('data-original-html')) {
+        button.setAttribute('data-original-html', button.innerHTML);
+    }
+
+    const originalHTML = button.getAttribute('data-original-html');
+
+    button.classList.add('btn-loading');
+    button.disabled = true;
+
+    // Scale loader for edit button
+    const isEdit = button.classList.contains('edit-btn');
+    const svgWidth = isEdit ? '32px' : '45px';
+    const svgHeight = isEdit ? '16px' : '22px';
+
+    button.innerHTML = `
+        <span class="btn-loading-content">${originalHTML}</span>
+        <div class="btn-heartbeat-loader">
+            <svg class="btn-heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" style="width: ${svgWidth}; height: ${svgHeight};">
+                <path class="heartbeat-line-anim" d="M0,30 L85,30 L90,10 L97,52 L105,5 L112,45 L120,30 L200,30"
+                    fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+    `;
+}
+
+/**
+ * Resets a button from its loading state back to its original state.
+ * @param {HTMLElement} button - The button element
+ */
+function resetButtonLoading(button) {
+    if (!button) return;
+
+    const originalHTML = button.getAttribute('data-original-html');
+    if (originalHTML) {
+        button.innerHTML = originalHTML;
+        button.classList.remove('btn-loading');
+        button.disabled = false;
+        // Keep the data-original-html for future use if needed, or remove it
+        // button.removeAttribute('data-original-html'); 
+    }
+}
+

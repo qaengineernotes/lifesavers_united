@@ -1420,8 +1420,7 @@ window.saveEditDonor = async function () {
     }
 
     // Saving state
-    saveBtn.disabled = true;
-    saveBtn.textContent = '⏳ Saving...';
+    setButtonLoading(saveBtn);
     statusEl.textContent = '';
     statusEl.className = '';
 
@@ -1587,8 +1586,7 @@ window.saveLogDonation = async function () {
         return;
     }
 
-    logBtn.disabled = true;
-    logBtn.textContent = '⏳ Logging...';
+    setButtonLoading(logBtn);
     statusEl.textContent = '';
 
     const donatedAtDate = new Date(donationDate + 'T00:00:00');
@@ -1653,8 +1651,7 @@ window.saveLogDonation = async function () {
         statusEl.textContent = `❌ ${err.message}`;
         statusEl.style.color = '#dc2626';
     } finally {
-        logBtn.disabled = false;
-        logBtn.textContent = '🩸 Log Donation';
+        resetButtonLoading(logBtn);
     }
 };
 
@@ -2172,3 +2169,53 @@ window.confirmDeleteDonationLog = async function () {
         btn.textContent = 'Yes, Delete';
     }
 };
+
+/**
+ * Sets a button to its loading state with a Heartbeat/EKG animation.
+ * Maintains the original button dimensions using visibility:hidden on content.
+ * @param {HTMLElement} button - The button element
+ */
+function setButtonLoading(button) {
+    if (!button || button.classList.contains('btn-loading')) return;
+
+    // Save original HTML if NOT already saved (fallback)
+    if (!button.getAttribute('data-original-html')) {
+        button.setAttribute('data-original-html', button.innerHTML);
+    }
+
+    const originalHTML = button.getAttribute('data-original-html');
+
+    button.classList.add('btn-loading');
+    button.disabled = true;
+
+    // Determine scale for loader: smaller for .action-btn or .edit-btn
+    const isSmall = button.classList.contains('action-btn') || button.classList.contains('edit-btn');
+    const svgWidth = isSmall ? '24px' : '45px';
+    const svgHeight = isSmall ? '12px' : '22px';
+
+    button.innerHTML = `
+        <span class="btn-loading-content">${originalHTML}</span>
+        <div class="btn-heartbeat-loader">
+            <svg class="btn-heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg" style="width: ${svgWidth}; height: ${svgHeight};">
+                <path class="heartbeat-line-anim" d="M0,30 L85,30 L90,10 L97,52 L105,5 L112,45 L120,30 L200,30"
+                    fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+        </div>
+    `;
+}
+
+/**
+ * Resets a button from its loading state back to its original state.
+ * @param {HTMLElement} button - The button element
+ */
+function resetButtonLoading(button) {
+    if (!button) return;
+
+    const originalHTML = button.getAttribute('data-original-html');
+    if (originalHTML) {
+        button.innerHTML = originalHTML;
+        button.classList.remove('btn-loading');
+        button.disabled = false;
+    }
+}
+

@@ -686,6 +686,54 @@ h6 {
   --tw-ring-offset-width: 2px;
 }
 
+/* Heartbeat Button Loader (Maintains button dimensions) */
+.btn-loading {
+  position: relative !important;
+  pointer-events: none !important;
+}
+
+.btn-loading-content {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  display: inline-block !important;
+  /* Ensure it takes up space correctly */
+}
+
+.btn-heartbeat-loader {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 10 !important;
+}
+
+.btn-heartbeat-svg {
+  width: 45px;
+  height: 22px;
+}
+
+.heartbeat-line-anim {
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: ekg-flow 1.5s linear infinite;
+}
+
+@keyframes ekg-flow {
+  0% {
+    stroke-dashoffset: 200;
+  }
+
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+
 .card {
   border-radius: 0.5rem;
   border-width: 1px;
