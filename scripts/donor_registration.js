@@ -7,6 +7,18 @@ const SUBMIT_URL = window.location.hostname === 'localhost' || window.location.h
 // Import phone normalizer utility
 import { normalizePhoneNumber } from './phone-normalizer.js';
 
+/**
+ * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
+ * @param {string} str - The string to format
+ * @returns {string} - The formatted string
+ */
+function toTitleCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().trim().split(/\s+/).map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
 // CAPTCHA variables
 let captchaAnswer = 0;
 let captchaQuestion = '';
@@ -396,7 +408,7 @@ async function handleFormSubmission(e) {
         const formDataObj = new FormData(e.target);
 
         const data = {
-            fullName: formDataObj.get('fullName'),
+            fullName: toTitleCase(formDataObj.get('fullName')),
             dateOfBirth: formDataObj.get('dateOfBirth'),
             gender: formDataObj.get('gender'),
             contactNumber: normalizePhoneNumber(formDataObj.get('contactNumber')), // Normalize phone number

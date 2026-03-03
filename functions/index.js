@@ -84,6 +84,18 @@ const normalizePhoneNumber = (phoneNumber) => {
     return normalized;
 };
 
+/**
+ * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
+ * @param {string} str - The string to format
+ * @returns {string} - The formatted string
+ */
+const toTitleCase = (str) => {
+    if (!str) return '';
+    return str.toLowerCase().trim().split(/\s+/).map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+};
+
 // Parse the "One-Shot" Text
 const parseRequestText = (text) => {
     // Map Telegram field names to Firestore database field names
@@ -109,7 +121,12 @@ const parseRequestText = (text) => {
         const cleanValue = values.join(":").trim(); // Rejoin in case value has :
 
         if (mapping[cleanKey]) {
-            data[mapping[cleanKey]] = cleanValue;
+            let val = cleanValue;
+            // Apply Title Case to name fields
+            if (mapping[cleanKey] === 'patientName' || mapping[cleanKey] === 'contactPerson') {
+                val = toTitleCase(val);
+            }
+            data[mapping[cleanKey]] = val;
         }
     });
 

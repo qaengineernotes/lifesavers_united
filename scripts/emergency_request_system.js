@@ -1,6 +1,18 @@
 // Local proxy URL to avoid CORS issues
 const FETCH_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 let isButtonActionInProgress = false; // Flag to prevent refresh during button actions
+
+/**
+ * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
+ * @param {string} str - The string to format
+ * @returns {string} - The formatted string
+ */
+function toTitleCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().trim().split(/\s+/).map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
 let verifierNames = []; // Store unique verifier names for autocomplete
 
 // Data Source Configuration
@@ -1554,7 +1566,7 @@ function showVerifierNamePopup() {
                 return;
             }
             modal.remove();
-            resolve(name);
+            resolve(toTitleCase(name));
         };
 
         confirmBtn.addEventListener('click', handleConfirm);
@@ -2028,7 +2040,7 @@ function showDonationPopup(requestData) {
             resolve({
                 units: selectedUnits,
                 donorType: donorType,
-                donorName: donorName,
+                donorName: toTitleCase(donorName),
                 donorContact: donorContact,
                 closureReason: closureReason
             });
@@ -2498,7 +2510,7 @@ function showEditRequestModal(requestData) {
 
             // Collect form data
             const editedData = {
-                patientName: document.getElementById('editPatientName').value.trim(),
+                patientName: toTitleCase(document.getElementById('editPatientName').value.trim()),
                 patientAge: document.getElementById('editPatientAge').value.trim(),
                 bloodType: document.getElementById('editBloodType').value,
                 unitsRequired: document.getElementById('editUnitsRequired').value,
@@ -2507,7 +2519,7 @@ function showEditRequestModal(requestData) {
                 city: document.getElementById('editCity').value.trim(),
                 urgency: document.getElementById('editUrgency').value,
                 diagnosis: document.getElementById('editDiagnosis').value.trim(),
-                contactPerson: document.getElementById('editContactPerson').value.trim(),
+                contactPerson: toTitleCase(document.getElementById('editContactPerson').value.trim()),
                 contactNumber: document.getElementById('editContactNumber').value.trim(),
                 contactEmail: document.getElementById('editContactEmail').value.trim(),
                 additionalInfo: document.getElementById('editAdditionalInfo').value.trim()

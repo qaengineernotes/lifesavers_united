@@ -44,6 +44,15 @@ def normalize_phone_number(phone_number):
     
     return normalized
 
+def to_title_case(text):
+    """
+    Convert a string to Title Case (e.g., "NIKUNJ MISTRI" -> "Nikunj Mistri")
+    """
+    if not text:
+        return ''
+    # capitalize each word
+    return ' '.join(word.capitalize() for word in text.strip().split())
+
 
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -68,6 +77,12 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             try:
                 # Parse the JSON data
                 data = json.loads(post_data.decode('utf-8'))
+
+                # Apply formatting
+                if 'patientName' in data:
+                    data['patientName'] = to_title_case(data['patientName'])
+                if 'contactPerson' in data:
+                    data['contactPerson'] = to_title_case(data['contactPerson'])
                 
                 # Prepare data for Google Apps Script
                 script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
@@ -130,7 +145,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 donor_data = {
                     'action': 'submit_donor_registration',
                     'data': json.dumps({
-                        'fullName': data.get('fullName'),
+                        'fullName': to_title_case(data.get('fullName')),
                         'dateOfBirth': data.get('dateOfBirth'),
                         'gender': data.get('gender'),
                         'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
@@ -200,7 +215,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 donor_data = {
                     'action': 'form_responses_2',
                     'data': json.dumps({
-                        'fullName': data.get('fullName'),
+                        'fullName': to_title_case(data.get('fullName')),
                         'dateOfBirth': data.get('dateOfBirth'),
                         'gender': data.get('gender'),
                         'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
@@ -216,7 +231,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         'registrationDate': data.get('registrationDate'),
                         'source': 'emergency_request_system',
                         'relatedRequestId': data.get('requestId', ''),
-                        'relatedPatientName': data.get('patientName', '')
+                        'relatedPatientName': to_title_case(data.get('patientName', ''))
                     })
                 }
                 

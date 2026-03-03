@@ -4,6 +4,18 @@ const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyf
 // Import phone normalizer utility
 import { normalizePhoneNumber } from './phone-normalizer.js';
 
+/**
+ * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
+ * @param {string} str - The string to format
+ * @returns {string} - The formatted string
+ */
+function toTitleCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().trim().split(/\s+/).map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
 // Initialize form validation when DOM is loaded
 document.addEventListener('DOMContentLoaded', function () {
     initializeFormValidation();
@@ -126,8 +138,8 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
         // Collect form data
         const formDataObj = new FormData(this);
         const data = {
-            patientName: formDataObj.get('patientName'),
-            contactPerson: formDataObj.get('contactPerson'),
+            patientName: toTitleCase(formDataObj.get('patientName')),
+            contactPerson: toTitleCase(formDataObj.get('contactPerson')),
             contactNumber: normalizePhoneNumber(formDataObj.get('contactNumber')), // Normalize phone number
             contactEmail: formDataObj.get('contactEmail'),
             bloodType: formDataObj.get('bloodType'),

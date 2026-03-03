@@ -4,6 +4,18 @@
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
 import { db, collection, doc, addDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from '/scripts/firebase-config.js';
 
+/**
+ * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
+ * @param {string} str - The string to format
+ * @returns {string} - The formatted string
+ */
+function toTitleCase(str) {
+    if (!str) return '';
+    return str.toLowerCase().trim().split(/\s+/).map(word => {
+        return word.charAt(0).toUpperCase() + word.slice(1);
+    }).join(' ');
+}
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -1389,7 +1401,7 @@ window.saveEditDonor = async function () {
     const saveBtn = document.getElementById('editDonorSaveBtn');
 
     // Validate
-    const fullName = document.getElementById('editFullName').value.trim();
+    const fullName = toTitleCase(document.getElementById('editFullName').value.trim());
     if (!fullName) {
         statusEl.textContent = '⚠️ Full name is required.';
         statusEl.className = 'err';
@@ -1571,7 +1583,7 @@ window.saveLogDonation = async function () {
 
     const donationDate = document.getElementById('logDonationDate').value;
     const donationType = document.getElementById('logDonationType').value;
-    const patientName = document.getElementById('logPatientSearch').value.trim();
+    const patientName = toTitleCase(document.getElementById('logPatientSearch').value.trim());
     const linkedReqId = document.getElementById('logRequestId').value.trim();
     const linkedBlood = document.getElementById('logRequestBloodGroup').value.trim();
 
@@ -2063,7 +2075,7 @@ window.saveEditDonationLog = async function () {
 
     const updatedDate = new Date(dateVal + 'T00:00:00');
     const units = parseInt(document.getElementById('editLogUnits').value) || 1;
-    const patientName = document.getElementById('editLogPatientName').value.trim();
+    const patientName = toTitleCase(document.getElementById('editLogPatientName').value.trim());
     const hospital = document.getElementById('editLogHospital').value.trim();
     const notes = document.getElementById('editLogNotes').value.trim();
 
