@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -19,9 +19,15 @@
     <link rel="icon" type="image/png" sizes="16x16" href="imgs/favicon/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="imgs/favicon/favicon-32x32.png">
 
-    <link rel="stylesheet" href="css/main.css" />
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/donors-redesign.css" />
 
     <!-- User Profile UI -->
     <script type="module">
@@ -31,11 +37,13 @@
             console.error('Failed to load user profile UI:', error);
         });
     </script>
-
 </head>
 
-<body class="bg-background">
-    <!-- Navigation Header -->
+<body class="bg-background donors-page">
+
+    <!-- ══════════════════════════════════════════════
+         NAVIGATION
+    ══════════════════════════════════════════════ -->
     <nav class="bg-white shadow-card sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -58,13 +66,13 @@
                         class="text-text-secondary hover:text-primary transition-smooth">Submit Request</a>
                     <a href="/blood_information_center"
                         class="text-text-secondary hover:text-primary transition-smooth">Learn</a>
-                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About
-                        Us</a>
+                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About Us</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button class="text-text-secondary hover:text-primary">
+                    <button id="mobileMenuBtn" class="text-text-secondary hover:text-primary p-2"
+                        aria-label="Open menu">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -73,62 +81,103 @@
                 </div>
             </div>
         </div>
+
+        <!-- Mobile Menu Drawer -->
+        <div id="mobileMenu" style="display:none; border-top:1px solid #f3f4f6; background:#fff; padding:12px 16px;">
+            <a href="/" class="block py-2 text-text-secondary hover:text-primary">Home</a>
+            <a href="/donor_registration" class="block py-2 text-text-secondary hover:text-primary">Donate</a>
+            <a href="/emergency_request_system" class="block py-2 text-text-secondary hover:text-primary">Emergency</a>
+            <a href="/emergency_blood_request" class="block py-2 text-text-secondary hover:text-primary">Submit
+                Request</a>
+            <a href="/blood_information_center" class="block py-2 text-text-secondary hover:text-primary">Learn</a>
+            <a href="/about_us" class="block py-2 text-text-secondary hover:text-primary">About Us</a>
+        </div>
     </nav>
 
-    <!-- Main Container -->
-    <div class="all-requests-container">
-        <!-- Page Header -->
-        <div class="page-header">
+    <!-- ══════════════════════════════════════════════
+         HERO HEADER
+    ══════════════════════════════════════════════ -->
+    <div class="donors-hero">
+        <div class="donors-hero-content">
+            <div class="donors-hero-icon">🩸</div>
             <h1>All Donors</h1>
-            <p>Comprehensive view of all registered blood donors in the system</p>
+            <p>Comprehensive view of all registered blood donors in the LifeSavers United network</p>
+        </div>
+    </div>
 
-            <!-- Statistics -->
-            <div class="stats-grid" id="statsGrid">
-                <div class="stat-card">
-                    <div class="stat-number" id="statTotal">0</div>
-                    <div class="stat-label">Total Donors</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statEmergency">0</div>
-                    <div class="stat-label">Emergency Available</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statActive">0</div>
-                    <div class="stat-label">Active Donors</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statThisMonth">0</div>
-                    <div class="stat-label">New This Month</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statCommonBlood">-</div>
-                    <div class="stat-label">Most Common</div>
-                </div>
-            </div>
+    <!-- ══════════════════════════════════════════════
+         STATS GRID (floats up over hero)
+    ══════════════════════════════════════════════ -->
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <div class="stat-number" id="statTotal">—</div>
+            <div class="stat-label">Total Donors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="statEmergency">—</div>
+            <div class="stat-label">Emergency Available</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="statActive">—</div>
+            <div class="stat-label">Active Donors</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="statThisMonth">—</div>
+            <div class="stat-label">New This Month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number" id="statCommonBlood">—</div>
+            <div class="stat-label">Most Common</div>
+        </div>
+    </div>
 
-            <!-- Search and Filters Combined -->
-            <div class="search-filters-combined" id="searchFiltersContainer" style="display: none;">
-                <div class="search-filters-row">
-                    <!-- Search Input -->
-                    <div class="search-wrapper">
-                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
-                            stroke="currentColor" stroke-width="2">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <path d="m21 21-4.35-4.35"></path>
+    <!-- ══════════════════════════════════════════════
+         MAIN CONTENT
+    ══════════════════════════════════════════════ -->
+    <div class="donors-main">
+
+        <!-- Search + Filters -->
+        <div class="search-filters-combined" id="searchFiltersContainer" style="display: none;">
+            <div class="search-filters-row">
+                <!-- Search Input -->
+                <div class="search-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input"
+                        placeholder="Search by name, contact, or city..." autocomplete="off" />
+                    <button id="clearSearch" class="clear-search-btn" style="display: none;" title="Clear search">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
                         </svg>
-                        <input type="text" id="searchInput" class="search-input"
-                            placeholder="Search by name, contact, or city..." autocomplete="off" />
-                        <button id="clearSearch" class="clear-search-btn" style="display: none;" title="Clear search">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <line x1="18" y1="6" x2="6" y2="18"></line>
-                                <line x1="6" y1="6" x2="18" y2="18"></line>
-                            </svg>
-                        </button>
-                    </div>
+                    </button>
+                </div>
 
-                    <!-- Filters -->
-                    <select id="filterBloodGroup" class="filter-select">
+                <!-- Blood Group custom dropdown -->
+                <div class="custom-dropdown" id="dropBloodGroup" data-filter="bloodGroup">
+                    <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cdd-label">All Blood Groups</span>
+                        <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <ul class="cdd-panel" role="listbox">
+                        <li class="cdd-option selected" data-value="" role="option">All Blood Groups</li>
+                        <li class="cdd-option" data-value="A+" role="option">🩸 A+</li>
+                        <li class="cdd-option" data-value="A-" role="option">🩸 A−</li>
+                        <li class="cdd-option" data-value="B+" role="option">🩸 B+</li>
+                        <li class="cdd-option" data-value="B-" role="option">🩸 B−</li>
+                        <li class="cdd-option" data-value="AB+" role="option">🩸 AB+</li>
+                        <li class="cdd-option" data-value="AB-" role="option">🩸 AB−</li>
+                        <li class="cdd-option" data-value="O+" role="option">🩸 O+</li>
+                        <li class="cdd-option" data-value="O-" role="option">🩸 O−</li>
+                    </ul>
+                    <!-- Hidden native select for JS compatibility -->
+                    <select id="filterBloodGroup" style="display:none;" aria-hidden="true">
                         <option value="">All Blood Groups</option>
                         <option value="A+">A+</option>
                         <option value="A-">A-</option>
@@ -139,44 +188,70 @@
                         <option value="O+">O+</option>
                         <option value="O-">O-</option>
                     </select>
+                </div>
 
-                    <select id="filterCity" class="filter-select">
+                <!-- City custom dropdown -->
+                <div class="custom-dropdown" id="dropCity" data-filter="city">
+                    <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cdd-label">All Cities</span>
+                        <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <ul class="cdd-panel" role="listbox">
+                        <li class="cdd-option selected" data-value="" role="option">All Cities</li>
+                    </ul>
+                    <!-- Hidden native select populated by JS -->
+                    <select id="filterCity" style="display:none;" aria-hidden="true">
                         <option value="">All Cities</option>
-                        <!-- Will be populated dynamically -->
                     </select>
+                </div>
 
-                    <select id="filterEmergency" class="filter-select">
+                <!-- Availability custom dropdown -->
+                <div class="custom-dropdown" id="dropEmergency" data-filter="emergency">
+                    <button class="cdd-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                        <span class="cdd-label">All Availability</span>
+                        <svg class="cdd-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                    </button>
+                    <ul class="cdd-panel" role="listbox">
+                        <li class="cdd-option selected" data-value="" role="option">All Availability</li>
+                        <li class="cdd-option" data-value="yes" role="option">✅ Emergency Available</li>
+                        <li class="cdd-option" data-value="no" role="option">❌ Not Available</li>
+                    </ul>
+                    <!-- Hidden native select for JS compatibility -->
+                    <select id="filterEmergency" style="display:none;" aria-hidden="true">
                         <option value="">All Availability</option>
                         <option value="yes">Emergency Available</option>
                         <option value="no">Not Available</option>
                     </select>
-
-                    <button id="clearFilters" class="clear-filters-btn" style="display: none;">
-                        Clear All
-                    </button>
                 </div>
 
-                <!-- Results Info -->
-                <div class="combined-results-row">
-                    <div id="searchResults" class="search-results-info"></div>
-                    <div id="filterResults" class="filter-results-info"></div>
-                </div>
+                <button id="clearFilters" class="clear-filters-btn">
+                    Clear All
+                </button>
+
+                <!-- Results info — inline, right-aligned, no extra height -->
+                <div id="filterResults" class="filter-results-info"></div>
+                <div id="searchResults" class="search-results-info"></div>
+            </div>
+
+            <!-- Hidden empty row — kept for JS compatibility -->
+            <div class="combined-results-row" style="display:none;">
             </div>
         </div>
 
-        <!-- Loading State with Heartbeat/EKG Loader -->
+        <!-- Loading State -->
         <div id="loadingState" class="loading-state">
             <div class="loader-container">
                 <div class="heartbeat-loader">
                     <div>
-                        <!-- Heartbeat/EKG Line -->
                         <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
                             <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
                                 fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
                         </svg>
-
-                        <!-- Loading Text with Animation -->
-                        <p class="loading-text text-text-secondary text-lg font-medium">
+                        <p class="loading-text">
                             <span class="loading-message">Loading donors</span>
                             <span class="loading-dots">
                                 <span class="dot">.</span>
@@ -193,10 +268,9 @@
         <div id="accessDenied" class="access-denied" style="display: none;">
             <div class="access-denied-icon">🔒</div>
             <h2>Access Denied</h2>
-            <p>
-                You need to be logged in as an approved user to view this page.
-            </p>
-            <button onclick="window.location.href='emergency_request_system.html'" class="action-btn">
+            <p>You need to be logged in as an approved user to view this page.</p>
+            <button onclick="window.location.href='emergency_request_system.html'" class="action-btn"
+                style="padding: 12px 28px; font-size: 14px; border-radius: 10px; background: #dc2626; color: #fff;">
                 Go to Emergency System
             </button>
         </div>
@@ -207,22 +281,22 @@
                 <table class="requests-table">
                     <thead>
                         <tr>
-                            <th>Donor Name</th>
-                            <th>Blood Group</th>
+                            <th class="sortable" data-sort="fullName">Donor Name</th>
+                            <th class="sortable" data-sort="bloodGroup">Blood Group</th>
                             <th>Contact</th>
-                            <th>City</th>
-                            <th>Area</th>
-                            <th>Age</th>
-                            <th>Gender</th>
-                            <th>Last Donated</th>
-                            <th>Emergency</th>
-                            <th>Registered</th>
+                            <th class="sortable" data-sort="city">City</th>
+                            <th class="sortable" data-sort="area">Area</th>
+                            <th class="sortable" data-sort="age">Age</th>
+                            <th class="sortable" data-sort="gender">Gender</th>
+                            <th class="sortable" data-sort="lastDonatedAt">Last Donated</th>
+                            <th class="sortable" data-sort="isEmergencyAvailable">Emergency</th>
+                            <th class="sortable" data-sort="registeredAt">Registered</th>
                             <th>Registered By</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody id="donorsTableBody">
-                        <!-- Rows will be inserted here -->
+                        <!-- Rows inserted by JS -->
                     </tbody>
                 </table>
             </div>
@@ -230,423 +304,17 @@
             <!-- Pagination -->
             <div id="pagination" class="mt-8 flex justify-center"></div>
         </div>
-    </div>
 
-    <!-- ==========================================================
-         SUPERUSER: Edit Donor Modal — Redesigned
-         ========================================================== -->
+    </div><!-- /.donors-main -->
 
-    <!-- Scoped styles for this modal ONLY — guarantees no cascade issues -->
-    <style>
-        /* ── Overlay ── */
-        #edm-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 9990;
-            align-items: center;
-            justify-content: center;
-            padding: 16px;
-            backdrop-filter: blur(4px);
-        }
+    <!-- ══════════════════════════════════════════════
+         EDIT DONOR MODAL (Superuser) — styles & markup
+    ══════════════════════════════════════════════ -->
 
-        #edm-overlay.active {
-            display: flex;
-        }
 
-        /* ── Panel ── */
-        #edm-panel {
-            background: #fff;
-            border-radius: 20px;
-            width: 100%;
-            max-width: 860px;
-            max-height: 92vh;
-            overflow-y: auto;
-            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
-        }
-
-        /* ── Header ── */
-        #edm-header {
-            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
-            border-radius: 20px 20px 0 0;
-            padding: 28px 28px 24px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            position: relative;
-            flex-shrink: 0;
-        }
-
-        #edm-avatar {
-            width: 64px;
-            height: 64px;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.25);
-            border: 3px solid rgba(255, 255, 255, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 800;
-            color: white;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-
-        #edm-header-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        #edm-header-name {
-            font-size: 20px;
-            font-weight: 700;
-            color: white;
-            margin: 0 0 8px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .edm-header-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .edm-tag {
-            background: rgba(255, 255, 255, 0.18);
-            color: white;
-            border-radius: 20px;
-            padding: 3px 12px;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            white-space: nowrap;
-        }
-
-        .edm-tag.blood {
-            background: white;
-            color: #dc2626;
-            border-color: white;
-            font-size: 13px;
-        }
-
-        #edm-close {
-            position: absolute;
-            top: 14px;
-            right: 16px;
-            background: rgba(255, 255, 255, 0.15);
-            border: none;
-            color: white;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-            line-height: 1;
-        }
-
-        #edm-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        /* ── Tabs ── */
-        #edm-tabs {
-            display: flex;
-            border-bottom: 2px solid #f3f4f6;
-            padding: 0 24px;
-            background: #fafafa;
-            flex-shrink: 0;
-        }
-
-        .edm-tab-btn {
-            padding: 14px 22px;
-            background: none;
-            border: none;
-            font-size: 14px;
-            font-weight: 600;
-            color: #9ca3af;
-            cursor: pointer;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .edm-tab-btn.active {
-            color: #dc2626;
-            border-bottom-color: #dc2626;
-        }
-
-        .edm-tab-btn:hover:not(.active) {
-            color: #374151;
-        }
-
-        /* ── Tab Panels ── */
-        .edm-panel {
-            display: none;
-            padding: 24px;
-        }
-
-        .edm-panel.active {
-            display: block;
-        }
-
-        /* ── Field Rows (3-col grid) ── */
-        .edm-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-        }
-
-        .edm-grid-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .edm-full {
-            grid-column: 1 / -1;
-        }
-
-        .edm-section-title {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #9ca3af;
-            margin: 20px 0 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .edm-section-title:first-child {
-            margin-top: 0;
-        }
-
-        .edm-section-title::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: #e5e7eb;
-        }
-
-        /* ── Field ── */
-        .edm-field {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .edm-field label {
-            font-size: 12px;
-            font-weight: 600;
-            color: #6b7280;
-            display: block;
-        }
-
-        .edm-field .req {
-            color: #dc2626;
-        }
-
-        .edm-input {
-            width: 100%;
-            box-sizing: border-box;
-            padding: 10px 12px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 14px;
-            color: #1f2937;
-            background: #fff;
-            font-family: inherit;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            -webkit-appearance: auto;
-            appearance: auto;
-        }
-
-        .edm-input:focus {
-            outline: none;
-            border-color: #dc2626;
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
-        }
-
-        .edm-input::placeholder {
-            color: #d1d5db;
-        }
-
-        .edm-hint {
-            font-size: 11px;
-            color: #9ca3af;
-            line-height: 1.4;
-        }
-
-        textarea.edm-input {
-            min-height: 80px;
-            resize: vertical;
-        }
-
-        /* ── Footer (actions) ── */
-        .edm-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 24px;
-            border-top: 1px solid #f3f4f6;
-            background: #fafafa;
-            border-radius: 0 0 20px 20px;
-            flex-shrink: 0;
-        }
-
-        #edm-status {
-            font-size: 13px;
-            font-weight: 500;
-            flex: 1;
-            margin-right: 16px;
-        }
-
-        #edm-status.err {
-            color: #dc2626;
-        }
-
-        #edm-status.ok {
-            color: #059669;
-        }
-
-        .edm-actions {
-            display: flex;
-            gap: 10px;
-        }
-
-        .edm-btn {
-            padding: 10px 24px;
-            border-radius: 9px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            border: none;
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .edm-btn-cancel {
-            background: #f3f4f6;
-            color: #374151;
-            border: 1.5px solid #e5e7eb;
-        }
-
-        .edm-btn-cancel:hover {
-            background: #e5e7eb;
-        }
-
-        .edm-btn-save {
-            background: linear-gradient(135deg, #dc2626, #991b1b);
-            color: white;
-            box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
-        }
-
-        .edm-btn-save:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
-        }
-
-        .edm-btn-save:disabled {
-            opacity: 0.55;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Log Donation specific */
-        #edm-log-success {
-            display: none;
-            text-align: center;
-            padding: 32px;
-        }
-
-        #edm-log-success .success-icon {
-            font-size: 52px;
-            margin-bottom: 12px;
-        }
-
-        #edm-log-success h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #059669;
-            margin-bottom: 8px;
-        }
-
-        #edm-log-success p {
-            color: #6b7280;
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 640px) {
-            #edm-panel {
-                border-radius: 16px;
-                max-height: 95vh;
-            }
-
-            .edm-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-
-            .edm-grid-2 {
-                grid-template-columns: 1fr;
-            }
-
-            .edm-header {
-                padding: 20px;
-            }
-
-            #edm-avatar {
-                width: 52px;
-                height: 52px;
-                font-size: 20px;
-            }
-
-            #edm-header-name {
-                font-size: 17px;
-            }
-        }
-
-        @media (max-width: 420px) {
-            .edm-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .edm-footer {
-                flex-direction: column;
-                gap: 10px;
-                align-items: stretch;
-            }
-
-            #edm-status {
-                margin-right: 0;
-                margin-bottom: 8px;
-            }
-
-            .edm-actions {
-                justify-content: flex-end;
-            }
-        }
-    </style>
-
-    <!-- Modal Markup -->
+    <!-- Edit Donor Modal Markup -->
     <div id="edm-overlay">
         <div id="edm-panel" role="dialog" aria-labelledby="edm-header-name">
-
-            <!-- ── Header ── -->
             <div id="edm-header">
                 <div id="edm-avatar">AB</div>
                 <div id="edm-header-info">
@@ -661,7 +329,6 @@
                 <button id="edm-close" onclick="closeEditDonorModal()" title="Close">✕</button>
             </div>
 
-            <!-- ── Tab Navigation ── -->
             <div id="edm-tabs">
                 <button class="edm-tab-btn active" id="edm-tab-profile-btn" onclick="switchEdmTab('profile')">
                     ✏️ Edit Profile
@@ -671,11 +338,10 @@
                 </button>
             </div>
 
-            <!-- ── Tab: Edit Profile ── -->
+            <!-- Tab: Edit Profile -->
             <div id="edm-panel-profile" class="edm-panel active">
                 <input type="hidden" id="editDonorId">
 
-                <!-- Identity -->
                 <p class="edm-section-title">👤 Identity</p>
                 <div class="edm-grid">
                     <div class="edm-field">
@@ -705,7 +371,6 @@
                     </div>
                 </div>
 
-                <!-- Personal -->
                 <p class="edm-section-title">📋 Personal Details</p>
                 <div class="edm-grid">
                     <div class="edm-field">
@@ -727,7 +392,6 @@
                     </div>
                 </div>
 
-                <!-- Contact & Location -->
                 <p class="edm-section-title">📞 Contact &amp; Location</p>
                 <div class="edm-grid">
                     <div class="edm-field">
@@ -753,7 +417,6 @@
                     </div>
                 </div>
 
-                <!-- Medical -->
                 <p class="edm-section-title">🏥 Medical History</p>
                 <div class="edm-field edm-full">
                     <label for="editMedicalHistory">Conditions / Notes</label>
@@ -762,10 +425,8 @@
                 </div>
             </div>
 
-            <!-- ── Tab: Log Donation ── -->
+            <!-- Tab: Log Donation -->
             <div id="edm-panel-donation" class="edm-panel">
-
-                <!-- Success message (shown after logging) -->
                 <div id="edm-log-success">
                     <div class="success-icon">✅</div>
                     <h3>Donation Logged!</h3>
@@ -774,9 +435,7 @@
                         onclick="switchEdmTab('donation'); resetLogDonationForm();">Log Another</button>
                 </div>
 
-                <!-- Form -->
                 <div id="edm-log-form">
-                    <!-- Patient / Request search field -->
                     <p class="edm-section-title">🧑‍⚕️ Patient / Request</p>
                     <div class="edm-field edm-full" style="position:relative; margin-bottom:8px;">
                         <label for="logPatientSearch">
@@ -787,14 +446,10 @@
                         <input id="logPatientSearch" type="text" class="edm-input"
                             placeholder="e.g. Ramesh Patel — or type to search requests..." autocomplete="off"
                             oninput="searchPatientRequests(this.value)">
-                        <!-- Autocomplete dropdown -->
-                        <div id="logPatientDropdown" style="
-                            display:none; position:absolute; top:100%; left:0; right:0;
+                        <div id="logPatientDropdown" style="display:none; position:absolute; top:100%; left:0; right:0;
                             background:#fff; border:1.5px solid #e5e7eb; border-top:none;
                             border-radius:0 0 8px 8px; box-shadow:0 8px 24px rgba(0,0,0,0.12);
-                            max-height:200px; overflow-y:auto; z-index:9999;
-                        "></div>
-                        <!-- Hidden fields for linked request -->
+                            max-height:200px; overflow-y:auto; z-index:9999;"></div>
                         <input type="hidden" id="logRequestId">
                         <input type="hidden" id="logRequestBloodGroup">
                         <span id="logRequestBadge"
@@ -846,10 +501,9 @@
                         </button>
                     </div>
                 </div>
-
             </div>
 
-            <!-- ── Footer ── -->
+            <!-- Footer -->
             <div class="edm-footer">
                 <div id="edm-status"></div>
                 <div class="edm-actions">
@@ -859,14 +513,12 @@
                     </button>
                 </div>
             </div>
-
-        </div><!-- end #edm-panel -->
+        </div>
     </div>
-    <!-- end Edit Donor Modal -->
 
-
-
-    <!-- View Details Modal -->
+    <!-- ══════════════════════════════════════════════
+         VIEW DETAILS MODAL
+    ══════════════════════════════════════════════ -->
     <div id="viewModal" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
@@ -874,36 +526,26 @@
                 <button class="modal-close" onclick="closeModal()">×</button>
             </div>
             <div class="modal-body">
-                <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab active" onclick="switchTab('overview')">Overview</button>
                     <button class="tab" onclick="switchTab('personal')">Personal Details</button>
                     <button class="tab" onclick="switchTab('medical')">Medical Info</button>
                     <button class="tab" onclick="switchTab('donations')">Donation History</button>
                 </div>
-
-                <!-- Tab Contents -->
-                <div id="tabOverview" class="tab-content active">
-                    <!-- Will be populated by JS -->
-                </div>
-                <div id="tabPersonal" class="tab-content">
-                    <!-- Will be populated by JS -->
-                </div>
-                <div id="tabMedical" class="tab-content">
-                    <!-- Will be populated by JS -->
-                </div>
-                <div id="tabDonations" class="tab-content">
-                    <!-- Will be populated by JS -->
-                </div>
+                <div id="tabOverview" class="tab-content active"></div>
+                <div id="tabPersonal" class="tab-content"></div>
+                <div id="tabMedical" class="tab-content"></div>
+                <div id="tabDonations" class="tab-content"></div>
             </div>
         </div>
     </div>
 
-    <!-- Footer -->
+    <!-- ══════════════════════════════════════════════
+         FOOTER
+    ══════════════════════════════════════════════ -->
     <footer class="bg-text-primary text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <!-- Logo and Mission -->
                 <div>
                     <div class="flex items-center mb-3">
                         <img src="imgs/Life-saver-united-logo-white.png" alt="Life Savers United" class="w-auto mr-3">
@@ -937,7 +579,6 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
                 <div class="text-center">
                     <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
                     <ul class="space-y-2">
@@ -955,7 +596,6 @@
                     </ul>
                 </div>
 
-                <!-- Quick Links -->
                 <div class="text-center">
                     <h3 class="text-lg font-semibold mb-3">Resources</h3>
                     <ul class="space-y-2">
@@ -970,14 +610,14 @@
                     </ul>
                 </div>
 
-                <!-- Contact Info -->
                 <div>
                     <h3 class="text-lg font-semibold mb-3">Contact</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="font-bold text-primary"><a
-                                href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
+                        <li class="font-bold text-primary">
+                            <a href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
                                 target="_blank" class="hover:text-primary-700 transition-smooth">24/7 Emergency:
-                                9979260393</a></li>
+                                9979260393</a>
+                        </li>
                         <li>Support: lifesaversunited.india@gmail.com</li>
                     </ul>
                 </div>
@@ -992,10 +632,18 @@
     </footer>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Set current year
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
-        });
+        // Set current year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // Mobile menu toggle
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        if (mobileMenuBtn && mobileMenu) {
+            mobileMenuBtn.addEventListener('click', () => {
+                const isOpen = mobileMenu.style.display === 'block';
+                mobileMenu.style.display = isOpen ? 'none' : 'block';
+            });
+        }
     </script>
 
     <!-- Firebase and Scripts -->

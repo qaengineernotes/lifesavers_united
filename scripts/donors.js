@@ -5,6 +5,14 @@ import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase
 import { db, collection, doc, addDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from '/scripts/firebase-config.js';
 
 // ============================================================================
+// CONSTANTS
+// ============================================================================
+const PAGE_SIZE = 20;                // Donors shown per table page
+const SEARCH_DEBOUNCE_MS = 300;      // Delay (ms) before search fires after keystroke
+const ACTIVE_MONTHS_THRESHOLD = 6;  // Months within which a donor is considered 'active'
+const WHATSAPP_COUNTRY_CODE = '91'; // India country code for WhatsApp links
+
+// ============================================================================
 // SUPERUSER CHECK
 // ============================================================================
 function isSuperuser() {
@@ -15,22 +23,28 @@ function isSuperuser() {
 let currentUser = null;
 let allDonors = [];
 let filteredDonors = []; // For search and filter results
-let searchQuery = ''; // Current search query
+let searchQuery = '';    // Current search query
 let activeFilters = {
     bloodGroup: '',
     city: '',
     emergency: ''
 };
+let currentSort = {
+    key: 'registeredAt',
+    dir: 'desc'
+};
 let currentPage = 1;
-const donorsPerPage = 20;
 
 // ============================================================================
 // INITIALIZE PAGE
 // ============================================================================
+// Holds the unsubscribe function for the auth listener — called on page unload
+let unsubscribeAuth = null;
+
 document.addEventListener('DOMContentLoaded', async () => {
 
-    // Listen for auth state changes
-    onAuthChange(async (user) => {
+    // Listen for auth state changes — store unsubscribe so we can clean up
+    unsubscribeAuth = onAuthChange(async (user) => {
         currentUser = user;
 
         if (!user) {
@@ -48,6 +62,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         // User is logged in and approved
         await loadAllDonors();
     });
+});
+
+// Clean up the auth listener when the user navigates away
+window.addEventListener('pagehide', () => {
+    if (unsubscribeAuth) {
+        unsubscribeAuth();
+        unsubscribeAuth = null;
+    }
 });
 
 // ============================================================================
@@ -127,9 +149,9 @@ async function loadAllDonors() {
     } catch (error) {
         console.error('Error loading donors:', error);
         document.getElementById('loadingState').innerHTML = `
-            <div style="color: #dc2626;">
-                <p style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">Error Loading Donors</p>
-                <p style="color: #6b7280;">${error.message}</p>
+            <div class="load-error">
+                <p class="load-error-title">Error Loading Donors</p>
+                <p class="load-error-message">${error.message}</p>
                 <button onclick="location.reload()" class="action-btn" style="margin-top: 20px;">Retry</button>
             </div>
         `;
@@ -149,7 +171,7 @@ function updateStatistics() {
 
     // Active donors (donated in last 6 months)
     const sixMonthsAgo = new Date();
-    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - ACTIVE_MONTHS_THRESHOLD);
     const activeCount = allDonors.filter(d => {
         if (!d.lastDonatedAt) return false;
         const lastDonation = d.lastDonatedAt.seconds
@@ -172,15 +194,20 @@ function updateStatistics() {
         return dateObj >= thisMonth;
     }).length;
 
-    // Most common blood group
+    // Most common blood group (exclude blank / Unknown entries)
     const bloodGroups = {};
     allDonors.forEach(d => {
-        const bg = d.bloodGroup || 'Unknown';
+        const bg = (d.bloodGroup || '').trim();
+        if (!bg || bg.toLowerCase() === 'unknown') return;
         bloodGroups[bg] = (bloodGroups[bg] || 0) + 1;
     });
-    const mostCommon = Object.keys(bloodGroups).reduce((a, b) =>
-        bloodGroups[a] > bloodGroups[b] ? a : b, 'N/A'
-    );
+
+    let mostCommon = 'N/A';
+    if (Object.keys(bloodGroups).length > 0) {
+        mostCommon = Object.keys(bloodGroups).sort(
+            (a, b) => bloodGroups[b] - bloodGroups[a]
+        )[0];
+    }
 
     document.getElementById('statTotal').textContent = total;
     document.getElementById('statEmergency').textContent = emergencyCount;
@@ -209,6 +236,9 @@ function populateCityFilter() {
         option.textContent = city;
         cityFilter.appendChild(option);
     });
+
+    // Also update custom dropdown panel for City
+    updateCityCustomDropdown(sortedCities);
 }
 
 // ============================================================================
@@ -219,7 +249,7 @@ function renderTable() {
     tbody.innerHTML = '';
 
     // Apply filters and search
-    let donorsToDisplay = allDonors;
+    let donorsToDisplay = [...allDonors];
 
     // Apply search
     if (searchQuery) {
@@ -248,11 +278,50 @@ function renderTable() {
         );
     }
 
+    // Apply Sorting
+    donorsToDisplay.sort((a, b) => {
+        const key = currentSort.key;
+        const dir = currentSort.dir === 'asc' ? 1 : -1;
+
+        // Helper to get comparable values
+        const getValue = (obj, k) => {
+            let val = obj[k];
+
+            // Handle registration date fallback
+            if (k === 'registeredAt') val = obj.registeredAt || obj.createdAt;
+
+            // Handle Firestore Timestamps
+            if (val && typeof val === 'object' && val.seconds !== undefined) {
+                return val.seconds;
+            }
+
+            // Handle Date objects or ISO strings
+            if (val && (k === 'lastDonatedAt' || k === 'registeredAt' || k === 'createdAt')) {
+                const d = new Date(val);
+                return isNaN(d.getTime()) ? 0 : d.getTime();
+            }
+
+            if (typeof val === 'string') return val.toLowerCase();
+            if (typeof val === 'number') return val;
+            return val || 0;
+        };
+
+        const valA = getValue(a, key);
+        const valB = getValue(b, key);
+
+        if (valA < valB) return -1 * dir;
+        if (valA > valB) return 1 * dir;
+        return 0;
+    });
+
     filteredDonors = donorsToDisplay;
 
+    // Update Header UI (sorting arrows)
+    updateHeaderSortUI();
+
     // Calculate pagination
-    const startIndex = (currentPage - 1) * donorsPerPage;
-    const endIndex = startIndex + donorsPerPage;
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const endIndex = startIndex + PAGE_SIZE;
     const pageDonors = donorsToDisplay.slice(startIndex, endIndex);
 
     if (pageDonors.length === 0) {
@@ -291,20 +360,15 @@ function createTableRow(donor, index) {
     // 1. Donor Name
     const donorName = escapeHtml(donor.fullName || 'Unknown');
 
-    // 2. Blood Group
-    const bloodGroup = `<strong style="color: #dc2626;">🩸 ${donor.bloodGroup || 'N/A'}</strong>`;
+    // 2. Blood Group — CSS class for colour
+    const bloodGroup = `<strong class="cell-blood-group">${donor.bloodGroup || 'N/A'}</strong>`;
 
-    // 3. Contact
+    // 3. Contact — just the number, no phone icon
     const contact = donor.contactNumber || 'N/A';
-    const contactHtml = `
-        <div>
-            ${contact}
-            ${contact !== 'N/A' ? '<br><small style="color: #6b7280;">📞</small>' : ''}
-        </div>
-    `;
+    const contactHtml = `<div>${contact}</div>`;
 
-    // 4. City
-    const city = `📍 ${escapeHtml(donor.city || 'N/A')}`;
+    // 4. City — no pin icon
+    const city = escapeHtml(donor.city || 'N/A');
 
     // 5. Area
     const area = escapeHtml(donor.area || 'N/A');
@@ -312,14 +376,13 @@ function createTableRow(donor, index) {
     // 6. Age
     const age = donor.age || 'N/A';
 
-    // 7. Gender
-    const genderIcon = donor.gender === 'Male' ? '👨' : donor.gender === 'Female' ? '👩' : '👤';
-    const gender = `${genderIcon} ${donor.gender || 'N/A'}`;
+    // 7. Gender — no emoji icon
+    const gender = donor.gender || 'N/A';
 
     // 8. Last Donated
     const lastDonated = donor.lastDonatedAt
-        ? `<div>${formatDateTime(donor.lastDonatedAt)}<br><small style="color: #6b7280;">${getTimeAgo(donor.lastDonatedAt)}</small></div>`
-        : '<span style="color: #9ca3af;">Never</span>';
+        ? `<div>${formatDateTime(donor.lastDonatedAt)}<br><small class="cell-time-ago">${getTimeAgo(donor.lastDonatedAt)}</small></div>`
+        : '<span class="cell-muted">Never</span>';
 
     // 9. Emergency Available
     const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
@@ -327,31 +390,25 @@ function createTableRow(donor, index) {
         ? '<span class="status-badge open">✓ YES</span>'
         : '<span class="status-badge closed">✗ NO</span>';
 
-    // 10. Registered Date (use registeredAt or createdAt as fallback)
+    // 10. Registered Date
     const regDate = donor.registeredAt || donor.createdAt;
     const registered = regDate
-        ? `\u003cdiv\u003e${formatDateTime(regDate)}\u003cbr\u003e\u003csmall style=\"color: #6b7280;\"\u003e${getTimeAgo(regDate)}\u003c/small\u003e\u003c/div\u003e`
+        ? `<div>${formatDateTime(regDate)}<br><small class="cell-time-ago">${getTimeAgo(regDate)}</small></div>`
         : 'N/A';
 
-    // 11. Registered By
-    const registeredBy = `👤 ${escapeHtml(donor.createdBy || 'Unknown')}`;
+    // 11. Registered By — no emoji
+    const registeredBy = escapeHtml(donor.createdBy || 'Unknown');
 
-    // 12. Actions
+    // 12. Actions — icons only, no text
     const donorId = donor.id;
     const superuserActions = isSuperuser() ? `
-        <button class="action-btn action-btn--edit" onclick="editDonor('${donorId}')" title="Edit Donor">
-            ✏️ Edit
-        </button>
-        <button class="action-btn action-btn--delete" onclick="deleteDonor('${donorId}')" title="Delete Donor">
-            🗑️ Delete
-        </button>
+        <button class="action-btn action-btn--edit" onclick="editDonor('${donorId}')" title="Edit Donor">✏️</button>
+        <button class="action-btn action-btn--delete" onclick="deleteDonor('${donorId}')" title="Delete Donor">🗑️</button>
     ` : '';
 
     const actionsHtml = `
-        <div style="display:flex; gap:6px; flex-wrap:wrap;">
-            <button class="action-btn" onclick="viewDonor('${donorId}')" title="View Details">
-                👁️ View
-            </button>
+        <div class="cell-actions">
+            <button class="action-btn" onclick="viewDonor('${donorId}')" title="View Details">👁️</button>
             ${superuserActions}
         </div>
     `;
@@ -419,37 +476,42 @@ async function populateModal(donor) {
 // ============================================================================
 function createOverviewTab(donor) {
     const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
+    const regDate = donor.registeredAt || donor.createdAt;
 
     return `
-        <div class="info-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
-            <h3 style="color: white;">👤 ${escapeHtml(donor.fullName || 'Unknown')}</h3>
-            <div class="info-row">
-                <div class="info-label">Blood Group:</div>
-                <div class="info-value"><strong style="font-size: 24px;">🩸 ${donor.bloodGroup || 'N/A'}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Contact:</div>
-                <div class="info-value"><strong>${donor.contactNumber || 'N/A'}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Emergency Available:</div>
-                <div class="info-value"><strong>${isEmergency ? '✓ YES' : '✗ NO'}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Registered:</div>
-                <div class="info-value">${formatDateTime(donor.registeredAt || donor.createdAt)}</div>
+        <div class="info-card" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white;">
+            <h3 style="color: rgba(255,255,255,0.75); margin-bottom: 12px;">👤 ${escapeHtml(donor.fullName || 'Unknown')}</h3>
+            <div class="info-fields-grid cols-3">
+                <div class="info-field" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
+                    <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Blood Group</div>
+                    <div class="info-field-value" style="color:#fff; font-size:22px;">🩸 ${donor.bloodGroup || 'N/A'}</div>
+                </div>
+                <div class="info-field" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
+                    <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Contact</div>
+                    <div class="info-field-value" style="color:#fff;">${donor.contactNumber || 'N/A'}</div>
+                </div>
+                <div class="info-field" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
+                    <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Emergency</div>
+                    <div class="info-field-value" style="color:${isEmergency ? '#86efac' : '#fca5a5'};">${isEmergency ? '✓ YES' : '✗ NO'}</div>
+                </div>
+                <div class="info-field full" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
+                    <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Registered</div>
+                    <div class="info-field-value" style="color:#fff;">${regDate ? formatDateTime(regDate) : 'N/A'}</div>
+                </div>
             </div>
         </div>
 
         <div class="info-card">
             <h3>📍 Location</h3>
-            <div class="info-row">
-                <div class="info-label">City:</div>
-                <div class="info-value">${escapeHtml(donor.city || 'N/A')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Area:</div>
-                <div class="info-value">${escapeHtml(donor.area || 'N/A')}</div>
+            <div class="info-fields-grid">
+                <div class="info-field">
+                    <div class="info-field-label">City</div>
+                    <div class="info-field-value">${escapeHtml(donor.city || 'N/A')}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Area</div>
+                    <div class="info-field-value">${escapeHtml(donor.area || 'N/A')}</div>
+                </div>
             </div>
         </div>
     `;
@@ -459,87 +521,98 @@ function createPersonalTab(donor) {
     return `
         <div class="info-card">
             <h3>👤 Personal Information</h3>
-            <div class="info-row">
-                <div class="info-label">Full Name:</div>
-                <div class="info-value"><strong>${escapeHtml(donor.fullName || 'N/A')}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Age:</div>
-                <div class="info-value">${donor.age || 'N/A'} years</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Gender:</div>
-                <div class="info-value">${donor.gender || 'N/A'}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Date of Birth:</div>
-                <div class="info-value">${donor.dateOfBirth || 'N/A'}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Weight:</div>
-                <div class="info-value">${donor.weight || 'N/A'} kg</div>
+            <div class="info-fields-grid">
+                <div class="info-field full">
+                    <div class="info-field-label">Full Name</div>
+                    <div class="info-field-value">${escapeHtml(donor.fullName || 'N/A')}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Age</div>
+                    <div class="info-field-value">${donor.age ? donor.age + ' yrs' : 'N/A'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Gender</div>
+                    <div class="info-field-value">${donor.gender || 'N/A'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Date of Birth</div>
+                    <div class="info-field-value">${donor.dateOfBirth || 'N/A'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Weight</div>
+                    <div class="info-field-value">${donor.weight ? donor.weight + ' kg' : 'N/A'}</div>
+                </div>
             </div>
         </div>
 
         <div class="info-card">
             <h3>📞 Contact Information</h3>
-            <div class="info-row">
-                <div class="info-label">Phone:</div>
-                <div class="info-value">
-                    <strong>${donor.contactNumber || 'N/A'}</strong>
-                    ${donor.contactNumber ? `<br><a href="tel:${donor.contactNumber}" style="color: #667eea;">📞 Call</a> | <a href="https://wa.me/91${donor.contactNumber}" target="_blank" style="color: #25D366;">💬 WhatsApp</a>` : ''}
+            <div class="info-fields-grid">
+                <div class="info-field full">
+                    <div class="info-field-label">Phone</div>
+                    <div class="info-field-value">
+                        ${donor.contactNumber || 'N/A'}
+                        ${donor.contactNumber ? `<br><small><a href="tel:${donor.contactNumber}" style="color:#dc2626;">📞 Call</a> &nbsp;|&nbsp; <a href="https://wa.me/${WHATSAPP_COUNTRY_CODE}${donor.contactNumber}" target="_blank" style="color:#25D366;">💬 WhatsApp</a></small>` : ''}
+                    </div>
                 </div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Email:</div>
-                <div class="info-value">${donor.email || 'N/A'}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Preferred Contact:</div>
-                <div class="info-value">${donor.preferredContact || 'N/A'}</div>
+                <div class="info-field">
+                    <div class="info-field-label">Email</div>
+                    <div class="info-field-value">${donor.email || 'N/A'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Preferred Contact</div>
+                    <div class="info-field-value">${donor.preferredContact || 'N/A'}</div>
+                </div>
             </div>
         </div>
 
         <div class="info-card">
             <h3>📍 Address</h3>
-            <div class="info-row">
-                <div class="info-label">City:</div>
-                <div class="info-value">${escapeHtml(donor.city || 'N/A')}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Area:</div>
-                <div class="info-value">${escapeHtml(donor.area || 'N/A')}</div>
+            <div class="info-fields-grid">
+                <div class="info-field">
+                    <div class="info-field-label">City</div>
+                    <div class="info-field-value">${escapeHtml(donor.city || 'N/A')}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Area</div>
+                    <div class="info-field-value">${escapeHtml(donor.area || 'N/A')}</div>
+                </div>
             </div>
         </div>
     `;
 }
 
 function createMedicalTab(donor) {
+    const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
     return `
         <div class="info-card">
             <h3>🩸 Blood Information</h3>
-            <div class="info-row">
-                <div class="info-label">Blood Group:</div>
-                <div class="info-value"><strong style="color: #dc2626; font-size: 20px;">🩸 ${donor.bloodGroup || 'N/A'}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Last Donated:</div>
-                <div class="info-value">${donor.lastDonatedAt ? formatDateTime(donor.lastDonatedAt) + ' (' + getTimeAgo(donor.lastDonatedAt) + ')' : 'Never'}</div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Emergency Available:</div>
-                <div class="info-value"><strong>${String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes' ? '✓ YES' : '✗ NO'}</strong></div>
+            <div class="info-fields-grid cols-3">
+                <div class="info-field">
+                    <div class="info-field-label">Blood Group</div>
+                    <div class="info-field-value" style="color:#dc2626; font-size:20px;">🩸 ${donor.bloodGroup || 'N/A'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Emergency</div>
+                    <div class="info-field-value" style="color:${isEmergency ? '#059669' : '#dc2626'}">${isEmergency ? '✓ YES' : '✗ NO'}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Last Donated</div>
+                    <div class="info-field-value">${donor.lastDonatedAt ? getTimeAgo(donor.lastDonatedAt) : 'Never'}</div>
+                </div>
+                <div class="info-field full">
+                    <div class="info-field-label">Last Donation Date</div>
+                    <div class="info-field-value">${donor.lastDonatedAt ? formatDateTime(donor.lastDonatedAt) : 'Never'}</div>
+                </div>
             </div>
         </div>
 
         <div class="info-card">
             <h3>🏥 Medical History</h3>
-            <div class="info-row" style="grid-template-columns: 1fr;">
-                <div>
-                    <div class="info-label" style="margin-bottom: 8px;">Medical Conditions:</div>
-                    <div class="info-value" style="background: white; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb;">
-                        ${escapeHtml(donor.medicalHistory || 'No medical history provided')}
-                    </div>
+            <div class="info-fields-grid cols-1">
+                <div class="info-field">
+                    <div class="info-field-label">Medical Conditions</div>
+                    <div class="info-field-value" style="white-space: pre-wrap; color:#374151;">${escapeHtml(donor.medicalHistory || 'No medical history provided')}</div>
                 </div>
             </div>
         </div>
@@ -550,13 +623,15 @@ function createDonationsTab(donor, donations) {
     let html = `
         <div class="info-card">
             <h3>🩸 Donation Summary</h3>
-            <div class="info-row">
-                <div class="info-label">Total Donations:</div>
-                <div class="info-value"><strong>${donations.length}</strong></div>
-            </div>
-            <div class="info-row">
-                <div class="info-label">Last Donation:</div>
-                <div class="info-value">${donor.lastDonatedAt ? formatDateTime(donor.lastDonatedAt) : 'Never'}</div>
+            <div class="info-fields-grid">
+                <div class="info-field">
+                    <div class="info-field-label">Total Donations</div>
+                    <div class="info-field-value" style="font-size:22px; color:#dc2626;">${donations.length}</div>
+                </div>
+                <div class="info-field">
+                    <div class="info-field-label">Last Donation</div>
+                    <div class="info-field-value">${donor.lastDonatedAt ? formatDateTime(donor.lastDonatedAt) : 'Never'}</div>
+                </div>
             </div>
         </div>
     `;
@@ -568,11 +643,11 @@ function createDonationsTab(donor, donations) {
             const superuserLogActions = isSuperuser() ? `
                 <div style="display:flex; gap:8px; margin-top:12px; padding-top:12px; border-top:1px solid #f3f4f6;">
                     <button onclick="editDonationLog('${donation.id}', decodeURIComponent('${donationJson}'))"
-                        style="flex:1; padding:7px 12px; border-radius:7px; border:1.5px solid #667eea;
-                               background:#fff; color:#667eea; font-size:12px; font-weight:600;
+                        style="flex:1; padding:7px 12px; border-radius:7px; border:1.5px solid #dc2626;
+                               background:#fff; color:#dc2626; font-size:12px; font-weight:600;
                                cursor:pointer; transition:all 0.2s;"
-                        onmouseover="this.style.background='#667eea';this.style.color='#fff'"
-                        onmouseout="this.style.background='#fff';this.style.color='#667eea'">
+                        onmouseover="this.style.background='#dc2626';this.style.color='#fff'"
+                        onmouseout="this.style.background='#fff';this.style.color='#dc2626'">
                         ✏️ Edit Log
                     </button>
                     <button onclick="deleteDonationLog('${donation.id}', '${escapeHtml(donation.patientName || 'this log')}', '${escapeHtml(donation.donationType || 'Whole Blood')}')"
@@ -620,11 +695,11 @@ function createDonationsTab(donor, donations) {
                     ${donation.notes ? `
                     <div class="info-row">
                         <div class="info-label">Notes:</div>
-                        <div class="info-value" style="font-style:italic; color:#6b7280;">${escapeHtml(donation.notes)}</div>
+                        <div class="info-value donation-notes">${escapeHtml(donation.notes)}</div>
                     </div>` : ''}
-                    <div style="margin-top:8px; display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-                        ${donation.source === 'admin_manual' ? `<span style="font-size:11px; background:#f0fdf4; color:#059669; padding:2px 8px; border-radius:20px; font-weight:600;">✍️ Manually Logged</span>` : ''}
-                        ${donation.requestId ? `<span style="font-size:11px; background:#eff6ff; color:#2563eb; padding:2px 8px; border-radius:20px; font-weight:600;">🔗 Linked to Request</span>` : ''}
+                    <div class="donation-meta">
+                        ${donation.source === 'admin_manual' ? `<span class="donation-badge donation-badge--manual">✍️ Manually Logged</span>` : ''}
+                        ${donation.requestId ? `<span class="donation-badge donation-badge--linked">🔗 Linked to Request</span>` : ''}
                     </div>
                     ${superuserLogActions}
                 </div>
@@ -633,10 +708,10 @@ function createDonationsTab(donor, donations) {
 
     } else {
         html += `
-            <div class="info-card" style="text-align: center; padding: 40px;">
-                <div style="font-size: 48px; margin-bottom: 15px;">📭</div>
-                <h3 style="color: #6b7280;">No Donations Yet</h3>
-                <p style="color: #9ca3af; margin-top: 10px;">This donor hasn't made any donations yet.</p>
+            <div class="info-card empty-donations">
+                <div class="empty-donations-icon">📭</div>
+                <h3 class="empty-donations-title">No Donations Yet</h3>
+                <p class="empty-donations-text">This donor hasn't made any donations yet.</p>
             </div>
         `;
     }
@@ -709,7 +784,7 @@ function updatePagination() {
     const donorsToDisplay = filteredDonors.length > 0 || searchQuery || hasActiveFilters()
         ? filteredDonors
         : allDonors;
-    const totalPages = Math.ceil(donorsToDisplay.length / donorsPerPage);
+    const totalPages = Math.ceil(donorsToDisplay.length / PAGE_SIZE);
 
     if (totalPages <= 1) {
         paginationContainer.innerHTML = '';
@@ -814,6 +889,8 @@ function initializeSearchAndFilters() {
 
     initializeSearch();
     initializeFilters();
+    initializeTableSorting();
+    setupCustomDropdowns();
 }
 
 // ============================================================================
@@ -843,7 +920,7 @@ function initializeSearch() {
         clearTimeout(debounceTimer);
         debounceTimer = setTimeout(() => {
             performSearch(value);
-        }, 300);
+        }, SEARCH_DEBOUNCE_MS);
     });
 
     // Clear search button
@@ -869,10 +946,9 @@ function performSearch(query) {
 
     if (!searchQuery) {
         searchResults.textContent = '';
-        searchResults.className = 'search-results-info';
-        searchResults.style.display = 'none';
+        searchResults.classList.remove('visible');
     } else {
-        searchResults.style.display = 'block';
+        searchResults.classList.add('visible');
     }
 
     currentPage = 1;
@@ -881,10 +957,12 @@ function performSearch(query) {
     // Update search results display
     if (searchQuery && filteredDonors.length > 0) {
         searchResults.textContent = `Found ${filteredDonors.length} donor${filteredDonors.length === 1 ? '' : 's'}`;
-        searchResults.className = 'search-results-info has-results';
+        searchResults.classList.add('visible');
     } else if (searchQuery) {
         searchResults.textContent = `No results found`;
-        searchResults.className = 'search-results-info no-results';
+        searchResults.classList.add('visible');
+    } else {
+        searchResults.classList.remove('visible');
     }
 }
 
@@ -933,9 +1011,29 @@ function initializeFilters() {
             city: '',
             emergency: ''
         };
+        currentSort = {
+            key: 'registeredAt',
+            dir: 'desc'
+        };
+
         bloodGroupFilter.value = '';
         cityFilter.value = '';
         emergencyFilter.value = '';
+
+        // Reset custom dropdown labels
+        document.querySelectorAll('.custom-dropdown').forEach(dropdown => {
+            const nativeSelect = dropdown.querySelector('select');
+            if (nativeSelect) nativeSelect.value = ''; // Reset native select
+
+            const defaultText = nativeSelect && nativeSelect.options[0] ? nativeSelect.options[0].text : 'All';
+            const label = dropdown.querySelector('.cdd-label');
+            if (label) label.textContent = defaultText;
+
+            dropdown.querySelectorAll('.cdd-option').forEach(opt => {
+                opt.classList.toggle('selected', opt.dataset.value === '');
+            });
+        });
+
         updateClearFiltersButton();
         currentPage = 1;
         renderTable();
@@ -944,12 +1042,139 @@ function initializeFilters() {
 
 function updateClearFiltersButton() {
     const clearFiltersBtn = document.getElementById('clearFilters');
-    const hasFilters = hasActiveFilters();
-    clearFiltersBtn.style.display = hasFilters ? 'block' : 'none';
+    if (hasActiveFilters()) {
+        clearFiltersBtn.classList.add('visible');
+    } else {
+        clearFiltersBtn.classList.remove('visible');
+    }
 }
 
 function hasActiveFilters() {
     return activeFilters.bloodGroup || activeFilters.city || activeFilters.emergency;
+}
+
+// ============================================================================
+// TABLE SORTING LOGIC
+// ============================================================================
+function initializeTableSorting() {
+    const headers = document.querySelectorAll('.requests-table thead th.sortable');
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const key = header.dataset.sort;
+
+            if (currentSort.key === key) {
+                // Toggle direction
+                currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                // New key, default to desc for dates, asc for names
+                currentSort.key = key;
+                currentSort.dir = (key === 'registeredAt' || key === 'lastDonatedAt') ? 'desc' : 'asc';
+            }
+
+            currentPage = 1;
+            renderTable();
+        });
+    });
+}
+
+function updateHeaderSortUI() {
+    const headers = document.querySelectorAll('.requests-table thead th.sortable');
+    headers.forEach(header => {
+        header.classList.remove('asc', 'desc');
+        if (header.dataset.sort === currentSort.key) {
+            header.classList.add(currentSort.dir);
+        }
+    });
+}
+
+// ============================================================================
+// CUSTOM DROPDOWN LOGIC
+// ============================================================================
+function setupCustomDropdowns() {
+    const dropdowns = document.querySelectorAll('.custom-dropdown');
+
+    dropdowns.forEach(dropdown => {
+        const trigger = dropdown.querySelector('.cdd-trigger');
+        const nativeSelect = dropdown.querySelector('select');
+        const label = dropdown.querySelector('.cdd-label');
+
+        // Sync initial state if native select is already set
+        if (nativeSelect && label) {
+            const initialValue = nativeSelect.value;
+            const initialText = nativeSelect.options[nativeSelect.selectedIndex]?.text;
+            if (initialValue !== '') {
+                label.textContent = initialText;
+                dropdown.querySelectorAll('.cdd-option').forEach(opt => {
+                    opt.classList.toggle('selected', opt.dataset.value === initialValue);
+                });
+            }
+        }
+
+        // Toggle dropdown
+        trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+
+            // Close others
+            dropdowns.forEach(other => {
+                if (other !== dropdown) {
+                    other.classList.remove('active');
+                    other.querySelector('.cdd-trigger').setAttribute('aria-expanded', 'false');
+                }
+            });
+
+            const isActive = dropdown.classList.toggle('active');
+            trigger.setAttribute('aria-expanded', isActive ? 'true' : 'false');
+        });
+
+        // Option selection
+        dropdown.addEventListener('click', (e) => {
+            const option = e.target.closest('.cdd-option');
+            if (!option) return;
+
+            const value = option.dataset.value;
+            const text = option.textContent;
+
+            // Update custom UI
+            dropdown.querySelector('.cdd-label').textContent = text;
+            dropdown.querySelectorAll('.cdd-option').forEach(opt => opt.classList.remove('selected'));
+            option.classList.add('selected');
+
+            // Sync with native select
+            nativeSelect.value = value;
+            nativeSelect.dispatchEvent(new Event('change'));
+
+            // Close dropdown
+            dropdown.classList.remove('active');
+            trigger.setAttribute('aria-expanded', 'false');
+        });
+    });
+
+    // Close on outside click
+    document.addEventListener('click', () => {
+        dropdowns.forEach(dropdown => {
+            dropdown.classList.remove('active');
+            dropdown.querySelector('.cdd-trigger').setAttribute('aria-expanded', 'false');
+        });
+    });
+}
+
+function updateCityCustomDropdown(cities) {
+    const cityDropdown = document.getElementById('dropCity');
+    if (!cityDropdown) return;
+
+    const panel = cityDropdown.querySelector('.cdd-panel');
+
+    // Keep the "All Cities" option
+    panel.innerHTML = '<li class="cdd-option selected" data-value="" role="option">All Cities</li>';
+
+    cities.forEach(city => {
+        const li = document.createElement('li');
+        li.className = 'cdd-option';
+        li.dataset.value = city;
+        li.setAttribute('role', 'option');
+        li.textContent = city;
+        panel.appendChild(li);
+    });
 }
 
 function updateFilterResults() {
@@ -963,9 +1188,10 @@ function updateFilterResults() {
 
         const filterText = filterTexts.length > 0 ? ` (${filterTexts.join(', ')})` : '';
         filterResults.textContent = `Showing ${filteredDonors.length} of ${allDonors.length} donors${filterText}`;
-        filterResults.style.display = 'block';
+        filterResults.classList.add('visible');
     } else {
-        filterResults.style.display = 'none';
+        filterResults.textContent = '';
+        filterResults.classList.remove('visible');
     }
 }
 
@@ -1527,7 +1753,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ">
                 <!-- Header -->
                 <div style="
-                    background:linear-gradient(135deg,#667eea,#764ba2);
+                    background:linear-gradient(135deg,#dc2626,#764ba2);
                     border-radius:16px 16px 0 0; padding:20px 24px;
                     display:flex; align-items:center; justify-content:space-between;
                 ">
@@ -1554,7 +1780,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             border:1.5px solid #e5e7eb; border-radius:8px;
                             font-size:14px; color:#1f2937; font-family:inherit;
                             outline:none; transition:border-color 0.2s;
-                        " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                        " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
                     </div>
 
                     <!-- Date + Type (2-col) -->
@@ -1566,7 +1792,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 border:1.5px solid #e5e7eb; border-radius:8px;
                                 font-size:14px; color:#1f2937; font-family:inherit;
                                 outline:none; transition:border-color 0.2s;
-                            " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                            " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <label style="font-size:12px; font-weight:600; color:#6b7280;">Donation Type <span style="color:#dc2626;">*</span></label>
@@ -1575,7 +1801,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 border:1.5px solid #e5e7eb; border-radius:8px;
                                 font-size:14px; color:#1f2937; font-family:inherit;
                                 outline:none; transition:border-color 0.2s; background:#fff;
-                            " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                            " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
                                 <option value="Whole Blood">🩸 Whole Blood</option>
                                 <option value="SDP">🧪 SDP (Single Donor Platelet)</option>
                                 <option value="Plasma">💉 Plasma</option>
@@ -1594,7 +1820,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 border:1.5px solid #e5e7eb; border-radius:8px;
                                 font-size:14px; color:#1f2937; font-family:inherit;
                                 outline:none; transition:border-color 0.2s;
-                            " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                            " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
                         </div>
                         <div style="display:flex; flex-direction:column; gap:4px;">
                             <label style="font-size:12px; font-weight:600; color:#6b7280;">Hospital / Location</label>
@@ -1603,7 +1829,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 border:1.5px solid #e5e7eb; border-radius:8px;
                                 font-size:14px; color:#1f2937; font-family:inherit;
                                 outline:none; transition:border-color 0.2s;
-                            " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'">
+                            " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
                         </div>
                     </div>
 
@@ -1615,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             border:1.5px solid #e5e7eb; border-radius:8px;
                             font-size:14px; color:#1f2937; font-family:inherit;
                             outline:none; resize:vertical; transition:border-color 0.2s;
-                        " onfocus="this.style.borderColor='#667eea'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
+                        " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'"></textarea>
                     </div>
 
                     <!-- Status -->
@@ -1634,7 +1860,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     ">Cancel</button>
                     <button id="editLogSaveBtn" onclick="saveEditDonationLog()" style="
                         padding:10px 22px; border-radius:8px; border:none;
-                        background:linear-gradient(135deg,#667eea,#764ba2);
+                        background:linear-gradient(135deg,#dc2626,#764ba2);
                         color:#fff; font-size:14px; font-weight:600; cursor:pointer;
                         box-shadow:0 4px 14px rgba(102,126,234,0.4);
                         transition:all 0.2s;

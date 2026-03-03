@@ -1,6 +1,6 @@
 /**
- * Stories Page JavaScript - Simplified Version
- * Shows full stories in expanded cards without modals
+ * Stories Page JavaScript
+ * Shows full stories in expanded cards + Share functionality
  */
 
 let allStories = [];
@@ -10,21 +10,21 @@ let currentFilter = 'all';
 document.addEventListener('DOMContentLoaded', function () {
     loadStories();
     setupEventListeners();
+    injectShareToastContainer();
 });
 
-/**
- * Load stories from JSON file
- */
+/* ─────────────────────────────────────────
+   DATA LOADING
+───────────────────────────────────────── */
+
 async function loadStories() {
     try {
         const response = await fetch('/data/stories.json');
         const data = await response.json();
         allStories = data.stories;
 
-        // Update stats
         updateStats(data.stats);
 
-        // Display stories (sorted by newest first)
         const sortedStories = [...allStories].sort((a, b) => new Date(b.date) - new Date(a.date));
         displayStories(sortedStories);
 
@@ -34,52 +34,41 @@ async function loadStories() {
     }
 }
 
-/**
- * Setup event listeners for filters
- */
+/* ─────────────────────────────────────────
+   FILTERS
+───────────────────────────────────────── */
+
 function setupEventListeners() {
-    // Filter buttons
     const filterButtons = document.querySelectorAll('.filter-btn');
     filterButtons.forEach(button => {
         button.addEventListener('click', function () {
-            // Update active state
             filterButtons.forEach(btn => btn.classList.remove('active'));
             this.classList.add('active');
-
-            // Apply filter
             currentFilter = this.dataset.filter;
             filterAndDisplayStories();
         });
     });
 }
 
-/**
- * Filter and display stories based on current filter
- */
 function filterAndDisplayStories() {
     let filteredStories = [...allStories];
 
-    // Apply type filter
     if (currentFilter !== 'all') {
         filteredStories = filteredStories.filter(story => story.type === currentFilter);
     }
 
-    // Sort by newest first
     filteredStories = filteredStories.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    // Display filtered stories
     displayStories(filteredStories);
 }
 
-/**
- * Display stories in the grid
- */
+/* ─────────────────────────────────────────
+   DISPLAY
+───────────────────────────────────────── */
+
 function displayStories(stories) {
     const storiesGrid = document.getElementById('storiesGrid');
-
     if (!storiesGrid) return;
 
-    // Clear existing content
     storiesGrid.innerHTML = '';
 
     if (stories.length === 0) {
@@ -95,28 +84,43 @@ function displayStories(stories) {
         return;
     }
 
-    // Display all stories
     stories.forEach(story => {
         storiesGrid.appendChild(createStoryCard(story));
     });
 }
 
-/**
- * Create a story card with full content
- */
+/* ─────────────────────────────────────────
+   CARD CREATION
+───────────────────────────────────────── */
+
 function createStoryCard(story) {
     const card = document.createElement('div');
-    card.className = 'story-card bg-white rounded-2xl shadow-card overflow-hidden hover:shadow-lg transition-smooth mb-8';
+    card.className = 'story-card bg-white rounded-2xl shadow-card overflow-hidden hover:shadow-lg transition-smooth mb-8 relative';
+    card.id = `story-card-${story.id}`;
 
     const typeInfo = getStoryTypeInfo(story.type);
     const dateFormatted = formatDate(story.date);
 
     card.innerHTML = `
+        <!-- Share icon – top right of the whole card -->
+        <button
+            id="share-btn-${story.id}"
+            onclick="shareStory(${story.id})"
+            style="position:absolute;top:12px;right:12px;z-index:10;"
+            class="p-2 rounded-full bg-white bg-opacity-90 hover:bg-gray-100 transition-colors shadow-sm"
+            title="Share this story">
+            <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"/>
+            </svg>
+        </button>
+
         <div class="grid md:grid-cols-3 gap-0">
             <!-- Image Section (1/3 width) -->
             <div class="relative md:col-span-1">
                 <img src="${story.image}" alt="${story.title}" 
                      class="w-full h-full object-cover min-h-[300px]"
+                     crossorigin="anonymous"
                      onerror="this.src='https://images.pexels.com/photos/5452268/pexels-photo-5452268.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'">
                 <div class="absolute top-4 left-4">
                     <span class="badge badge-${story.type}">
@@ -160,7 +164,7 @@ function createStoryCard(story) {
                 ` : ''}
                 
                 ${story.outcome ? `
-                <div class="bg-green-50 rounded-lg p-3 flex items-center">
+                <div class="bg-green-50 rounded-lg p-3 flex items-center mb-4">
                     <svg class="w-5 h-5 text-green-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
                     </svg>
@@ -176,9 +180,306 @@ function createStoryCard(story) {
     return card;
 }
 
+/* ─────────────────────────────────────────
+   SHARE FUNCTIONALITY
+───────────────────────────────────────── */
+
 /**
- * Get story type information (label and icon)
+ * Called when user clicks the share icon on a story card.
+ * Opens a modal identical to emergency_request_system's showShareOptions().
  */
+function shareStory(storyId) {
+    const story = allStories.find(s => s.id === storyId);
+    if (!story) return;
+
+    const cardEl = document.getElementById(`story-card-${storyId}`);
+    const quote = story.testimonial || story.motivation || story.excerpt || '';
+    const shareText = `${story.name}\n\n"${quote}"\n\n🔗 https://lifesaversunited.org/stories`;
+    const pageUrl = 'https://lifesaversunited.org/stories';
+    const fileName = `${story.name.replace(/\s+/g, '-').toLowerCase()}-story.png`;
+
+    // ── Build modal (identical layout to emergency_request_system)
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999;
+    `;
+
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+        background-color: white;
+        border-radius: 16px;
+        padding: 32px;
+        max-width: 400px;
+        width: 90%;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+        position: relative;
+        z-index: 1000000;
+    `;
+    modalContent.innerHTML = `
+        <div style="text-align:center; margin-bottom:24px;">
+            <div style="width:64px;height:64px;background-color:#dbeafe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+                <svg style="width:32px;height:32px;color:#2563eb;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                </svg>
+            </div>
+            <h3 style="font-size:24px;font-weight:bold;color:#1f2937;margin-bottom:8px;">Share Story</h3>
+            <p style="color:#6b7280;">Choose how you want to share this story</p>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <!-- WhatsApp -->
+            <button id="storyWhatsappBtn" style="display:flex;align-items:center;padding:16px;border:1px solid #d1d5db;border-radius:12px;background-color:#25D366;color:white;font-weight:500;cursor:pointer;transition:all 0.2s ease;width:100%;">
+                <svg style="width:24px;height:24px;margin-right:12px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                </svg>
+                <span>Share on WhatsApp</span>
+            </button>
+
+            <!-- Download Poster (captures card as image) -->
+            <button id="storyDownloadBtn" style="display:flex;align-items:center;padding:16px;border:1px solid #d1d5db;border-radius:12px;background-color:#DC2626;color:white;font-weight:500;cursor:pointer;transition:all 0.2s ease;width:100%;">
+                <svg style="width:24px;height:24px;margin-right:12px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                <span>Download Story Image</span>
+            </button>
+
+            <!-- Facebook -->
+            <button id="storyFacebookBtn" style="display:flex;align-items:center;padding:16px;border:1px solid #d1d5db;border-radius:12px;background-color:#1877f2;color:white;font-weight:500;cursor:pointer;transition:all 0.2s ease;width:100%;">
+                <svg style="width:24px;height:24px;margin-right:12px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                <span>Share on Facebook</span>
+            </button>
+
+            <!-- X / Twitter -->
+            <button id="storyTwitterBtn" style="display:flex;align-items:center;padding:16px;border:1px solid #d1d5db;border-radius:12px;background-color:#000000;color:white;font-weight:500;cursor:pointer;transition:all 0.2s ease;width:100%;">
+                <svg style="width:24px;height:24px;margin-right:12px;flex-shrink:0;" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+                <span>Share on X (Twitter)</span>
+            </button>
+
+            <!-- Copy to Clipboard -->
+            <button id="storyCopyBtn" style="display:flex;align-items:center;padding:16px;border:1px solid #d1d5db;border-radius:12px;background-color:white;color:#374151;font-weight:500;cursor:pointer;transition:all 0.2s ease;width:100%;">
+                <svg style="width:24px;height:24px;margin-right:12px;flex-shrink:0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <span>Copy to Clipboard</span>
+            </button>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:24px;">
+            <button id="storyCancelBtn" style="flex:1;padding:12px 16px;border:1px solid #d1d5db;border-radius:8px;color:#374151;font-weight:500;background-color:white;cursor:pointer;transition:all 0.2s ease;">
+                Cancel
+            </button>
+        </div>
+    `;
+
+    // ── Hover effects
+    const whatsappBtn = modalContent.querySelector('#storyWhatsappBtn');
+    const downloadBtn = modalContent.querySelector('#storyDownloadBtn');
+    const facebookBtn = modalContent.querySelector('#storyFacebookBtn');
+    const twitterBtn = modalContent.querySelector('#storyTwitterBtn');
+    const copyBtn = modalContent.querySelector('#storyCopyBtn');
+    const cancelBtn = modalContent.querySelector('#storyCancelBtn');
+
+    whatsappBtn.addEventListener('mouseenter', () => whatsappBtn.style.backgroundColor = '#1faa59');
+    whatsappBtn.addEventListener('mouseleave', () => whatsappBtn.style.backgroundColor = '#25D366');
+    downloadBtn.addEventListener('mouseenter', () => downloadBtn.style.backgroundColor = '#b91c1c');
+    downloadBtn.addEventListener('mouseleave', () => downloadBtn.style.backgroundColor = '#DC2626');
+    facebookBtn.addEventListener('mouseenter', () => facebookBtn.style.backgroundColor = '#166fe5');
+    facebookBtn.addEventListener('mouseleave', () => facebookBtn.style.backgroundColor = '#1877f2');
+    twitterBtn.addEventListener('mouseenter', () => twitterBtn.style.backgroundColor = '#333333');
+    twitterBtn.addEventListener('mouseleave', () => twitterBtn.style.backgroundColor = '#000000');
+    copyBtn.addEventListener('mouseenter', () => copyBtn.style.backgroundColor = '#f3f4f6');
+    copyBtn.addEventListener('mouseleave', () => copyBtn.style.backgroundColor = 'white');
+    cancelBtn.addEventListener('mouseenter', () => cancelBtn.style.backgroundColor = '#f3f4f6');
+    cancelBtn.addEventListener('mouseleave', () => cancelBtn.style.backgroundColor = 'white');
+
+    // ── WhatsApp
+    whatsappBtn.addEventListener('click', () => {
+        const url = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+        window.open(url, '_blank');
+        modal.remove();
+    });
+
+    // ── Download Story Image (html2canvas capture)
+    downloadBtn.addEventListener('click', async () => {
+        const origHTML = downloadBtn.innerHTML;
+        downloadBtn.disabled = true;
+        downloadBtn.innerHTML = `
+            <svg style="width:24px;height:24px;margin-right:12px;animation:spin 1s linear infinite;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            <span>Generating…</span>
+        `;
+        try {
+            const canvas = await html2canvas(cardEl, {
+                useCORS: true,
+                allowTaint: false,
+                scale: 2,
+                backgroundColor: '#ffffff',
+                logging: false
+            });
+            downloadCanvas(canvas, fileName);
+            showShareToast('✅ Story image downloaded!');
+            modal.remove();
+        } catch (err) {
+            console.error('Download failed:', err);
+            showShareToast('⚠️ Could not generate image. Please try again.', 'error');
+            downloadBtn.innerHTML = origHTML;
+            downloadBtn.disabled = false;
+        }
+    });
+
+    // ── Facebook
+    facebookBtn.addEventListener('click', () => {
+        copyToClipboard(shareText).catch(() => { });
+        const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}`;
+        window.open(fbUrl, '_blank', 'width=600,height=400');
+        setTimeout(() => showShareToast('Text copied! Paste it in the Facebook post.'), 400);
+        modal.remove();
+    });
+
+    // ── Twitter / X
+    twitterBtn.addEventListener('click', () => {
+        const twitterShareText = `${story.name} — "${quote}" #LifeSaversUnited #BloodDonation`;
+        const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterShareText)}&url=${encodeURIComponent(pageUrl)}`;
+        window.open(tweetUrl, '_blank', 'width=600,height=400');
+        modal.remove();
+    });
+
+    // ── Copy to Clipboard
+    copyBtn.addEventListener('click', async () => {
+        await copyToClipboard(shareText);
+        showShareToast('✅ Copied to clipboard!');
+        modal.remove();
+    });
+
+    // ── Cancel
+    cancelBtn.addEventListener('click', () => modal.remove());
+
+    // ── Click outside to close
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+
+    // ── Escape key to close
+    document.addEventListener('keydown', function escHandler(e) {
+        if (e.key === 'Escape') { modal.remove(); document.removeEventListener('keydown', escHandler); }
+    });
+
+    modal.appendChild(modalContent);
+    document.body.appendChild(modal);
+}
+
+/** Convert canvas to Blob (promise wrapper) */
+function canvasToBlob(canvas) {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+            if (blob) resolve(blob);
+            else reject(new Error('Canvas toBlob failed'));
+        }, 'image/png');
+    });
+}
+
+/** Trigger image download from canvas */
+function downloadCanvas(canvas, fileName) {
+    const link = document.createElement('a');
+    link.download = fileName;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+/** Copy text to clipboard */
+async function copyToClipboard(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text);
+    } else {
+        // Legacy fallback
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    }
+}
+
+/* ─────────────────────────────────────────
+   TOAST NOTIFICATION
+───────────────────────────────────────── */
+
+function injectShareToastContainer() {
+    if (document.getElementById('share-toast-container')) return;
+    const container = document.createElement('div');
+    container.id = 'share-toast-container';
+    container.style.cssText = `
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        pointer-events: none;
+    `;
+    document.body.appendChild(container);
+}
+
+function showShareToast(message, type = 'success') {
+    const container = document.getElementById('share-toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        background: ${type === 'error' ? '#dc2626' : '#1f2937'};
+        color: white;
+        padding: 12px 24px;
+        border-radius: 50px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        pointer-events: none;
+        white-space: nowrap;
+    `;
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    // Animate in
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            toast.style.opacity = '1';
+            toast.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Animate out and remove
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(12px)';
+        setTimeout(() => toast.remove(), 350);
+    }, 3000);
+}
+
+/* ─────────────────────────────────────────
+   HELPERS
+───────────────────────────────────────── */
+
 function getStoryTypeInfo(type) {
     const types = {
         patient: {
@@ -197,9 +498,6 @@ function getStoryTypeInfo(type) {
     return types[type] || types.patient;
 }
 
-/**
- * Get story-specific metrics
- */
 function getStoryMetrics(story) {
     let metrics = '';
 
@@ -281,9 +579,6 @@ function getStoryMetrics(story) {
     return metrics;
 }
 
-/**
- * Update statistics
- */
 function updateStats(stats) {
     const statElements = {
         totalStories: document.getElementById('totalStories'),
@@ -296,9 +591,6 @@ function updateStats(stats) {
     if (statElements.totalPatients) statElements.totalPatients.textContent = stats.totalPatients;
 }
 
-/**
- * Format date to readable format
- */
 function formatDate(dateString) {
     const date = new Date(dateString);
     const now = new Date();
@@ -313,9 +605,6 @@ function formatDate(dateString) {
     return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
-/**
- * Show error message
- */
 function showError(message) {
     const storiesGrid = document.getElementById('storiesGrid');
     if (storiesGrid) {
