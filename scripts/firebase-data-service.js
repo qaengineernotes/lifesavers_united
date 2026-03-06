@@ -64,7 +64,7 @@ export async function fetchEmergencyRequestsFromFirebase(options = {}) {
                 id: doc.id,
                 inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
-                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
+                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : null),
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
@@ -206,7 +206,7 @@ export function listenToEmergencyRequests(callback) {
                 // even if the request was subsequently verified or changed to another status.
                 inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
-                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : new Date()),
+                    : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : null),
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
