@@ -64,7 +64,7 @@ async function loadAllRequests() {
         document.getElementById('loadingState').style.display = 'block';
         document.getElementById('accessDenied').style.display = 'none';
         document.getElementById('tableContainer').style.display = 'none';
-        const response = await fetchEmergencyRequestsFromFirebase();
+        const response = await fetchEmergencyRequestsFromFirebase({ includeClosed: true });
 
         if (response.success && response.requests) {
             allRequests = response.requests;

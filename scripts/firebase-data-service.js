@@ -25,7 +25,8 @@ import {
 // ============================================================================
 // FETCH EMERGENCY REQUESTS FROM FIREBASE
 // ============================================================================
-export async function fetchEmergencyRequestsFromFirebase() {
+export async function fetchEmergencyRequestsFromFirebase(options = {}) {
+    const { includeClosed = false } = options;
     try {
         const requestsRef = collection(db, 'emergency_requests');
 
@@ -38,11 +39,18 @@ export async function fetchEmergencyRequestsFromFirebase() {
             getCountFromServer(query(requestsRef, where('status', '==', 'Closed'), where('closureType', '==', 'fulfilled')))
         ]);
 
-        // 2. Query ONLY active records (for Display)
-        const q = query(
-            requestsRef,
-            where('status', 'in', ['Open', 'Reopened', 'Verified'])
-        );
+        // 2. Query records (Active by default, All if includeClosed is true)
+        let q;
+        if (includeClosed) {
+            // Fetch all records across all statuses
+            q = query(requestsRef);
+        } else {
+            // Fetch only active records for primary display
+            q = query(
+                requestsRef,
+                where('status', 'in', ['Open', 'Reopened', 'Verified'])
+            );
+        }
 
         const fetchPromise = getDocs(q);
 
