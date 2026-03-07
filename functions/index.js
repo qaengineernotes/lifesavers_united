@@ -106,9 +106,16 @@ const parseRequestText = (text) => {
         "units required": "unitsRequired",
         "hospital": "hospitalName",
         "location": "hospitalCity",
+        "city": "hospitalCity",
         "suffering from": "patientSufferingFrom",
+        "diagnosis": "patientSufferingFrom",
         "contact person": "contactPerson",
-        "contact number": "contactNumber"
+        "contact number": "contactNumber",
+        "email": "contactEmail",
+        "urgency": "urgencyLevel",
+        "hospital address": "hospitalAddress",
+        "additional info": "additionalInfo",
+        "info": "additionalInfo"
     };
 
     const lines = text.split("\n");
@@ -238,7 +245,23 @@ bot.on("text", async (ctx) => {
     if (!cleanText.toLowerCase().includes("patient name")) {
         // Ignore casual chat or provide help
         if (text.startsWith("/start")) {
-            return ctx.reply("Welcome to LifeSavers Bot! \nPaste your request in the format:\n\nPatient Name: ...\nBlood Group: ...\n...");
+            const template = `Welcome to LifeSavers Bot! 🩸
+
+Paste your request in this format:
+
+Patient Name: 
+Age: 
+Blood Group: 
+Units Required: 
+Hospital: 
+Location: 
+Email: 
+Urgency: (Normal/Urgent/Critical)
+Hospital Address: 
+Additional Info: 
+Contact Person: 
+Contact Number: `;
+            return ctx.reply(template);
         }
         return; // Silent fail for random text to avoid spamming
     }
