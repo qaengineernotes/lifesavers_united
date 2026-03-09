@@ -90,4 +90,36 @@
         <priority>0.3</priority>
     </url>
     
+    <!-- Blog: Blood Donation Rules in India -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-blood-donation-rules-india-dghs</loc>
+        <lastmod>2026-03-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Blog: Complete Guide to Blood Donation Types -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-complete-guide-blood-donation-types</loc>
+        <lastmod>2026-03-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Blog: Complete Guide to Rare Blood Groups in India -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-rare-blood-groups-india</loc>
+        <lastmod>2026-03-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Blog: Thalassemia in India: The Complete Story -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-thalassemia-india-complete-guide</loc>
+        <lastmod>2026-03-07</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
 </urlset>
