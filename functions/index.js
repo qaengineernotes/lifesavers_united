@@ -30,11 +30,11 @@ const twitterClient = new TwitterApi({
 const postBloodRequestToTwitter = async (requestData) => {
     try {
         // Format: URGENT: [Name], [Age], needs [Units] units [Blood Group] blood RIGHT NOW...
-        const tweetText = `URGENT: ${requestData.patientName}, ${requestData.patientAge || 'N/A'}, needs ${requestData.unitsRequired} units ${requestData.requiredBloodGroup} blood RIGHT NOW at ${requestData.hospitalName}, ${requestData.hospitalCity || 'N/A'}!
-Your donation can save a life today. Please come forward!
+        const tweetText = `#${requestData.hospitalCity?.replace(/\s/g, "") || "India"} #URGENT: ${requestData.patientName}, ${requestData.patientAge || 'N/A'}, needs ${requestData.unitsRequired} units ${requestData.requiredBloodGroup} #blood TODAY at ${requestData.hospitalName}, ${requestData.hospitalCity || 'N/A'}!
+Your donation can save a life today. Even a retweet helps
 Call: ${requestData.contactNumber}
-https://lifesaversunited.org
-#LifeSaversUnited #BloodDonation #SaveLives #${requestData.hospitalCity?.replace(/\s/g, "") || "India"} #Emergency`;
+https://lifesaversunited.org @GCRI_1972 @civilhospamd 
+#LifeSaversUnited #BloodDonation #Emergency`;
 
         console.log("📤 Posting to Twitter...");
         const { data: tweet } = await twitterClient.v2.tweet(tweetText);
