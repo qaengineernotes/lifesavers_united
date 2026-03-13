@@ -3,13 +3,22 @@
 
 $profileUIScript = @"
 
-    <!-- User Profile UI -->
+     <!-- User Profile UI -->
     <script type="module">
         import('./scripts/user-profile-ui.js').then(module => {
             module.initializeUserProfileUI();
         }).catch(error => {
             console.error('Failed to load user profile UI:', error);
         });
+    </script>
+
+    <!-- Microsoft Clarity -->
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vv2e6pv1i7");
     </script>
 "@
 
