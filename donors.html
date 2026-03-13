@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -20,14 +20,26 @@
     <link rel="icon" type="image/png" sizes="32x32" href="imgs/favicon/favicon-32x32.png">
 
     <!-- Fonts -->
+    <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
 
-    <!-- Styles -->
-    <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/donors-redesign.css" />
+    <!-- Optimized CSS and Fonts Loading -->
+    <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/main.css"></noscript>
+    <link rel="preload" href="css/donors-redesign.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/donors-redesign.css"></noscript>
+
+    <!-- Load combined fonts with display=swap + preload trick -->
+    <link rel="preload"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Crimson+Text:wght@400;600&display=swap"
+        as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Crimson+Text:wght@400;600&display=swap"
+            rel="stylesheet">
+    </noscript>
 
     <!-- User Profile UI -->
     <script type="module">
