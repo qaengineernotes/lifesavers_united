@@ -122,4 +122,60 @@
         <priority>0.8</priority>
     </url>
     
+    <!-- All Requests -->
+    <url>
+        <loc>https://lifesaversunited.org/all_requests</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>hourly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Blogs Listing -->
+    <url>
+        <loc>https://lifesaversunited.org/blogs</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Civil Hospital Blood Bank RTI -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-civil-hospital-blood-bank-rti</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+    
+    <!-- Connect / Contact -->
+    <url>
+        <loc>https://lifesaversunited.org/connect</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+
+    <!-- Donors Directory -->
+    <url>
+        <loc>https://lifesaversunited.org/donors</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Medical Information Library -->
+    <url>
+        <loc>https://lifesaversunited.org/medical_information_library</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Plasma Donation in India — Complete Guide -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-plasma-donation-india-guide</loc>
+        <lastmod>2026-03-15</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
 </urlset>

@@ -432,7 +432,132 @@ class MobileMenu {
 // Initialize mobile menu when script loads
 const mobileMenu = new MobileMenu();
 
+/**
+ * Initialize Announcement Popup
+ * Displays the important announcement image once per user
+ */
+function initializeAnnouncementPopup() {
+    // Check if the user has already seen the popup
+    if (localStorage.getItem('announcement_seen')) {
+        return;
+    }
+
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'announcement-popup-overlay';
+    Object.assign(overlay.style, {
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: '99999',
+        opacity: '0',
+        transition: 'opacity 0.3s ease'
+    });
+
+    // Create popup container
+    const popup = document.createElement('div');
+    popup.id = 'announcement-popup-content';
+    Object.assign(popup.style, {
+        position: 'relative',
+        maxWidth: '90%',
+        maxHeight: '90vh',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        overflow: 'hidden',
+        transform: 'scale(0.9)',
+        transition: 'transform 0.3s ease'
+    });
+
+    // Create close button
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '&times;';
+    Object.assign(closeBtn.style, {
+        position: 'absolute',
+        top: '10px',
+        right: '15px',
+        fontSize: '28px',
+        fontWeight: 'bold',
+        color: '#dc2626',
+        backgroundColor: 'rgba(255,255,255,0.9)',
+        border: 'none',
+        borderRadius: '50%',
+        width: '36px',
+        height: '36px',
+        lineHeight: '36px',
+        textAlign: 'center',
+        cursor: 'pointer',
+        zIndex: '100000',
+        boxShadow: '0 0 5px rgba(0,0,0,0.2)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: '0'
+    });
+    
+    // Add hover effect via JS since it's inline
+    closeBtn.addEventListener('mouseenter', () => closeBtn.style.backgroundColor = '#fff');
+    closeBtn.addEventListener('mouseleave', () => closeBtn.style.backgroundColor = 'rgba(255,255,255,0.9)');
+
+    // Create image
+    const img = document.createElement('img');
+    // Reference the image that the user will upload
+    img.src = '/imgs/important-announcement.jpg';
+    img.alt = 'Important Announcement';
+    Object.assign(img.style, {
+        display: 'block',
+        maxWidth: '100%',
+        maxHeight: '85vh',
+        objectFit: 'contain'
+    });
+
+    // Action function to close popup
+    const closePopup = () => {
+        overlay.style.opacity = '0';
+        popup.style.transform = 'scale(0.9)';
+        setTimeout(() => {
+            if (document.body.contains(overlay)) {
+                document.body.removeChild(overlay);
+            }
+        }, 300);
+        // Set the flag in localStorage so it doesn't show again
+        localStorage.setItem('announcement_seen', 'true');
+    };
+
+    closeBtn.addEventListener('click', closePopup);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closePopup();
+        }
+    });
+
+    // Assemble popup
+    popup.appendChild(closeBtn);
+    popup.appendChild(img);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
+
+    // Trigger animation
+    setTimeout(() => {
+        overlay.style.opacity = '1';
+        popup.style.transform = 'scale(1)';
+    }, 100);
+}
+
+// Auto-initialize announcement when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnnouncementPopup);
+} else {
+    initializeAnnouncementPopup();
+}
+
 // Export for potential external use
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = MobileMenu;
+    module.exports = { MobileMenu, initializeAnnouncementPopup };
 }
