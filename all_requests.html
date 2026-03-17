@@ -21,7 +21,9 @@
 
     <!-- Optimized CSS and Fonts Loading -->
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/main.css"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="css/main.css">
+    </noscript>
 
     <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,7 +68,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="index.html">
+                    <a href="/">
                         <img src="imgs/Life-saver-united-logo.png" alt="LifeSavers United Logo"
                             class="h-10 w-auto mr-3">
                     </a>
@@ -188,7 +190,7 @@
             <p>
                 You need to be logged in as an approved user to view this page.
             </p>
-            <button onclick="window.location.href='emergency_request_system.html'" class="action-btn">
+            <button onclick="window.location.href='emergency_request_system'" class="action-btn">
                 Go to Emergency System
             </button>
         </div>

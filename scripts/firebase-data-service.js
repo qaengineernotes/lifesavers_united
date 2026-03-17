@@ -819,7 +819,7 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 // ============================================================================
 // ADD HISTORY ENTRY
 // ============================================================================
-async function addHistoryEntry(requestId, data) {
+export async function addHistoryEntry(requestId, data) {
     try {
         const historyRef = collection(db, 'emergency_requests', requestId, 'updates');
 

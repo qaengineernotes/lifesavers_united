@@ -26,9 +26,13 @@
 
     <!-- Optimized CSS and Fonts Loading -->
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/main.css"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="css/main.css">
+    </noscript>
     <link rel="preload" href="css/donors-redesign.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/donors-redesign.css"></noscript>
+    <noscript>
+        <link rel="stylesheet" href="css/donors-redesign.css">
+    </noscript>
 
     <!-- Load combined fonts with display=swap + preload trick -->
     <link rel="preload"
@@ -70,7 +74,7 @@
             <div class="flex justify-between items-center h-16">
                 <!-- Logo -->
                 <div class="flex items-center">
-                    <a href="index.html">
+                    <a href="/">
                         <img src="imgs/Life-saver-united-logo.png" alt="LifeSavers United Logo"
                             class="h-10 w-auto mr-3">
                     </a>
@@ -290,7 +294,7 @@
             <div class="access-denied-icon">🔒</div>
             <h2>Access Denied</h2>
             <p>You need to be logged in as an approved user to view this page.</p>
-            <button onclick="window.location.href='emergency_request_system.html'" class="action-btn"
+            <button onclick="window.location.href='emergency_request_system'" class="action-btn"
                 style="padding: 12px 28px; font-size: 14px; border-radius: 10px; background: #dc2626; color: #fff;">
                 Go to Emergency System
             </button>

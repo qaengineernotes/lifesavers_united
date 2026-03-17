@@ -2,7 +2,8 @@
 // Handles authentication, data fetching, table rendering, filtering, and modal display
 
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
-import { db, collection, doc, addDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp } from '/scripts/firebase-config.js';
+import { db, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, arrayUnion } from '/scripts/firebase-config.js';
+import { addHistoryEntry } from '/scripts/firebase-data-service.js';
 
 /**
  * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
@@ -1604,6 +1605,22 @@ window.saveLogDonation = async function () {
     const donatedAtDate = new Date(donationDate + 'T00:00:00');
     const units = parseInt(document.getElementById('logDonationUnits').value) || 1;
 
+    let currentReopenCount = 0;
+    let requestSnap = null;
+
+    // Pre-fetch request if linked to get reopenCycle and validation
+    if (linkedReqId) {
+        try {
+            const requestRef = doc(db, 'emergency_requests', linkedReqId);
+            requestSnap = await getDoc(requestRef);
+            if (requestSnap.exists()) {
+                currentReopenCount = requestSnap.data().reopenCount || 0;
+            }
+        } catch (reqErr) {
+            console.error('Error pre-fetching request:', reqErr);
+        }
+    }
+
     // Use the existing schema field names so the donor detail view reads them correctly
     const logEntry = {
         donorId: donorId,
@@ -1629,12 +1646,14 @@ window.saveLogDonation = async function () {
         recordedByUid: currentUser?.uid || '',
         createdBy: currentUser?.displayName || 'Superuser',
         createdById: currentUser?.uid || '',
-        source: 'admin_manual'
+        source: 'admin_manual',
+        reopenCycle: currentReopenCount
     };
 
     try {
         // 1. Write donation_log entry
-        await addDoc(collection(db, 'donation_logs'), logEntry);
+        const donationLogRef = await addDoc(collection(db, 'donation_logs'), logEntry);
+        const logId = donationLogRef.id;
 
         // 2. Update donor's lastDonatedAt
         await updateDoc(doc(db, 'donors', donorId), {
@@ -1653,7 +1672,78 @@ window.saveLogDonation = async function () {
         renderTable();
         updateStatistics();
 
-        // 4. Show success state
+        // 4. Update the emergency request if linked
+        if (linkedReqId && requestSnap && requestSnap.exists()) {
+            try {
+                const requestRef = doc(db, 'emergency_requests', linkedReqId);
+                const requestData = requestSnap.data();
+                
+                const currentUnitsFulfilled = parseInt(requestData.unitsFulfilled) || 0;
+                const totalUnitsRequired = parseInt(requestData.unitsRequired) || 0;
+                const newUnitsFulfilled = currentUnitsFulfilled + units;
+                const willClose = newUnitsFulfilled >= totalUnitsRequired;
+
+                // Update donor summary
+                const currentSummary = requestData.donorSummary || '';
+                const donorEntry = `${donor?.fullName || 'Anonymous'} (${units} unit${units > 1 ? 's' : ''})`;
+                const newSummary = currentSummary ? `${currentSummary}, ${donorEntry}` : donorEntry;
+
+                const requestUpdateData = {
+                    unitsFulfilled: newUnitsFulfilled,
+                    donorSummary: newSummary,
+                    donationLogIds: arrayUnion(logId),
+                    allDonationLogIds: arrayUnion(logId),
+                    lastDonatedAt: serverTimestamp(), // Match field name in emergency request
+                    lastDonationAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    updatedBy: currentUser?.displayName || 'Superuser',
+                    updatedByUid: currentUser?.uid || '',
+                    lastUpdatedAt: serverTimestamp(),
+                    lastUpdatedByName: currentUser?.displayName || 'Superuser'
+                };
+
+                if (willClose) {
+                    requestUpdateData.status = 'Closed';
+                    requestUpdateData.closedBy = currentUser?.displayName || 'Superuser';
+                    requestUpdateData.closedByUid = currentUser?.uid || '';
+                    requestUpdateData.closedAt = serverTimestamp();
+                    requestUpdateData.closureReason = 'Blood fulfilled by our donors';
+                    requestUpdateData.closureType = 'fulfilled';
+                    requestUpdateData.fulfilledAt = new Date().toISOString();
+
+                    // Add to closure history
+                    const closureEntry = {
+                        closedBy: currentUser?.displayName || 'Superuser',
+                        closedByUid: currentUser?.uid || '',
+                        closedAt: new Date().toISOString(),
+                        closureReason: 'Blood fulfilled by our donors',
+                        closureType: 'fulfilled',
+                        reopenCycle: currentReopenCount,
+                        unitsFulfilled: newUnitsFulfilled,
+                        donationLogIds: [logId]
+                    };
+                    requestUpdateData.closureHistory = arrayUnion(closureEntry);
+                    requestUpdateData.totalClosures = (requestData.totalClosures || 0) + 1;
+                }
+
+                await updateDoc(requestRef, requestUpdateData);
+
+                // Add history entry
+                await addHistoryEntry(linkedReqId, {
+                    type: willClose ? 'CLOSED' : 'DONATION',
+                    createdBy: currentUser?.displayName || 'Superuser',
+                    createdById: currentUser?.uid || '',
+                    donorName: donor?.fullName || 'Anonymous',
+                    note: willClose 
+                        ? `Request closed - Blood fulfilled by ${donor?.fullName || 'Anonymous'} (${units} unit(s))`
+                        : `${units} unit(s) donated by ${donor?.fullName || 'Anonymous'}`
+                });
+            } catch (reqErr) {
+                console.error('Error updating associated request:', reqErr);
+            }
+        }
+
+        // 5. Show success state
         document.getElementById('edm-log-form').style.display = 'none';
         document.getElementById('edm-log-success').style.display = 'block';
         showDonorToast('🩸 Donation logged successfully!');
