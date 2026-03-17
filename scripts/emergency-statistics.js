@@ -6,10 +6,27 @@
 const EMERGENCY_API_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec';
 
 /**
- * Load emergency statistics from the API
+ * Load emergency statistics from the API or Firebase
  * @returns {Promise<Object>} Statistics data or fallback values
  */
 async function loadEmergencyStatistics() {
+    // 1. Try fetching from Firebase first (most accurate and consistent)
+    try {
+        // Dynamically import firebase-data-service to avoid loading it on pages that don't need it
+        // and to handle cases where it might not be present.
+        const firebaseModule = await import('./firebase-data-service.js').catch(() => null);
+
+        if (firebaseModule && typeof firebaseModule.fetchEmergencyRequestsFromFirebase === 'function') {
+            const data = await firebaseModule.fetchEmergencyRequestsFromFirebase();
+            if (data && data.success && data.statistics) {
+                return data.statistics;
+            }
+        }
+    } catch (firebaseError) {
+        console.warn('⚠️ Firebase stats not available, falling back to Google Sheets:', firebaseError);
+    }
+
+    // 2. Fallback to Google Sheets API
     try {
         const response = await fetch(EMERGENCY_API_URL, {
             method: 'GET',
@@ -26,7 +43,7 @@ async function loadEmergencyStatistics() {
             return { total: 0, open: 0, verified: 0, closed: 0 };
         }
     } catch (error) {
-        console.error('❌ Error loading emergency statistics:', error);
+        console.error('❌ Error loading emergency statistics from fallback:', error);
         // Fallback to default values on error
         return { total: 0, open: 0, verified: 0, closed: 0 };
     }
@@ -52,7 +69,7 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
         const closedRequests = statistics.closed;
 
         successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = closedRequests; // Count all closed requests as lives saved
+        livesSaved = closedRequests; // Show only the closed requests count
     } else {
         // Fallback to local calculation (for backward compatibility)
         openRequests = requests.filter(request => {
@@ -68,14 +85,14 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
             return storedState && storedState.verifyStatus === 'verified';
         }).length;
 
-        successRate = totalRequests > 0 ? Math.round((verifiedRequests / totalRequests) * 100) : 94;
-
         const closedRequests = requests.filter(request => {
             const cardKey = `${request.patientName}-${request.bloodType}`;
             const storedState = buttonStates.get(cardKey);
             return storedState && storedState.closeStatus === 'closed';
         }).length;
-        livesSaved = closedRequests * 3;
+
+        successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
+        livesSaved = closedRequests; // Show only the closed requests count
     }
 
     // Update the DOM elements
