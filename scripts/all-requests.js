@@ -512,7 +512,7 @@ function createHospitalDetailsCard(request) {
                     <strong>${request.contactNumber || 'N/A'}</strong><br>
                     ${request.contactNumber ? `
                         <a href="tel:${request.contactNumber}" style="color: #667eea; text-decoration: none;">📞 Call</a> | 
-                        <a href="https://wa.me/91${request.contactNumber}" target="_blank" style="color: #25D366; text-decoration: none;">💬 WhatsApp</a>
+                        <a href="https://wa.me/91${request.contactNumber}" target="_blank" rel="noopener noreferrer" style="color: #25D366; text-decoration: none;">💬 WhatsApp</a>
                     ` : ''}
                 </div>
             </div>

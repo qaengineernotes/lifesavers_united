@@ -565,7 +565,7 @@ function createPersonalTab(donor) {
                     <div class="info-field-label">Phone</div>
                     <div class="info-field-value">
                         ${donor.contactNumber || 'N/A'}
-                        ${donor.contactNumber ? `<br><small><a href="tel:${donor.contactNumber}" style="color:#dc2626;">📞 Call</a> &nbsp;|&nbsp; <a href="https://wa.me/${WHATSAPP_COUNTRY_CODE}${donor.contactNumber}" target="_blank" style="color:#25D366;">💬 WhatsApp</a></small>` : ''}
+                        ${donor.contactNumber ? `<br><small><a href="tel:${donor.contactNumber}" style="color:#dc2626;">📞 Call</a> &nbsp;|&nbsp; <a href="https://wa.me/${WHATSAPP_COUNTRY_CODE}${donor.contactNumber}" target="_blank" rel="noopener noreferrer" style="color:#25D366;">💬 WhatsApp</a></small>` : ''}
                     </div>
                 </div>
                 <div class="info-field">
