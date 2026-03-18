@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Donor Registration - LifeSavers United</title>
+    <title>Register as a Blood Donor | LifeSavers United - Save Lives Today</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
@@ -13,13 +13,9 @@
         content="blood donor registration, become a blood donor, donor signup, blood donation registration, donor application, blood donor form, join blood donors, register to donate blood">
     <meta name="author" content="Life Savers United">
     <meta name="robots" content="index, follow">
-    <meta name="language" content="English">
-    <meta name="revisit-after" content="7 days">
-    <meta name="distribution" content="global">
-    <meta name="rating" content="general">
 
     <!-- Open Graph Meta Tags (WhatsApp, Facebook, LinkedIn) -->
-    <meta property="og:title" content="🩸 Become a Blood Donor - Save Lives Today!">
+    <meta property="og:title" content="Become a Blood Donor - Save Lives Today!">
     <meta property="og:description"
         content="Join LifeSavers United and become a hero! Register as a blood donor in just 2 minutes. Your donation can save up to 3 lives. Easy registration, ongoing support, and a community of lifesavers waiting for you.">
     <meta property="og:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
@@ -35,7 +31,7 @@
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="🩸 Become a Blood Donor - Save Lives Today!">
+    <meta name="twitter:title" content="Become a Blood Donor - Save Lives Today!">
     <meta name="twitter:description"
         content="Join LifeSavers United and become a hero! Register as a blood donor in just 2 minutes. Your donation can save up to 3 lives.">
     <meta name="twitter:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
@@ -52,12 +48,6 @@
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://lifesaversunited.org/donor_registration">
-
-    <!-- Sitemap -->
-    <link rel="sitemap" type="application/xml" title="Sitemap" href="/sitemap.xml">
-
-    <!-- Robots.txt -->
-    <link rel="robots" href="/robots.txt">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="imgs/favicon/favicon.ico">
@@ -93,25 +83,17 @@
     <link rel="manifest" href="imgs/favicon/manifest.json">
 
     <!-- Optimized CSS and Fonts Loading -->
-    <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript>
-        <link rel="stylesheet" href="css/main.css">
-    </noscript>
+    <link rel="stylesheet" href="css/main.css">
+
 
     <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Load combined fonts with display=swap + preload trick -->
-    <link rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-        as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap">
 
-    <noscript>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-            rel="stylesheet">
-    </noscript>
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -121,6 +103,11 @@
         "name": "Blood Donor Registration - Join Life Savers United",
         "description": "Register as a blood donor with Life Savers United. Join our community of heroes saving lives through blood donation. Easy registration process and ongoing support.",
         "url": "https://lifesaversunited.org/donor_registration",
+        "potentialAction": {
+            "@type": "RegisterAction",
+            "name": "Register as a Blood Donor",
+            "target": "https://lifesaversunited.org/donor_registration"
+        },
         "mainEntity": {
             "@type": "Service",
             "name": "Blood Donor Registration Service",
@@ -131,12 +118,7 @@
                 "url": "https://lifesaversunited.org"
             },
             "areaServed": "India",
-            "serviceType": "Blood Donor Registration",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "INR"
-            }
+            "serviceType": "Blood Donor Registration"
         }
     }
     </script>
@@ -170,14 +152,6 @@
         });
     </script>
 
-    <!-- Microsoft Clarity -->
-    <script type="text/javascript">
-        (function (c, l, a, r, i, t, y) {
-            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", "vv2e6pv1i7");
-    </script>
 </head>
 
 <body class="donor-form-page">
@@ -205,7 +179,7 @@
                         Us</a>
                 </div>
                 <div class="md:hidden">
-                    <button class="text-text-secondary hover:text-primary">
+                    <button class="text-text-secondary hover:text-primary" aria-label="Open navigation menu">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -222,7 +196,7 @@
         <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h1 class="text-hero mb-6">
-                    Register as a <span class="text-accent-300">Blood Donor</span>
+                    Register as a Blood Donor | LifeSavers United
                 </h1>
                 <p class="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
                     Join our community of lifesavers. Register as a blood donor and help save lives in your area.
@@ -243,12 +217,12 @@
                         <div class="form-group">
                             <label for="fullName">Full Name *</label>
                             <input type="text" id="fullName" name="fullName" required placeholder="e.g., John Doe">
-                            <div id="fullNameError" class="error-message hidden"></div>
+                            <div id="fullNameError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="dateOfBirth">Date of Birth</label>
                             <input type="date" id="dateOfBirth" name="dateOfBirth">
-                            <div id="dateOfBirthError" class="error-message hidden"></div>
+                            <div id="dateOfBirthError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                     </div>
                     <div class="form-row">
@@ -257,12 +231,12 @@
                             <input type="text" id="contactNumber" name="contactNumber" required
                                 placeholder="e.g., 9876543210" pattern="[0-9]*" inputmode="numeric" minlength="10"
                                 maxlength="15">
-                            <div id="contactNumberError" class="error-message hidden"></div>
+                            <div id="contactNumberError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="email">Email Address</label>
                             <input type="email" id="email" name="email" placeholder="e.g., john@example.com">
-                            <div id="emailError" class="error-message hidden"></div>
+                            <div id="emailError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -301,14 +275,14 @@
                                 <label for="bloodType-O-">O-</label>
                             </div>
                         </div>
-                        <div id="bloodGroupError" class="error-message hidden"></div>
+                        <div id="bloodGroupError" class="error-message hidden" aria-live="polite"></div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="weight">Weight (kg)</label>
                             <input type="text" id="weight" name="weight" placeholder="e.g., 65" pattern="[0-9]*"
                                 inputmode="numeric">
-                            <div id="weightError" class="error-message hidden"></div>
+                            <div id="weightError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="gender">Gender</label>
@@ -318,7 +292,7 @@
                                 <option value="Female">Female</option>
                                 <option value="Other">Other</option>
                             </select>
-                            <div id="genderError" class="error-message hidden"></div>
+                            <div id="genderError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="city">City</label>
@@ -327,14 +301,14 @@
                                     autocomplete="off">
                                 <div id="citySuggestions" class="city-suggestions hidden"></div>
                             </div>
-                            <div id="cityError" class="error-message hidden"></div>
+                            <div id="cityError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label for="area">Area/Locality</label>
                             <input type="text" id="area" name="area" placeholder="e.g., Vastrapur, Asarva">
-                            <div id="areaError" class="error-message hidden"></div>
+                            <div id="areaError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="emergencyAvailable">Available for Emergency</label>
@@ -343,7 +317,7 @@
                                 <option value="Yes">Yes</option>
                                 <option value="No">No</option>
                             </select>
-                            <div id="emergencyAvailableError" class="error-message hidden"></div>
+                            <div id="emergencyAvailableError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                         <div class="form-group">
                             <label for="preferredContact">Preferred Contact Method</label>
@@ -354,7 +328,7 @@
                                 <option value="WhatsApp">WhatsApp</option>
                                 <option value="SMS">SMS</option>
                             </select>
-                            <div id="preferredContactError" class="error-message hidden"></div>
+                            <div id="preferredContactError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -374,7 +348,7 @@
                             <div class="captcha-question">
                                 <span id="captchaQuestion"></span>
                                 <button type="button" id="refreshCaptcha" class="captcha-refresh-btn"
-                                    title="Refresh Captcha">
+                                    title="Refresh Captcha" aria-label="Refresh captcha">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2">
                                         <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
@@ -386,7 +360,7 @@
                             </div>
                             <input type="text" id="captchaAnswer" name="captchaAnswer" required
                                 placeholder="Enter your answer" pattern="[0-9]*" inputmode="numeric">
-                            <div id="captchaError" class="error-message hidden"></div>
+                            <div id="captchaError" class="error-message hidden" aria-live="polite"></div>
                         </div>
                     </div>
 
@@ -413,7 +387,7 @@
                                         consent to be contacted by Lifesavers United.
                                     </span>
                                 </label>
-                                <div id="declarationError" class="error-message hidden"></div>
+                                <div id="declarationError" class="error-message hidden" aria-live="polite"></div>
                             </div>
 
                             <!-- Privacy & Consent Checkbox -->
@@ -427,7 +401,7 @@
                                         camps, awareness campaigns, and other activities from Lifesavers United.
                                     </span>
                                 </label>
-                                <div id="privacyError" class="error-message hidden"></div>
+                                <div id="privacyError" class="error-message hidden" aria-live="polite"></div>
                             </div>
                         </div>
                     </div>
@@ -467,7 +441,7 @@
                         <li>1 in 7 people entering a hospital needs blood.</li>
                         <li>There is no substitute for human blood.</li>
                     </ul>
-                    <a href="#" class="btn-outline mt-2">See Real Stories</a>
+                    <a href="/stories" class="btn-outline mt-2">See Real Stories</a>
                 </div>
                 <!-- Who Can Donate -->
                 <div
@@ -486,7 +460,7 @@
                         <li>Good general health</li>
                         <li>No recent major illness or surgery</li>
                     </ul>
-                    <a href="health_assessment_tools" class="btn-outline mt-2">Check Eligibility</a>
+                    <a href="/health_assessment_tools" class="btn-outline mt-2">Check Eligibility</a>
                 </div>
                 <!-- How It Works -->
                 <div
@@ -579,7 +553,8 @@
                 <h3 class="text-lg font-semibold text-primary mb-2">Need Help?</h3>
                 <p class="text-gray-700">Send us a message on our 24/7 helpline: <span class="font-bold"><a
                             href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
-                            target="_blank" rel="noopener noreferrer" class="hover:text-primary-700 transition-smooth">9979260393</a></span> or
+                            target="_blank" rel="noopener noreferrer"
+                            class="hover:text-primary-700 transition-smooth">9979260393</a></span> or
                     email
                     <a href="mailto:lifesaversunited.india@gmail.com"
                         class="text-primary underline">lifesaversunited.india@gmail.com</a>
@@ -604,21 +579,24 @@
                         blood donation.
                     </p>
                     <div class="flex space-x-4">
-                        <a href="https://www.instagram.com/lifesavers_blooddonors" target="_blank" rel="noopener noreferrer"
+                        <a href="https://www.instagram.com/lifesavers_blooddonors" target="_blank"
+                            rel="noopener noreferrer" aria-label="Follow LifeSavers United on Instagram"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
                             </svg>
                         </a>
-                        <a href="https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw?mode=ac_t" target="_blank" rel="noopener noreferrer"
+                        <a href="https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw?mode=ac_t" target="_blank"
+                            rel="noopener noreferrer" aria-label="Join LifeSavers United on WhatsApp"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                             </svg>
                         </a>
-                        <a href="https://x.com/lifesaversunit" target="_blank" rel="noopener noreferrer"
+                        <a href="https://x.com/lifesaversunit" target="_blank"
+                            aria-label="Follow LifeSavers United on X (Twitter)" rel="noopener noreferrer"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
@@ -668,9 +646,13 @@
                     <ul class="space-y-2 text-gray-300">
                         <li class="font-bold text-primary"><a
                                 href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
-                                target="_blank" rel="noopener noreferrer" class="hover:text-primary-700 transition-smooth">24/7 Emergency:
+                                target="_blank" rel="noopener noreferrer"
+                                class="hover:text-primary-700 transition-smooth">24/7 Emergency:
                                 9979260393</a></li>
-                        <li>Support: lifesaversunited.india@gmail.com</li>
+                        <li>Support: <a href="mailto:lifesaversunited.india@gmail.com"
+                                class="hover:text-white transition-smooth">
+                                lifesaversunited.india@gmail.com</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -695,6 +677,15 @@
     </script>
     <script type="module" src="scripts/donor_registration.js"></script>
     <script src="scripts/mobile-menu.js"></script>
+
+    <!-- Microsoft Clarity -->
+    <script async type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "vv2e6pv1i7");
+    </script>
 </body>
 
 </html>
