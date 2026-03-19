@@ -1,6 +1,5 @@
 // Firebase Configuration and Initialization
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-import { initializeAppCheck, ReCaptchaV3Provider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app-check.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, getCountFromServer, addDoc, updateDoc, deleteDoc, query, where, orderBy, limit, onSnapshot, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
@@ -19,31 +18,54 @@ const firebaseConfig = {
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);
 
-// Initialize App Check BEFORE any other Firebase service.
-// On localhost: debug token (registered in Firebase Console → App Check → Manage debug tokens).
-// On production: reCAPTCHA v3 runs invisibly — zero user friction.
-const RECAPTCHA_V3_SITE_KEY = '6LfUJ3YsAAAAAKMf6JP9vmCkEAubCWuGaRYjWsC_';
-
-const isLocalhost = (
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1'
-);
-
-if (isLocalhost) {
-    // Debug token registered under name "my-local-test" in Firebase Console App Check
-    self.FIREBASE_APPCHECK_DEBUG_TOKEN = '9f4a2b8e-3c7d-4e1f-a5b6-c2d3e4f5a6b7';
-}
-
-const appCheck = initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
-    isTokenAutoRefreshEnabled: true
-});
-
 // Initialize Firebase services
 const auth = getAuth(app);
 const db = getFirestore(app);
 const analytics = getAnalytics(app);
 const functions = getFunctions(app);
+
+// LAZY LOAD APP CHECK (Google reCAPTCHA v3) to save 1.5+ seconds of load time!
+let appCheckInitialized = false;
+
+const initAppCheck = async () => {
+    if (appCheckInitialized) return;
+    appCheckInitialized = true;
+    
+    try {
+        // Dynamically import App Check so the browser ignores it completely until it's needed
+        const { initializeAppCheck, ReCaptchaV3Provider } = await import("https://www.gstatic.com/firebasejs/11.1.0/firebase-app-check.js");
+        
+        const RECAPTCHA_V3_SITE_KEY = '6LfUJ3YsAAAAAKMf6JP9vmCkEAubCWuGaRYjWsC_';
+        const isLocalhost = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+
+        if (isLocalhost) {
+            self.FIREBASE_APPCHECK_DEBUG_TOKEN = '9f4a2b8e-3c7d-4e1f-a5b6-c2d3e4f5a6b7';
+        }
+
+        initializeAppCheck(app, {
+            provider: new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
+            isTokenAutoRefreshEnabled: true
+        });
+        
+        console.log("Lazy-loaded Firebase App Check (reCAPTCHA v3) successfully.");
+    } catch (e) {
+        console.error("Failed to load Firebase App Check lazily:", e);
+    }
+};
+
+// Trigger App Check on the very first user interaction (mouse movement, scroll, touch, or click)
+const interactionEvents = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart'];
+const triggerAppCheck = () => {
+    initAppCheck();
+    // Remove the listeners once triggered so it only runs once
+    interactionEvents.forEach(e => window.removeEventListener(e, triggerAppCheck));
+};
+
+// Add listeners passively to not hurt performance
+interactionEvents.forEach(e => window.addEventListener(e, triggerAppCheck, { once: true, passive: true }));
+
+// Fallback: If the user doesn't interact within 5 seconds, load it anyway just to be safe
+setTimeout(triggerAppCheck, 5000);
 
 export {
     app,
@@ -51,7 +73,6 @@ export {
     db,
     analytics,
     functions,
-    appCheck,
     // Auth functions
     RecaptchaVerifier,
     signInWithPhoneNumber,

@@ -16,7 +16,8 @@
     "dev": "npm run watch:css",
     "optimize-images": "node scripts/optimize-images.js",
     "watch-images": "node scripts/optimize-images.js --watch",
-    "replace-html-images": "node scripts/replace-html-images.js"
+    "replace-html-images": "node scripts/replace-html-images.js",
+    "optimize-fonts": "node scripts/optimize-fonts.js"
   },
   "author": "",
   "license": "MIT",

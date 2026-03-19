@@ -112,7 +112,8 @@
 
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="preload" as="style" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css">
     </noscript>
 
     <!-- Preconnect for Google Fonts -->
@@ -147,6 +148,9 @@
             y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
         })(window, document, "clarity", "script", "vv2e6pv1i7");
     </script>
+
+    <!-- LCP Preload for Important Announcement Popup -->
+    <link rel="preload" as="image" href="/imgs/important-announcement.webp" fetchpriority="high">
 </head>
 
 <body class="bg-gray-50">

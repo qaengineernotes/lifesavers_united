@@ -50,7 +50,8 @@
 
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="preload" as="style" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css">
     </noscript>
 
     <!-- Preconnect for Google Fonts -->
@@ -68,6 +69,9 @@
             rel="stylesheet">
     </noscript>
     <script src="scripts/mobile-menu.js"></script>
+
+    <!-- LCP Preload for Important Announcement Popup -->
+    <link rel="preload" as="image" href="/imgs/important-announcement.webp" fetchpriority="high">
 </head>
 
 <body class="bg-gray-50">

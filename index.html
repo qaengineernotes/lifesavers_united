@@ -100,25 +100,19 @@
 
     <!-- Optimized CSS and Fonts Loading -->
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/main.css"></noscript>
+    <noscript><link rel="preload" as="style" href="css/main.css">
+    <link rel="stylesheet" href="css/main.css"></noscript>
 
     <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Load combined fonts with display=swap + preload trick -->
-    <link rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-        as="style" onload="this.onload=null;this.rel='stylesheet'">
-
+    <!-- Load combined fonts with display=swap + preload trick to prevent render blocking -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" as="style" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" media="print" onload="this.media='all'" />
     <noscript>
-        <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-            rel="stylesheet">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" />
     </noscript>
-    <script type="module"
-        src="https://static.rocket.new/rocket-web.js?_cfg=https%3A%2F%2Flifesaver8673back.builtwithrocket.new&_be=https%3A%2F%2Fapplication.rocket.new&_v=0.1.5"></script>
-
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -341,6 +335,9 @@
         })(window, document, "clarity", "script", "vv2e6pv1i7");
     </script>
 
+
+    <!-- LCP Preload for Important Announcement Popup -->
+    <link rel="preload" as="image" href="/imgs/important-announcement.webp" fetchpriority="high">
 </head>
 
 <body class="bg-background">
