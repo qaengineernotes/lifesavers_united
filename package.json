@@ -13,15 +13,20 @@
   "scripts": {
     "build:css": "npx @dhiwise/component-tagger && npx tailwindcss -i ./css/tailwind.css -o ./css/main.css",
     "watch:css": "npx @dhiwise/component-tagger && npx tailwindcss -i ./css/tailwind.css -o ./css/main.css --watch",
-    "dev": "npm run watch:css"
+    "dev": "npm run watch:css",
+    "optimize-images": "node scripts/optimize-images.js",
+    "watch-images": "node scripts/optimize-images.js --watch",
+    "replace-html-images": "node scripts/replace-html-images.js"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "tailwindcss": "^3.4.17",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/line-clamp": "^0.1.0",
-    "@tailwindcss/typography": "^0.5.16"
+    "@tailwindcss/typography": "^0.5.16",
+    "chokidar": "^5.0.0",
+    "sharp": "^0.34.5",
+    "tailwindcss": "^3.4.17"
   }
 }

@@ -500,7 +500,7 @@ function initializeAnnouncementPopup() {
         alignItems: 'center',
         padding: '0'
     });
-    
+
     // Add hover effect via JS since it's inline
     closeBtn.addEventListener('mouseenter', () => closeBtn.style.backgroundColor = '#fff');
     closeBtn.addEventListener('mouseleave', () => closeBtn.style.backgroundColor = 'rgba(255,255,255,0.9)');
@@ -508,7 +508,7 @@ function initializeAnnouncementPopup() {
     // Create image
     const img = document.createElement('img');
     // Reference the image that the user will upload
-    img.src = '/imgs/important-announcement.jpg';
+    img.src = '/imgs/important-announcement.webp';
     img.alt = 'Important Announcement';
     Object.assign(img.style, {
         display: 'block',
