@@ -1,6 +1,10 @@
 # Redirect trailing slash to non-trailing slash for consistency
 RewriteEngine On
 
+# Remove www
+RewriteCond %{HTTP_HOST} ^www\.lifesaversunited\.org [NC]
+RewriteRule ^(.*)$ https://lifesaversunited.org/$1 [L,R=301]
+
 # Redirect URLs with trailing slash to without trailing slash
 RewriteCond %{REQUEST_URI} ^(.+)/$
 RewriteCond %{REQUEST_FILENAME} !-d
