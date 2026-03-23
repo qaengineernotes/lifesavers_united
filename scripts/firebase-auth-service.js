@@ -9,7 +9,7 @@ import {
     updateProfile
 } from './firebase-config.js';
 
-import { db, doc, setDoc, getDoc, getDocs, onSnapshot, serverTimestamp, collection, query, where, updateDoc } from './firebase-config.js';
+import { db, doc, setDoc, getDoc, getDocs, onSnapshot, serverTimestamp, collection, query, where, updateDoc, initAppCheck } from './firebase-config.js';
 
 // Current user state
 let currentUser = null;
@@ -30,6 +30,7 @@ export function initializeAuth() {
 
         if (user) {
             // User is signed in
+            await initAppCheck();
 
             // First, try to find the user's Firestore document by UID
             const userRef = doc(db, 'users', user.uid);
@@ -147,6 +148,7 @@ export function isAuthenticated() {
 // ============================================================================
 async function getUserProfile(uid, phoneNumber) {
     try {
+        await initAppCheck();
         // Step 1: Try to find document by Firebase Auth UID
         const userRef = doc(db, 'users', uid);
         const userDoc = await getDoc(userRef);

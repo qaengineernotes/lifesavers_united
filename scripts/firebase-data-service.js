@@ -17,7 +17,8 @@ import {
     onSnapshot,
     serverTimestamp,
     arrayUnion,
-    getCountFromServer
+    getCountFromServer,
+    initAppCheck
 } from './firebase-config.js';
 
 // ... existing code ...
@@ -28,6 +29,7 @@ import {
 export async function fetchEmergencyRequestsFromFirebase(options = {}) {
     const { includeClosed = false } = options;
     try {
+        await initAppCheck();
         const requestsRef = collection(db, 'emergency_requests');
 
         // 1. Efficient Count Queries for Statistics (Server-side)
@@ -126,6 +128,7 @@ async function calculateStatistics() {
     // Legacy function - ideally unused now as we calculate in fetchEmergencyRequestsFromFirebase
     // But kept for compatibility if called independently
     try {
+        await initAppCheck();
         const requestsRef = collection(db, 'emergency_requests');
         // We can use getCountFromServer in future for optimization, 
         // but for now keeping it simple or reusing the implementation above if possible.
@@ -167,6 +170,7 @@ async function calculateStatistics() {
 // ============================================================================
 async function getUniqueVerifiers() {
     try {
+        await initAppCheck();
         const requestsRef = collection(db, 'emergency_requests');
         const q = query(requestsRef, where('verifiedByName', '!=', ''));
         const querySnapshot = await getDocs(q);
@@ -188,14 +192,20 @@ async function getUniqueVerifiers() {
 // REAL-TIME LISTENER FOR EMERGENCY REQUESTS
 // ============================================================================
 export function listenToEmergencyRequests(callback) {
-    const requestsRef = collection(db, 'emergency_requests');
-    const q = query(
-        requestsRef,
-        where('status', 'in', ['Open', 'Reopened', 'Verified', 'Closed'])
-    );
+    let unsubscribeFn = null;
+    let cancelled = false;
 
-    // Set up real-time listener
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    initAppCheck().then(() => {
+        if (cancelled) return;
+        
+        const requestsRef = collection(db, 'emergency_requests');
+        const q = query(
+            requestsRef,
+            where('status', 'in', ['Open', 'Reopened', 'Verified', 'Closed'])
+        );
+
+        // Set up real-time listener
+        unsubscribeFn = onSnapshot(q, (snapshot) => {
         const requests = [];
         snapshot.forEach((doc) => {
             const data = doc.data();
@@ -240,7 +250,14 @@ export function listenToEmergencyRequests(callback) {
         console.error('Error in real-time listener:', error);
     });
 
-    return unsubscribe; // Return function to stop listening
+    }).catch((error) => {
+        console.error('Error initializing AppCheck for real-time listener:', error);
+    });
+
+    return () => {
+        cancelled = true;
+        if (unsubscribeFn) unsubscribeFn();
+    }; // Return function to stop listening
 }
 
 // ============================================================================
@@ -248,6 +265,7 @@ export function listenToEmergencyRequests(callback) {
 // ============================================================================
 export async function updateRequestStatusInFirebase(patientName, bloodType, newStatus, verifiedBy, currentUser, contactNumber = null) {
     try {
+        await initAppCheck();
         // Find the request - try to be robust with names and types
         const requestsRef = collection(db, 'emergency_requests');
         let querySnapshot;
@@ -331,6 +349,7 @@ export async function updateRequestStatusInFirebase(patientName, bloodType, newS
 // ============================================================================
 export async function updateRequestInFirebase(originalContactNumber, editedData, currentUser) {
     try {
+        await initAppCheck();
         // Find the request by original contact number - try both string and number
         const requestsRef = collection(db, 'emergency_requests');
         const contactVariations = [
@@ -432,6 +451,7 @@ export async function updateRequestInFirebase(originalContactNumber, editedData,
 // ============================================================================
 export async function logDonationToFirebase(requestData, donationInfo, currentUser) {
     try {
+        await initAppCheck();
         // Find the request - robust lookup
         const requestsRef = collection(db, 'emergency_requests');
 

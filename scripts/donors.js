@@ -2,7 +2,7 @@
 // Handles authentication, data fetching, table rendering, filtering, and modal display
 
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
-import { db, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, serverTimestamp, arrayUnion } from '/scripts/firebase-config.js';
+import { db, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, serverTimestamp, arrayUnion, getCountFromServer, initAppCheck } from '/scripts/firebase-config.js';
 import { addHistoryEntry } from '/scripts/firebase-data-service.js';
 
 /**
@@ -34,9 +34,8 @@ function isSuperuser() {
 
 // Global state
 let currentUser = null;
-let allDonors = [];
-let filteredDonors = []; // For search and filter results
-let searchQuery = '';    // Current search query
+let currentDonorsPage = []; // Holds the exact 20 donors for the current page
+let searchQuery = '';    // Exact Contact Number match
 let activeFilters = {
     bloodGroup: '',
     city: '',
@@ -46,7 +45,11 @@ let currentSort = {
     key: 'registeredAt',
     dir: 'desc'
 };
+
+// --- PAGINATION STATE ---
 let currentPage = 1;
+let pageCursors = { 1: null }; // Maps pageNumber -> the last document snapshot of the previous page
+let isFetchingDocs = false;
 
 // ============================================================================
 // INITIALIZE PAGE
@@ -73,7 +76,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // User is logged in and approved
-        await loadAllDonors();
+        updateStatistics();
+        populateCityFilter();
+        initializeSearchAndFilters();
+
+        // Reset and fetch first page
+        currentPage = 1;
+        pageCursors = { 1: null };
+        await fetchAndRenderPage();
     });
 });
 
@@ -97,161 +107,193 @@ function showAccessDenied(message) {
 }
 
 // ============================================================================
-// LOAD ALL DONORS
+// SERVER-SIDE FETCHING & PAGINATION
 // ============================================================================
-async function loadAllDonors() {
+async function fetchAndRenderPage() {
+    if (isFetchingDocs) return;
+    isFetchingDocs = true;
+
     try {
-        document.getElementById('loadingState').style.display = 'block';
-        document.getElementById('accessDenied').style.display = 'none';
-        document.getElementById('tableContainer').style.display = 'none';
+        await initAppCheck();
+        
+        if (currentPage === 1) {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('tableContainer').style.display = 'none';
+        }
 
         const donorsRef = collection(db, 'donors');
-        // Don't use orderBy in query - it excludes documents without that field
-        // We'll sort in memory instead to include all donors
-        const snapshot = await getDocs(donorsRef);
+        let queryConstraints = [];
 
-        allDonors = [];
-        snapshot.forEach((doc) => {
-            allDonors.push({
-                id: doc.id,
-                ...doc.data()
-            });
-        });
+        // 1. FILTERING
+        // Server-Side Search
+        let isTextSearch = false;
 
-        // Sort in memory by lastDonatedAt first, then registeredAt/createdAt (fallback)
-        allDonors.sort((a, b) => {
-            const getTimestamp = (donor) => {
-                // Priority 1: Last donation date (most important - shows active donors first)
-                const lastDonated = donor.lastDonatedAt;
-                if (lastDonated) {
-                    return lastDonated.seconds ? lastDonated.seconds : new Date(lastDonated).getTime() / 1000;
-                }
+        if (searchQuery) {
+            const hasLetters = /[a-zA-Z]/.test(searchQuery);
 
-                // Priority 2: Registration date (for donors who haven't donated yet)
-                const regAt = donor.registeredAt;
-                const createdAt = donor.createdAt;
+            if (hasLetters) {
+                // Prefix Match (Starts With) requires stripping normal Date sorting!
+                isTextSearch = true;
+                const searchNameTitle = toTitleCase(searchQuery); // e.g., 'moxesh' -> 'Moxesh'
+                queryConstraints.push(where('fullName', '>=', searchNameTitle));
+                queryConstraints.push(where('fullName', '<=', searchNameTitle + '\uf8ff'));
+                // Note: We cannot ORDER BY registeredAt if we use >= or <= on fullName.
+            } else {
+                // Exact Mobile Match
+                let cleanNumber = searchQuery.replace(/\D/g, '');
+                if (cleanNumber.startsWith('91') && cleanNumber.length > 10) cleanNumber = cleanNumber.substring(2);
+                if (cleanNumber.length > 10) cleanNumber = cleanNumber.slice(-10);
+                queryConstraints.push(where('contactNumber', '==', cleanNumber || searchQuery));
+            }
+        }
 
-                if (regAt) {
-                    return regAt.seconds ? regAt.seconds : new Date(regAt).getTime() / 1000;
-                } else if (createdAt) {
-                    return createdAt.seconds ? createdAt.seconds : new Date(createdAt).getTime() / 1000;
-                }
-                return 0;
-            };
+        if (activeFilters.bloodGroup) {
+            queryConstraints.push(where('bloodGroup', '==', activeFilters.bloodGroup));
+        }
+        if (activeFilters.city) {
+            queryConstraints.push(where('city', '==', activeFilters.city));
+        }
+        if (activeFilters.emergency) {
+            const emergencyValue = activeFilters.emergency === 'yes' ? 'yes' : 'no';
+            queryConstraints.push(where('isEmergencyAvailable', '==', emergencyValue));
+        }
 
-            return getTimestamp(b) - getTimestamp(a); // Descending order (newest first)
-        });
+        // 2. SORTING
+        if (isTextSearch) {
+            // Firebase limits: You MUST order by the field you are checking >= against.
+            queryConstraints.push(orderBy('fullName', 'asc'));
+        } else {
+            queryConstraints.push(orderBy(currentSort.key, currentSort.dir));
+        }
 
-        // Update statistics
-        updateStatistics();
+        // 3. PAGINATION
+        const cursorDoc = pageCursors[currentPage];
+        if (cursorDoc) {
+            queryConstraints.push(startAfter(cursorDoc));
+        }
+        queryConstraints.push(limit(PAGE_SIZE));
 
-        // Populate city filter
-        populateCityFilter();
+        // EXECUTE QUERY
+        const finalQuery = query(donorsRef, ...queryConstraints);
+        const snapshot = await getDocs(finalQuery);
 
-        // Render first page
-        currentPage = 1;
+        currentDonorsPage = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Store the cursor for the NEXT page
+        if (snapshot.docs.length === PAGE_SIZE) {
+            pageCursors[currentPage + 1] = snapshot.docs[snapshot.docs.length - 1];
+        } else {
+            pageCursors[currentPage + 1] = null; // No next page
+        }
+
         renderTable();
+        updatePaginationUI(snapshot.docs.length);
 
-        // Show table and controls
+        if (currentPage === 1) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('tableContainer').style.display = 'block';
+        }
+    } catch (error) {
+        console.error("Error fetching page:", error);
+        const tbody = document.getElementById('donorsTableBody');
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding: 40px; color: #dc2626;">Error loading data: ${error.message} <br> Firebase may require a new composite index for this exact sorting/filtering combination. Check Developer Console (F12) for the creation link.</td></tr>`;
         document.getElementById('loadingState').style.display = 'none';
         document.getElementById('tableContainer').style.display = 'block';
-
-        // Initialize search and filters (combined)
-        initializeSearchAndFilters();
-
-    } catch (error) {
-        console.error('Error loading donors:', error);
-        document.getElementById('loadingState').innerHTML = `
-            <div class="load-error">
-                <p class="load-error-title">Error Loading Donors</p>
-                <p class="load-error-message">${error.message}</p>
-                <button onclick="location.reload()" class="action-btn" style="margin-top: 20px;">Retry</button>
-            </div>
-        `;
+    } finally {
+        isFetchingDocs = false;
     }
 }
 
 // ============================================================================
 // UPDATE STATISTICS
 // ============================================================================
-function updateStatistics() {
-    const total = allDonors.length;
+async function updateStatistics() {
+    await initAppCheck();
+    const donorsRef = collection(db, 'donors');
 
-    // Emergency available count
-    const emergencyCount = allDonors.filter(d =>
-        String(d.isEmergencyAvailable || '').toLowerCase() === 'yes'
-    ).length;
-
-    // Active donors (donated in last 6 months)
+    // Dates
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - ACTIVE_MONTHS_THRESHOLD);
-    const activeCount = allDonors.filter(d => {
-        if (!d.lastDonatedAt) return false;
-        const lastDonation = d.lastDonatedAt.seconds
-            ? new Date(d.lastDonatedAt.seconds * 1000)
-            : new Date(d.lastDonatedAt);
-        return lastDonation >= sixMonthsAgo;
-    }).length;
-
-    // New this month
     const thisMonth = new Date();
     thisMonth.setDate(1);
     thisMonth.setHours(0, 0, 0, 0);
-    const newThisMonth = allDonors.filter(d => {
-        // Use registeredAt if available, otherwise use createdAt
-        const regDate = d.registeredAt || d.createdAt;
-        if (!regDate) return false;
-        const dateObj = regDate.seconds
-            ? new Date(regDate.seconds * 1000)
-            : new Date(regDate);
-        return dateObj >= thisMonth;
-    }).length;
 
-    // Most common blood group (exclude blank / Unknown entries)
-    const bloodGroups = {};
-    allDonors.forEach(d => {
-        const bg = (d.bloodGroup || '').trim();
-        if (!bg || bg.toLowerCase() === 'unknown') return;
-        bloodGroups[bg] = (bloodGroups[bg] || 0) + 1;
-    });
-
-    let mostCommon = 'N/A';
-    if (Object.keys(bloodGroups).length > 0) {
-        mostCommon = Object.keys(bloodGroups).sort(
-            (a, b) => bloodGroups[b] - bloodGroups[a]
-        )[0];
+    // 1. Total Donors
+    try {
+        const snap = await getCountFromServer(donorsRef);
+        document.getElementById('statTotal').textContent = snap.data().count;
+    } catch (e) {
+        console.error("Total error:", e);
+        document.getElementById('statTotal').textContent = "Err";
     }
 
-    document.getElementById('statTotal').textContent = total;
-    document.getElementById('statEmergency').textContent = emergencyCount;
-    document.getElementById('statActive').textContent = activeCount;
-    document.getElementById('statThisMonth').textContent = newThisMonth;
-    document.getElementById('statCommonBlood').textContent = mostCommon;
+    // 2. Emergency Available
+    try {
+        const snap = await getCountFromServer(query(donorsRef, where('isEmergencyAvailable', '==', 'yes')));
+        document.getElementById('statEmergency').textContent = snap.data().count;
+    } catch (e) {
+        console.error("Emergency error:", e);
+        document.getElementById('statEmergency').textContent = "Err";
+    }
+
+    // 3. Active Donors
+    try {
+        const snap = await getCountFromServer(query(donorsRef, where('lastDonatedAt', '>=', sixMonthsAgo)));
+        document.getElementById('statActive').textContent = snap.data().count;
+    } catch (e) {
+        console.error("Active error:", e);
+        document.getElementById('statActive').textContent = "Err";
+    }
+
+    // 4. New This Month
+    try {
+        const snap = await getCountFromServer(query(donorsRef, where('registeredAt', '>=', thisMonth)));
+        document.getElementById('statThisMonth').textContent = snap.data().count;
+    } catch (e) {
+        console.error("New This Month error:", e);
+        document.getElementById('statThisMonth').textContent = "Err";
+    }
+
+    // 5. Most Common Blood Group
+    try {
+        const bloodGroups = ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'];
+        const groupCountsSnapshots = await Promise.all(
+            bloodGroups.map(bg => getCountFromServer(query(donorsRef, where('bloodGroup', '==', bg))))
+        );
+        let maxCount = 0;
+        let mostCommon = 'N/A';
+        groupCountsSnapshots.forEach((snap, index) => {
+            const count = snap.data().count;
+            if (count > maxCount) {
+                maxCount = count;
+                mostCommon = bloodGroups[index];
+            }
+        });
+        document.getElementById('statCommonBlood').textContent = mostCommon;
+    } catch (e) {
+        console.error("Blood group error:", e);
+        document.getElementById('statCommonBlood').textContent = "Err";
+    }
 }
 
 // ============================================================================
 // POPULATE CITY FILTER
 // ============================================================================
 function populateCityFilter() {
-    const cities = new Set();
-    allDonors.forEach(donor => {
-        if (donor.city) {
-            cities.add(donor.city);
-        }
-    });
+    // Static list of popular cities in Gujarat for dropdown (since server-side UNIQUE/DISTINCT is unavailable without complex triggers)
+    const defaultCities = ['Ahmedabad', 'Gandhinagar', 'Surat', 'Vadodara', 'Rajkot', 'Bhavnagar', 'Jamnagar', 'Anand', 'Nadiad', 'Morbi', 'Mehsana'];
 
     const cityFilter = document.getElementById('filterCity');
-    const sortedCities = Array.from(cities).sort();
+    cityFilter.innerHTML = '<option value="">All Cities</option>';
 
-    sortedCities.forEach(city => {
+    defaultCities.forEach(city => {
         const option = document.createElement('option');
         option.value = city;
         option.textContent = city;
         cityFilter.appendChild(option);
     });
 
-    // Also update custom dropdown panel for City
-    updateCityCustomDropdown(sortedCities);
+    updateCityCustomDropdown(defaultCities);
 }
 
 // ============================================================================
@@ -261,84 +303,10 @@ function renderTable() {
     const tbody = document.getElementById('donorsTableBody');
     tbody.innerHTML = '';
 
-    // Apply filters and search
-    let donorsToDisplay = [...allDonors];
+    updateHeaderSortUI(); // Highlight sorting column headers
 
-    // Apply search
-    if (searchQuery) {
-        donorsToDisplay = donorsToDisplay.filter(donor => {
-            const name = String(donor.fullName || '').toLowerCase();
-            const contact = String(donor.contactNumber || '').toLowerCase();
-            const city = String(donor.city || '').toLowerCase();
-
-            return name.includes(searchQuery) ||
-                contact.includes(searchQuery) ||
-                city.includes(searchQuery);
-        });
-    }
-
-    // Apply filters
-    if (activeFilters.bloodGroup) {
-        donorsToDisplay = donorsToDisplay.filter(d => d.bloodGroup === activeFilters.bloodGroup);
-    }
-    if (activeFilters.city) {
-        donorsToDisplay = donorsToDisplay.filter(d => d.city === activeFilters.city);
-    }
-    if (activeFilters.emergency) {
-        const emergencyValue = activeFilters.emergency === 'yes' ? 'yes' : 'no';
-        donorsToDisplay = donorsToDisplay.filter(d =>
-            String(d.isEmergencyAvailable || '').toLowerCase() === emergencyValue
-        );
-    }
-
-    // Apply Sorting
-    donorsToDisplay.sort((a, b) => {
-        const key = currentSort.key;
-        const dir = currentSort.dir === 'asc' ? 1 : -1;
-
-        // Helper to get comparable values
-        const getValue = (obj, k) => {
-            let val = obj[k];
-
-            // Handle registration date fallback
-            if (k === 'registeredAt') val = obj.registeredAt || obj.createdAt;
-
-            // Handle Firestore Timestamps
-            if (val && typeof val === 'object' && val.seconds !== undefined) {
-                return val.seconds;
-            }
-
-            // Handle Date objects or ISO strings
-            if (val && (k === 'lastDonatedAt' || k === 'registeredAt' || k === 'createdAt')) {
-                const d = new Date(val);
-                return isNaN(d.getTime()) ? 0 : d.getTime();
-            }
-
-            if (typeof val === 'string') return val.toLowerCase();
-            if (typeof val === 'number') return val;
-            return val || 0;
-        };
-
-        const valA = getValue(a, key);
-        const valB = getValue(b, key);
-
-        if (valA < valB) return -1 * dir;
-        if (valA > valB) return 1 * dir;
-        return 0;
-    });
-
-    filteredDonors = donorsToDisplay;
-
-    // Update Header UI (sorting arrows)
-    updateHeaderSortUI();
-
-    // Calculate pagination
-    const startIndex = (currentPage - 1) * PAGE_SIZE;
-    const endIndex = startIndex + PAGE_SIZE;
-    const pageDonors = donorsToDisplay.slice(startIndex, endIndex);
-
-    if (pageDonors.length === 0) {
-        const message = searchQuery || hasActiveFilters()
+    if (currentDonorsPage.length === 0) {
+        const message = searchQuery || activeFilters.bloodGroup || activeFilters.city || activeFilters.emergency
             ? 'No donors found matching your search/filters'
             : 'No donors found';
         tbody.innerHTML = `
@@ -351,17 +319,13 @@ function renderTable() {
         return;
     }
 
-    // Render each donor
-    pageDonors.forEach((donor, index) => {
+    currentDonorsPage.forEach((donor, index) => {
+        const startIndex = (currentPage - 1) * PAGE_SIZE; // just for rendering row number if needed
         const row = createTableRow(donor, startIndex + index);
         tbody.appendChild(row);
     });
 
-    // Update pagination
-    updatePagination();
-
-    // Update filter results
-    updateFilterResults();
+    // Removed updateFilterResults() as we no longer calculate precise full-table matching lengths natively
 }
 
 // ============================================================================
@@ -448,12 +412,8 @@ function createTableRow(donor, index) {
 // VIEW DONOR DETAILS
 // ============================================================================
 window.viewDonor = function (donorId) {
-    // Look up by stable Firestore document ID — never stale, no index offset math
-    let donor = filteredDonors.find(d => d.id === donorId);
-    if (!donor) {
-        // Fallback: donor may have been filtered out since the row was rendered
-        donor = allDonors.find(d => d.id === donorId);
-    }
+    // Look up by stable Firestore document ID
+    let donor = currentDonorsPage.find(d => d.id === donorId);
     if (!donor) {
         console.error('Donor not found:', donorId);
         return;
@@ -792,14 +752,11 @@ document.getElementById('viewModal').addEventListener('click', function (e) {
 // ============================================================================
 // PAGINATION
 // ============================================================================
-function updatePagination() {
+function updatePaginationUI(docsReturned) {
     const paginationContainer = document.getElementById('pagination');
-    const donorsToDisplay = filteredDonors.length > 0 || searchQuery || hasActiveFilters()
-        ? filteredDonors
-        : allDonors;
-    const totalPages = Math.ceil(donorsToDisplay.length / PAGE_SIZE);
 
-    if (totalPages <= 1) {
+    // If no records at all and we're on page 1, hide pagination
+    if (currentPage === 1 && docsReturned === 0) {
         paginationContainer.innerHTML = '';
         return;
     }
@@ -808,65 +765,30 @@ function updatePagination() {
         <button class="pagination-prev" 
                 ${currentPage === 1 ? 'disabled' : ''}
                 aria-label="Previous page">
-            «
+            « Previous
         </button>
-    `;
+        
+        <span class="pagination-page active" style="padding: 8px 16px; cursor: default;">
+            Page ${currentPage}
+        </span>
 
-    // Smart pagination with ellipsis
-    const showPages = 5;
-    let startPage = Math.max(1, currentPage - Math.floor(showPages / 2));
-    let endPage = Math.min(totalPages, startPage + showPages - 1);
-
-    if (endPage - startPage < showPages - 1) {
-        startPage = Math.max(1, endPage - showPages + 1);
-    }
-
-    // Show first page and ellipsis if needed
-    if (startPage > 1) {
-        paginationHTML += `<button class="pagination-page" data-page="1">1</button>`;
-        if (startPage > 2) {
-            paginationHTML += `<button class="pagination-ellipsis" disabled>...</button>`;
-        }
-    }
-
-    // Show page numbers
-    for (let i = startPage; i <= endPage; i++) {
-        paginationHTML += `
-            <button class="pagination-page ${i === currentPage ? 'active' : ''}" data-page="${i}">
-                ${i}
-            </button>
-        `;
-    }
-
-    // Show last page and ellipsis if needed
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            paginationHTML += `<button class="pagination-ellipsis" disabled>...</button>`;
-        }
-        const lastPageActive = currentPage === totalPages ? 'active' : '';
-        paginationHTML += `<button class="pagination-page ${lastPageActive}" data-page="${totalPages}">${totalPages}</button>`;
-    }
-
-    paginationHTML += `
         <button class="pagination-next" 
-                ${currentPage === totalPages ? 'disabled' : ''}
+                ${!pageCursors[currentPage + 1] ? 'disabled' : ''}
                 aria-label="Next page">
-            »
+            Next »
         </button>
     `;
 
     paginationContainer.innerHTML = paginationHTML;
 
-    // Add event listeners
     const prevBtn = paginationContainer.querySelector('.pagination-prev');
     const nextBtn = paginationContainer.querySelector('.pagination-next');
-    const pageBtns = paginationContainer.querySelectorAll('.pagination-page');
 
     if (prevBtn) {
         prevBtn.addEventListener('click', () => {
             if (currentPage > 1) {
                 currentPage--;
-                renderTable();
+                fetchAndRenderPage();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
@@ -874,21 +796,13 @@ function updatePagination() {
 
     if (nextBtn) {
         nextBtn.addEventListener('click', () => {
-            if (currentPage < totalPages) {
+            if (pageCursors[currentPage + 1]) {
                 currentPage++;
-                renderTable();
+                fetchAndRenderPage();
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         });
     }
-
-    pageBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-            currentPage = parseInt(btn.dataset.page);
-            renderTable();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-    });
 }
 
 // ============================================================================
@@ -954,7 +868,7 @@ function initializeSearch() {
 }
 
 function performSearch(query) {
-    searchQuery = query.toLowerCase();
+    searchQuery = query.trim();
     const searchResults = document.getElementById('searchResults');
 
     if (!searchQuery) {
@@ -965,14 +879,12 @@ function performSearch(query) {
     }
 
     currentPage = 1;
-    renderTable();
+    pageCursors = { 1: null };
+    fetchAndRenderPage();
 
     // Update search results display
-    if (searchQuery && filteredDonors.length > 0) {
-        searchResults.textContent = `Found ${filteredDonors.length} donor${filteredDonors.length === 1 ? '' : 's'}`;
-        searchResults.classList.add('visible');
-    } else if (searchQuery) {
-        searchResults.textContent = `No results found`;
+    if (searchQuery) {
+        searchResults.textContent = `Searching for exact contact "${searchQuery}"`;
         searchResults.classList.add('visible');
     } else {
         searchResults.classList.remove('visible');
@@ -998,7 +910,8 @@ function initializeFilters() {
         activeFilters.bloodGroup = e.target.value;
         updateClearFiltersButton();
         currentPage = 1;
-        renderTable();
+        pageCursors = { 1: null };
+        fetchAndRenderPage();
     });
 
     // City filter
@@ -1006,7 +919,8 @@ function initializeFilters() {
         activeFilters.city = e.target.value;
         updateClearFiltersButton();
         currentPage = 1;
-        renderTable();
+        pageCursors = { 1: null };
+        fetchAndRenderPage();
     });
 
     // Emergency filter
@@ -1014,7 +928,8 @@ function initializeFilters() {
         activeFilters.emergency = e.target.value;
         updateClearFiltersButton();
         currentPage = 1;
-        renderTable();
+        pageCursors = { 1: null };
+        fetchAndRenderPage();
     });
 
     // Clear filters button
@@ -1049,7 +964,8 @@ function initializeFilters() {
 
         updateClearFiltersButton();
         currentPage = 1;
-        renderTable();
+        pageCursors = { 1: null };
+        fetchAndRenderPage();
     });
 }
 
@@ -1085,7 +1001,8 @@ function initializeTableSorting() {
             }
 
             currentPage = 1;
-            renderTable();
+            pageCursors = { 1: null };
+            fetchAndRenderPage();
         });
     });
 }
@@ -1677,7 +1594,7 @@ window.saveLogDonation = async function () {
             try {
                 const requestRef = doc(db, 'emergency_requests', linkedReqId);
                 const requestData = requestSnap.data();
-                
+
                 const currentUnitsFulfilled = parseInt(requestData.unitsFulfilled) || 0;
                 const totalUnitsRequired = parseInt(requestData.unitsRequired) || 0;
                 const newUnitsFulfilled = currentUnitsFulfilled + units;
@@ -1734,7 +1651,7 @@ window.saveLogDonation = async function () {
                     createdBy: currentUser?.displayName || 'Superuser',
                     createdById: currentUser?.uid || '',
                     donorName: donor?.fullName || 'Anonymous',
-                    note: willClose 
+                    note: willClose
                         ? `Request closed - Blood fulfilled by ${donor?.fullName || 'Anonymous'} (${units} unit(s))`
                         : `${units} unit(s) donated by ${donor?.fullName || 'Anonymous'}`
                 });
