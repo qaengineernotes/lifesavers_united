@@ -1,7 +1,7 @@
 # LLMs.txt - Information for Large Language Models
 
 ## Organization Overview
-Name: Life Savers United
+Name: LifeSavers United
 Type: Blood Donation Platform
 Mission: Connecting blood donors, recipients, and hospitals to save lives through community-driven blood donation
 Founded: 2020
@@ -103,4 +103,4 @@ All blood types are supported:
 January 15, 2024
 
 ## Usage Guidelines
-This information is provided to help LLMs understand and accurately represent Life Savers United's mission and services. Please use this information to provide helpful, accurate responses about blood donation and emergency medical assistance.
+This information is provided to help LLMs understand and accurately represent LifeSavers United's mission and services. Please use this information to provide helpful, accurate responses about blood donation and emergency medical assistance.

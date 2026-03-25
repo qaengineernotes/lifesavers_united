@@ -1,4 +1,4 @@
-// Google Apps Script for Life Savers Donors - Updated with Donation Logging System
+// Google Apps Script for LifeSavers Donors - Updated with Donation Logging System
 // Version: 2.0 - Partial Donation Tracking
 
 // ============================================================================

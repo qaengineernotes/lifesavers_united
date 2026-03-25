@@ -304,7 +304,7 @@ Suffering From: ${requestData.diagnosis || 'N/A'}
 Contact Person: ${requestData.contactPerson || 'N/A'}
 Contact Number: ${requestData.contactNumber || 'N/A'}
 
-Connect with Life Savers United - Your community blood donation network
+Connect with LifeSavers United - Your community blood donation network
 Visit: https://lifesaversunited.org/`;
 }
 

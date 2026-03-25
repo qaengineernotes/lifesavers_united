@@ -2183,7 +2183,7 @@ function formatRequestDataForCopy(requestData) {
         formatField('Contact Person', requestData.contactPerson),
         formatField('Contact Number', requestData.contactNumber),
         '',
-        '🩸 Connect with Life Savers United - Your community blood donation network',
+        '🩸 Connect with LifeSavers United - Your community blood donation network',
         '🌐 Visit: https://lifesaversunited.org/',
         '💬 WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw'
     ].join('\n');

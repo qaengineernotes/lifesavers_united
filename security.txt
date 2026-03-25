@@ -7,7 +7,7 @@ Preferred-Languages: en, hi, gu
 Canonical: https://lifesaversunited.org/.well-known/security.txt
 Policy: https://lifesaversunited.org/security-policy
 
-# Security Policy for Life Savers United
+# Security Policy for LifeSavers United
 
 ## Reporting Security Vulnerabilities
 

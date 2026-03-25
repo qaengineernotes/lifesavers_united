@@ -105,7 +105,7 @@ class MobileMenu {
         mobileMenuFooter.className = 'mobile-menu-footer';
         mobileMenuFooter.innerHTML = `
             <div class="mobile-menu-footer-content">
-                <p class="text-sm text-gray-500 text-center">Life Savers United</p>
+                <p class="text-sm text-gray-500 text-center">LifeSavers United</p>
                 <p class="text-xs text-gray-400 text-center mt-1">Saving Lives Together</p>
             </div>
         `;

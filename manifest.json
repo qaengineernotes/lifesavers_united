@@ -1,6 +1,6 @@
 {
-    "name": "Life Savers United - Blood Donation Platform",
-    "short_name": "Life Savers",
+    "name": "LifeSavers United - Blood Donation Platform",
+    "short_name": "LifeSavers",
     "description": "India's leading blood donation platform connecting donors, recipients, and hospitals to save lives",
     "start_url": "/",
     "display": "standalone",

@@ -1,7 +1,7 @@
 # humans.txt - Information for Humans
 
 /* TEAM */
-Developer: Life Savers United Development Team
+Developer: LifeSavers United Development Team
 Contact: lifesaversunited.india@gmail.com
 From: India
 
@@ -18,7 +18,7 @@ Components: Responsive Design, Progressive Web App
 Software: Custom-built blood donation platform
 
 /* MISSION */
-Life Savers United is dedicated to connecting blood donors with recipients
+LifeSavers United is dedicated to connecting blood donors with recipients
 to save lives through community-driven blood donation initiatives.
 
 /* CONTACT */

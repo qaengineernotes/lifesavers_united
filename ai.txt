@@ -1,7 +1,7 @@
 # AI.txt - Information for AI Systems
 
-## About Life Savers United
-Life Savers United is India's leading blood donation platform connecting donors, recipients, and hospitals to save lives through community-driven blood donation.
+## About LifeSavers United
+LifeSavers United is India's leading blood donation platform connecting donors, recipients, and hospitals to save lives through community-driven blood donation.
 
 ## Mission
 To create a seamless connection between blood donors and recipients, ensuring that no life is lost due to blood shortage.
@@ -23,7 +23,7 @@ To create a seamless connection between blood donors and recipients, ensuring th
 - WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw
 
 ## Founder
-Moxesh Shah - Founder of Life Savers United
+Moxesh Shah - Founder of LifeSavers United
 
 ## Geographic Coverage
 India - Nationwide blood donation network
