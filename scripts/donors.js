@@ -1256,7 +1256,7 @@ window.editDonor = function (donorId) {
         return;
     }
 
-    const donor = allDonors.find(d => d.id === donorId);
+    const donor = currentDonorsPage.find(d => d.id === donorId);
     if (!donor) { alert('Donor not found.'); return; }
 
     // ── Populate header ──────────────────────────────────────
@@ -1358,14 +1358,14 @@ window.saveEditDonor = async function () {
         await updateDoc(doc(db, 'donors', donorId), updateData);
 
         // Patch local cache
-        const idx = allDonors.findIndex(d => d.id === donorId);
+        const idx = currentDonorsPage.findIndex(d => d.id === donorId);
         if (idx !== -1) {
-            allDonors[idx] = {
-                ...allDonors[idx],
+            currentDonorsPage[idx] = {
+                ...currentDonorsPage[idx],
                 ...updateData,
                 lastDonatedAt: lastDonatedInput
                     ? { seconds: new Date(lastDonatedInput + 'T00:00:00').getTime() / 1000 }
-                    : allDonors[idx].lastDonatedAt
+                    : currentDonorsPage[idx].lastDonatedAt
             };
         }
 
@@ -1495,7 +1495,7 @@ window.saveLogDonation = async function () {
     if (!isSuperuser()) return;
 
     const donorId = document.getElementById('editDonorId').value;
-    const donor = allDonors.find(d => d.id === donorId);
+    const donor = currentDonorsPage.find(d => d.id === donorId);
     const statusEl = document.getElementById('edm-log-status');
     const logBtn = document.getElementById('edm-log-btn');
 
@@ -1581,9 +1581,9 @@ window.saveLogDonation = async function () {
         });
 
         // 3. Patch local cache
-        const idx = allDonors.findIndex(d => d.id === donorId);
+        const idx = currentDonorsPage.findIndex(d => d.id === donorId);
         if (idx !== -1) {
-            allDonors[idx].lastDonatedAt = { seconds: donatedAtDate.getTime() / 1000 };
+            currentDonorsPage[idx].lastDonatedAt = { seconds: donatedAtDate.getTime() / 1000 };
         }
 
         renderTable();
@@ -1936,7 +1936,7 @@ window.deleteDonor = function (donorId) {
         return;
     }
 
-    const donor = allDonors.find(d => d.id === donorId);
+    const donor = currentDonorsPage.find(d => d.id === donorId);
     if (!donor) {
         alert('Donor not found.');
         return;
@@ -1985,12 +1985,8 @@ window.confirmDeleteDonor = async function () {
         await deleteDoc(doc(db, 'donors', donorId));
 
         // Remove from local arrays
-        const idx = allDonors.findIndex(d => d.id === donorId);
-        if (idx !== -1) allDonors.splice(idx, 1);
-
-        // Also remove from filteredDonors if present
-        const fidx = filteredDonors.findIndex(d => d.id === donorId);
-        if (fidx !== -1) filteredDonors.splice(fidx, 1);
+        const idx = currentDonorsPage.findIndex(d => d.id === donorId);
+        if (idx !== -1) currentDonorsPage.splice(idx, 1);
 
         // Close modal first
         window.closeDeleteConfirm();
