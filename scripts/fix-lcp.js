@@ -22,7 +22,9 @@ files.forEach(file => {
     // Make sure we haven't already added it to prevent duplicates
     if (!content.includes('href="/imgs/important-announcement.webp"')) {
         // Find the closing </head> tag and insert the preload line right above it
-        const preloadTag = `\n    <!-- LCP Preload for Important Announcement Popup -->\n    <link rel="preload" as="image" href="/imgs/important-announcement.webp" fetchpriority="high">\n`;
+        const preloadTag = `\n     <script defer src="https://cloud.umami.is/script.js"
+        data-website-id="7f971a01-0c53-4b99-87d8-4f507e85b6b7"></script>
+    <!-- LCP Preload for Important Announcement Popup -->\n    <link rel="preload" as="image" href="/imgs/important-announcement.webp" fetchpriority="high">\n`;
         content = content.replace('</head>', `${preloadTag}</head>`);
         fs.writeFileSync(file, content, 'utf8');
     }
