@@ -477,6 +477,45 @@ async function handleFormSubmission(e) {
         if (finalResult.success) {
             showSuccessMessage();
             e.target.reset(); // Reset form on success
+
+            // --- Send confirmation emails (fire-and-forget, non-blocking) ---
+            // Calls the CF Pages Function which emails the donor + admin
+            if (data.email) {
+                fetch('/donor-registration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName:           data.fullName,
+                        bloodGroup:         data.bloodGroup,
+                        city:               data.city,
+                        area:               data.area,
+                        email:              data.email,
+                        contactNumber:      data.contactNumber,
+                        emergencyAvailable: data.emergencyAvailable,
+                        preferredContact:   data.preferredContact,
+                    }),
+                }).then(r => r.json())
+                  .then(result => console.log('📧 Email notification:', result))
+                  .catch(err  => console.warn('📧 Email send failed (registration still saved):', err));
+            } else {
+                // No donor email — still notify admin
+                fetch('/donor-registration', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        fullName:           data.fullName,
+                        bloodGroup:         data.bloodGroup,
+                        city:               data.city,
+                        area:               data.area,
+                        email:              '',
+                        contactNumber:      data.contactNumber,
+                        emergencyAvailable: data.emergencyAvailable,
+                        preferredContact:   data.preferredContact,
+                    }),
+                }).then(r => r.json())
+                  .then(result => console.log('📧 Admin notification:', result))
+                  .catch(err  => console.warn('📧 Admin email failed:', err));
+            }
         } else {
             showErrorMessage(finalResult.message || 'Failed to register. Please try again.');
         }

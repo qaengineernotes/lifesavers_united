@@ -41,6 +41,14 @@
         <priority>0.8</priority>
     </url>
 
+    <!-- Volunteers -->
+    <url>
+        <loc>https://lifesaversunited.org/volunteers</loc>
+        <lastmod>2026-04-13</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
     <!-- About Us -->
     <url>
         <loc>https://lifesaversunited.org/about_us</loc>

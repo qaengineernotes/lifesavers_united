@@ -541,9 +541,7 @@ iframe,
 embed,
 object {
   display: block;
-  /* 1 */
-  vertical-align: middle;
-  /* 2 */
+  /* display: block removes the default baseline gap under images */
 }
 
 /*
@@ -6080,3 +6078,1120 @@ article.py-16 {
   transition-duration: 300ms;
   transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
 }
+
+/* ----------------------------------------------
+   VOLUNTEERS PREMIUM STYLES (volunteers-premium.html)
+   ---------------------------------------------- */
+
+/* HERO SECTION */
+.vol-hero {
+    background: #B91C1C;
+    color: #fff;
+    padding: 72px 24px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.vol-hero::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    right: -80px;
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    pointer-events: none;
+}
+
+.vol-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    left: -60px;
+    width: 280px;
+    height: 280px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    pointer-events: none;
+}
+
+.vol-hero-badge {
+    display: inline-block;
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 5px 16px;
+    margin-bottom: 20px;
+}
+
+.vol-hero h1 {
+    font-size: clamp(26px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.25;
+    max-width: 640px;
+    margin: 0 auto 14px;
+    color: #fff;
+}
+
+.vol-hero h2 {
+    font-size: clamp(16px, 2.5vw, 20px);
+    font-weight: 400;
+    opacity: 0.85;
+    margin-bottom: 14px;
+    color: #fff;
+}
+
+.vol-hero p {
+    font-size: 15px;
+    opacity: 0.8;
+    max-width: 540px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* STATS BAR */
+.stats-bar {
+    background: #fff;
+    border-bottom: 1px solid #FEE2E2;
+    padding: 0;
+}
+
+.stats-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.stat-cell {
+    text-align: center;
+    padding: 28px 16px;
+    border-right: 1px solid #FEE2E2;
+    position: relative;
+}
+
+.stat-cell:last-child {
+    border-right: none;
+}
+
+.stat-cell .s-num {
+    font-size: 32px;
+    font-weight: 700;
+    color: #B91C1C;
+    line-height: 1;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.stat-cell .s-label {
+    font-size: 12px;
+    color: #6B7280;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+/* SECTION SHARED */
+.section-head {
+    text-align: center;
+    padding: 56px 24px 36px;
+}
+
+.section-head .s-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #B91C1C;
+    margin-bottom: 10px;
+}
+
+.section-head h2 {
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 12px;
+    line-height: 1.3;
+}
+
+.section-head p {
+    font-size: 15px;
+    color: #6B7280;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+}
+
+/* FEATURED VOLUNTEER */
+.featured-section {
+    background: #FFF7F7;
+    padding: 0 24px 64px;
+}
+
+.featured-card {
+    max-width: 860px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #FEE2E2;
+    border-radius: 20px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    overflow: hidden;
+}
+
+.featured-img-col {
+    background: #B91C1C;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 32px;
+    text-align: center;
+}
+
+.featured-img-col img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 18px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.featured-img-col .f-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 6px;
+}
+
+.featured-img-col .f-role {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.featured-content {
+    padding: 40px 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.featured-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #B91C1C;
+    background: #FEE2E2;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.featured-content blockquote {
+    font-size: 18px;
+    line-height: 1.65;
+    color: #1F2937;
+    font-style: italic;
+    margin: 0 0 20px;
+    position: relative;
+    padding-left: 20px;
+    border-left: 3px solid #B91C1C;
+}
+
+.featured-content .f-desc {
+    font-size: 14px;
+    color: #6B7280;
+    line-height: 1.7;
+}
+
+.featured-pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+.f-pill {
+    font-size: 12px;
+    background: #FEF2F2;
+    color: #991B1B;
+    border: 1px solid #FECACA;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-weight: 500;
+}
+
+/* VOLUNTEER GRID */
+.grid-section {
+    background: #fff;
+    padding: 0 24px 80px;
+}
+
+.vol-grid {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 24px;
+}
+
+.vol-card {
+    background: #ffffff;
+    border: 1px solid #f3f4f6;
+    border-radius: 28px;
+    padding: 40px 24px 32px;
+    text-align: center;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
+}
+
+.vol-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 110px;
+    background: linear-gradient(180deg, rgba(185, 28, 28, 0.03) 0%, rgba(255, 255, 255, 0) 100%);
+    z-index: 0;
+    transition: opacity 0.4s;
+}
+
+.vol-card:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 30px 40px -10px rgba(0, 0, 0, 0.08);
+    border-color: #fee2e2;
+}
+
+.vol-card:hover::before {
+    opacity: 1;
+}
+
+.vol-avatar-wrap {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 20px;
+    z-index: 1;
+}
+
+.vol-avatar-wrap img {
+    width: 100px;
+    height: 100px;
+    border-radius: 24px;
+    object-fit: cover;
+    object-position: center 15%;
+    border: 4px solid #ffffff;
+    box-shadow: 0 12px 20px -5px rgba(0, 0, 0, 0.15);
+    background: #f3f4f6;
+    transition: all 0.4s ease;
+}
+
+.vol-card:hover .vol-avatar-wrap img {
+    transform: scale(1.08) translateY(-5px);
+    box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.2);
+}
+
+.vol-dot {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #10b981;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+    z-index: 2;
+}
+
+.vol-info {
+    position: relative;
+    z-index: 1;
+}
+
+.vol-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 4px;
+}
+
+.vol-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 4px 12px;
+    border-radius: 12px;
+    background: #fef2f2;
+    color: #b91c1c;
+    margin-bottom: 16px;
+    border: 1px solid #fee2e2;
+}
+
+.vol-quote {
+    font-size: 14px;
+    color: #4b5563;
+    line-height: 1.6;
+    font-style: normal;
+    position: relative;
+    padding-top: 10px;
+}
+
+.vol-quote::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px;
+    color: #fee2e2;
+    font-family: serif;
+    line-height: 1;
+}
+
+.vol-card-footer {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    z-index: 1;
+    position: relative;
+}
+
+.vol-card:hover .vol-card-footer {
+    opacity: 1;
+}
+
+.vol-social-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #f9fafb;
+    color: #6b7280;
+    transition: all 0.2s;
+    border: 1px solid #e5e7eb;
+    text-decoration: none;
+}
+
+.vol-social-btn:hover {
+    background: #b91c1c;
+    color: #fff;
+    border-color: #b91c1c;
+}
+
+/* JOIN FORM */
+.join-section {
+    background: #FFF7F7;
+    padding: 0 24px 72px;
+}
+
+.join-wrap {
+    max-width: 640px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #FEE2E2;
+    border-radius: 20px;
+    padding: 48px 48px;
+}
+
+.join-wrap .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    border: 1px solid #E5E7EB;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 14px;
+    color: #111827;
+    background: #FAFAFA;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #B91C1C;
+    background: #fff;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 90px;
+}
+
+.form-full {
+    grid-column: 1 / -1;
+}
+
+.join-btn {
+    width: 100%;
+    margin-top: 8px;
+    background: #B91C1C;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.join-btn:hover {
+    background: #991B1B;
+}
+
+.join-btn:active {
+    transform: scale(0.99);
+}
+
+.form-note {
+    text-align: center;
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-top: 14px;
+}
+
+.form-success {
+    display: none;
+    text-align: center;
+    padding: 32px;
+}
+
+.form-success .check-icon {
+    width: 56px;
+    height: 56px;
+    background: #DCFCE7;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 24px;
+}
+
+.form-success h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.form-success p {
+    font-size: 14px;
+    color: #6B7280;
+}
+
+/* CTA BAND */
+.cta-band {
+    background: #7F1D1D;
+    color: #fff;
+    text-align: center;
+    padding: 64px 24px;
+}
+
+.cta-band h2 {
+    font-size: clamp(22px, 3vw, 32px);
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #fff;
+}
+
+.cta-band p {
+    font-size: 15px;
+    opacity: 0.8;
+    max-width: 500px;
+    margin: 0 auto 28px;
+    line-height: 1.7;
+}
+
+.cta-band-btns {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-white {
+    background: #fff;
+    color: #991B1B;
+    border: none;
+    border-radius: 10px;
+    padding: 13px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: opacity 0.2s;
+}
+
+.btn-white:hover {
+    opacity: 0.9;
+}
+
+.btn-outline-white {
+    background: transparent;
+    color: #fff;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 10px;
+    padding: 13px 28px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: border-color 0.2s;
+}
+
+.btn-outline-white:hover {
+    border-color: #fff;
+}
+
+/* VOLUNTEERS PAGE - RESPONSIVE */
+@media (max-width: 700px) {
+    .stats-inner {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .stat-cell:nth-child(2) {
+        border-right: none;
+    }
+
+    .featured-card {
+        grid-template-columns: 1fr;
+    }
+
+    .featured-img-col {
+        padding: 36px 24px 28px;
+    }
+
+    .featured-content {
+        padding: 28px 24px 36px;
+    }
+
+    .join-wrap {
+        padding: 32px 24px;
+    }
+
+    .join-wrap .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-inner {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* =============================================================================
+   HEALTH ASSESSMENT TOOLS — Pill Radio Toggle (health_assessment_tools.html)
+   ============================================================================= */
+
+.pill-radio {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.pill-toggle-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+}
+
+.pill-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 22px;
+    border-radius: 50px;
+    border: 2px solid #e2e8f0;
+    background: #f8fafc;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: #64748b;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    letter-spacing: 0.01em;
+    line-height: 1.4;
+}
+
+.pill-label:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-color: #94a3b8;
+    color: #374151;
+}
+
+/* YES selected → green */
+.pill-radio.pill-yes:checked + .pill-label {
+    background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+    border-color: #16a34a;
+    color: #15803d;
+    box-shadow: 0 2px 10px rgba(22, 163, 74, 0.25);
+    font-weight: 600;
+}
+
+/* NO selected → red */
+.pill-radio.pill-no:checked + .pill-label {
+    background: linear-gradient(135deg, #fee2e2, #fecaca);
+    border-color: #dc2626;
+    color: #b91c1c;
+    box-shadow: 0 2px 10px rgba(220, 38, 38, 0.25);
+    font-weight: 600;
+}
+
+/* Neutral / multi-option → indigo */
+.pill-radio.pill-neutral:checked + .pill-label {
+    background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+    border-color: #4f46e5;
+    color: #3730a3;
+    box-shadow: 0 2px 10px rgba(79, 70, 229, 0.25);
+    font-weight: 600;
+}
+
+/* Focus ring for accessibility */
+.pill-radio:focus + .pill-label {
+    outline: 2px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* =============================================================================
+   HEALTH ASSESSMENT TOOLS — Negative Result Card UI
+   ============================================================================= */
+
+/* Wrapper shown after a negative check result */
+.result-negative {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+/* Headline banner */
+.rn-banner {
+    background: #FAEEDA;
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.rn-banner-icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.rn-banner-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #633806;
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+.rn-banner-sub {
+    font-size: 0.8125rem;
+    color: #8a5523;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Issue cards grid */
+.rn-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 640px) {
+    .rn-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Single issue card */
+.rn-card {
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.rn-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* Circular amber icon */
+.rn-card-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background: #FAEEDA;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* Blue icon for closing card */
+.rn-card-icon--blue {
+    background: #EFF6FF;
+}
+
+/* Green icon for iron supplementation card */
+.rn-card-icon--green {
+    background: #F0FDF4;
+}
+
+.rn-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rn-card-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 3px 0;
+    line-height: 1.3;
+}
+
+.rn-card-desc {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Divider inside card */
+.rn-card-divider {
+    border: none;
+    border-top: 1px solid #f0f0f0;
+    margin: 0 0 10px 0;
+}
+
+/* Tip / Remember row */
+.rn-card-tip {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.rn-badge {
+    display: inline-block;
+    background: #FAEEDA;
+    color: #633806;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.rn-badge--blue {
+    background: #DBEAFE;
+    color: #1e40af;
+}
+
+.rn-tip-text {
+    font-size: 0.8rem;
+    color: #374151;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Closing reassurance card (spans full width even in 2-col grid) */
+.rn-card--full {
+    grid-column: 1 / -1;
+}
+
+/* =============================================================================
+   HEALTH ASSESSMENT TOOLS — Positive Result Card UI
+   ============================================================================= */
+
+.result-positive {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+/* Green headline banner */
+.rp-banner {
+    background: #ECFDF5;
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.rp-banner-icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.rp-banner-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #065F46;
+    margin: 0 0 2px 0;
+    line-height: 1.3;
+}
+
+.rp-banner-sub {
+    font-size: 0.8125rem;
+    color: #047857;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Cards grid */
+.rp-cards-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+@media (min-width: 640px) {
+    .rp-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Individual card */
+.rp-card {
+    background: #fff;
+    border: 1px solid #d1fae5;
+    border-radius: 12px;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.rp-card-top {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* Small icon circle (non-stat cards) */
+.rp-card-icon {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    border-radius: 50%;
+    background: #ECFDF5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+}
+
+/* CTA card icon — light transparent circle on dark bg */
+.rp-card-icon--cta {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.rp-card-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.rp-card-title {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin: 0 0 3px 0;
+    line-height: 1.3;
+}
+
+.rp-card-desc {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.45;
+}
+
+/* Divider */
+.rp-card-divider {
+    border: none;
+    border-top: 1px solid #f0fdf4;
+    margin: 0 0 10px 0;
+}
+
+/* Note row (badge + text) */
+.rp-card-note {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+/* Green badge */
+.rp-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 2px 7px;
+    border-radius: 20px;
+    white-space: nowrap;
+    margin-top: 1px;
+    flex-shrink: 0;
+}
+
+.rp-badge--green {
+    background: #ECFDF5;
+    color: #065F46;
+}
+
+.rp-note-text {
+    font-size: 0.8rem;
+    color: #374151;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Stat circle — large display for the key metric */
+.rp-stat-circle {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    background: #ECFDF5;
+    border: 2.5px solid #6EE7B7;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.rp-stat-value {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #065F46;
+    line-height: 1.1;
+}
+
+.rp-stat-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    color: #047857;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+/* CTA card — full-width green gradient */
+.rp-card--cta {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #065F46 0%, #047857 100%);
+    border-color: transparent;
+}
+
+.rp-card--cta .rp-card-title {
+    color: #fff;
+}
+
+.rp-card--cta .rp-card-desc {
+    color: #A7F3D0;
+}
+
+/* CTA button */
+.rp-cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fff;
+    color: #065F46;
+    font-size: 0.875rem;
+    font-weight: 700;
+    padding: 8px 20px;
+    border-radius: 50px;
+    text-decoration: none;
+    margin-top: 10px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    width: fit-content;
+}
+
+.rp-cta-btn:hover {
+    background: #ECFDF5;
+    transform: translateX(4px);
+}
+
+

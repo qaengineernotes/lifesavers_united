@@ -334,40 +334,58 @@
                     <!-- Eligibility Checker Form will go here -->
                     <form id="eligibility-form" class="space-y-4">
                         <div>
-                            <label class="block font-medium mb-1">Are you at least 18 years old?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="age" value="yes" required> Yes</label>
-                                <label><input type="radio" name="age" value="no"> No</label>
+                            <label class="block font-medium mb-2">Are you at least 18 years old?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="age" id="age-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="age-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="age" id="age-no" value="no" class="pill-radio pill-no">
+                                <label for="age-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Do you weigh at least 45 kg (110 lbs)?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="weight" value="yes" required> Yes</label>
-                                <label><input type="radio" name="weight" value="no"> No</label>
+                            <label class="block font-medium mb-2">Do you weigh at least 45 kg (110 lbs)?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="weight" id="weight-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="weight-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="weight" id="weight-no" value="no" class="pill-radio pill-no">
+                                <label for="weight-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you feeling healthy and well today?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="well" value="yes" required> Yes</label>
-                                <label><input type="radio" name="well" value="no"> No</label>
+                            <label class="block font-medium mb-2">Are you feeling healthy and well today?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="well" id="well-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="well-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="well" id="well-no" value="no" class="pill-radio pill-no">
+                                <label for="well-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Gender</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="eligibility_gender" value="male" required> Male</label>
-                                <label><input type="radio" name="eligibility_gender" value="female"> Female</label>
+                            <label class="block font-medium mb-2">Gender</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="eligibility_gender" id="elig-gender-male" value="male"
+                                    required class="pill-radio pill-neutral">
+                                <label for="elig-gender-male" class="pill-label">♂ Male</label>
+                                <input type="radio" name="eligibility_gender" id="elig-gender-female" value="female"
+                                    class="pill-radio pill-neutral">
+                                <label for="elig-gender-female" class="pill-label">♀ Female</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">What type of donation did you last make?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="donation_type" value="none" required> Never
-                                    Donated</label>
-                                <label><input type="radio" name="donation_type" value="whole"> Whole Blood</label>
-                                <label><input type="radio" name="donation_type" value="sdp"> SDP (Platelets)</label>
+                            <label class="block font-medium mb-2">What type of donation did you last make?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="donation_type" id="donation-none" value="none" required
+                                    class="pill-radio pill-neutral">
+                                <label for="donation-none" class="pill-label">Never Donated</label>
+                                <input type="radio" name="donation_type" id="donation-whole" value="whole"
+                                    class="pill-radio pill-neutral">
+                                <label for="donation-whole" class="pill-label">Whole Blood</label>
+                                <input type="radio" name="donation_type" id="donation-sdp" value="sdp"
+                                    class="pill-radio pill-neutral">
+                                <label for="donation-sdp" class="pill-label">SDP (Platelets)</label>
                             </div>
                         </div>
                         <div id="donation-date-section" style="display: none;">
@@ -376,27 +394,39 @@
                                 class="form-input w-full">
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you currently taking antibiotics or feeling
+                            <label class="block font-medium mb-2">Are you currently taking antibiotics or feeling
                                 unwell?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="antibiotics" value="no" required> No</label>
-                                <label><input type="radio" name="antibiotics" value="yes"> Yes</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="antibiotics" id="antibiotics-no" value="no" required
+                                    class="pill-radio pill-yes">
+                                <label for="antibiotics-no" class="pill-label">✓ No</label>
+                                <input type="radio" name="antibiotics" id="antibiotics-yes" value="yes"
+                                    class="pill-radio pill-no">
+                                <label for="antibiotics-yes" class="pill-label">✗ Yes</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Have you had a tattoo or piercing in the last 12
+                            <label class="block font-medium mb-2">Have you had a tattoo or piercing in the last 12
                                 months?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="tattoo" value="no" required> No</label>
-                                <label><input type="radio" name="tattoo" value="yes"> Yes</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="tattoo" id="tattoo-no" value="no" required
+                                    class="pill-radio pill-yes">
+                                <label for="tattoo-no" class="pill-label">✓ No</label>
+                                <input type="radio" name="tattoo" id="tattoo-yes" value="yes"
+                                    class="pill-radio pill-no">
+                                <label for="tattoo-yes" class="pill-label">✗ Yes</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you pregnant or have you been pregnant in the last
-                                12 months (1 year)?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="pregnant" value="no" required> No</label>
-                                <label><input type="radio" name="pregnant" value="yes"> Yes</label>
+                            <label class="block font-medium mb-2">Are you pregnant or have you been pregnant in the last
+                                12 months?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="pregnant" id="pregnant-no" value="no" required
+                                    class="pill-radio pill-yes">
+                                <label for="pregnant-no" class="pill-label">✓ No</label>
+                                <input type="radio" name="pregnant" id="pregnant-yes" value="yes"
+                                    class="pill-radio pill-no">
+                                <label for="pregnant-yes" class="pill-label">✗ Yes</label>
                             </div>
                         </div>
                         <button type="submit" class="btn-primary mt-4">Check Eligibility</button>
@@ -413,56 +443,83 @@
                     <!-- Pre-Donation Health Checker Form will go here -->
                     <form id="prehealth-form" class="space-y-4">
                         <div>
-                            <label class="block font-medium mb-1">Did you sleep at least 6 hours last night?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="sleep" value="yes" required> Yes</label>
-                                <label><input type="radio" name="sleep" value="no"> No</label>
+                            <label class="block font-medium mb-2">Did you get at least 6 hours of sleep last
+                                night?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="sleep" id="sleep-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="sleep-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="sleep" id="sleep-no" value="no" class="pill-radio pill-no">
+                                <label for="sleep-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Have you eaten a healthy meal in the last 4
+                            <label class="block font-medium mb-2">Have you eaten a healthy meal in the last 4
                                 hours?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="meal" value="yes" required> Yes</label>
-                                <label><input type="radio" name="meal" value="no"> No</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="meal" id="meal-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="meal-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="meal" id="meal-no" value="no" class="pill-radio pill-no">
+                                <label for="meal-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you well hydrated today?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="hydrated" value="yes" required> Yes</label>
-                                <label><input type="radio" name="hydrated" value="no"> No</label>
+                            <label class="block font-medium mb-2">Are you well hydrated today?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="hydrated" id="hydrated-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="hydrated-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="hydrated" id="hydrated-no" value="no"
+                                    class="pill-radio pill-no">
+                                <label for="hydrated-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you free from cold, flu, or infection
+                            <label class="block font-medium mb-2">Are you free from cold, flu, or infection
                                 symptoms?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="symptoms" value="yes" required> Yes</label>
-                                <label><input type="radio" name="symptoms" value="no"> No</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="symptoms" id="symptoms-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="symptoms-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="symptoms" id="symptoms-no" value="no"
+                                    class="pill-radio pill-no">
+                                <label for="symptoms-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you not under the influence of alcohol or
-                                drugs?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="alcohol" value="yes" required> Yes</label>
-                                <label><input type="radio" name="alcohol" value="no"> No</label>
+                            <label class="block font-medium mb-2">Are you sober and free from alcohol or drugs
+                                today?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="alcohol" id="alcohol-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="alcohol-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="alcohol" id="alcohol-no" value="no"
+                                    class="pill-radio pill-no">
+                                <label for="alcohol-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you not experiencing heavy menstrual bleeding
-                                today? <span class="text-xs text-text-secondary">(for women)</span></label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="menstrual" value="yes" required> Yes</label>
-                                <label><input type="radio" name="menstrual" value="no"> No</label>
+                            <label class="block font-medium mb-2">Are you free from heavy menstrual bleeding today?
+                                <span class="text-xs text-text-secondary">(for women)</span></label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="menstrual" id="menstrual-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="menstrual-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="menstrual" id="menstrual-no" value="no"
+                                    class="pill-radio pill-no">
+                                <label for="menstrual-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <div>
-                            <label class="block font-medium mb-1">Are you not feeling anxious or faint?</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="anxious" value="yes" required> Yes</label>
-                                <label><input type="radio" name="anxious" value="no"> No</label>
+                            <label class="block font-medium mb-2">Do you feel calm and comfortable right now?</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="anxious" id="anxious-yes" value="yes" required
+                                    class="pill-radio pill-yes">
+                                <label for="anxious-yes" class="pill-label">✓ Yes</label>
+                                <input type="radio" name="anxious" id="anxious-no" value="no"
+                                    class="pill-radio pill-no">
+                                <label for="anxious-no" class="pill-label">✗ No</label>
                             </div>
                         </div>
                         <button type="submit" class="btn-secondary mt-4">Check Readiness</button>
@@ -503,10 +560,14 @@
                     <!-- Iron Level Tracker Form will go here -->
                     <form id="iron-form" class="space-y-4">
                         <div>
-                            <label class="block font-medium mb-1">Gender</label>
-                            <div class="flex space-x-4">
-                                <label><input type="radio" name="gender" value="male" required> Male</label>
-                                <label><input type="radio" name="gender" value="female"> Female</label>
+                            <label class="block font-medium mb-2">Gender</label>
+                            <div class="pill-toggle-group">
+                                <input type="radio" name="gender" id="iron-gender-male" value="male" required
+                                    class="pill-radio pill-neutral">
+                                <label for="iron-gender-male" class="pill-label">♂ Male</label>
+                                <input type="radio" name="gender" id="iron-gender-female" value="female"
+                                    class="pill-radio pill-neutral">
+                                <label for="iron-gender-female" class="pill-label">♀ Female</label>
                             </div>
                         </div>
                         <div>
@@ -675,6 +736,8 @@
                                 class="text-gray-300 hover:text-white transition-smooth">Emergency</a></li>
                         <li><a href="/emergency_blood_request"
                                 class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
+                        <li><a href="/volunteers"
+                                class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
                         <li><a href="/blood_information_center"
                                 class="text-gray-300 hover:text-white transition-smooth">Learn</a></li>
                         <li><a href="/about_us" class="text-gray-300 hover:text-white transition-smooth">About Us</a>
@@ -743,17 +806,128 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Set current year
             document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-            // --- Eligibility Checker Logic ---
+            // ── Shared: render card-based negative result ──────────────────
+            function renderNegativeResult(el, issues, mode, title, sub) {
+                title = title || 'Not quite ready to donate today';
+                sub = sub || 'Here\'s what to address before your next visit';
+                const iconClass = mode === 'green' ? 'rn-card-icon--green' : 'rn-card-icon--blue';
+                const icon = mode === 'green' ? '🌿' : 'ℹ️';
+                const cards = issues.map(i => `
+                    <div class="rn-card">
+                        <div class="rn-card-top">
+                            <div class="rn-card-icon">${i.icon}</div>
+                            <div class="rn-card-body">
+                                <p class="rn-card-title">${i.title}</p>
+                                <p class="rn-card-desc">${i.desc}</p>
+                            </div>
+                        </div>
+                        <hr class="rn-card-divider">
+                        <div class="rn-card-tip">
+                            <span class="rn-badge">Tip</span>
+                            <p class="rn-tip-text">${i.tip}</p>
+                        </div>
+                    </div>`).join('');
+                el.className = 'result-negative';
+                el.innerHTML = `
+                    <div class="rn-banner">
+                        <span class="rn-banner-icon">⚠️</span>
+                        <div><p class="rn-banner-title">${title}</p><p class="rn-banner-sub">${sub}</p></div>
+                    </div>
+                    <div>
+                        ${cards}
+                        <div class="rn-card rn-card--full">
+                            <div class="rn-card-top">
+                                <div class="rn-card-icon ${iconClass}">${icon}</div>
+                                <div class="rn-card-body">
+                                    <p class="rn-card-title">Not cancelled — just postponed</p>
+                                    <p class="rn-card-desc">Addressing these points will have you donation-ready in no time.</p>
+                                </div>
+                            </div>
+                            <hr class="rn-card-divider">
+                            <div class="rn-card-tip">
+                                <span class="rn-badge rn-badge--blue">Remember</span>
+                                <p class="rn-tip-text">Every eligible donor saves up to 3 lives. Take care of yourself and come back when you're ready — we'll be here! 💙</p>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            // ── Shared: render card-based positive result ──────────────────
+            function renderPositiveResult(el, bannerTitle, bannerSub, statValue, statLabel, cardNote) {
+                el.className = 'result-positive';
+                el.innerHTML = `
+                    <div class="rp-banner">
+                        <span class="rp-banner-icon">✅</span>
+                        <div><p class="rp-banner-title">${bannerTitle}</p><p class="rp-banner-sub">${bannerSub}</p></div>
+                    </div>
+                    <div class="rp-cards-grid">
+                        <div class="rp-card">
+                            <div class="rp-card-top">
+                                <div class="rp-stat-circle">
+                                    <span class="rp-stat-value">${statValue}</span>
+                                    <span class="rp-stat-label">${statLabel}</span>
+                                </div>
+                                <div class="rp-card-body">
+                                    <p class="rp-card-title">Result summary</p>
+                                    <p class="rp-card-desc">${cardNote}</p>
+                                </div>
+                            </div>
+                            <hr class="rp-card-divider">
+                            <div class="rp-card-note">
+                                <span class="rp-badge rp-badge--green">Great</span>
+                                <p class="rp-note-text">Every donation can save up to 3 lives. Thank you for stepping up! ❤️</p>
+                            </div>
+                        </div>
+                        <div class="rp-card">
+                            <div class="rp-card-top">
+                                <div class="rp-card-icon">📋</div>
+                                <div class="rp-card-body">
+                                    <p class="rp-card-title">What to bring</p>
+                                    <p class="rp-card-desc">A valid photo ID and comfortable clothing with sleeves that roll up easily.</p>
+                                </div>
+                            </div>
+                            <hr class="rp-card-divider">
+                            <div class="rp-card-note">
+                                <span class="rp-badge rp-badge--green">Remind</span>
+                                <p class="rp-note-text">Stay hydrated and have a light snack before you head to the centre.</p>
+                            </div>
+                        </div>
+                        <div class="rp-card rp-card--cta">
+                            <div class="rp-card-top">
+                                <div class="rp-card-icon rp-card-icon--cta">📍</div>
+                                <div class="rp-card-body">
+                                    <p class="rp-card-title">Ready to save lives?</p>
+                                    <p class="rp-card-desc">Find your nearest blood donation centre and book your slot today.</p>
+                                </div>
+                            </div>
+                            <a href="/donor_registration" class="rp-cta-btn">Register as a Donor →</a>
+                        </div>
+                    </div>`;
+            }
+
+            // ── Eligibility Checker ────────────────────────────────────────
+            const eligIssueMap = {
+                'You must be at least 18 years old.':
+                    { icon: '🎂', title: 'Age requirement not met', desc: 'Donors must be 18–65 years old.', tip: 'Mark your 18th birthday and register as a donor then!' },
+                'You must weigh at least 45 kg.':
+                    { icon: '⚖️', title: 'Below minimum weight', desc: 'A minimum of 45 kg (110 lbs) is required for safe donation.', tip: 'Focus on a balanced diet. Once you reach 45 kg, you\'re good to go.' },
+                'You must feel healthy and well today.':
+                    { icon: '🤒', title: 'Not feeling well today', desc: 'Donors need to feel healthy with no active illness on donation day.', tip: 'Rest up, recover fully, and try again once you\'re 100%.' },
+                'You should not donate while taking antibiotics or feeling unwell.':
+                    { icon: '💊', title: 'Antibiotics or active illness', desc: 'Antibiotics signal an infection. Donating now could affect the recipient.', tip: 'Finish your full antibiotic course and wait until fully recovered.' },
+                'Wait at least 12 months after a tattoo or piercing.':
+                    { icon: '🎨', title: 'Recent tattoo or piercing', desc: 'A 12-month deferral applies to rule out infection risk.', tip: 'Note the date and set a reminder to donate 12 months later.' },
+                'You cannot donate while pregnant or within 12 months (1 year) after pregnancy.':
+                    { icon: '🤰', title: 'Pregnancy deferral', desc: 'Donation is not safe during pregnancy or within 12 months of delivery.', tip: 'Focus on recovery. You can donate again 12 months post-delivery.' }
+            };
+
             const eligibilityForm = document.getElementById('eligibility-form');
             if (eligibilityForm) {
-                // Show/hide donation date field based on donation type
                 const donationTypeRadios = document.querySelectorAll('input[name="donation_type"]');
                 const lastDonationDateInput = document.getElementById('last-donation-date');
                 const donationDateSection = document.getElementById('donation-date-section');
-
                 donationTypeRadios.forEach(radio => {
                     radio.addEventListener('change', function () {
                         if (this.value !== 'none') {
@@ -770,122 +944,101 @@
                 eligibilityForm.onsubmit = function (e) {
                     e.preventDefault();
                     const form = e.target;
-                    const answers = {
-                        age: form.age.value,
-                        weight: form.weight.value,
-                        well: form.well.value,
-                        gender: form.eligibility_gender.value,
-                        donation_type: form.donation_type.value,
+                    const ans = {
+                        age: form.age.value, weight: form.weight.value, well: form.well.value,
+                        gender: form.eligibility_gender.value, donation_type: form.donation_type.value,
                         last_donation_date: form.last_donation_date.value,
-                        antibiotics: form.antibiotics.value,
-                        tattoo: form.tattoo.value,
-                        pregnant: form.pregnant.value
+                        antibiotics: form.antibiotics.value, tattoo: form.tattoo.value, pregnant: form.pregnant.value
                     };
-
-                    const gender = answers.gender;
-                    let eligible = true;
-                    let reasons = [];
-
-                    if (answers.age !== 'yes') {
-                        eligible = false;
-                        reasons.push('You must be at least 18 years old.');
-                    }
-                    if (answers.weight !== 'yes') {
-                        eligible = false;
-                        reasons.push('You must weigh at least 45 kg.');
-                    }
-                    if (answers.well !== 'yes') {
-                        eligible = false;
-                        reasons.push('You must feel healthy and well today.');
-                    }
-
-                    // Check donation waiting period
-                    if (answers.donation_type !== 'none' && answers.last_donation_date) {
-                        const lastDonation = new Date(answers.last_donation_date);
-                        const today = new Date();
-                        const daysSinceLastDonation = Math.floor((today - lastDonation) / (1000 * 60 * 60 * 24));
-
-                        if (answers.donation_type === 'whole') {
-                            // Whole Blood: 90 days for males, 120 days for females
-                            const requiredDays = gender === 'male' ? 90 : 120;
-                            const requiredMonths = gender === 'male' ? 3 : 4;
-
-                            if (daysSinceLastDonation < requiredDays) {
-                                eligible = false;
-                                const daysRemaining = requiredDays - daysSinceLastDonation;
-                                reasons.push(`As a ${gender}, you must wait ${requiredDays} days (${requiredMonths} months) between whole blood donations. You have ${daysRemaining} days remaining.`);
-                            }
-                        } else if (answers.donation_type === 'sdp') {
-                            // SDP (Platelet): 72 hours (3 days)
-                            if (daysSinceLastDonation < 3) {
-                                eligible = false;
-                                const daysRemaining = 3 - daysSinceLastDonation;
-                                reasons.push(`You must wait 72 hours (3 days) between SDP (platelet) donations. ${daysRemaining} days remaining.`);
-                            }
+                    const gender = ans.gender;
+                    let eligible = true, reasons = [];
+                    if (ans.age !== 'yes') { eligible = false; reasons.push('You must be at least 18 years old.'); }
+                    if (ans.weight !== 'yes') { eligible = false; reasons.push('You must weigh at least 45 kg.'); }
+                    if (ans.well !== 'yes') { eligible = false; reasons.push('You must feel healthy and well today.'); }
+                    if (ans.donation_type !== 'none' && ans.last_donation_date) {
+                        const days = Math.floor((new Date() - new Date(ans.last_donation_date)) / 86400000);
+                        if (ans.donation_type === 'whole') {
+                            const req = gender === 'male' ? 90 : 120, months = gender === 'male' ? 3 : 4;
+                            if (days < req) { eligible = false; reasons.push(`_WAIT_WHOLE_${gender}_${req}_${months}_${req - days}`); }
+                        } else if (ans.donation_type === 'sdp' && days < 3) {
+                            eligible = false; reasons.push(`_WAIT_SDP_${3 - days}`);
                         }
                     }
-
-                    if (answers.antibiotics !== 'no') {
-                        eligible = false;
-                        reasons.push('You should not donate while taking antibiotics or feeling unwell.');
-                    }
-                    if (answers.tattoo !== 'no') {
-                        eligible = false;
-                        reasons.push('Wait at least 12 months after a tattoo or piercing.');
-                    }
-                    if (answers.pregnant !== 'no') {
-                        eligible = false;
-                        reasons.push('You cannot donate while pregnant or within 12 months (1 year) after pregnancy.');
-                    }
+                    if (ans.antibiotics !== 'no') { eligible = false; reasons.push('You should not donate while taking antibiotics or feeling unwell.'); }
+                    if (ans.tattoo !== 'no') { eligible = false; reasons.push('Wait at least 12 months after a tattoo or piercing.'); }
+                    if (ans.pregnant !== 'no') { eligible = false; reasons.push('You cannot donate while pregnant or within 12 months (1 year) after pregnancy.'); }
 
                     const resultDiv = document.getElementById('eligibility-result');
                     if (eligible) {
-                        resultDiv.textContent = 'You are likely eligible to donate blood today!';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-primary';
+                        renderPositiveResult(resultDiv,
+                            'You\'re eligible to donate!',
+                            'All checks passed — see you at the centre 🎉',
+                            '✓', 'eligible',
+                            'You passed all eligibility criteria for blood donation today.'
+                        );
                     } else {
-                        resultDiv.innerHTML = 'You are <span class="text-error">not eligible</span> to donate today.<br><span class="text-sm">' + reasons.join('<br>') + '</span>';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        const issues = reasons.map(r => {
+                            if (r.startsWith('_WAIT_WHOLE_')) {
+                                const [, , , g, req, months, rem] = r.split('_');
+                                return { icon: '⏳', title: 'Donation interval not reached', desc: `As a ${g}, you need ${req} days (${months} months) between whole blood donations.`, tip: `${rem} days remaining — set a reminder!` };
+                            }
+                            if (r.startsWith('_WAIT_SDP_')) {
+                                return { icon: '⏳', title: 'SDP interval not reached', desc: '72 hours (3 days) required between platelet donations.', tip: `${r.split('_')[3]} day(s) remaining.` };
+                            }
+                            return eligIssueMap[r] || { icon: '⚠️', title: r, desc: '', tip: 'Check with your donation center.' };
+                        });
+                        renderNegativeResult(resultDiv, issues, 'blue', 'Not quite eligible today', 'Here\'s what to address before your next visit');
                     }
                 };
             }
 
-            // --- Pre-Donation Health Checker Logic ---
+            // ── Pre-Donation Health Checker ────────────────────────────────
+            const phIssueMap = {
+                'You should sleep at least 6 hours before donating.':
+                    { icon: '😴', title: 'Insufficient sleep', desc: 'At least 6 hours of sleep is needed for a safe donation.', tip: 'Get a good night\'s rest and reschedule for tomorrow.' },
+                'Eat a healthy meal within 4 hours before donating.':
+                    { icon: '🍽️', title: 'No recent meal', desc: 'Eating beforehand stabilises blood sugar and prevents dizziness.', tip: 'Have a light iron-rich meal and come back in a few hours.' },
+                'Drink plenty of water before donating.':
+                    { icon: '💧', title: 'Not well hydrated', desc: 'Good hydration makes donation easier and recovery faster.', tip: 'Drink 2–3 glasses of water before heading to the centre.' },
+                'You should be free from cold, flu, or infection symptoms.':
+                    { icon: '🤧', title: 'Active illness symptoms', desc: 'Donating while sick can endanger you and the recipient.', tip: 'Wait at least 7 days after symptoms clear before donating.' },
+                'Do not donate under the influence of alcohol or drugs.':
+                    { icon: '🍺', title: 'Alcohol or substance use', desc: 'Alcohol affects how your body responds to donation.', tip: 'Avoid alcohol for 24 hours before donating.' },
+                'Avoid donating during heavy menstrual bleeding.':
+                    { icon: '🩸', title: 'Heavy menstrual bleeding', desc: 'Heavy periods reduce iron stores, making donation riskier right now.', tip: 'Wait until your cycle ends — usually 5–7 days.' },
+                'If you feel anxious or faint, wait until you feel better.':
+                    { icon: '😰', title: 'Feeling anxious or faint', desc: 'Anxiety increases the risk of fainting during donation.', tip: 'Talk to centre staff — they\'re trained to help nervous donors.' }
+            };
+
             const prehealthForm = document.getElementById('prehealth-form');
             if (prehealthForm) {
                 prehealthForm.onsubmit = function (e) {
                     e.preventDefault();
                     const form = e.target;
-                    const answers = {
-                        sleep: form.sleep.value,
-                        meal: form.meal.value,
-                        hydrated: form.hydrated.value,
-                        symptoms: form.symptoms.value,
-                        alcohol: form.alcohol.value,
-                        menstrual: form.menstrual.value,
-                        anxious: form.anxious.value
-                    };
-                    let ready = true;
-                    let reasons = [];
-                    if (answers.sleep !== 'yes') { ready = false; reasons.push('You should sleep at least 6 hours before donating.'); }
-                    if (answers.meal !== 'yes') { ready = false; reasons.push('Eat a healthy meal within 4 hours before donating.'); }
-                    if (answers.hydrated !== 'yes') { ready = false; reasons.push('Drink plenty of water before donating.'); }
-                    if (answers.symptoms !== 'yes') { ready = false; reasons.push('You should be free from cold, flu, or infection symptoms.'); }
-                    if (answers.alcohol !== 'yes') { ready = false; reasons.push('Do not donate under the influence of alcohol or drugs.'); }
-                    if (answers.menstrual !== 'yes') { ready = false; reasons.push('Avoid donating during heavy menstrual bleeding.'); }
-                    if (answers.anxious !== 'yes') { ready = false; reasons.push('If you feel anxious or faint, wait until you feel better.'); }
-
+                    let ready = true, reasons = [];
+                    if (form.sleep.value !== 'yes') { ready = false; reasons.push('You should sleep at least 6 hours before donating.'); }
+                    if (form.meal.value !== 'yes') { ready = false; reasons.push('Eat a healthy meal within 4 hours before donating.'); }
+                    if (form.hydrated.value !== 'yes') { ready = false; reasons.push('Drink plenty of water before donating.'); }
+                    if (form.symptoms.value !== 'yes') { ready = false; reasons.push('You should be free from cold, flu, or infection symptoms.'); }
+                    if (form.alcohol.value !== 'yes') { ready = false; reasons.push('Do not donate under the influence of alcohol or drugs.'); }
+                    if (form.menstrual.value !== 'yes') { ready = false; reasons.push('Avoid donating during heavy menstrual bleeding.'); }
+                    if (form.anxious.value !== 'yes') { ready = false; reasons.push('If you feel anxious or faint, wait until you feel better.'); }
                     const resultDiv = document.getElementById('prehealth-result');
                     if (ready) {
-                        resultDiv.textContent = 'You are ready to donate blood today!';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-secondary';
+                        renderPositiveResult(resultDiv,
+                            'You\'re ready to donate today!',
+                            'Your body is well-prepared — donation day is go! 💪',
+                            '7/7', 'checks',
+                            'All 7 readiness checks passed. Your body is in great shape to donate right now.'
+                        );
                     } else {
-                        resultDiv.innerHTML = 'You are <span class="text-error">not ready</span> to donate today.<br><span class="text-sm">' + reasons.join('<br>') + '</span>';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        const issues = reasons.map(r => phIssueMap[r] || { icon: '⚠️', title: r, desc: '', tip: 'Check with your donation center.' });
+                        renderNegativeResult(resultDiv, issues, 'blue', 'Not quite ready today', 'A few things to sort before you donate');
                     }
                 };
             }
 
-            // --- BMI Calculator Logic ---
+            // ── BMI Calculator ─────────────────────────────────────────────
             const bmiForm = document.getElementById('bmi-form');
             if (bmiForm) {
                 bmiForm.onsubmit = function (e) {
@@ -893,66 +1046,62 @@
                     const weight = parseFloat(document.getElementById('bmi-weight').value);
                     const heightCm = parseFloat(document.getElementById('bmi-height').value);
                     const resultDiv = document.getElementById('bmi-result');
-
                     if (!weight || !heightCm || heightCm <= 0) {
-                        resultDiv.textContent = 'Please enter valid values.';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
-                        return;
+                        resultDiv.innerHTML = ''; resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        resultDiv.textContent = 'Please enter valid values.'; return;
                     }
-                    const heightM = heightCm / 100;
-                    const bmi = weight / (heightM * heightM);
-                    let message = `Your BMI is ${bmi.toFixed(1)}. `;
-
+                    const bmi = weight / Math.pow(heightCm / 100, 2);
                     if (weight < 45) {
-                        message += 'You need to weigh at least 45 kg to donate blood. ';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        renderNegativeResult(resultDiv,
+                            [{ icon: '⚖️', title: `BMI ${bmi.toFixed(1)} — below donation weight`, desc: 'You need at least 45 kg to donate blood safely.', tip: 'Focus on a balanced, iron-rich diet and come back once you reach 45 kg!' }],
+                            'blue', 'Weight requirement not met', 'Here\'s what to work on');
+                    } else if (bmi < 18.5) {
+                        renderNegativeResult(resultDiv,
+                            [{ icon: '⚖️', title: `BMI ${bmi.toFixed(1)} — Underweight`, desc: 'You meet the 45 kg minimum, but your BMI suggests you\'re underweight.', tip: 'Consider consulting a healthcare provider about nutrition before donating.' }],
+                            'blue', 'BMI check — a heads up', 'You can still donate, but here\'s something to consider');
                     } else {
-                        message += 'You meet the weight requirement for donation! ';
-                        if (bmi < 18.5) {
-                            message += 'Your BMI indicates you are underweight. Consider consulting a healthcare provider.';
-                            resultDiv.className = 'mt-6 text-lg font-semibold text-warning';
-                        } else if (bmi >= 18.5 && bmi <= 24.9) {
-                            message += 'Your BMI is in a healthy range.';
-                            resultDiv.className = 'mt-6 text-lg font-semibold text-accent';
-                        } else if (bmi >= 25 && bmi <= 29.9) {
-                            message += 'Your BMI indicates you are overweight.';
-                            resultDiv.className = 'mt-6 text-lg font-semibold text-warning';
-                        } else {
-                            message += 'Your BMI indicates obesity. Consider consulting a healthcare provider.';
-                            resultDiv.className = 'mt-6 text-lg font-semibold text-warning';
-                        }
+                        const bmiNote = bmi >= 30
+                            ? 'BMI is in the obese range — you can donate, but please consult a healthcare provider about your overall health.'
+                            : bmi >= 25
+                                ? 'BMI is in the overweight range — you meet the donation weight requirement. A balanced lifestyle is recommended.'
+                                : 'BMI is in the healthy range — great for donation!';
+                        renderPositiveResult(resultDiv,
+                            'You meet the weight requirement!',
+                            bmi >= 25 ? 'You can donate — here\'s a health note to keep in mind' : 'All weight checks passed — ready to donate 🎉',
+                            bmi.toFixed(1), 'BMI',
+                            bmiNote
+                        );
                     }
-                    resultDiv.textContent = message;
                 };
             }
 
-            // --- Iron Level Tracker Logic ---
+            // ── Iron Level Tracker ─────────────────────────────────────────
             const ironForm = document.getElementById('iron-form');
             if (ironForm) {
                 ironForm.onsubmit = function (e) {
                     e.preventDefault();
                     const genderChecked = document.querySelector('input[name="gender"]:checked');
                     if (!genderChecked) return;
-
-                    const gender = genderChecked.value;
                     const hemoglobin = parseFloat(document.getElementById('iron-hemoglobin').value);
                     const resultDiv = document.getElementById('iron-result');
-
                     if (!hemoglobin || hemoglobin <= 0) {
-                        resultDiv.textContent = 'Please enter a valid hemoglobin value.';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
-                        return;
+                        resultDiv.innerHTML = ''; resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        resultDiv.textContent = 'Please enter a valid hemoglobin value.'; return;
                     }
-                    const minLevel = 12.5;
-                    let message = `Your hemoglobin level is ${hemoglobin} g/dL.`;
-                    if (hemoglobin >= minLevel) {
-                        message += ' Your iron levels are good for donation!';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-warning';
+                    if (hemoglobin >= 12.5) {
+                        renderPositiveResult(resultDiv,
+                            'Your iron levels are donation-ready!',
+                            'Haemoglobin is above the minimum threshold — you\'re good to go 🌿',
+                            hemoglobin, 'g/dL',
+                            `Your haemoglobin is ${hemoglobin} g/dL — above the 12.5 g/dL minimum required for safe blood donation.`
+                        );
                     } else {
-                        message += ' Your iron levels are below the minimum for donation. Consider iron-rich foods or supplements.';
-                        resultDiv.className = 'mt-6 text-lg font-semibold text-error';
+                        const deficit = (12.5 - hemoglobin).toFixed(1);
+                        renderNegativeResult(resultDiv, [
+                            { icon: '🩸', title: `Hemoglobin ${hemoglobin} g/dL — below minimum`, desc: `Minimum required is 12.5 g/dL. You are ${deficit} g/dL below the threshold.`, tip: 'Eat iron-rich foods: red meat, spinach, lentils, cereals. Add vitamin C to boost absorption.' },
+                            { icon: '💊', title: 'Consider iron supplementation', desc: 'Low haemoglobin often responds well to dietary changes and supplements.', tip: 'Consult your doctor about an iron supplement if diet alone isn\'t enough.' }
+                        ], 'green', 'Iron levels need a boost', 'Here\'s how to get donation-ready');
                     }
-                    resultDiv.textContent = message;
                 };
             }
         });
