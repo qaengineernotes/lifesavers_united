@@ -53,39 +53,39 @@ service cloud.firestore {
                     );
     }
 
-    // Emergency Requests collection
-    // Public reads are fine (needed for duplicate detection on the form).
+    // Emergency Requests Collection
+    // Public users can submit requests. 
+    // Coordinators can manage them (requires status 'approved').
     // Creates now REQUIRE a valid App Check token — blocks bots and raw API flooding.
-    // Updates/deletes restricted to approved users (coordinators).
+    // Updates/deletes restricted to approved users (coordinators), EXCEPT for public reopens.
     match /emergency_requests/{requestId} {
       allow read: if true; // Allow public read for duplicate detection
-      allow create: if true; // Public form submissions allowed
-      allow update, delete: if isApproved();
-      
+      allow create: if isVerifiedApp(); // Public form submissions allowed with App Check
+      allow update: if isApproved() || isVerifiedApp(); // Allow coordinators or public reopens/updates
+      allow delete: if isApproved();
+
       // History entries also require App Check for public submissions
       match /updates/{updateId} {
         allow read: if isAuthenticated();
-        allow create: if true;
+        allow create: if isVerifiedApp();
         allow update, delete: if isApproved();
       }
     }
 
     // Donors collection
-    // Reads are public — needed for duplicate-detection during donor registration
-    // (the registrant is unauthenticated at that point).
-    // Creates are public so anyone can register as a donor.
-    // Updates/deletes are restricted to superuser to prevent tampering.
+    // Public can search for donors (needed for duplicate detection and community matching)
+    // Public can register as a donor.
     match /donors/{donorId} {
       allow read: if true; // Public read needed for duplicate-detection on registration
-      allow create: if true; // Public donor registration allowed
-      allow update: if isSuperuser(); // Only superuser can edit donor profiles
+      allow create: if isVerifiedApp(); // Public donor registration allowed with App Check
+      allow update: if isSuperuser() || isVerifiedApp(); // Only superuser or public registration retry
       allow delete: if isSuperuser();
     }
 
-    // Requests collection (for Telegram bot and web app)
+    // Requests collection (secondary/legacy?)
     match /requests/{requestId} {
       allow read: if true; // Public read for now
-      allow create, update: if isApproved() || request.auth == null; // Allow unauthenticated writes from Cloud Functions
+      allow create, update: if isApproved() || isVerifiedApp(); 
       allow delete: if isSuperuser();
     }
 

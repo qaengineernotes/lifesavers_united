@@ -873,6 +873,7 @@ export async function addHistoryEntry(requestId, data) {
 // ============================================================================
 export async function createNewRequestInFirebase(requestData, currentUser = null) {
     try {
+        await initAppCheck();
         const requestsRef = collection(db, 'emergency_requests');
         let existingDoc = null;
         let requestId = null;
@@ -1090,6 +1091,7 @@ function generateRequestId(patientName, contactNumber) {
 // ============================================================================
 export async function registerDonorInFirebase(donorData) {
     try {
+        await initAppCheck();
         const donorsRef = collection(db, 'donors');
         let existingDonor = null;
         let donorId = null;

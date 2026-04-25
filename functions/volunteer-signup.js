@@ -90,6 +90,7 @@ export async function onRequestPost(context) {
         <!-- Header -->
         <tr>
           <td style="background:#c0392b;padding:24px 32px;text-align:center;">
+            <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:60px;width:auto;margin-bottom:10px;">
             <h1 style="color:#ffffff;margin:0;font-size:22px;">🩸 New Volunteer Application</h1>
             <p style="color:#f5b7b1;margin:6px 0 0;font-size:14px;">Lifesavers United — lifesaversunited.org</p>
           </td>
@@ -140,7 +141,8 @@ export async function onRequestPost(context) {
         <!-- Footer -->
         <tr>
           <td style="background:#fafafa;padding:16px 32px;border-top:1px solid #eee;text-align:center;">
-            <p style="color:#aaa;font-size:12px;margin:0;">Submitted on ${istTime} IST via lifesaversunited.org/volunteers</p>
+            <p style="color:#aaa;font-size:12px;margin:0 0 4px;">Submitted on ${istTime} IST via lifesaversunited.org/volunteers</p>
+            <p style="color:#bbb;font-size:11px;margin:0;">© ${new Date().getFullYear()} LifeSavers United</p>
           </td>
         </tr>
       </table>

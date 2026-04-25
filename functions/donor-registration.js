@@ -125,7 +125,7 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 
   <!-- HEADER -->
   <tr><td style="background:linear-gradient(135deg,#c0392b 0%,#e74c3c 100%);padding:48px 32px;text-align:center;">
-    <div style="font-size:56px;margin-bottom:16px;">🩸</div>
+    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:80px;width:auto;margin-bottom:20px;">
     <h1 style="color:#fff;margin:0;font-size:30px;font-weight:800;letter-spacing:-0.5px;">You're a LifeSaver!</h1>
     <p style="color:#f5b7b1;margin:10px 0 0;font-size:16px;">Registration Confirmed — Thank You, ${first}!</p>
   </td></tr>
@@ -177,8 +177,8 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
             <div style="width:42px;height:42px;background:#fef2f2;border-radius:50%;text-align:center;line-height:42px;font-size:20px;">📋</div>
           </td>
           <td style="padding-left:14px;vertical-align:top;">
-            <strong style="color:#1a1a1a;font-size:15px;display:block;margin-bottom:4px;">1. Profile Review</strong>
-            <span style="color:#666;font-size:13px;line-height:1.7;">Our team verifies your details and adds you to our donor database.</span>
+            <strong style="color:#1a1a1a;font-size:15px;display:block;margin-bottom:4px;">1. Profile Activation</strong>
+            <span style="color:#666;font-size:13px;line-height:1.7;">Your profile is now active in our donor database, ensuring we can match you with those in need.</span>
           </td>
         </tr></table>
       </td></tr>
@@ -251,7 +251,7 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 
   <!-- FOOTER -->
   <tr><td style="background:#1a1a1a;padding:24px 32px;text-align:center;">
-    <p style="margin:0 0 6px;color:#888;font-size:13px;">© 2025 LifeSavers United | Made with ❤️ for India</p>
+    <p style="margin:0 0 6px;color:#888;font-size:13px;">© ${new Date().getFullYear()} LifeSavers United | Made with ❤️ for India</p>
     <p style="margin:0 0 8px;">
       <a href="https://lifesaversunited.org" style="color:#666;text-decoration:none;font-size:12px;">lifesaversunited.org</a>
       <span style="color:#444;margin:0 6px;">•</span>
@@ -285,6 +285,7 @@ function buildAdminEmail(name, blood, city, area, email, phone, emergency, prefe
 
   <!-- HEADER -->
   <tr><td style="background:#c0392b;padding:24px 32px;text-align:center;">
+    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:60px;width:auto;margin-bottom:10px;">
     <h1 style="color:#fff;margin:0;font-size:22px;">🩸 New Donor Registration</h1>
     <p style="color:#f5b7b1;margin:6px 0 0;font-size:14px;">LifeSavers United — lifesaversunited.org</p>
   </td></tr>
