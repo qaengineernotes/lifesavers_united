@@ -8,6 +8,7 @@
             "**/node_modules/**",
             "**/*.md",
             "google-apps-script/**",
+            "firebase-functions/**",
             "functions/**",
             ".agent/**",
             "*.py"
@@ -21,7 +22,7 @@
     },
     "functions": [
         {
-            "source": "functions",
+            "source": "firebase-functions",
             "codebase": "default",
             "ignore": [
                 "node_modules",

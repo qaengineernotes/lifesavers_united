@@ -16,7 +16,7 @@ npm run dev           # Alias for watch:css
 
 ### Firebase Functions
 ```bash
-cd functions
+cd firebase-functions
 npm run serve         # Firebase emulators:start --only functions
 npm run deploy        # firebase deploy --only functions
 npm run logs          # firebase functions:log
@@ -39,7 +39,7 @@ python -m http.server 8000  # Simple alternative
 ### Backend Services
 - **Firestore**: Primary database for users, donors, emergency_requests, donation_logs
 - **Firebase Auth**: Phone authentication (requires reCAPTCHA v3)
-- **Cloud Functions** (`functions/index.js`):
+- **Cloud Functions** (`firebase-functions/index.js`):
   - `telegramBot`: Telegram webhook for blood requests
   - `postRequestToTwitter`: Callable function for Twitter posting
   - `processNewUser`: Auth trigger for user creation
@@ -82,7 +82,7 @@ NOT bare `npx tailwindcss` which would miss the component tagging.
 
 ### Phone Number Handling
 Phone numbers are normalized to 10-digit format (no +91 prefix) across:
-- `functions/index.js` - `normalizePhoneNumber()`
+- `firebase-functions/index.js` - `normalizePhoneNumber()`
 - `server.py` - `normalize_phone_number()`
 
 ### Request Submission Flow
@@ -93,7 +93,7 @@ Phone numbers are normalized to 10-digit format (no +91 prefix) across:
 
 ## Key Files
 - `scripts/firebase-config.js` - Firebase init with lazy App Check
-- `functions/index.js` - Cloud Functions (730 lines, Telegram + Twitter)
+- `firebase-functions/index.js` - Cloud Functions (730 lines, Telegram + Twitter)
 - `server.py` - Local dev server with API proxies
 - `index.html` - Main landing page with Tailwind CSS
 - `emergency_blood_request.html` - Request submission form

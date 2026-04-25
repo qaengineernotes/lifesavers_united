@@ -267,6 +267,46 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(error_response.encode('utf-8'))
             return  # Important: return here to prevent fallback to super()
+        elif self.path == '/volunteer-signup':
+            # Handle volunteer signup (Mock for local dev)
+            print("Processing volunteer signup (Local Mock)...")
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            try:
+                data = json.loads(post_data.decode('utf-8'))
+                print(f"Volunteer Data: {data}")
+                
+                # Mock success response
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": true, "message": "Local Mock: Registration received!"}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": false, "error": str(e)}).encode('utf-8'))
+            return
+        elif self.path == '/donor-registration':
+            # Handle donor registration email trigger (Mock for local dev)
+            print("Processing donor registration email trigger (Local Mock)...")
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            
+            try:
+                data = json.loads(post_data.decode('utf-8'))
+                print(f"Donor Email Notification Data: {data}")
+                
+                # Mock success response
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": true, "message": "Local Mock: Email notification triggered!"}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": false, "error": str(e)}).encode('utf-8'))
+            return
         else:
             super().do_POST()
     
