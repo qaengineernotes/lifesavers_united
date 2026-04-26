@@ -199,6 +199,20 @@ export function initializeBroadcastSystem() {
         const message = document.getElementById('broadcastMessage').value.trim();
         const isTest = testToggle ? testToggle.checked : false;
         const testEmail = testInput ? testInput.value.trim() : '';
+        
+        // Find the donor name from our local list if it's a test
+        let testName = 'Test Admin';
+        if (isTest && testEmail) {
+            const options = datalist.querySelectorAll('option');
+            for (const opt of options) {
+                if (opt.value === testEmail) {
+                    // textContent is "Name (email)"
+                    const parts = opt.textContent.split(' (');
+                    if (parts.length > 0) testName = parts[0];
+                    break;
+                }
+            }
+        }
 
         // Loading state
         submitBtn.disabled = true;
@@ -216,7 +230,8 @@ export function initializeBroadcastSystem() {
                     message,
                     adminUid: user.uid,
                     isTest,
-                    testEmail
+                    testEmail,
+                    testName // Pass the actual name
                 }),
             });
 

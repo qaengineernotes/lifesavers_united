@@ -42,7 +42,7 @@ export async function onRequestPost(context) {
             return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
         }
 
-        const { subject, message, adminUid, isTest, testEmail } = data;
+        const { subject, message, adminUid, isTest, testEmail, testName } = data;
         const FIREBASE_API_KEY = 'AIzaSyBBhXKv-U_Ze2cUr6_QCX9mLN7Jrfjr7aA';
 
         if (!subject || !message || !adminUid) {
@@ -59,7 +59,7 @@ export async function onRequestPost(context) {
             }
             recipients = [{
                 email: testEmail,
-                name: 'Test Admin'
+                name: testName || 'Test Admin'
             }];
         } else {
             // PRODUCTION MODE: Fetch all donors from Firestore
