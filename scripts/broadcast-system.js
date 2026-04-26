@@ -10,6 +10,13 @@ export function initializeBroadcastSystem() {
     const submitBtn = document.getElementById('submitBroadcast');
     const btnText = document.getElementById('broadcastBtnText');
     const btnLoader = document.getElementById('broadcastBtnLoader');
+    
+    const formControls = document.getElementById('broadcastFormControls');
+    const confirmStep = document.getElementById('broadcastConfirmStep');
+    const nextBtn = document.getElementById('nextToConfirm');
+    const backBtn = document.getElementById('backToEdit');
+    const previewSubject = document.getElementById('previewSubject');
+    const previewMessage = document.getElementById('previewMessage');
 
     if (!broadcastBtnContainer || !modal) return;
 
@@ -29,6 +36,11 @@ export function initializeBroadcastSystem() {
         if (e) e.preventDefault();
         console.log('Opening Broadcast Modal (Direct Style)...');
         if (modal) {
+            // Reset to step 1
+            formControls.style.display = 'flex';
+            confirmStep.style.display = 'none';
+            confirmStep.classList.add('hidden');
+            
             modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -45,6 +57,36 @@ export function initializeBroadcastSystem() {
             form.reset();
         }
     };
+
+    // Navigation between steps
+    if (nextBtn) {
+        nextBtn.addEventListener('click', () => {
+            const subject = document.getElementById('broadcastSubject').value.trim();
+            const message = document.getElementById('broadcastMessage').value.trim();
+            
+            if (!subject || !message) {
+                showToast('Wait!', 'Please fill in both subject and message first.', 'error');
+                return;
+            }
+
+            // Populate previews
+            previewSubject.textContent = subject;
+            previewMessage.textContent = message;
+
+            // Switch views
+            formControls.style.display = 'none';
+            confirmStep.style.display = 'flex';
+            confirmStep.classList.remove('hidden');
+        });
+    }
+
+    if (backBtn) {
+        backBtn.addEventListener('click', () => {
+            formControls.style.display = 'flex';
+            confirmStep.style.display = 'none';
+            confirmStep.classList.add('hidden');
+        });
+    }
 
     // Use multiple attachment points for robustness
     broadcastBtnContainer.onclick = openModal;
@@ -66,22 +108,12 @@ export function initializeBroadcastSystem() {
 
         const user = getCurrentUser();
         if (!user || user.role !== 'superuser') {
-            alert('Unauthorized: Only Superusers can send broadcasts.');
+            showToast('Unauthorized', 'Only Superusers can send broadcasts.', 'error');
             return;
         }
 
         const subject = document.getElementById('broadcastSubject').value.trim();
         const message = document.getElementById('broadcastMessage').value.trim();
-
-        if (!subject || !message) {
-            alert('Please fill in both subject and message.');
-            return;
-        }
-
-        // Confirmation before sending to EVERYONE
-        if (!confirm(`Are you sure you want to send this email to ALL registered donors?`)) {
-            return;
-        }
 
         // Loading state
         submitBtn.disabled = true;
@@ -101,6 +133,12 @@ export function initializeBroadcastSystem() {
                 }),
             });
 
+            // Handle potential 500 errors with better messaging
+            if (response.status === 500) {
+                const errData = await response.json();
+                throw new Error(errData.error || 'Server error. Check if RESEND_API_KEY is configured.');
+            }
+
             const result = await response.json();
 
             if (result.success) {
@@ -111,10 +149,10 @@ export function initializeBroadcastSystem() {
             }
         } catch (error) {
             console.error('Broadcast Error:', error);
-            showToast('Error', 'Failed to connect to the broadcast service.', 'error');
+            showToast('Error', error.message || 'Failed to connect to the broadcast service.', 'error');
         } finally {
             submitBtn.disabled = false;
-            btnText.textContent = 'Send Broadcast';
+            btnText.textContent = 'Yes, Send to Everyone';
             btnLoader.classList.add('hidden');
         }
     });
