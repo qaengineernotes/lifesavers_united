@@ -25,6 +25,9 @@ export function initializeBroadcastSystem() {
     const datalist = document.getElementById('donorEmailsList');
     const loaderIndicator = document.getElementById('loadingDonorsIndicator');
 
+    // Ensure the browser doesn't try to validate this hidden field
+    if (testInput) testInput.required = false;
+
     let donorsLoaded = false;
 
     if (!broadcastBtnContainer || !modal) return;
@@ -90,12 +93,10 @@ export function initializeBroadcastSystem() {
             if (testToggle.checked) {
                 testContainer.style.display = 'block';
                 testContainer.classList.remove('hidden');
-                testInput.required = true;
                 fetchDonorEmails(); // Fetch when enabled
             } else {
                 testContainer.style.display = 'none';
                 testContainer.classList.add('hidden');
-                testInput.required = false;
             }
         });
     }
