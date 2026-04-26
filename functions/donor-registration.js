@@ -124,8 +124,12 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);">
 
   <!-- HEADER -->
-  <tr><td style="background:linear-gradient(135deg,#c0392b 0%,#e74c3c 100%);padding:48px 32px;text-align:center;">
-    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:80px;width:auto;margin-bottom:20px;">
+  <tr><td style="background:#ffffff;padding:32px 32px 24px;text-align:center;">
+    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo.png" alt="LifeSavers United" style="height:70px;width:auto;">
+  </td></tr>
+
+  <!-- HERO -->
+  <tr><td style="background:linear-gradient(135deg,#c0392b 0%,#e74c3c 100%);padding:40px 32px;text-align:center;">
     <h1 style="color:#fff;margin:0;font-size:30px;font-weight:800;letter-spacing:-0.5px;">You're a LifeSaver!</h1>
     <p style="color:#f5b7b1;margin:10px 0 0;font-size:16px;">Registration Confirmed — Thank You, ${first}!</p>
   </td></tr>
@@ -284,8 +288,12 @@ function buildAdminEmail(name, blood, city, area, email, phone, emergency, prefe
 <table width="600" cellpadding="0" cellspacing="0" style="background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.08);">
 
   <!-- HEADER -->
+  <tr><td style="background:#ffffff;padding:24px 32px;text-align:center;border-bottom:1px solid #f0f0f0;">
+    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo.png" alt="LifeSavers United" style="height:50px;width:auto;">
+  </td></tr>
+
+  <!-- HERO -->
   <tr><td style="background:#c0392b;padding:24px 32px;text-align:center;">
-    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:60px;width:auto;margin-bottom:10px;">
     <h1 style="color:#fff;margin:0;font-size:22px;">🩸 New Donor Registration</h1>
     <p style="color:#f5b7b1;margin:6px 0 0;font-size:14px;">LifeSavers United — lifesaversunited.org</p>
   </td></tr>

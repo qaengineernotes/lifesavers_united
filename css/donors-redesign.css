@@ -1436,3 +1436,42 @@ textarea.edm-input {
         justify-content: flex-end;
     }
 }
+
+/* Broadcast Styles */
+.broadcast-email-btn {
+    height: 46px;
+    padding: 0 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+    color: #fff !important;
+    border: none;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.broadcast-email-btn:hover {
+    background: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(124, 58, 237, 0.45);
+    color: #fff !important;
+}
+
+.broadcast-email-btn:active {
+    transform: translateY(0);
+}
+
+.broadcast-email-btn svg {
+    width: 20px;
+    height: 20px;
+    stroke-width: 2.5;
+}
+.broadcast-email-btn.hidden { display: none !important; }
+#broadcastModal:not(.hidden) { display: flex !important; z-index: 100000 !important; }

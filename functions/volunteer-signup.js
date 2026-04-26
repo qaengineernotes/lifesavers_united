@@ -89,8 +89,13 @@ export async function onRequestPost(context) {
       <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
         <!-- Header -->
         <tr>
+          <td style="background:#ffffff;padding:24px 32px;text-align:center;border-bottom:1px solid #f0f0f0;">
+            <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo.png" alt="LifeSavers United" style="height:50px;width:auto;">
+          </td>
+        </tr>
+        <!-- Hero -->
+        <tr>
           <td style="background:#c0392b;padding:24px 32px;text-align:center;">
-            <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" style="height:60px;width:auto;margin-bottom:10px;">
             <h1 style="color:#ffffff;margin:0;font-size:22px;">🩸 New Volunteer Application</h1>
             <p style="color:#f5b7b1;margin:6px 0 0;font-size:14px;">Lifesavers United — lifesaversunited.org</p>
           </td>

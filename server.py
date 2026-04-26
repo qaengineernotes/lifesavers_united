@@ -9,146 +9,95 @@ import socketserver
 import os
 import webbrowser
 from pathlib import Path
-
-# Configuration
-PORT = 8000
-DIRECTORY = Path(__file__).parent
-
 import urllib.request
 import urllib.parse
 import json
 import re
 
+# Configuration
+PORT = 8000
+DIRECTORY = Path(__file__).parent
+
 def normalize_phone_number(phone_number):
     """
     Normalize phone number to 10-digit format
     Removes country code (+91 or 91), spaces, and special characters
-    Examples: "94283 54534" → "9428354534", "+91 94283 54534" → "9428354534"
     """
     if not phone_number:
         return ''
-    
-    # Convert to string and trim whitespace
     normalized = str(phone_number).strip()
-    
-    # Remove all non-digit characters (spaces, +, -, (, ), etc.)
     normalized = re.sub(r'\D', '', normalized)
-    
-    # Remove country code if present (91 for India)
     if normalized.startswith('91') and len(normalized) > 10:
         normalized = normalized[2:]
-    
-    # If the number still has more than 10 digits, take the last 10 digits
     if len(normalized) > 10:
         normalized = normalized[-10:]
-    
     return normalized
 
 def to_title_case(text):
     """
-    Convert a string to Title Case (e.g., "NIKUNJ MISTRI" -> "Nikunj Mistri")
+    Convert a string to Title Case
     """
     if not text:
         return ''
-    # capitalize each word
     return ' '.join(word.capitalize() for word in text.strip().split())
 
 
 class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
-        # Add CORS headers to allow cross-origin requests
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         super().end_headers()
     
     def do_OPTIONS(self):
-        # Handle preflight requests
         self.send_response(200)
         self.end_headers()
     
     def do_POST(self):
-        print(f"POST request to: {self.path}")  # Debug log
+        print(f"POST request to: {self.path}")
         if self.path == '/api/submit-blood-request':
-            # Handle blood request submission
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
-                # Parse the JSON data
                 data = json.loads(post_data.decode('utf-8'))
-
-                # Apply formatting
-                if 'patientName' in data:
-                    data['patientName'] = to_title_case(data['patientName'])
-                if 'contactPerson' in data:
-                    data['contactPerson'] = to_title_case(data['contactPerson'])
+                if 'patientName' in data: data['patientName'] = to_title_case(data['patientName'])
+                if 'contactPerson' in data: data['contactPerson'] = to_title_case(data['contactPerson'])
                 
-                # Prepare data for Google Apps Script
                 script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
-                
-                # Create form data
-                form_data = urllib.parse.urlencode({
-                    'data': json.dumps(data)
-                }).encode('utf-8')
-                
-                # Make request to Google Apps Script
+                form_data = urllib.parse.urlencode({'data': json.dumps(data)}).encode('utf-8')
                 req = urllib.request.Request(script_url, data=form_data)
                 req.add_header('Content-Type', 'application/x-www-form-urlencoded')
                 
                 with urllib.request.urlopen(req) as response:
                     result = response.read().decode('utf-8')
-                    
-                # Return the result
+                
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(result.encode('utf-8'))
-                
             except Exception as e:
-                # Return error response
-                error_response = json.dumps({
-                    'success': False,
-                    'message': 'Failed to submit request',
-                    'error': str(e)
-                })
-                
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(error_response.encode('utf-8'))
-            return  # Important: return here to prevent fallback to super()
+                self.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode('utf-8'))
+            return
+
         elif self.path == '/api/submit-donor-registration':
-            # Handle donor registration submission
-            print("Processing donor registration submission...")  # Debug log
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
-                # Parse the form data
-                form_data = post_data.decode('utf-8')
-                print(f"Received form data: {form_data[:200]}...")  # Debug log
-                parsed_data = urllib.parse.parse_qs(form_data)
+                parsed_data = urllib.parse.parse_qs(post_data.decode('utf-8'))
+                if 'data' not in parsed_data: raise ValueError("No data found")
+                data = json.loads(parsed_data['data'][0])
                 
-                # Extract the JSON data
-                if 'data' in parsed_data:
-                    data = json.loads(parsed_data['data'][0])
-                    print(f"Parsed data: {data}")  # Debug log
-                else:
-                    raise ValueError("No data found in form submission")
-                
-                # Prepare data for Google Apps Script (donor registration)
                 script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
-                
-                # Create form data for Google Apps Script
-                # Use the correct action for donor registration
                 donor_data = {
                     'action': 'submit_donor_registration',
                     'data': json.dumps({
                         'fullName': to_title_case(data.get('fullName')),
                         'dateOfBirth': data.get('dateOfBirth'),
                         'gender': data.get('gender'),
-                        'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
+                        'contactNumber': normalize_phone_number(data.get('contactNumber')),
                         'email': data.get('email'),
                         'weight': data.get('weight'),
                         'bloodGroup': data.get('bloodGroup'),
@@ -162,186 +111,119 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                         'source': 'donor_registration'
                     })
                 }
-                
                 script_form_data = urllib.parse.urlencode(donor_data).encode('utf-8')
-                
-                print(f"Submitting to Google Apps Script: {script_url}")  # Debug log
-                print(f"Donor data being sent: {donor_data}")  # Debug log
-                
-                # Make request to Google Apps Script
                 req = urllib.request.Request(script_url, data=script_form_data)
                 req.add_header('Content-Type', 'application/x-www-form-urlencoded')
                 
                 with urllib.request.urlopen(req) as response:
                     result = response.read().decode('utf-8')
-                    print(f"Google Apps Script response: {result}")  # Debug log
-                    
-                # Return the result
+                
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(result.encode('utf-8'))
-                
             except Exception as e:
-                print(f"Error in donor registration: {str(e)}")  # Debug log
-                # Return error response
-                error_response = json.dumps({
-                    'success': False,
-                    'message': 'Failed to submit donor registration',
-                    'error': str(e)
-                })
-                
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(error_response.encode('utf-8'))
-            return  # Important: return here to prevent fallback to super()
+                self.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode('utf-8'))
+            return
+
         elif self.path == '/api/submit-donor-details':
-            # Handle donor details submission from emergency request system
-            print("Processing donor details submission from emergency system...")  # Debug log
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
-                # Parse the JSON data
                 data = json.loads(post_data.decode('utf-8'))
-                print(f"Received donor details: {data}")  # Debug log
-                
-                # Prepare data for Google Apps Script (donor details from emergency system)
                 script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
-                
-                # Create form data for Google Apps Script
-                # Try action that might route to Form Responses 2
                 donor_data = {
                     'action': 'form_responses_2',
                     'data': json.dumps({
                         'fullName': to_title_case(data.get('fullName')),
-                        'dateOfBirth': data.get('dateOfBirth'),
-                        'gender': data.get('gender'),
-                        'contactNumber': normalize_phone_number(data.get('contactNumber')),  # Normalize phone number
-                        'email': data.get('email'),
-                        'weight': data.get('weight'),
+                        'contactNumber': normalize_phone_number(data.get('contactNumber')),
                         'bloodGroup': data.get('bloodGroup'),
-                        'city': data.get('city'),
-                        'area': data.get('area'),
-                        'emergencyAvailable': data.get('emergencyAvailable', 'Yes'),
-                        'preferredContact': data.get('preferredContact'),
-                        'lastDonation': data.get('lastDonation', ''),
-                        'medicalHistory': data.get('medicalHistory', ''),
-                        'registrationDate': data.get('registrationDate'),
                         'source': 'emergency_request_system',
-                        'relatedRequestId': data.get('requestId', ''),
-                        'relatedPatientName': to_title_case(data.get('patientName', ''))
+                        'relatedRequestId': data.get('requestId', '')
                     })
                 }
-                
                 script_form_data = urllib.parse.urlencode(donor_data).encode('utf-8')
-                
-                print(f"Submitting donor details to Google Apps Script: {script_url}")  # Debug log
-                
-                # Make request to Google Apps Script
                 req = urllib.request.Request(script_url, data=script_form_data)
                 req.add_header('Content-Type', 'application/x-www-form-urlencoded')
-                
                 with urllib.request.urlopen(req) as response:
                     result = response.read().decode('utf-8')
-                    print(f"Google Apps Script response: {result}")  # Debug log
-                    
-                # Return the result
+                
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(result.encode('utf-8'))
-                
             except Exception as e:
-                print(f"Error in donor details submission: {str(e)}")  # Debug log
-                # Return error response
-                error_response = json.dumps({
-                    'success': False,
-                    'message': 'Failed to submit donor details',
-                    'error': str(e)
-                })
-                
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(error_response.encode('utf-8'))
-            return  # Important: return here to prevent fallback to super()
+                self.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode('utf-8'))
+            return
+
         elif self.path == '/volunteer-signup':
-            # Handle volunteer signup (Mock for local dev)
-            print("Processing volunteer signup (Local Mock)...")
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
-                data = json.loads(post_data.decode('utf-8'))
-                print(f"Volunteer Data: {data}")
-                
-                # Mock success response
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": true, "message": "Local Mock: Registration received!"}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Registration received!"}).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": false, "error": str(e)}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
-        elif self.path == '/donor-registration':
-            # Handle donor registration email trigger (Mock for local dev)
-            print("Processing donor registration email trigger (Local Mock)...")
+
+        elif self.path == '/donor-registration-email':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
-            
             try:
-                data = json.loads(post_data.decode('utf-8'))
-                print(f"Donor Email Notification Data: {data}")
-                
-                # Mock success response
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": true, "message": "Local Mock: Email notification triggered!"}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Email triggered!"}).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": false, "error": str(e)}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
+
+        elif self.path == '/functions/broadcast-email':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Broadcast initiated!"}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+            return
+
         else:
             super().do_POST()
     
     def do_GET(self):
-        print(f"GET request to: {self.path}")  # Debug log
         if self.path == '/api/fetch-requests':
-            # Handle fetching emergency requests
             try:
                 script_url = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyfdlfIL3uFlIMeEHvvFf91M0yD39VfNeIjYwjYGoxuVeSYnwV/exec'
-                
                 with urllib.request.urlopen(script_url) as response:
                     result = response.read().decode('utf-8')
-                    
-                # Return the result
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(result.encode('utf-8'))
-                
             except Exception as e:
-                # Return error response
-                error_response = json.dumps({
-                    'success': False,
-                    'message': 'Failed to fetch requests',
-                    'error': str(e)
-                })
-                
                 self.send_response(500)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(error_response.encode('utf-8'))
-            return  # Important: return here to prevent fallback to super()
+                self.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode('utf-8'))
+            return
         else:
-            # Handle extensionless URLs
-            # If path doesn't have an extension and doesn't end with /, try adding .html
             if '.' not in os.path.basename(self.path) and not self.path.endswith('/'):
                 html_path = self.path + '.html'
                 file_path = os.path.join(DIRECTORY, html_path.lstrip('/'))
@@ -349,66 +231,18 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     self.path = html_path
             super().do_GET()
 
-def find_available_port(start_port=8000, max_attempts=10):
-    """Find an available port starting from start_port"""
-    import socket
-    for port in range(start_port, start_port + max_attempts):
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.bind(('', port))
-                return port
-        except OSError:
-            continue
-    return None
-
 def main():
-    # Change to the project directory
     os.chdir(DIRECTORY)
-    
-    # Allow socket reuse to prevent "address already in use" errors
     socketserver.TCPServer.allow_reuse_address = True
-    
-    port_to_use = PORT
-    
     try:
-        # Create server
-        with socketserver.TCPServer(("", port_to_use), CORSHTTPRequestHandler) as httpd:
-            print(f"[*] Server started at http://localhost:{port_to_use}")
-            print(f"[*] Serving files from: {DIRECTORY}")
-            print(f"[*] Open your browser and go to: http://localhost:{port_to_use}")
-            print(f"[*] Emergency Blood Request Form: http://localhost:{port_to_use}/pages/emergency_blood_request.html")
-            print(f"[*] Emergency Request System: http://localhost:{port_to_use}/pages/emergency_request_system.html")
-            print("\nPress Ctrl+C to stop the server")
-            
-            # Try to open the main page in browser
-            try:
-                webbrowser.open(f'http://localhost:{port_to_use}')
-            except:
-                pass
-            
-            # Start serving
-            try:
-                httpd.serve_forever()
-            except KeyboardInterrupt:
-                print("\n[!] Server stopped")
-    
-    except OSError as e:
-        if e.errno == 10048:  # Port already in use on Windows
-            print(f"[X] Port {port_to_use} is already in use!")
-            print(f"[*] Looking for an available port...")
-            
-            available_port = find_available_port(PORT + 1)
-            if available_port:
-                print(f"[+] Found available port: {available_port}")
-                print(f"[!] You can either:")
-                print(f"   1. Stop the process using port {PORT} and run this script again")
-                print(f"   2. Change PORT in server.py to {available_port}")
-                print(f"\n[*] To find what's using port {PORT}, run:")
-                print(f"   netstat -ano | findstr :{PORT}")
-            else:
-                print(f"[X] Could not find an available port. Please stop other servers and try again.")
-        else:
-            raise
+        with socketserver.TCPServer(("", PORT), CORSHTTPRequestHandler) as httpd:
+            print(f"[*] Server started at http://localhost:{PORT}")
+            webbrowser.open(f'http://localhost:{PORT}/emergency_request_system')
+            httpd.serve_forever()
+    except KeyboardInterrupt:
+        print("\n[!] Server stopped")
+    except Exception as e:
+        print(f"[X] Error: {e}")
 
 if __name__ == "__main__":
     main()
