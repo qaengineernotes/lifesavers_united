@@ -65,11 +65,19 @@ export async function onRequestPost(context) {
 
         // 2. Fetch Donors from Firestore
         // We fetch from the 'donors' collection. Using REST API 'documents' list.
-        // For larger lists, we'd need pagination, but this handles up to 1000 donors in one call (max page size).
-        const donorsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/donors?pageSize=1000`;
+        // Adding the API key from firebase-config.js to ensure the request is authorized.
+        const FIREBASE_API_KEY = 'AIzaSyBBhXKv-U_Ze2cUr6_QCX9mLN7Jrfjr7aA';
+        const donorsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/donors?pageSize=1000&key=${FIREBASE_API_KEY}`;
+        
         const donorsRes = await fetch(donorsUrl);
         if (!donorsRes.ok) {
-            return Response.json({ success: false, error: 'Failed to fetch donor list.' }, { status: 500, headers: CORS });
+            const errorBody = await donorsRes.text();
+            console.error('[broadcast-email] Firestore Fetch Failed:', errorBody);
+            return Response.json({ 
+                success: false, 
+                error: 'Failed to fetch donor list.',
+                details: errorBody 
+            }, { status: 500, headers: CORS });
         }
         const donorsData = await donorsRes.json();
         const documents = donorsData.documents || [];
