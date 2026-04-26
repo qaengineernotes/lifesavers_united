@@ -1,5 +1,6 @@
 // Broadcast Email System for Admin Dashboard
 import { getCurrentUser, onAuthChange } from './firebase-auth-service.js';
+import { db, collection, getDocs, query, limit } from './firebase-config.js';
 
 export function initializeBroadcastSystem() {
     const broadcastBtnContainer = document.getElementById('broadcastButtonContainer');
@@ -18,7 +19,59 @@ export function initializeBroadcastSystem() {
     const previewSubject = document.getElementById('previewSubject');
     const previewMessage = document.getElementById('previewMessage');
 
+    const testToggle = document.getElementById('testEmailToggle');
+    const testContainer = document.getElementById('testEmailContainer');
+    const testInput = document.getElementById('testEmailAddress');
+    const datalist = document.getElementById('donorEmailsList');
+    const loaderIndicator = document.getElementById('loadingDonorsIndicator');
+
+    let donorsLoaded = false;
+
     if (!broadcastBtnContainer || !modal) return;
+
+    // Fetch real donors to populate the test dropdown
+    async function fetchDonorEmails() {
+        if (donorsLoaded) return;
+        
+        console.log('Fetching donor emails for test mode...');
+        if (loaderIndicator) loaderIndicator.style.display = 'block';
+        if (datalist) datalist.innerHTML = '<option value="">Searching...</option>';
+
+        try {
+            const donorsRef = collection(db, 'donors');
+            // Fetch 50 donors to keep it fast
+            const q = query(donorsRef, limit(50));
+            const snapshot = await getDocs(q);
+            
+            if (datalist) {
+                datalist.innerHTML = '';
+                let count = 0;
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email && data.email.includes('@')) {
+                        const option = document.createElement('option');
+                        option.value = data.email;
+                        option.textContent = `${data.fullName || 'Unknown'} (${data.email})`;
+                        datalist.appendChild(option);
+                        count++;
+                    }
+                });
+                
+                if (count === 0) {
+                    const option = document.createElement('option');
+                    option.value = "";
+                    option.textContent = "No donors with email found";
+                    datalist.appendChild(option);
+                }
+            }
+            donorsLoaded = true;
+        } catch (error) {
+            console.error('Error fetching donors for test mode:', error);
+            if (datalist) datalist.innerHTML = '<option value="">Error loading donors</option>';
+        } finally {
+            if (loaderIndicator) loaderIndicator.style.display = 'none';
+        }
+    }
 
     // 1. Authorization: Only show button for Superusers
     onAuthChange((user) => {
@@ -31,6 +84,22 @@ export function initializeBroadcastSystem() {
         }
     });
 
+    // Handle test toggle
+    if (testToggle) {
+        testToggle.addEventListener('change', () => {
+            if (testToggle.checked) {
+                testContainer.style.display = 'block';
+                testContainer.classList.remove('hidden');
+                testInput.required = true;
+                fetchDonorEmails(); // Fetch when enabled
+            } else {
+                testContainer.style.display = 'none';
+                testContainer.classList.add('hidden');
+                testInput.required = false;
+            }
+        });
+    }
+
     // 2. Modal Controls
     const openModal = (e) => {
         if (e) e.preventDefault();
@@ -41,6 +110,13 @@ export function initializeBroadcastSystem() {
             confirmStep.style.display = 'none';
             confirmStep.classList.add('hidden');
             
+            // Reset test toggle
+            if (testToggle) {
+                testToggle.checked = false;
+                testContainer.style.display = 'none';
+                testContainer.classList.add('hidden');
+            }
+
             modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
@@ -63,14 +139,21 @@ export function initializeBroadcastSystem() {
         nextBtn.addEventListener('click', () => {
             const subject = document.getElementById('broadcastSubject').value.trim();
             const message = document.getElementById('broadcastMessage').value.trim();
+            const isTest = testToggle ? testToggle.checked : false;
+            const testEmail = testInput ? testInput.value.trim() : '';
             
             if (!subject || !message) {
                 showToast('Wait!', 'Please fill in both subject and message first.', 'error');
                 return;
             }
 
+            if (isTest && !testEmail) {
+                showToast('Email Required', 'Please enter a test email address.', 'error');
+                return;
+            }
+
             // Populate previews
-            previewSubject.textContent = subject;
+            previewSubject.textContent = isTest ? `[TEST] ${subject}` : subject;
             previewMessage.textContent = message;
 
             // Switch views
@@ -114,10 +197,12 @@ export function initializeBroadcastSystem() {
 
         const subject = document.getElementById('broadcastSubject').value.trim();
         const message = document.getElementById('broadcastMessage').value.trim();
+        const isTest = testToggle ? testToggle.checked : false;
+        const testEmail = testInput ? testInput.value.trim() : '';
 
         // Loading state
         submitBtn.disabled = true;
-        btnText.textContent = 'Sending...';
+        btnText.textContent = isTest ? 'Sending Test...' : 'Sending...';
         btnLoader.classList.remove('hidden');
 
         try {
@@ -129,7 +214,9 @@ export function initializeBroadcastSystem() {
                 body: JSON.stringify({
                     subject,
                     message,
-                    adminUid: user.uid
+                    adminUid: user.uid,
+                    isTest,
+                    testEmail
                 }),
             });
 

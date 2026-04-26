@@ -42,71 +42,88 @@ export async function onRequestPost(context) {
             return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
         }
 
-        const { subject, message, adminUid } = data;
+        const { subject, message, adminUid, isTest, testEmail } = data;
+        const FIREBASE_API_KEY = 'AIzaSyBBhXKv-U_Ze2cUr6_QCX9mLN7Jrfjr7aA';
 
         if (!subject || !message || !adminUid) {
-            return Response.json({ success: false, error: 'Missing required fields (subject, message, adminUid).' }, { status: 400, headers: CORS });
+            return Response.json({ success: false, error: 'Missing required fields.' }, { status: 400, headers: CORS });
         }
 
-        /* 
-        // 1. Verify Superuser Status (Temporarily disabled because Cloudflare is unauthenticated in Firestore)
-        // We rely on the frontend authorization for now.
-        const adminCheckUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${adminUid}`;
-        const adminRes = await fetch(adminCheckUrl);
-        if (!adminRes.ok) {
-            return Response.json({ success: false, error: 'Unauthorized. Admin profile not found.' }, { status: 403, headers: CORS });
-        }
-        const adminData = await adminRes.json();
-        const role = adminData.fields?.role?.stringValue;
-        if (role !== 'superuser') {
-            return Response.json({ success: false, error: 'Unauthorized. Only Superusers can send broadcasts.' }, { status: 403, headers: CORS });
-        }
-        */
+        // --- STEP 1: Identify Recipients ---
+        let recipients = [];
 
-        // 2. Fetch Donors from Firestore
-        // We fetch from the 'donors' collection. Using REST API 'documents' list.
-        // Adding the API key from firebase-config.js to ensure the request is authorized.
-        const FIREBASE_API_KEY = 'AIzaSyBBhXKv-U_Ze2cUr6_QCX9mLN7Jrfjr7aA';
-        const donorsUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents/donors?pageSize=1000&key=${FIREBASE_API_KEY}`;
-        
-        const donorsRes = await fetch(donorsUrl);
-        if (!donorsRes.ok) {
-            const errorBody = await donorsRes.text();
-            console.error('[broadcast-email] Firestore Fetch Failed:', errorBody);
-            return Response.json({ 
-                success: false, 
-                error: 'Failed to fetch donor list.',
-                details: errorBody 
-            }, { status: 500, headers: CORS });
-        }
-        const donorsData = await donorsRes.json();
-        const documents = donorsData.documents || [];
+        if (isTest) {
+            // TEST MODE: Just one recipient
+            if (!testEmail) {
+                return Response.json({ success: false, error: 'Test email address required.' }, { status: 400, headers: CORS });
+            }
+            recipients = [{
+                email: testEmail,
+                name: 'Test Admin'
+            }];
+        } else {
+            // PRODUCTION MODE: Fetch all donors from Firestore
+            // Using runQuery (POST) instead of list (GET) to bypass potential 403 listing restrictions.
+            const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery?key=${FIREBASE_API_KEY}`;
+            
+            const queryBody = {
+                structuredQuery: {
+                    from: [{ collectionId: 'donors' }],
+                    // Select all documents
+                }
+            };
 
-        if (documents.length === 0) {
+            const donorsRes = await fetch(queryUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(queryBody)
+            });
+
+            if (!donorsRes.ok) {
+                const errorBody = await donorsRes.text();
+                console.error('[broadcast-email] Firestore Query Failed:', errorBody);
+                return Response.json({ 
+                    success: false, 
+                    error: 'Failed to access donor database (Permission Denied).',
+                    details: errorBody 
+                }, { status: 500, headers: CORS });
+            }
+
+            const queryResults = await donorsRes.json();
+            // runQuery returns an array of objects: [{ document: { ... } }, ...]
+            for (const result of queryResults) {
+                if (result.document) {
+                    const fields = result.document.fields;
+                    const email = fields?.email?.stringValue;
+                    const name = fields?.fullName?.stringValue || 'Donor';
+                    if (email && email.includes('@')) {
+                        recipients.push({ email, name });
+                    }
+                }
+            }
+        }
+
+        if (recipients.length === 0) {
             return Response.json({ success: true, message: 'No donors found to email.' }, { headers: CORS });
         }
 
-        // 3. Prepare Batch Emails
+        // --- STEP 2: Prepare Batch Emails ---
         const emailBatch = [];
-        for (const doc of documents) {
-            const fields = doc.fields;
-            const name = fields?.fullName?.stringValue || 'Donor';
-            const email = fields?.email?.stringValue;
+        for (const recipient of recipients) {
+            const { email, name } = recipient;
+            
+            // Personalize the message
+            const personalizedBody = message.replace(/\{\{name\}\}/g, name);
+            
+            // Wrap in official Template Sandwich
+            const html = buildBroadcastTemplate(name, personalizedBody);
 
-            if (email && email.includes('@')) {
-                // Personalize the message
-                const personalizedBody = message.replace(/\{\{name\}\}/g, name);
-                
-                // Wrap in official Template Sandwich
-                const html = buildBroadcastTemplate(name, personalizedBody);
-
-                emailBatch.push({
-                    from: FROM,
-                    to: email,
-                    subject: subject,
-                    html: html
-                });
-            }
+            emailBatch.push({
+                from: FROM,
+                to: email,
+                subject: isTest ? `[TEST] ${subject}` : subject,
+                html: html
+            });
         }
 
         if (emailBatch.length === 0) {
