@@ -65,7 +65,7 @@ export async function onRequestPost(context) {
             // PRODUCTION MODE: Fetch all donors from Firestore
             // Using runQuery (POST) instead of list (GET) to bypass potential 403 listing restrictions.
             const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery?key=${FIREBASE_API_KEY}`;
-            
+
             const queryBody = {
                 structuredQuery: {
                     from: [{ collectionId: 'donors' }],
@@ -82,10 +82,10 @@ export async function onRequestPost(context) {
             if (!donorsRes.ok) {
                 const errorBody = await donorsRes.text();
                 console.error('[broadcast-email] Firestore Query Failed:', errorBody);
-                return Response.json({ 
-                    success: false, 
+                return Response.json({
+                    success: false,
                     error: 'Failed to access donor database (Permission Denied).',
-                    details: errorBody 
+                    details: errorBody
                 }, { status: 500, headers: CORS });
             }
 
@@ -111,10 +111,10 @@ export async function onRequestPost(context) {
         const emailBatch = [];
         for (const recipient of recipients) {
             const { email, name } = recipient;
-            
+
             // Personalize the message
             const personalizedBody = message.replace(/\{\{name\}\}/g, name);
-            
+
             // Wrap in official Template Sandwich
             const html = buildBroadcastTemplate(name, personalizedBody);
 
@@ -147,10 +147,10 @@ export async function onRequestPost(context) {
             sendResults.push({ status: res.status, data: result });
         }
 
-        return Response.json({ 
-            success: true, 
+        return Response.json({
+            success: true,
             message: `Broadcast initiated. Sent to ${emailBatch.length} donors.`,
-            details: sendResults 
+            details: sendResults
         }, { headers: CORS });
 
     } catch (err) {
@@ -190,7 +190,7 @@ ${content}
   <!-- FOOTER -->
   <tr><td style="background:#f9f9f9;padding:32px;text-align:center;">
     <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600;">LifeSavers United</p>
-    <p style="margin:0 0 20px;color:#666;font-size:13px;line-height:1.5;">Saving lives through community blood donation.<br>Nadiad, Gujarat, India.</p>
+    <p style="margin:0 0 20px;color:#666;font-size:13px;line-height:1.5;">Saving lives through community blood donation.<br>Ahmedabad, Gujarat, India.</p>
     
     <div style="padding-top:20px;border-top:1px solid #eee;">
       <p style="margin:0 0 8px;color:#999;font-size:12px;">📞 WhatsApp: <a href="https://wa.me/919979260393" style="color:#c0392b;text-decoration:none;">+91 9979260393</a></p>
