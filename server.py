@@ -190,7 +190,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
 
-        elif self.path == '/functions/broadcast-email':
+        elif self.path == '/broadcast-email':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:

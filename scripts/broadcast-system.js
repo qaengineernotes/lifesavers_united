@@ -89,7 +89,7 @@ export function initializeBroadcastSystem() {
         btnLoader.classList.remove('hidden');
 
         try {
-            const response = await fetch('/functions/broadcast-email', {
+            const response = await fetch('/broadcast-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
