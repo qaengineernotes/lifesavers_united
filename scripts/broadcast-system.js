@@ -201,26 +201,52 @@ export function initializeBroadcastSystem() {
         const isTest = testToggle ? testToggle.checked : false;
         const testEmail = testInput ? testInput.value.trim() : '';
         
-        // Find the donor name from our local list if it's a test
-        let testName = 'Test Admin';
-        if (isTest && testEmail) {
-            const options = datalist.querySelectorAll('option');
-            for (const opt of options) {
-                if (opt.value === testEmail) {
-                    // textContent is "Name (email)"
-                    const parts = opt.textContent.split(' (');
-                    if (parts.length > 0) testName = parts[0];
-                    break;
-                }
-            }
-        }
+        let donorList = [];
 
         // Loading state
         submitBtn.disabled = true;
-        btnText.textContent = isTest ? 'Sending Test...' : 'Sending...';
+        btnText.textContent = isTest ? 'Sending Test...' : 'Preparing Broadcast...';
         btnLoader.classList.remove('hidden');
 
         try {
+            // --- STEP 1: Get Recipients (Client-side fetch to bypass 403 issues) ---
+            if (isTest) {
+                // Find the donor name from our local list if it's a test
+                let testName = 'Test Admin';
+                if (testEmail) {
+                    const options = datalist.querySelectorAll('option');
+                    for (const opt of options) {
+                        if (opt.value === testEmail) {
+                            const parts = opt.textContent.split(' (');
+                            if (parts.length > 0) testName = parts[0];
+                            break;
+                        }
+                    }
+                }
+                donorList = [{ email: testEmail, name: testName }];
+            } else {
+                // Fetch ALL donors from Firebase using the authenticated SDK
+                btnText.textContent = 'Fetching Donors...';
+                const donorsRef = collection(db, 'donors');
+                const snapshot = await getDocs(donorsRef);
+                
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.email && data.email.includes('@')) {
+                        donorList.push({
+                            email: data.email,
+                            name: data.fullName || 'Donor'
+                        });
+                    }
+                });
+
+                if (donorList.length === 0) {
+                    throw new Error('No donors with email addresses found in the database.');
+                }
+                btnText.textContent = `Sending to ${donorList.length} donors...`;
+            }
+
+            // --- STEP 2: Send to Cloudflare ---
             const response = await fetch('/broadcast-email', {
                 method: 'POST',
                 headers: {
@@ -230,9 +256,8 @@ export function initializeBroadcastSystem() {
                     subject,
                     message,
                     adminUid: user.uid,
-                    isTest,
-                    testEmail,
-                    testName // Pass the actual name
+                    donorList, // Pass the list directly
+                    isTest
                 }),
             });
 

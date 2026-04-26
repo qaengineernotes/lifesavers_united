@@ -42,69 +42,18 @@ export async function onRequestPost(context) {
             return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
         }
 
-        const { subject, message, adminUid, isTest, testEmail, testName } = data;
-        const FIREBASE_API_KEY = 'AIzaSyBBhXKv-U_Ze2cUr6_QCX9mLN7Jrfjr7aA';
+        const { subject, message, adminUid, donorList, isTest } = data;
 
-        if (!subject || !message || !adminUid) {
+        if (!subject || !message || !adminUid || !donorList) {
             return Response.json({ success: false, error: 'Missing required fields.' }, { status: 400, headers: CORS });
         }
 
         // --- STEP 1: Identify Recipients ---
-        let recipients = [];
-
-        if (isTest) {
-            // TEST MODE: Just one recipient
-            if (!testEmail) {
-                return Response.json({ success: false, error: 'Test email address required.' }, { status: 400, headers: CORS });
-            }
-            recipients = [{
-                email: testEmail,
-                name: testName || 'Test Admin'
-            }];
-        } else {
-            // PRODUCTION MODE: Fetch all donors from Firestore
-            // Using runQuery (POST) instead of list (GET) to bypass potential 403 listing restrictions.
-            const queryUrl = `https://firestore.googleapis.com/v1/projects/${FIREBASE_PROJECT_ID}/databases/(default)/documents:runQuery?key=${FIREBASE_API_KEY}`;
-
-            const queryBody = {
-                structuredQuery: {
-                    from: [{ collectionId: 'donors' }],
-                    // Select all documents
-                }
-            };
-
-            const donorsRes = await fetch(queryUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(queryBody)
-            });
-
-            if (!donorsRes.ok) {
-                const errorBody = await donorsRes.text();
-                console.error('[broadcast-email] Firestore Query Failed:', errorBody);
-                return Response.json({
-                    success: false,
-                    error: 'Failed to access donor database (Permission Denied).',
-                    details: errorBody
-                }, { status: 500, headers: CORS });
-            }
-
-            const queryResults = await donorsRes.json();
-            // runQuery returns an array of objects: [{ document: { ... } }, ...]
-            for (const result of queryResults) {
-                if (result.document) {
-                    const fields = result.document.fields;
-                    const email = fields?.email?.stringValue;
-                    const name = fields?.fullName?.stringValue || 'Donor';
-                    if (email && email.includes('@')) {
-                        recipients.push({ email, name });
-                    }
-                }
-            }
-        }
+        // Recipients are now passed directly from the authenticated frontend to bypass 403 issues.
+        const recipients = donorList;
 
         if (recipients.length === 0) {
-            return Response.json({ success: true, message: 'No donors found to email.' }, { headers: CORS });
+            return Response.json({ success: true, message: 'No recipients provided.' }, { headers: CORS });
         }
 
         // --- STEP 2: Prepare Batch Emails ---
