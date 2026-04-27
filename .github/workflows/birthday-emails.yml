@@ -2,9 +2,14 @@ name: Daily Birthday Emails
 
 on:
   schedule:
-    # Run at 03:30 UTC every day (09:00 AM IST)
-    - cron: '30 3 * * *'
-  workflow_dispatch: # Allow manual triggering
+    # Run at 19:30 UTC every day (01:00 AM IST)
+    - cron: '30 19 * * *'
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: 'Send a test birthday card to this email (Leave blank for real run)'
+        required: false
+        default: ''
 
 jobs:
   send-birthday-emails:
@@ -16,7 +21,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install dependencies
         run: npm install firebase-admin axios
@@ -25,4 +30,5 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TEST_EMAIL: ${{ github.event.inputs.test_email }}
         run: node scripts/auto-birthday-emails.js

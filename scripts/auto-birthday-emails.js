@@ -44,13 +44,22 @@ async function run() {
     const targetDay   = String(istDate.getUTCDate()).padStart(2, '0');
     const targetMMDD  = `${targetMonth}-${targetDay}`;
 
+    // CHECK FOR TEST MODE
+    if (process.env.TEST_EMAIL) {
+        console.log(`🧪 TEST MODE: Sending a test card to ${process.env.TEST_EMAIL}`);
+        await sendBirthdayEmail({
+            fullName: 'Test Donor',
+            email: process.env.TEST_EMAIL,
+            bloodGroup: 'O+'
+        });
+        console.log('✅ Test email sent. Skipping database check.');
+        return;
+    }
+
     console.log(`📅 Checking for birthdays matching: ${targetMMDD} (IST)`);
 
     try {
         const donorsRef = db.collection('donors');
-        // We can't query by MM-DD directly in Firestore without a specific field,
-        // so we fetch all donors with a DOB and filter in JS.
-        // For larger databases, one would store a 'birthdayMMDD' field for indexing.
         const snapshot = await donorsRef.where('dateOfBirth', '!=', '').get();
 
         if (snapshot.empty) {
@@ -80,6 +89,7 @@ async function run() {
 
         console.log(`🎉 Found ${birthdayDonors.length} donors celebrating today!`);
 
+        const sentList = [];
         for (const donor of birthdayDonors) {
             if (!donor.email || !donor.email.includes('@')) {
                 console.log(`⚠️ Skipping ${donor.fullName} (No email provided)`);
@@ -87,7 +97,13 @@ async function run() {
             }
 
             console.log(`✉️ Sending birthday email to ${donor.fullName} (${donor.email})...`);
-            await sendBirthdayEmail(donor);
+            const success = await sendBirthdayEmail(donor);
+            if (success) sentList.push(donor);
+        }
+
+        // SEND SUMMARY TO ADMIN (only if emails were sent)
+        if (sentList.length > 0) {
+            await sendAdminSummary(sentList);
         }
 
         console.log('✅ Birthday automation task completed.');
@@ -121,11 +137,48 @@ async function sendBirthdayEmail(donor) {
 
         if (response.status === 200 || response.status === 201) {
             console.log(`✅ Success! Email sent to ${donor.fullName}`);
+            return true;
         } else {
             console.error(`❌ Unexpected status ${response.status} for ${donor.email}`);
+            return false;
         }
     } catch (err) {
         console.error(`❌ Error sending to ${donor.email}:`, err.response?.data || err.message);
+        return false;
+    }
+}
+
+async function sendAdminSummary(sentList) {
+    const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
+    const names = sentList.map(d => `<li><strong>${d.fullName}</strong> (${d.email}) - Blood: ${d.bloodGroup}</li>`).join('');
+    
+    const html = `
+        <div style="font-family:sans-serif;padding:20px;border:1px solid #eee;border-radius:10px;">
+            <h2 style="color:#c0392b;">🩸 Daily Birthday Report</h2>
+            <p>Hello Admin,</p>
+            <p>Today, we successfully sent <strong>${sentList.length}</strong> birthday greeting(s) to our donors:</p>
+            <ul>${names}</ul>
+            <p style="color:#777;font-size:12px;margin-top:20px;border-top:1px solid #eee;padding-top:10px;">
+                This is an automated report from LifeSavers United.
+            </p>
+        </div>
+    `;
+
+    try {
+        await axios.post('https://api.resend.com/emails', {
+            from: 'LifeSavers United <noreply@lifesaversunited.org>',
+            to: [ADMIN_EMAIL],
+            subject: `🎂 Birthday Report: ${sentList.length} Emails Sent Today`,
+            html: html
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log('📊 Admin summary sent to lifesaversunited.india@gmail.com');
+    } catch (err) {
+        console.error('❌ Failed to send admin summary:', err.message);
     }
 }
 
