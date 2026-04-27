@@ -50,7 +50,7 @@ export async function onRequestPost(context) {
         }
 
         const { fullName, bloodGroup, city, area, email, contactNumber,
-                emergencyAvailable, preferredContact } = data;
+                dateOfBirth, emergencyAvailable, preferredContact } = data;
 
         if (!fullName || !bloodGroup || !contactNumber) {
             return Response.json(
@@ -67,6 +67,7 @@ export async function onRequestPost(context) {
         const safeArea     = c(area);
         const safeEmail    = c(email);
         const safePhone    = c(contactNumber);
+        const safeDob      = c(dateOfBirth);
         const safeEmerg    = c(emergencyAvailable);
         const safePref     = c(preferredContact);
 
@@ -91,7 +92,7 @@ export async function onRequestPost(context) {
         const r2 = await sendEmail(apiKey, {
             to: [ADMIN_EMAIL],
             subject: `🩸 New Donor: ${safeName} (${safeBlood}) from ${safeCity || 'Unknown City'}`,
-            html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeEmerg, safePref, istTime),
+            html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeDob, safeEmerg, safePref, istTime),
         });
         results.push({ type: 'admin', ...r2 });
 
@@ -272,7 +273,7 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 }
 
 // ── Admin Notification Email ──────────────────────────────────────────────────
-function buildAdminEmail(name, blood, city, area, email, phone, emergency, preferred, time) {
+function buildAdminEmail(name, blood, city, area, email, phone, dob, emergency, preferred, time) {
     const row = (label, value) => `
       <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;">
         <span style="color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;">${label}</span>
@@ -307,6 +308,7 @@ function buildAdminEmail(name, blood, city, area, email, phone, emergency, prefe
   <tr><td style="padding:24px 32px;">
     <table width="100%" cellpadding="0" cellspacing="0">
       ${row('Full Name', `<strong>${name}</strong>`)}
+      ${row('Date of Birth', dob)}
       ${row('Phone Number', phone)}
       ${row('Email Address', email ? `<a href="mailto:${email}" style="color:#c0392b;">${email}</a>` : '')}
       ${row('City / Area', city ? `${city}${area ? ', ' + area : ''}` : '')}
