@@ -193,4 +193,12 @@
         <priority>0.8</priority>
     </url>
 
+    <!-- Blog: Your Complete Guide to Better Health: Indian Diet, Lifestyle, and Wellness Tips -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-indian-diet-wellness-guide</loc>
+        <lastmod>2026-04-27</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
 </urlset>

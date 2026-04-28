@@ -64,12 +64,13 @@ function setupEventListeners() {
 
 // Initialize form validation
 function initializeFormValidation() {
-    // Real-time validation for mandatory fields only
     const fullNameInput = document.getElementById('fullName');
     const contactNumberInput = document.getElementById('contactNumber');
+    const dobInput = document.getElementById('dateOfBirth');
 
     fullNameInput.addEventListener('blur', () => validateFullName());
     contactNumberInput.addEventListener('blur', () => validateContactNumber());
+    dobInput.addEventListener('blur', () => validateDateOfBirth());
 }
 
 // Generate CAPTCHA
@@ -146,8 +147,8 @@ function validateDateOfBirth() {
     if (age < 18) {
         showFieldError('dateOfBirth', 'You must be at least 18 years old to donate blood');
         return false;
-    } else if (age > 65) {
-        showFieldError('dateOfBirth', 'You must be 65 years or younger to donate blood');
+    } else if (age > 70) {
+        showFieldError('dateOfBirth', 'You must be 70 years or younger to donate blood');
         return false;
     } else {
         clearFieldError('dateOfBirth');
@@ -375,15 +376,16 @@ function clearAllErrors() {
 function validateForm() {
     clearAllErrors();
 
-    // Validate mandatory fields: Full Name, Contact Number, Blood Group, Security Verification, and Consent Checkboxes
+    // Validate mandatory fields: Full Name, Date of Birth, Contact Number, Blood Group, Security Verification, and Consent Checkboxes
     const isFullNameValid = validateFullName();
+    const isDateOfBirthValid = validateDateOfBirth();
     const isContactNumberValid = validateContactNumber();
     const isBloodGroupValid = validateBloodGroup();
     const isCaptchaValid = validateCaptcha();
     const isDeclarationValid = validateDeclaration();
     const isPrivacyValid = validatePrivacy();
 
-    return isFullNameValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid &&
+    return isFullNameValid && isDateOfBirthValid && isContactNumberValid && isBloodGroupValid && isCaptchaValid &&
         isDeclarationValid && isPrivacyValid;
 }
 
