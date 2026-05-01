@@ -48,11 +48,11 @@ module.exports = {
         // Background Colors
         background: "#fefefe", // neutral-50 - Clean medical canvas
         surface: "#f8fafc", // slate-50 - Subtle content elevation
-        
+
         // Text Colors
         'text-primary': "#1f2937", // gray-800 - Extended reading comfort
         'text-secondary': "#6b7280", // gray-500 - Clear supporting hierarchy
-        
+
         // Status Colors
         success: "#10b981", // emerald-500 - Celebration of life-saving impact
         warning: "#f59e0b", // amber-500 - Important medical attention

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Proud Donor Poster - Clean Light Version</title>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #111;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+            max-width: 1200px;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            max-height: 80vh;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 20px;
+            margin-top: 20px;
+            background: white;
+        }
+
+        .controls {
+            margin-top: 30px;
+        }
+
+        button {
+            background: #DC2626;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        button:hover {
+            background: #B91C1C;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h2>🩸 Clean Light Theme & Extra Text</h2>
+        <p>Using the original medical pattern background. I've added placeholders for extra text!</p>
+
+        <canvas id="posterCanvas" width="1080" height="1080"></canvas>
+
+        <div class="controls">
+            <button onclick="downloadPoster()">Download High-Res Version</button>
+        </div>
+    </div>
+
+    <script>
+        function drawBloodDrop(ctx, x, y, size) {
+            ctx.beginPath();
+            ctx.moveTo(x, y - size);
+            ctx.bezierCurveTo(
+                x + size, y - size * 0.3,
+                x + size, y + size,
+                x, y + size
+            );
+            ctx.bezierCurveTo(
+                x - size, y + size,
+                x - size, y - size * 0.3,
+                x, y - size
+            );
+            ctx.closePath();
+        }
+
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        async function drawPoster(name, bloodGroup) {
+            const canvas = document.getElementById('posterCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // 1. BASE BACKGROUND - Clean White/Off-White
+            ctx.fillStyle = '#FAFAFA';
+            ctx.fillRect(0, 0, 1080, 1080);
+
+            // 2. MEDICAL PATTERN OVERLAY
+            try {
+                const bgPattern = new Image();
+                bgPattern.src = 'imgs/medical-pattern-bg.png';
+                await new Promise((res, rej) => { bgPattern.onload = res; bgPattern.onerror = rej; setTimeout(rej, 1500); });
+
+                ctx.globalAlpha = 0.8;
+                const pattern = ctx.createPattern(bgPattern, 'repeat');
+                ctx.fillStyle = pattern;
+                ctx.fillRect(0, 0, 1080, 1080);
+                ctx.globalAlpha = 1.0;
+            } catch (error) {
+                console.log("Pattern not loaded");
+            }
+
+            // 3. TOP RED WAVE/HEADER
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(1080, 0);
+            ctx.lineTo(1080, 250);
+            ctx.quadraticCurveTo(540, 380, 0, 250); // Curved bottom
+            ctx.closePath();
+
+            const topGrad = ctx.createLinearGradient(0, 0, 1080, 0);
+            topGrad.addColorStop(0, '#DC2626');
+            topGrad.addColorStop(1, '#991B1B');
+            ctx.fillStyle = topGrad;
+
+            // Shadow for header
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 15;
+            ctx.shadowOffsetY = 5;
+            ctx.fill();
+
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Header Text
+            ctx.fillStyle = '#FFF';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 60px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('PROUD TO BE A LIFESAVER', 540, 100);
+
+            ctx.fillStyle = '#FCD34D'; // Gold
+            ctx.font = '30px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('I just pledged to save lives!', 540, 160);
+
+            // 4. THE HAPPY BLOOD CHARACTER (Far Right)
+            const dropX = 880;
+            const dropY = 640;
+            const dropSize = 400;
+
+            try {
+                const dropImg = new Image();
+                dropImg.src = 'imgs/Happy Blood.png';
+                await new Promise((res, rej) => { dropImg.onload = res; dropImg.onerror = rej; setTimeout(rej, 1500); });
+
+                ctx.shadowColor = 'rgba(220, 38, 38, 0.2)';
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetY = 10;
+
+                ctx.drawImage(dropImg, dropX - dropSize / 2, dropY - dropSize / 2, dropSize, dropSize);
+
+                ctx.shadowBlur = 0;
+                ctx.shadowOffsetY = 0;
+            } catch (error) {
+                console.log("Could not load blood drop image");
+            }
+
+            // 5. THE MASSIVE BLOOD GROUP HIGHLIGHT (Center/Right)
+            const bgTextX = 600;
+            const bgTextY = 580;
+
+            ctx.shadowColor = 'rgba(220, 38, 38, 0.4)';
+            ctx.shadowBlur = 35;
+            ctx.shadowOffsetY = 15;
+
+            const bloodGroupGrad = ctx.createLinearGradient(bgTextX, bgTextY - 80, bgTextX, bgTextY + 80);
+            bloodGroupGrad.addColorStop(0, '#EF4444');
+            bloodGroupGrad.addColorStop(1, '#991B1B');
+
+            ctx.fillStyle = bloodGroupGrad;
+            ctx.font = '900 180px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(bloodGroup, bgTextX, bgTextY);
+
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetY = 0;
+            ctx.textBaseline = 'alphabetic'; // Reset
+
+            // 6. TEXT CONTENT (Stacked vertically on the Left)
+            ctx.textAlign = 'left';
+
+            // Donor Name (Huge Dark Text)
+            ctx.fillStyle = '#111827';
+            ctx.font = '900 75px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText(name, 80, 440);
+
+            // Red Badge Line
+            ctx.fillStyle = '#DC2626';
+            ctx.fillRect(80, 480, 150, 8);
+
+            // --- EXTRA TEXT SECTIONS --- //
+
+            const compatibility = {
+                'A+': 'A+, AB+',
+                'A-': 'A+, A-, AB+, AB-',
+                'B+': 'B+, AB+',
+                'B-': 'B+, B-, AB+, AB-',
+                'AB+': 'AB+',
+                'AB-': 'AB+, AB-',
+                'O+': 'O+, A+, B+, AB+',
+                'O-': 'Everyone (Universal)'
+            };
+            const canDonateTo = compatibility[bloodGroup] || 'Check local guidelines';
+
+            // Label 1
+            ctx.fillStyle = '#6B7280';
+            ctx.font = 'bold 20px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('PLEDGE / COMMITMENT', 80, 560);
+
+            // Value 1
+            ctx.fillStyle = '#111827';
+            ctx.font = '28px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('Emergency Responder', 80, 600);
+
+            // Label 2
+            ctx.fillStyle = '#6B7280';
+            ctx.font = 'bold 20px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('CAN DONATE TO', 80, 680);
+
+            // Value 2
+            ctx.fillStyle = '#DC2626'; // Emphasizing with red text
+            ctx.font = 'bold 28px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText(canDonateTo, 80, 720);
+
+            // Impact statement
+            ctx.fillStyle = '#DC2626';
+            ctx.font = 'italic bold 32px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('"Every drop makes a hero."', 80, 790);
+
+            // Call to Action statement
+            ctx.fillStyle = '#4B5563'; // Dark Gray
+            ctx.font = 'italic 20px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('"I’ve taken the pledge to become a lifesaver. Now it’s your turn!', 80, 830);
+            ctx.fillText('I request all my friends and family to register and join the mission."', 80, 860);
+
+            // 6. FOOTER/BRANDING (Dark Red)
+            ctx.fillStyle = '#991B1B';
+            ctx.fillRect(0, 900, 1080, 180);
+
+            // Try to load the white logo
+            try {
+                const logo = new Image();
+                logo.src = 'imgs/Life-saver-united-logo-white.png';
+                await new Promise((res, rej) => { logo.onload = res; logo.onerror = rej; setTimeout(rej, 1500); });
+                const h = 70;
+                const w = (logo.width / logo.height) * h;
+
+                // Create off-screen canvas to convert the entire logo (including the red icon) to pure white
+                const logoCanvas = document.createElement('canvas');
+                logoCanvas.width = w;
+                logoCanvas.height = h;
+                const logoCtx = logoCanvas.getContext('2d');
+                logoCtx.drawImage(logo, 0, 0, w, h);
+                logoCtx.globalCompositeOperation = 'source-in';
+                logoCtx.fillStyle = '#FFFFFF';
+                logoCtx.fillRect(0, 0, w, h);
+
+                ctx.drawImage(logoCanvas, 80, 955);
+            } catch (e) {
+                ctx.fillStyle = '#FFFFFF';
+                ctx.font = 'bold 36px "Segoe UI", Roboto, Arial, sans-serif';
+                ctx.fillText('LifeSavers United', 80, 1000);
+            }
+
+            // Website on right
+            ctx.textAlign = 'right';
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 34px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('www.lifesaversunited.org', 1000, 980);
+
+            ctx.fillStyle = '#FCA5A5';
+            ctx.font = '24px "Segoe UI", Roboto, Arial, sans-serif';
+            ctx.fillText('Join the mission. Register today.', 1000, 1020);
+        }
+
+        function downloadPoster() {
+            const canvas = document.getElementById('posterCanvas');
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.download = `clean-donor-Nikunj.png`;
+                a.href = url;
+                a.click();
+                URL.revokeObjectURL(url);
+            }, 'image/png');
+        }
+
+        window.onload = () => {
+            drawPoster('Nikunj Mistri', 'O+');
+        };
+    </script>
+<script id="dhws-dataInjector" src="/public/dhws-data-injector.js"></script>
+</body>
+
+</html>

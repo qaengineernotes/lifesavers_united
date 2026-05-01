@@ -6,64 +6,106 @@
 
 :root {
   /* Primary Colors */
-  --color-primary: #dc2626; /* red-600 - Empowering life-force, heroic action */
-  --color-primary-50: #fef2f2; /* red-50 */
-  --color-primary-100: #fee2e2; /* red-100 */
-  --color-primary-200: #fecaca; /* red-200 */
-  --color-primary-300: #fca5a5; /* red-300 */
-  --color-primary-400: #f87171; /* red-400 */
-  --color-primary-500: #ef4444; /* red-500 */
-  --color-primary-600: #dc2626; /* red-600 */
-  --color-primary-700: #b91c1c; /* red-700 */
-  --color-primary-800: #991b1b; /* red-800 */
-  --color-primary-900: #7f1d1d; /* red-900 */
+  --color-primary: #dc2626;
+  /* red-600 - Empowering life-force, heroic action */
+  --color-primary-50: #fef2f2;
+  /* red-50 */
+  --color-primary-100: #fee2e2;
+  /* red-100 */
+  --color-primary-200: #fecaca;
+  /* red-200 */
+  --color-primary-300: #fca5a5;
+  /* red-300 */
+  --color-primary-400: #f87171;
+  /* red-400 */
+  --color-primary-500: #ef4444;
+  /* red-500 */
+  --color-primary-600: #dc2626;
+  /* red-600 */
+  --color-primary-700: #b91c1c;
+  /* red-700 */
+  --color-primary-800: #991b1b;
+  /* red-800 */
+  --color-primary-900: #7f1d1d;
+  /* red-900 */
 
   /* Secondary Colors */
-  --color-secondary: #1e40af; /* blue-700 - Trustworthy medical authority */
-  --color-secondary-50: #eff6ff; /* blue-50 */
-  --color-secondary-100: #dbeafe; /* blue-100 */
-  --color-secondary-200: #bfdbfe; /* blue-200 */
-  --color-secondary-300: #93c5fd; /* blue-300 */
-  --color-secondary-400: #60a5fa; /* blue-400 */
-  --color-secondary-500: #3b82f6; /* blue-500 */
-  --color-secondary-600: #2563eb; /* blue-600 */
-  --color-secondary-700: #1d4ed8; /* blue-700 */
-  --color-secondary-800: #1e3a8a; /* blue-800 */
-  --color-secondary-900: #1e40af; /* blue-900 */
+  --color-secondary: #1e40af;
+  /* blue-700 - Trustworthy medical authority */
+  --color-secondary-50: #eff6ff;
+  /* blue-50 */
+  --color-secondary-100: #dbeafe;
+  /* blue-100 */
+  --color-secondary-200: #bfdbfe;
+  /* blue-200 */
+  --color-secondary-300: #93c5fd;
+  /* blue-300 */
+  --color-secondary-400: #60a5fa;
+  /* blue-400 */
+  --color-secondary-500: #3b82f6;
+  /* blue-500 */
+  --color-secondary-600: #2563eb;
+  /* blue-600 */
+  --color-secondary-700: #1d4ed8;
+  /* blue-700 */
+  --color-secondary-800: #1e3a8a;
+  /* blue-800 */
+  --color-secondary-900: #1e40af;
+  /* blue-900 */
 
   /* Accent Colors */
-  --color-accent: #059669; /* emerald-600 - Positive health outcomes */
-  --color-accent-50: #ecfdf5; /* emerald-50 */
-  --color-accent-100: #d1fae5; /* emerald-100 */
-  --color-accent-200: #a7f3d0; /* emerald-200 */
-  --color-accent-300: #6ee7b7; /* emerald-300 */
-  --color-accent-400: #34d399; /* emerald-400 */
-  --color-accent-500: #10b981; /* emerald-500 */
-  --color-accent-600: #059669; /* emerald-600 */
-  --color-accent-700: #047857; /* emerald-700 */
-  --color-accent-800: #065f46; /* emerald-800 */
-  --color-accent-900: #064e3b; /* emerald-900 */
+  --color-accent: #059669;
+  /* emerald-600 - Positive health outcomes */
+  --color-accent-50: #ecfdf5;
+  /* emerald-50 */
+  --color-accent-100: #d1fae5;
+  /* emerald-100 */
+  --color-accent-200: #a7f3d0;
+  /* emerald-200 */
+  --color-accent-300: #6ee7b7;
+  /* emerald-300 */
+  --color-accent-400: #34d399;
+  /* emerald-400 */
+  --color-accent-500: #10b981;
+  /* emerald-500 */
+  --color-accent-600: #059669;
+  /* emerald-600 */
+  --color-accent-700: #047857;
+  /* emerald-700 */
+  --color-accent-800: #065f46;
+  /* emerald-800 */
+  --color-accent-900: #064e3b;
+  /* emerald-900 */
 
   /* Background Colors */
-  --color-background: #fefefe; /* neutral-50 - Clean medical canvas */
-  --color-surface: #f8fafc; /* slate-50 - Subtle content elevation */
+  --color-background: #fefefe;
+  /* neutral-50 - Clean medical canvas */
+  --color-surface: #f8fafc;
+  /* slate-50 - Subtle content elevation */
 
   /* Text Colors */
-  --color-text-primary: #1f2937; /* gray-800 - Extended reading comfort */
-  --color-text-secondary: #6b7280; /* gray-500 - Clear supporting hierarchy */
+  --color-text-primary: #1f2937;
+  /* gray-800 - Extended reading comfort */
+  --color-text-secondary: #6b7280;
+  /* gray-500 - Clear supporting hierarchy */
 
   /* Status Colors */
-  --color-success: #10b981; /* emerald-500 - Celebration of life-saving impact */
-  --color-warning: #f59e0b; /* amber-500 - Important medical attention */
-  --color-error: #ef4444; /* red-500 - Helpful medical concern */
+  --color-success: #10b981;
+  /* emerald-500 - Celebration of life-saving impact */
+  --color-warning: #f59e0b;
+  /* amber-500 - Important medical attention */
+  --color-error: #ef4444;
+  /* red-500 - Helpful medical concern */
 
   /* Shadow Variables */
   --shadow-minimal: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
 
   /* Border Variables */
-  --border-color: #e5e7eb; /* gray-200 */
-  --border-input: #d1d5db; /* gray-300 */
+  --border-color: #e5e7eb;
+  /* gray-200 */
+  --border-input: #d1d5db;
+  /* gray-300 */
 }
 
 /* Base Styles */
@@ -75,7 +117,12 @@
     line-height: 1.6;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: 'Inter', sans-serif;
     font-weight: 600;
     line-height: 1.2;

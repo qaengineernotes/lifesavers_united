@@ -480,6 +480,11 @@ async function handleFormSubmission(e) {
             showSuccessMessage();
             e.target.reset(); // Reset form on success
 
+            // Trigger the social sharing poster modal
+            if (data.fullName && data.bloodGroup) {
+                showDonorPosterModal(data.fullName, data.bloodGroup);
+            }
+
             // --- Send confirmation emails (fire-and-forget, non-blocking) ---
             // Calls the CF Pages Function which emails the donor + admin
             if (data.email) {
@@ -487,38 +492,38 @@ async function handleFormSubmission(e) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        fullName:           data.fullName,
-                        bloodGroup:         data.bloodGroup,
-                        city:               data.city,
-                        area:               data.area,
-                        email:              data.email,
-                        contactNumber:      data.contactNumber,
-                        dateOfBirth:        data.dateOfBirth,
+                        fullName: data.fullName,
+                        bloodGroup: data.bloodGroup,
+                        city: data.city,
+                        area: data.area,
+                        email: data.email,
+                        contactNumber: data.contactNumber,
+                        dateOfBirth: data.dateOfBirth,
                         emergencyAvailable: data.emergencyAvailable,
-                        preferredContact:   data.preferredContact,
+                        preferredContact: data.preferredContact,
                     }),
                 }).then(r => r.json())
-                  .then(result => console.log('📧 Email notification:', result))
-                  .catch(err  => console.warn('📧 Email send failed (registration still saved):', err));
+                    .then(result => console.log('📧 Email notification:', result))
+                    .catch(err => console.warn('📧 Email send failed (registration still saved):', err));
             } else {
                 // No donor email — still notify admin
                 fetch('/donor-registration', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        fullName:           data.fullName,
-                        bloodGroup:         data.bloodGroup,
-                        city:               data.city,
-                        area:               data.area,
-                        email:              '',
-                        contactNumber:      data.contactNumber,
-                        dateOfBirth:        data.dateOfBirth,
+                        fullName: data.fullName,
+                        bloodGroup: data.bloodGroup,
+                        city: data.city,
+                        area: data.area,
+                        email: '',
+                        contactNumber: data.contactNumber,
+                        dateOfBirth: data.dateOfBirth,
                         emergencyAvailable: data.emergencyAvailable,
-                        preferredContact:   data.preferredContact,
+                        preferredContact: data.preferredContact,
                     }),
                 }).then(r => r.json())
-                  .then(result => console.log('📧 Admin notification:', result))
-                  .catch(err  => console.warn('📧 Admin email failed:', err));
+                    .then(result => console.log('📧 Admin notification:', result))
+                    .catch(err => console.warn('📧 Admin email failed:', err));
             }
         } else {
             showErrorMessage(finalResult.message || 'Failed to register. Please try again.');
@@ -746,4 +751,121 @@ function setupCityDropdown() {
             suggestionsContainer.classList.add('hidden');
         }
     });
+}
+
+// Show the dynamic "Proud Donor" Poster Modal
+async function showDonorPosterModal(name, bloodGroup) {
+    // Create modal container
+    const modal = document.createElement('div');
+    modal.className = 'custom-donor-modal';
+
+    // Add loading text
+    modal.innerHTML = `
+        <div style="color: white; font-size: 1.25rem; font-weight: bold; display: flex; flex-direction: column; align-items: center;">
+            <svg style="animation: spin-custom 1s linear infinite; margin-bottom: 1rem; width: 2.5rem; height: 2.5rem;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle style="opacity: 0.25;" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path style="opacity: 0.75;" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Generating your Proud Donor Badge...
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Trigger transition
+    requestAnimationFrame(() => {
+        modal.style.opacity = '1';
+    });
+
+    try {
+        const { generateDonorPoster } = await import('./donor-poster-generator.js');
+        const blob = await generateDonorPoster(name, bloodGroup);
+        const imageUrl = URL.createObjectURL(blob);
+
+        // Update modal with the generated image
+        modal.innerHTML = `
+            <div class="custom-donor-content" id="posterModalContent">
+                <button id="closePosterModal" class="custom-donor-close">✕</button>
+                
+                <div style="text-align: center; margin-bottom: 1rem; margin-top: 0.5rem;">
+                    <h3 style="font-size: 1.5rem; font-weight: bold; color: #dc2626; margin: 0 0 0.25rem 0;">You are a Hero! 🎉</h3>
+                    <p style="color: #4b5563; font-size: 0.875rem; margin: 0;">Share your pledge and inspire others.</p>
+                </div>
+                
+                <div style="background: #f3f4f6; border-radius: 0.75rem; padding: 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: center; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);">
+                    <img src="${imageUrl}" alt="Proud Donor Badge" style="max-width: 100%; height: auto; max-height: 45vh; object-fit: contain; border-radius: 0.5rem;">
+                </div>
+                
+                <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <button id="sharePosterBtn" class="custom-donor-btn-primary">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        Share on Social Media
+                    </button>
+                    <button id="downloadPosterBtn" class="custom-donor-btn-secondary">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        Download Image
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // Animate content in
+        requestAnimationFrame(() => {
+            const content = document.getElementById('posterModalContent');
+            if (content) {
+                content.style.transform = 'scale(1)';
+                content.style.opacity = '1';
+            }
+        });
+
+        // Event listeners
+        document.getElementById('closePosterModal').addEventListener('click', () => {
+            modal.style.opacity = '0';
+            setTimeout(() => { modal.remove(); URL.revokeObjectURL(imageUrl); }, 300);
+        });
+
+        // Close on clicking outside
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.opacity = '0';
+                setTimeout(() => { modal.remove(); URL.revokeObjectURL(imageUrl); }, 300);
+            }
+        });
+
+        // Share button
+        document.getElementById('sharePosterBtn').addEventListener('click', async () => {
+            const file = new File([blob], 'lifesavers-united-proud-donor.png', { type: 'image/png' });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({
+                        title: 'I just became a blood donor!',
+                        text: '🩸 I just took the pledge to save lives with LifeSavers United! Be a hero today—your single blood donation can save up to 3 lives. 💪\n\nLet\'s make a difference together! Register now and join the mission: https://lifesaversunited.org/donor_registration',
+                        url: 'https://lifesaversunited.org/donor_registration',
+                        files: [file]
+                    });
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                }
+            } else {
+                // Fallback: If share API doesn't support files or isn't available
+                alert('Your device does not support direct image sharing. Please download the image and share it manually!');
+            }
+        });
+
+        // Download button
+        document.getElementById('downloadPosterBtn').addEventListener('click', () => {
+            const a = document.createElement('a');
+            a.href = imageUrl;
+            a.download = `proud-donor-${name.replace(/\s+/g, '-')}.png`;
+            a.click();
+        });
+
+    } catch (error) {
+        console.error('Error generating poster:', error);
+        modal.innerHTML = `
+            <div style="background: white; border-radius: 1rem; padding: 1.5rem; max-width: 24rem; margin: 1rem; text-align: center;">
+                <p style="color: #ef4444; margin-bottom: 1rem; font-weight: 500;">Sorry, we couldn't generate your badge right now.</p>
+                <button onclick="this.parentElement.parentElement.remove()" style="padding: 0.5rem 1rem; background: #f3f4f6; border: none; border-radius: 0.5rem; cursor: pointer; font-weight: 500;">Close</button>
+            </div>
+        `;
+    }
 }
