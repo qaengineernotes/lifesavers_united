@@ -11,7 +11,7 @@ export async function generateDonorPoster(name, bloodGroup) {
     // 2. MEDICAL PATTERN OVERLAY
     try {
         const bgPattern = new Image();
-        bgPattern.src = 'imgs/medical-pattern-bg.png';
+        bgPattern.src = 'imgs/medical-pattern-bg.webp';
         await new Promise((res, rej) => { bgPattern.onload = res; bgPattern.onerror = rej; setTimeout(rej, 1500); });
 
         ctx.globalAlpha = 0.8;
@@ -63,7 +63,7 @@ export async function generateDonorPoster(name, bloodGroup) {
 
     try {
         const dropImg = new Image();
-        dropImg.src = 'imgs/Happy Blood.png';
+        dropImg.src = 'imgs/Happy-Blood.webp';
         await new Promise((res, rej) => { dropImg.onload = res; dropImg.onerror = rej; setTimeout(rej, 1500); });
 
         ctx.shadowColor = 'rgba(220, 38, 38, 0.2)';
@@ -164,7 +164,7 @@ export async function generateDonorPoster(name, bloodGroup) {
     // Try to load the white logo
     try {
         const logo = new Image();
-        logo.src = 'imgs/Life-saver-united-logo-white.png';
+        logo.src = 'imgs/Life-saver-united-logo-white.webp';
         await new Promise((res, rej) => { logo.onload = res; logo.onerror = rej; setTimeout(rej, 1500); });
         const h = 70;
         const w = (logo.width / logo.height) * h;

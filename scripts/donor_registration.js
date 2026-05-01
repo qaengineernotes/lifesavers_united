@@ -838,7 +838,7 @@ async function showDonorPosterModal(name, bloodGroup) {
                 try {
                     await navigator.share({
                         title: 'I just became a blood donor!',
-                        text: '🩸 I just took the pledge to save lives with LifeSavers United! Be a hero today—your single blood donation can save up to 3 lives. 💪\n\nLet\'s make a difference together! Register now and join the mission: https://lifesaversunited.org/donor_registration',
+                        text: '🩸 I just took the pledge to save lives with LifeSavers United! Be a hero today—your single blood donation can save up to 3 lives. 💪\n\nLet\'s make a difference together! Register now and join the mission: ',
                         url: 'https://lifesaversunited.org/donor_registration',
                         files: [file]
                     });
