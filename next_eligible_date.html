@@ -679,7 +679,7 @@
         </svg>
     </a>
 
-    <div id="copied-toast">Copied!</div>
+    <div id="copied-toast" style="display: none;">Copied!</div>
 
     <!-- Javascript Logic -->
     <script>
@@ -1007,9 +1007,15 @@ END:VCALENDAR`;
 
             function showToast() {
                 const toast = document.getElementById('copied-toast');
+                toast.style.display = 'block';
+                // Trigger reflow
+                toast.offsetHeight;
                 toast.classList.add('show');
                 setTimeout(() => {
                     toast.classList.remove('show');
+                    setTimeout(() => {
+                        toast.style.display = 'none';
+                    }, 300); // Match transition duration
                 }, 2000);
             }
 
