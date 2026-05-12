@@ -3705,6 +3705,14 @@ html {
   transform: translateY(-1px);
 }
 
+.reopen-btn {
+  background: #4f46e5 !important; /* Indigo */
+}
+
+.reopen-btn:hover {
+  background: #4338ca !important;
+}
+
 /* Loading State */
 .loading-state {
   text-align: center;
@@ -7919,4 +7927,129 @@ article.py-16 {
 #copied-toast.show {
   opacity: 1;
   transform: translateX(0);
+}
+
+/* --- Smart Donation Planner Styles --- */
+.blood-gradient {
+  background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+}
+
+.roadmap-card {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  border-top: 4px solid #e11d48;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.roadmap-step {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
+  border-left: 2px solid #e2e8f0;
+}
+
+.roadmap-step::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e11d48;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 1px #e2e8f0;
+}
+
+.roadmap-step.wb-step::before {
+  background-color: #e11d48;
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.3);
+}
+
+.roadmap-step.sdp-step::before {
+  background-color: #10b981;
+}
+
+.planner-advice-card {
+  background-color: #f8fafc;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #f1f5f9;
+}
+
+.planner-advice-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  color: #e11d48;
+}
+
+.planner-list {
+  font-size: 0.8125rem;
+  color: #64748b;
+  list-style-type: disc;
+  margin-left: 1.25rem;
+}
+
+.planner-list li {
+  margin-bottom: 0.5rem;
+}
+
+.planner-input-wrapper {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.reset-field-btn {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 30 !important;
+  cursor: pointer !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+
+.reset-field-btn:hover {
+  background: #fee2e2 !important;
+  color: #ef4444 !important;
+}
+
+/* Segmented Toggle Control */
+.planner-toggle-container {
+  display: flex !important;
+  background: #f1f5f9 !important;
+  padding: 4px !important;
+  border-radius: 12px !important;
+  gap: 4px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.planner-toggle-btn {
+  flex: 1 !important;
+  padding: 10px 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  color: #64748b !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+.planner-toggle-btn.active {
+  background: white !important;
+  color: #e11d48 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }

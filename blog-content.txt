@@ -1,256 +1,106 @@
-# Feature Specification: "Next Eligible Date" Calculator
-### Website: LifeSaversUnited.org
-### Version: 1.0
-### Authority Reference: CDSCO (Central Drugs Standard Control Organisation), NBTC (National Blood Transfusion Council), MoHFW (Ministry of Health & Family Welfare), eRaktKosh Guidelines — India
-
----
-
-## 1. OVERVIEW & PURPOSE
-
-The "Next Eligible Date" feature is a self-service tool on LifeSaversUnited.org that helps blood donors in India find out when they are next eligible to donate — based on their last donation date and the type of donation they made. Additionally, it shows them when they become eligible for ALL other types of donations, not just the one they last did. To make it actionable, donors can set a calendar reminder directly from the results page for any donation type they choose.
-
-The goal is to increase repeat donations by removing the guesswork from the process, keeping donors informed, and making it easy for them to commit to their next donation before they even leave the page.
-
----
-
-## 2. WHO WILL USE THIS FEATURE
-
-This feature is for any blood donor in India who has previously donated blood or blood components and wants to know:
-
-- When they can safely donate again
-- What types of donations they are eligible for and when
-- How to set a reminder so they don't forget their next donation date
-
-No login or account is required to use this feature. It is open to all visitors of the website.
-
----
-
-## 3. WHAT THE USER NEEDS TO PROVIDE (INPUT FIELDS)
-
-The feature will ask the donor to fill in two simple pieces of information:
-
-**Field 1 — Last Donation Date**
-The donor selects or types the date on which they last donated. This should be a date picker that allows selection of any past date. Future dates should be blocked. The system should also prevent dates older than 5 years, as such old data is not practically useful.
-
-**Field 2 — Last Donation Type**
-The donor selects from a dropdown menu what type of donation they made last time. The options, based on Indian guidelines, are:
-
-- Whole Blood
-- Single Donor Platelets (SDP / Plateletpheresis)
-- Plasma (Apheresis)
-- Double Red Cell (Apheresis)
-- Packed Red Blood Cells (pRBC — component from whole blood)
-
-A small tooltip or info icon should appear next to each option explaining what it means in simple language, because many donors may not know the technical name of the donation they made. For example, next to "Whole Blood" the tooltip can say: "The most common type — a full unit of blood collected from your arm in about 10–15 minutes."
-
-**Optional Field 3 — Donor Gender**
-Since Indian guidelines (NBTC) specify different waiting periods for male and female whole blood donors, the tool should ask for gender when "Whole Blood" is selected as the last donation type. The options should be Male and Female. This field only appears when Whole Blood is selected. For all other donation types, the waiting period is the same regardless of gender.
-
----
-
-## 4. THE CORE LOGIC — WAITING PERIODS (INDIA / CDSCO / NBTC GUIDELINES)
-
-The following waiting periods are based on official Indian blood donation guidelines issued by CDSCO, NBTC under MoHFW, and eRaktKosh (the national blood bank management system).
-
----
-
-### 4A. WAITING PERIOD AFTER WHOLE BLOOD DONATION
-
-If the donor's last donation was Whole Blood:
-
-- Male donors must wait a minimum of 3 months (90 days) before donating Whole Blood again.
-- Female donors must wait a minimum of 4 months (120 days) before donating Whole Blood again.
-- Before donating Single Donor Platelets (SDP), any donor must wait a minimum of 4 weeks (28 days) after a Whole Blood donation.
-- Before donating Plasma via Apheresis, the donor must wait a minimum of 4 weeks (28 days) after a Whole Blood donation.
-- Double Red Cell donation requires a minimum wait of 6 months (180 days) after Whole Blood.
-
----
-
-### 4B. WAITING PERIOD AFTER SINGLE DONOR PLATELETS (SDP / PLATELETPHERESIS)
-
-If the donor's last donation was Single Donor Platelets:
-
-- The donor may donate SDP again after a minimum of 2 days (48 hours). However, they must not exceed 24 SDP donations in a calendar year and not more than 2 per week.
-- Before donating Whole Blood, the donor must wait a minimum of 4 weeks (28 days) after an SDP donation.
-- Before donating Plasma via Apheresis, the donor must wait a minimum of 7 days after an SDP donation.
-- Double Red Cell donation requires a minimum wait of 4 weeks (28 days) after SDP.
-
----
-
-### 4C. WAITING PERIOD AFTER PLASMA (APHERESIS)
-
-If the donor's last donation was Plasma via Apheresis:
-
-- The donor may donate Plasma again after a minimum of 14 days (2 weeks). Plasma via Apheresis can be donated up to every 2 weeks.
-- Before donating Whole Blood, the donor must wait a minimum of 4 weeks (28 days) after a Plasma donation.
-- Before donating Single Donor Platelets (SDP), the donor must wait a minimum of 7 days after a Plasma donation.
-- Double Red Cell donation requires a minimum wait of 4 weeks (28 days) after Plasma.
-
----
-
-### 4D. WAITING PERIOD AFTER DOUBLE RED CELL (APHERESIS)
-
-If the donor's last donation was Double Red Cell:
-
-- The donor must wait a minimum of 6 months (180 days) before donating Double Red Cell again.
-- Before donating Whole Blood, the donor must wait a minimum of 6 months (180 days).
-- Before donating SDP, the donor must wait a minimum of 4 weeks (28 days).
-- Before donating Plasma, the donor must wait a minimum of 4 weeks (28 days).
-
----
-
-### 4E. WAITING PERIOD AFTER PACKED RED BLOOD CELLS (pRBC — Component)
-
-This is when a donor donated whole blood and the component was separated at the blood bank. The waiting period logic is the same as Whole Blood donation, since the full volume of red blood cells was collected.
-
-Apply the same rules as Whole Blood for this type.
-
----
-
-## 5. WHAT THE SYSTEM WILL DISPLAY (OUTPUT / RESULTS SCREEN)
-
-Once the donor submits their last donation date and type, the system calculates and displays a results card. This results card shows:
-
-**Section A — Your Last Donation Summary**
-A brief confirmation line at the top, for example:
-"You last donated Whole Blood on 15 January 2025."
-
-**Section B — Next Eligible Dates Table**
-A clear table or card layout showing all donation types and when the donor can next donate each one. The table should have:
-
-- Donation Type (e.g., Whole Blood, Single Donor Platelets, Plasma, Double Red Cell)
-- Next Eligible Date (shown as a full date, e.g., 15 April 2025)
-- Days Remaining (how many more days from today until eligible, e.g., "12 more days" OR "Eligible Today" OR "Already Eligible — you can donate now")
-- Status indicator — a simple visual tag: GREEN for already eligible, ORANGE for eligible within 30 days, RED for more than 30 days away
-- A "Set Reminder" button next to each row
-
-If a donation type has the same eligible date as another, group them together with a note.
-
-**Section C — Special Notice for SDP**
-If the donor's last donation was SDP and they are an SDP donor, show a note:
-"Per Indian guidelines, SDP can be donated up to 24 times per year and not more than twice per week. Please keep track of your annual donation count."
-
-**Section D — Health Reminder Note**
-At the bottom of the results, display a standard disclaimer in a small box:
-"These dates are calculated based on NBTC/CDSCO guidelines for Indian blood donors. Final eligibility is always determined by the blood bank's medical officer on the day of donation through a health screening. Factors such as haemoglobin levels (minimum 12.5 g/dL), body weight (minimum 45–50 kg), blood pressure, pulse, and recent illnesses or medications may affect your eligibility on the day."
-
----
-
-## 6. SET REMINDER FEATURE (CALENDAR INTEGRATION)
-
-Next to each donation type in the results table, there is a "Set Reminder" button. When clicked, this opens a small popup or dropdown offering the following calendar options:
-
-- Add to Google Calendar
-- Add to Apple Calendar (downloads .ics file)
-- Add to Outlook Calendar (downloads .ics file)
-- Copy Date to Clipboard (plain text fallback)
-
-**What the reminder should contain:**
-- Title: "Time to Donate Blood — [Donation Type]" (e.g., "Time to Donate Blood — Whole Blood")
-- Date: The exact eligible date calculated by the system
-- Description: A short message such as — "You are now eligible to donate [Donation Type] as per Indian NBTC guidelines. Visit your nearest blood bank or book a donation camp at LifeSaversUnited.org."
-- Optional Location field: Left blank, or pre-filled with "Nearest Blood Bank" as placeholder text
-- Reminder alert: Set to trigger 1 day before the eligible date and again on the morning of the eligible date (for Google Calendar and Outlook integrations)
-
-For Apple Calendar and Outlook, the system generates a standard .ics file that downloads automatically when the user clicks the option.
-
-For Google Calendar, it opens a new browser tab with the Google Calendar event creation page pre-filled with all the details above using Google Calendar's URL parameters.
-
----
-
-## 7. ADDITIONAL FEATURES & SMART BEHAVIOURS
-
-**7A — "You Can Donate Today" Banner**
-If the system calculates that the donor is already past their waiting period for any donation type, a prominent banner appears at the top of the results saying:
-"Great news! You are already eligible to donate [Donation Type]. Find a blood bank near you today."
-This banner should link to the blood bank locator on the website or to eRaktKosh's locator.
-
-**7B — Share Results**
-A "Share" button below the results card that allows the donor to share their next eligible dates with a friend or family member via WhatsApp, SMS, or copy link. This is useful to encourage peer motivation and group donations.
-
-**7C — "Plan Ahead" Button**
-Below the results, a button labeled "Plan My Next Donation" which, when clicked, opens a simple prompt asking "Would you like to schedule a donation reminder for your next eligible date?" and pre-selects the soonest eligible donation type as the default.
-
-**7D — No Account Needed**
-The results are displayed immediately without requiring the user to create an account or log in. However, if the user IS logged in, the system should optionally save their last donation record to their profile for future reference and auto-fill next time.
-
-**7E — Mobile Responsive**
-The entire feature — the input form, results table, and reminder popup — must be fully functional on mobile devices. Many donors in India access the web via smartphone. Buttons must be large enough to tap comfortably. The table should stack vertically on smaller screens.
-
-**7F — Language Support (Future Scope)**
-While the initial version should be in English, the feature should be built in a way that makes it easy to add Gujarati and Hindi language options in a future update, since LifeSaversUnited.org serves a primarily Gujarat-based community.
-
----
-
-## 8. IMPORTANT EDGE CASES TO HANDLE
-
-The system must handle these situations gracefully:
-
-**Edge Case 1 — Date in the Future**
-If the donor accidentally enters a future date as their last donation date, show an error: "Last donation date cannot be in the future. Please check and re-enter."
-
-**Edge Case 2 — Already Eligible**
-If the waiting period has already passed, do not show a negative number. Show "Already Eligible" in green instead of "-5 days."
-
-**Edge Case 3 — Same Day Eligibility**
-If the eligible date is today, show "Eligible Today" rather than 0 days.
-
-**Edge Case 4 — SDP Annual Limit**
-If the donor selects SDP as their last donation type, show a note below the SDP row: "Note: You are permitted a maximum of 24 SDP donations per year as per Indian guidelines. Please track your annual count."
-
-**Edge Case 5 — Unknown Donation Type**
-If a donor is unsure what type they donated, add a "Not Sure?" link near the dropdown that opens a simple one-page guide explaining the difference between donation types in plain, non-medical language with visual icons.
-
-**Edge Case 6 — Very Old Donation Date**
-If the last donation was more than 2 years ago, display all donation types as "Already Eligible" and add a note: "It has been a while since your last donation — your body has had plenty of time to recover. You should be eligible to donate any type now, subject to health screening on the day."
-
----
-
-## 9. COMPLIANCE & MEDICAL DISCLAIMER
-
-This feature is an informational tool only and is based on the following official Indian authorities and their published guidelines:
-
-- CDSCO — Central Drugs Standard Control Organisation (under MoHFW)
-- NBTC — National Blood Transfusion Council
-- NACO — National AIDS Control Organisation
-- eRaktKosh — National Blood Bank Management System (MoHFW)
-- Drugs and Cosmetics Act, 1940 and its Amendments — Schedule F Part XII B (Blood Bank Regulations)
-
-The feature must display a medical disclaimer on the results page clarifying that:
-
-1. The dates shown are minimum waiting periods as per national guidelines.
-2. Final eligibility is always determined by a qualified medical officer at the blood bank on the day of donation.
-3. Donors with specific health conditions, recent illnesses, surgeries, vaccinations, medications, or travel history may have additional deferral periods beyond what this tool shows.
-4. The website is not a medical authority and this tool does not constitute medical advice.
-5. Donors are encouraged to contact their nearest licensed blood bank for any questions about their specific eligibility.
-
----
-
-## 10. SUMMARY TABLE — WAITING PERIODS AT A GLANCE
-
-The following table summarises all the waiting periods this feature will use, based on Indian NBTC/CDSCO guidelines:
-
-| Previous Donation Type | Wait Before Next Whole Blood | Wait Before Next SDP | Wait Before Next Plasma | Wait Before Next Double Red Cell |
-|------------------------|------------------------------|----------------------|-------------------------|----------------------------------|
-| Whole Blood (Male) | 90 days (3 months) | 28 days | 28 days | 180 days |
-| Whole Blood (Female) | 120 days (4 months) | 28 days | 28 days | 180 days |
-| Single Donor Platelets | 28 days | 2 days (max 24/year) | 7 days | 28 days |
-| Plasma (Apheresis) | 28 days | 7 days | 14 days | 28 days |
-| Double Red Cell | 180 days | 28 days | 28 days | 180 days |
-
----
-
-## 11. WHAT THIS FEATURE IS NOT
-
-To keep the scope clear, this version of the feature will NOT:
-
-- Check or verify the donor's actual health status or haemoglobin levels
-- Connect to any hospital or blood bank database to verify past donations
-- Show real-time blood availability or urgency at nearby blood banks (that is a separate feature)
-- Send automated SMS or email reminders (calendar integration handles this via the user's own calendar app)
-- Replace the official screening done by the blood bank on donation day
-
----
-
-*Document prepared for LifeSaversUnited.org — Next Eligible Date Feature — v1.0*
-*Authority References: CDSCO, NBTC, NACO, eRaktKosh, MoHFW India*
+Serum Protein Test for Regular SDP Donors: What Every Platelet Donor in India Should Know
+Published by LifeSavers United | lifesaversunited.org
+
+A Message Before We Begin
+If you are someone who donates platelets regularly, first of all, thank you. Single Donor Platelet donation, which most people in India know as SDP donation, is one of the most generous and impactful things a person can do. The platelets you donate go directly to cancer patients, thalassemia children, accident victims, and people undergoing major surgeries. Your contribution is not just a medical procedure. It is a lifeline for real people and real families.
+But because you donate regularly and because platelet donation works differently from whole blood donation, your body deserves extra attention and care. One of the most important ways to protect your health as a regular SDP donor is through a simple but significant test called the Serum Protein Test.
+This blog is written for you. It explains what this test is, why it matters, and how it fits into your journey as a responsible and healthy platelet donor in India.
+
+What Is SDP Donation and Why Is It Different
+Before we understand the serum protein test, it helps to understand what makes SDP donation unique.
+Single Donor Platelet donation is a process called apheresis. During this procedure, blood is drawn from your arm, passed through a special machine that separates out only the platelets, and then the remaining components including red blood cells and plasma are returned to your body. The entire process takes about 60 to 90 minutes and is done at apheresis centres in hospitals and blood banks across India.
+Because only platelets are removed and the rest of the blood is returned, SDP donation is considered safer in many ways than whole blood donation. It also means that a healthy person can donate platelets more frequently, usually once every two to four weeks, depending on the guidelines followed by the blood bank.
+However, this frequency comes with a responsibility. Because you are donating more often, your body needs to consistently recover well. And that recovery depends significantly on your protein levels.
+
+What Is a Serum Protein Test
+A serum protein test is a blood test that measures the total amount of protein present in the liquid part of your blood, which is called serum. It primarily measures two key proteins: albumin and globulin. Together, these are reported as total serum protein.
+Proteins in your blood are not just numbers on a lab report. They perform essential functions in your body. They help carry nutrients and hormones. They support your immune system. They regulate fluid balance between your blood vessels and tissues. They assist in clotting. And importantly, they help your body recover after procedures like platelet donation.
+Normal total serum protein levels in adults are generally between 6.0 and 8.3 grams per decilitre, though individual blood banks and hospitals in India may use slightly varying reference ranges based on their laboratory standards.
+For a regular SDP donor, the serum protein test is a way of checking that your body is maintaining these levels adequately despite the frequency of donation.
+
+Why Regular SDP Donors Need This Test
+Here is something that many donors do not fully realise. When you donate platelets, small amounts of plasma proteins are also removed along with the platelets during the apheresis process. Modern apheresis machines used in India are designed to minimise this, but over time and with repeated donations, there can be a gradual impact on your protein levels if your diet and recovery are not adequate.
+A person who donates platelets once and never again faces a very different physiological situation from someone who donates every three to four weeks throughout the year. The regular donor's body is continuously asked to replenish what has been taken. If protein intake or absorption is insufficient, levels can slowly drop without the donor even noticing.
+Low protein levels, a condition called hypoproteinemia, can cause fatigue, reduced immunity, slow healing, fluid retention, and a general decline in physical wellbeing. In more significant cases it can affect organ function. None of these outcomes are what anyone wants for a person who is voluntarily giving their time and health to save others.
+The serum protein test is simply a way of making sure your body is keeping up. It is a check in, a health safeguard, and a way for the blood bank and medical team to catch any decline early before it becomes a problem.
+
+What Indian Blood Bank Guidelines Say
+Blood banks and apheresis centres in India operate under the guidelines set by the Drugs and Cosmetic Act, the National Blood Transfusion Council, and the standards maintained by the National AIDS Control Organisation. Many leading hospitals also follow international standards from organisations like the AABB and WHO as a reference.
+Under these frameworks, regular SDP donors are expected to meet certain eligibility criteria before each donation. Total serum protein is one of the parameters checked to confirm donor fitness. Most centres in India require a minimum total serum protein level of 6.0 g/dL or above before allowing a donor to proceed with apheresis.
+In practice, the approach varies across centres. Some hospitals check serum protein before every donation session. Others conduct it at regular intervals, such as every three months for donors who donate frequently. Some centres test it only when a donor reports symptoms or when routine haematological values raise a concern.
+The important point is that this test is not optional or bureaucratic. It exists because donor safety is a medical and ethical priority for every responsible blood bank in India.
+
+Real Situations from Indian Apheresis Centres
+Let us look at some everyday scenarios that help illustrate why this test matters.
+Consider Ramesh, a 34 year old IT professional from Hyderabad who has been donating platelets regularly for the past two years. He donates once every three to four weeks and has always been told he is a healthy donor. But over the past few months he has been feeling unusually tired, and his concentration at work has dropped. When his blood bank runs a serum protein test before his next donation, they find his albumin level has dropped below normal range. A closer look reveals that his diet had become irregular due to work stress, and his protein intake was insufficient to support his donation schedule. The blood bank advises him to pause donation for six weeks, improve his diet, and return for a retest. Ramesh recovers, his levels normalise, and he resumes donation safely.
+Now consider Priya, a 28 year old schoolteacher from Pune who donates platelets to support a childhood friend undergoing cancer treatment. She donates once a month and is diligent about her diet and sleep. Her serum protein levels consistently fall within the healthy range at every check. For Priya, the serum protein test is reassurance. It tells her that her body is managing well and that she can continue to help her friend and others like him without compromising her own health.
+Both stories reflect what happens in apheresis centres every week across cities like Delhi, Mumbai, Chennai, Bengaluru, Kolkata, Ahmedabad, and beyond. The test is not about discouraging donation. It is about making sure donation remains sustainable and safe for the long term.
+
+How Frequent Platelet Donation Affects Protein Levels
+To understand this more clearly, let us think about what happens in your body with repeated donations.
+Each time you undergo apheresis, your body enters a mild recovery state. It needs to replenish the platelets that have been removed, restore the small amount of plasma proteins that accompany the process, and stabilise its internal fluid and electrolyte balance. For most healthy donors, this recovery happens within 48 to 72 hours for platelets, and a bit longer for full protein restoration.
+If you donate again before this recovery is complete, or if your nutritional intake is not supporting recovery, the cumulative effect can be a slow downward drift in protein levels. This is not dramatic or sudden. It is gradual. And that is exactly why it can go unnoticed without testing.
+Factors that make Indian donors more vulnerable to this include irregular meal patterns, a predominantly low protein vegetarian diet without adequate compensation, high physical activity or labour intensive occupations, periods of illness or infection between donations, and economic or lifestyle constraints that affect nutrition quality.
+None of these are reasons to stop donating. They are reasons to monitor more carefully and support the donor with guidance and education.
+
+Proteins, Platelet Donation, and the Indian Diet
+India is a country of immense dietary diversity, and the nutritional needs of a regular SDP donor need to be understood in the context of what most people actually eat.
+A significant proportion of donors across India are vegetarian. While a well planned vegetarian diet can absolutely provide adequate protein, many people do not consume enough protein rich foods consistently. Dal, paneer, curd, milk, rajma, chana, moong, soybean, and nuts are all excellent protein sources available across India. But portion sizes, cooking methods, and regularity of consumption vary widely.
+Non vegetarian donors have access to eggs, chicken, fish, and mutton, which are high quality complete protein sources. However, affordability, personal preferences, and availability can affect intake.
+When a blood bank conducts a serum protein test and finds a donor's levels are borderline or below normal, the follow up conversation often includes dietary counselling. A clinical nutritionist or the blood bank's medical officer may advise on increasing protein intake through food, sometimes with specific guidance on meal planning suitable for the donor's region, religion, and budget.
+This is one of the quieter but genuinely important ways that blood banks in India look after their donors. It is healthcare that goes beyond the donation itself.
+
+Signs That Your Protein Levels May Need Attention
+Your body often gives signals before a test confirms anything. As a regular SDP donor, it is worth paying attention to these signs and discussing them honestly with the medical team at your apheresis centre.
+Persistent fatigue that is not explained by lack of sleep or overwork can be an early sign. Feeling unusually weak or finding that your recovery after donation takes longer than before is worth noting. Swelling or puffiness around the face, ankles, or feet, which can indicate fluid imbalance related to low albumin, is something to bring up with your doctor. Frequent infections or slower healing of minor wounds may point to reduced immune proteins.
+None of these symptoms automatically mean your protein levels are low. But they are signals worth investigating. And the serum protein test is exactly the right starting point.
+The most important thing is not to hide these symptoms or feel embarrassed about them. The medical team at your blood bank wants to know. They are there to help you stay healthy, not to turn you away.
+
+How the Serum Protein Test Is Done
+The test itself is straightforward and familiar. A small sample of blood is drawn from your vein, usually from the arm. The sample is sent to the laboratory where it is processed to measure total protein, albumin, and globulin levels. Results are typically available within a few hours to one day depending on the laboratory setup.
+In most apheresis centres attached to large hospitals in India, the test is done in house. In smaller standalone blood banks, it may be sent to an affiliated laboratory. The cost is minimal and in many cases is covered as part of the pre donation screening process.
+You do not need to fast before a standard serum protein test in most situations, though your blood bank may give you specific instructions depending on whether other tests are being done at the same time.
+Once results are available, the medical officer at the blood bank will review them alongside your other health parameters and advise accordingly. If your levels are within normal range, you proceed with donation as planned. If they are borderline or below normal, the doctor will guide you on next steps, which may include a temporary pause in donation, dietary changes, or referral for further evaluation if needed.
+
+Addressing Common Concerns of Regular SDP Donors
+Will I be disqualified from donating forever if my protein levels drop?
+Almost always, no. A temporary deferral is a pause, not a permanent exclusion. With proper nutrition and rest, protein levels typically recover within a few weeks. Most donors who are deferred due to low protein return to regular donation after following the recommended dietary and recovery plan.
+Should I take protein supplements?
+This is a question many donors ask, especially younger donors who are health and fitness conscious. The honest answer is that food based protein is almost always preferred and sufficient for most donors. Supplements may be recommended in specific cases by the doctor, but self medicating with protein powders without medical guidance is not advisable. Focus on a balanced diet rich in natural protein sources first.
+How often should I get this test done?
+This depends on how frequently you donate and what your blood bank's protocol is. If you donate once a month or more, most responsible apheresis centres will check serum protein at least every three to six months. If you are donating less frequently, it may be checked periodically or whenever a clinical need arises. Ask your blood bank directly about their protocol so you are informed.
+Is this test required by law in India?
+Indian regulatory guidelines mandate certain pre donation checks. The specific frequency and scope of serum protein testing may vary, but reputable blood banks and apheresis centres include it as a standard part of caring for regular donors. If your centre does not check it regularly, it is entirely appropriate to request it or ask why.
+
+The Responsibility of Blood Banks Towards Donors
+It is easy to focus on what donors give. But responsible blood banking is a two way relationship. Just as donors give their time, health, and commitment, blood banks and apheresis centres have a duty of care toward every person who walks through their door.
+This duty includes thorough pre donation screening, honest communication about test results, respectful counselling when levels are not adequate, follow up after a deferral period, and creating an environment where donors feel safe to share health concerns without fear of being judged or turned away.
+In India, the best blood banks and apheresis centres already do this. They treat their regular donors like extended family. They know their names, know their histories, and genuinely care about their wellbeing beyond the donation session.
+LifeSavers United stands firmly behind this model of donor care. A donor who is healthy, informed, and supported will donate safely for years. A donor who is neglected or ill informed may face health consequences that no one wanted. Building a culture of mutual responsibility between donors and healthcare providers is central to a sustainable blood donation ecosystem in India.
+
+Nutrition Tips for Regular SDP Donors in India
+While dietary advice should always be personalised and given by a qualified professional, here are some general principles that most healthcare educators recommend for regular platelet donors in India.
+Include a good protein source in every main meal. This could be dal and curd together, paneer with vegetables, eggs in any preparation, chicken or fish for non vegetarians, or a combination of legumes and whole grains that together provide complete protein.
+Do not skip meals, especially on donation days and the day before. Your body needs nourishment to prepare for the donation and to recover afterwards.
+Stay well hydrated. Water and fluids support circulation, make the apheresis process smoother, and support overall recovery.
+Include iron rich foods alongside protein foods, since many donors need to support both haemoglobin and protein levels simultaneously. Spinach, methi, horsegram, and fortified foods are helpful here.
+Rest adequately after donation. Physical recovery and nutritional recovery go hand in hand. Avoid strenuous physical activity on the day of donation.
+If you have specific dietary restrictions due to health conditions, allergies, or personal beliefs, talk to the medical officer at your blood bank. There is almost always a practical and culturally appropriate way to meet your nutritional needs.
+
+Why This Matters to LifeSavers United
+At LifeSavers United, we believe that saving lives cannot come at the cost of the person who is doing the saving. Our donors are not just a supply of platelets. They are community heroes who deserve full information, genuine care, and ongoing support.
+The serum protein test is one small but meaningful piece of that larger commitment to donor health. It is a test that says we value you, we are watching over your health, and we want you to keep giving safely for as long as you choose to.
+Our work across India involves not just encouraging donation but educating donors about their rights and responsibilities, supporting blood banks in strengthening their donor care practices, and raising public awareness about what responsible platelet donation looks like.
+When a regular SDP donor in Nagpur or Kochi or Jaipur knows what a serum protein test is and why it matters, they are a more informed and empowered donor. And informed donors are the foundation of a strong, safe, and sustainable blood donation system.
+
+A Gentle Call to Action
+If you are a regular SDP donor, please ask your apheresis centre when your serum protein was last checked. If it has been a while, request the test at your next visit. Take your diet seriously, not just on donation days but every day.
+If you are someone who has been thinking about starting platelet donation, know that responsible blood banks in India take your health seriously and have processes in place to protect you every step of the way.
+And if you work in a blood bank, apheresis centre, or hospital setting, we encourage you to make serum protein testing a consistent and transparent part of your regular donor care protocol. It is a small investment that protects your donors and builds lasting trust.
+Visit lifesaversunited.org to learn more about safe donation practices, donor health resources, and how LifeSavers United is working to strengthen platelet donation awareness across India. Share this blog with a fellow donor, a blood bank volunteer, or anyone in your community who might benefit from this information.
+Your health matters. Your donation matters. And together, we can make sure that giving life never costs you yours.
+
+In Summary
+The serum protein test is a straightforward and essential health check for anyone who donates platelets regularly in India. It measures the total protein in your blood and ensures that your body is coping well with the demands of frequent donation. For regular SDP donors, this test is a safeguard, a health monitor, and a sign that the blood bank genuinely cares about the person behind the donation.
+Getting tested regularly, eating well, staying hydrated, and communicating openly with your medical team are the four pillars of long term healthy donation. When these are in place, you can continue to be the lifesaver that so many patients in India are counting on.
+Thank you for what you do. Stay healthy. Keep giving.

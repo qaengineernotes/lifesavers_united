@@ -3,7 +3,7 @@
 
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
 import { fetchEmergencyRequestsFromFirebase } from '/scripts/firebase-data-service.js';
-import { db, collection, getDocs, query, where, orderBy } from '/scripts/firebase-config.js';
+import { db, collection, getDocs, query, where, orderBy, doc, updateDoc, addDoc, serverTimestamp } from '/scripts/firebase-config.js';
 
 // Global state
 let currentUser = null;
@@ -148,7 +148,7 @@ function renderTable() {
 
     // Render each request
     pageRequests.forEach((request, index) => {
-        const row = createTableRow(request, startIndex + index);
+        const row = createTableRow(request, index);
         tbody.appendChild(row);
     });
 
@@ -227,9 +227,16 @@ function createTableRow(request, index) {
 
     // 12. Actions
     const actionsHtml = `
-        <button class="action-btn" onclick="viewRequest(${index})" title="View Details">
-            👁️ View
-        </button>
+        <div style="display: flex; gap: 8px;">
+            <button class="action-btn" onclick="viewRequest(${index})" title="View Details">
+                👁️ View
+            </button>
+            ${request.status === 'Closed' ? `
+            <button class="action-btn reopen-btn" onclick="reopenRequest(${index})" title="Reopen Request">
+                🔄 Reopen
+            </button>
+            ` : ''}
+        </div>
     `;
 
     tr.innerHTML = `
@@ -267,6 +274,85 @@ window.viewRequest = function (index) {
     }
     populateModal(request);
     document.getElementById('viewModal').classList.add('active');
+};
+
+// ============================================================================
+// REOPEN REQUEST
+// ============================================================================
+window.reopenRequest = async function (index) {
+    const actualIndex = (currentPage - 1) * requestsPerPage + index;
+    const requestsToDisplay = searchQuery ? filteredRequests : allRequests;
+    const request = requestsToDisplay[actualIndex];
+
+    if (!request || !request.id) {
+        alert('Request data not found.');
+        return;
+    }
+
+    if (!confirm(`Are you sure you want to REOPEN the request for ${request.patientName}? This will reset the current cycle progress and move it to the top of the list.`)) {
+        return;
+    }
+
+    try {
+        // Show loading state or disable button (simplifying with alert for now)
+        const requestRef = doc(db, 'emergency_requests', request.id);
+        
+        // Prepare update data for Reopen (matching createNewRequestInFirebase logic)
+        const currentReopenCount = parseInt(request.reopenCount) || 0;
+        const updateData = {
+            // RESET donation tracking for new cycle
+            unitsFulfilled: 0,
+            donorSummary: '',
+            donationLogIds: [],
+
+            // Status Update
+            status: 'Reopened',
+            updatedBy: currentUser?.displayName || currentUser?.phoneNumber || 'Unknown',
+            updatedByUid: currentUser?.uid || 'legacy',
+            updatedAt: serverTimestamp(),
+            lastUpdatedByName: currentUser?.displayName || currentUser?.phoneNumber || 'Unknown',
+            lastUpdatedAt: serverTimestamp(),
+            reopenedAt: serverTimestamp(),
+            reopenedBy: currentUser?.displayName || currentUser?.phoneNumber || 'Unknown',
+            reopenedByUid: currentUser?.uid || 'legacy',
+
+            // Track reopen count
+            reopenCount: currentReopenCount + 1
+        };
+
+        // PRESERVE donation history
+        // Note: fetchEmergencyRequestsFromFirebase maps data.allDonationLogIds to request.allDonationLogIds
+        // and data.donationLogIds to request.donationLogIds
+        const currentDonationLogIds = request.donationLogIds || [];
+        if (currentDonationLogIds.length > 0) {
+            const previousAllDonations = request.allDonationLogIds || [];
+            // Combine previous and current cycle donations into the "all" bucket
+            const combinedDonations = [...previousAllDonations, ...currentDonationLogIds];
+            // Unique IDs only
+            updateData.allDonationLogIds = Array.from(new Set(combinedDonations));
+        }
+
+        // 1. Update the request document
+        await updateDoc(requestRef, updateData);
+
+        // 2. Add history entry
+        const updatesRef = collection(db, 'emergency_requests', request.id, 'updates');
+        await addDoc(updatesRef, {
+            type: 'REOPENED',
+            timestamp: serverTimestamp(),
+            userName: currentUser?.displayName || currentUser?.phoneNumber || 'Unknown',
+            userUid: currentUser?.uid || 'legacy',
+            note: `Request reopened (Cycle ${currentReopenCount + 2})`
+        });
+
+        alert('Request reopened successfully! The request is now back at the top of the list.');
+        
+        // 3. Refresh the table
+        await loadAllRequests();
+    } catch (error) {
+        console.error('Error reopening request:', error);
+        alert('Failed to reopen request: ' + error.message);
+    }
 };
 
 // ============================================================================
@@ -423,7 +509,7 @@ function createTrackingCard(request) {
             </div>
             <div class="info-row">
                 <div class="info-label">Created At:</div>
-                <div class="info-value">${formatDateTime(request.inquiryDate)}</div>
+                <div class="info-value">${formatDateTime(request.realCreatedAt)}</div>
             </div>
             <div class="info-row">
                 <div class="info-label">Verified By:</div>
@@ -435,8 +521,22 @@ function createTrackingCard(request) {
                     <div class="info-value">${escapeHtml(request.closedBy || 'N/A')}</div>
                 </div>
                 <div class="info-row">
+                    <div class="info-label">Closed At:</div>
+                    <div class="info-value">${formatDateTime(request.closedAt)}</div>
+                </div>
+                <div class="info-row">
                     <div class="info-label">Closure Reason:</div>
                     <div class="info-value">${escapeHtml(request.closureReason || 'N/A')}</div>
+                </div>
+            ` : ''}
+            ${request.reopenedAt ? `
+                <div class="info-row">
+                    <div class="info-label">Reopened By:</div>
+                    <div class="info-value">${escapeHtml(request.reopenedBy || 'Unknown')}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Reopened At:</div>
+                    <div class="info-value">${formatDateTime(request.reopenedAt)}</div>
                 </div>
             ` : ''}
             <div class="info-row">

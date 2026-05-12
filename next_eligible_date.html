@@ -346,215 +346,256 @@
 
     <!-- Main Content Section -->
     <section class="py-16 bg-surface">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
 
-            <!-- Calculator Card -->
-            <div class="card p-8 mb-8" id="calculator-card">
-                <h2 class="text-2xl font-bold mb-2 text-primary">Check Your Eligibility</h2>
-                <p class="text-text-secondary mb-6">Enter details about your last donation to see when you can donate
-                    next.</p>
+                <!-- Column 1: Eligibility Calculator -->
+                <div class="space-y-8">
+                    <div class="card p-8" id="calculator-card">
+                        <h2 class="text-2xl font-bold mb-2 text-primary">Check Your Eligibility</h2>
+                        <p class="text-text-secondary mb-6 text-sm">Enter details about your last donation to see when
+                            you can donate next.</p>
 
-                <form id="eligibility-calculator-form" class="space-y-6"
-                    aria-label="Blood donation eligibility calculator">
-
-                    <!-- Date Input -->
-                    <div>
-                        <label class="block font-medium mb-2" for="last-donation-date">Date of Your Last
-                            Donation</label>
-                        <input type="date" id="last-donation-date" class="form-input w-full"
-                            aria-label="Date of your last blood donation" required>
-                        <p id="date-error" class="text-red-600 text-sm mt-1 hidden" role="alert" aria-live="assertive">
-                            Your last donation date cannot be in the future. Please re-enter a valid past date.</p>
-                        <p id="date-old-error" class="text-red-600 text-sm mt-1 hidden" role="alert"
-                            aria-live="assertive">
-                            Date cannot be older than 5 years.</p>
-                    </div>
-
-                    <!-- Donation Type Select -->
-                    <div>
-                        <label class="block font-medium mb-2" for="donation-type">Type of Last Donation</label>
-                        <select id="donation-type" class="form-input w-full bg-white"
-                            aria-label="Select your last donation type" required>
-                            <option value="" disabled selected>Select donation type...</option>
-                            <option value="whole">Whole Blood</option>
-                            <option value="sdp">Single Donor Platelets (SDP / Plateletpheresis)</option>
-                            <option value="plasma">Plasma (Apheresis)</option>
-                            <option value="drc">Double Red Cell (Apheresis)</option>
-                            <option value="prbc">Packed Red Blood Cells (pRBC)</option>
-                            <option value="unsure">I'm Not Sure</option>
-                        </select>
-                        <p id="type-error" class="text-red-600 text-sm mt-1 hidden">Please select the type of your last
-                            donation to continue.</p>
-
-                        <!-- Helper Guide (Hidden by default) -->
-                        <!-- Simple Helper Guide (Hidden by default) -->
-                        <div id="helper-guide"
-                            class="hidden mt-6 p-6 border border-gray-200 rounded-xl bg-white animate-fade-in"
-                            aria-live="polite">
-                            <h4 class="font-bold text-text-primary mb-4">How to identify your donation type:</h4>
-                            <ul class="space-y-4">
-                                <li class="flex items-start">
-                                    <span class="text-primary font-bold mr-3 mt-1 text-lg leading-none">•</span>
-                                    <p class="text-text-secondary leading-relaxed">
-                                        If you donated in <strong class="text-text-primary">10-15 minutes</strong> with
-                                        no machine involved — it was most likely <strong class="text-text-primary">Whole
-                                            Blood</strong>.
-                                    </p>
-                                </li>
-                                <li class="flex items-start">
-                                    <span class="text-primary font-bold mr-3 mt-1 text-lg leading-none">•</span>
-                                    <p class="text-text-secondary leading-relaxed">
-                                        If you were connected to a machine for <strong class="text-text-primary">45-90
-                                            minutes</strong> and blood was returned to you — it was likely <strong
-                                            class="text-text-primary">SDP (Platelets)</strong> or <strong
-                                            class="text-text-primary">Plasma</strong>.
-                                    </p>
-                                </li>
-                                <li class="flex items-start border-t border-gray-100 pt-4">
-                                    <span class="text-primary font-bold mr-3 mt-1 text-lg leading-none">•</span>
-                                    <p class="text-text-secondary leading-relaxed italic">
-                                        Still unsure? Select <strong class="text-text-primary">Whole Blood</strong> as
-                                        the safest assumption for your recovery.
-                                    </p>
-                                </li>
-                            </ul>
-                            <div class="mt-5 pt-4 border-t border-gray-100 flex items-center text-sm text-gray-400">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
-                                </svg>
-                                <span>Once identified, update your selection above.</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Gender Input (Conditional) -->
-                    <div id="gender-section" class="hidden">
-                        <label id="gender-label" class="block font-medium mb-2">Are you Male or Female?</label>
-                        <div class="radio-group-container" role="radiogroup" aria-labelledby="gender-label">
-                            <label class="radio-label">
-                                <input type="radio" name="gender" value="male"> Male
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="gender" value="female"> Female
-                            </label>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-2">Required because Indian guidelines specify different
-                            waiting periods for whole blood donation based on gender.</p>
-                        <p id="gender-error" class="text-red-600 text-sm mt-1 hidden">Please select your gender to
-                            continue.</p>
-                    </div>
-
-                    <button type="submit" id="calculate-btn" class="btn-primary w-full sm:w-auto">Calculate My Next
-                        Eligible Date</button>
-                </form>
-            </div>
-
-            <!-- Results Section (Hidden by default) -->
-            <div id="results-section" class="hidden">
-                <div class="card p-8 mb-8 border-t-4 border-primary">
-                    <h3 class="text-xl font-semibold mb-4 text-gray-800" id="results-summary">Based on your last
-                        donation, here are your next eligible dates.</h3>
-
-                    <div id="eligible-today-banner" class="banner-eligible hidden">
-                        You are already eligible to donate <span id="eligible-types-text"></span>! Find a blood bank
-                        near you and donate today.
-                    </div>
-
-                    <div id="not-eligible-banner" class="banner-not-eligible hidden">
-                        You are not yet eligible for any donation type. Your next soonest eligibility is on <span
-                            id="next-eligible-date-text"></span>.
-                    </div>
-
-                    <div id="old-donation-note"
-                        class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 text-blue-800 hidden">
-                        It has been more than 2 years since your last donation. Your body has had plenty of time to
-                        recover. All donation types should be available to you, subject to health screening on the day.
-                    </div>
-
-                    <div class="ned-results-table-header">
-                        <div class="ned-col-type">Donation Type</div>
-                        <div class="ned-col-date">Eligible Date</div>
-                        <div class="ned-col-status">Status</div>
-                        <div class="ned-col-action">Action</div>
-                    </div>
-
-                    <div id="results-container" class="mb-6">
-                        <!-- Results will be injected here via JS -->
-                    </div>
-
-                    <div id="sdp-annual-note" class="text-sm text-gray-600 bg-gray-50 p-3 rounded mb-6 hidden">
-                        <strong>Note:</strong> Indian guidelines permit a maximum of 24 SDP donations per year and no
-                        more than 2 per week. Please ensure you are within this limit before donating.
-                    </div>
-
-                    <!-- Medical Disclaimer -->
-                    <div class="bg-warning-100 border-l-4 border-warning p-6 mt-8">
-                        <div class="flex items-start">
-                            <svg class="w-6 h-6 text-warning mr-3 mt-1 flex-shrink-0" fill="currentColor"
-                                viewBox="0 0 20 20">
-                                <path fill-rule="evenodd"
-                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                                    clip-rule="evenodd" />
-                            </svg>
+                        <form id="eligibility-calculator-form" class="space-y-6"
+                            aria-label="Blood donation eligibility calculator">
+                            <!-- Date Input -->
                             <div>
-                                <h3 class="text-lg font-semibold text-warning mb-2">Important Disclaimer</h3>
-                                <p class="text-text-secondary text-sm">
-                                    These dates are the minimum waiting periods as per NBTC and CDSCO guidelines for
-                                    Indian blood donors. Your actual eligibility on the day of donation is determined by
-                                    a qualified medical officer at the blood bank through a health screening. Factors
-                                    such as haemoglobin levels (minimum 12.5 g/dL), body weight (minimum 45 kg), blood
-                                    pressure, recent illness, vaccination, medication, or travel history may result in a
-                                    temporary deferral even if the waiting period has passed. This tool does not
-                                    constitute medical advice.
-                                </p>
+                                <label class="block font-medium mb-2 text-sm" for="last-donation-date">Date of Your Last
+                                    Donation</label>
+                                <input type="date" id="last-donation-date" class="form-input w-full text-sm" required>
+                                <p id="date-error" class="text-red-600 text-xs mt-1 hidden">Invalid future date.</p>
+                                <p id="date-old-error" class="text-red-600 text-xs mt-1 hidden">Date exceeds 5-year
+                                    limit.</p>
                             </div>
-                        </div>
-                    </div>
-                    <!-- Action Buttons -->
-                    <div class="flex flex-col sm:flex-row gap-4 justify-center mt-6">
-                        <button id="recalculate-btn"
-                            class="btn-outline border-gray-300 text-gray-700 hover:bg-gray-50">Check Again / New
-                            Calculation</button>
-                        <a href="https://eraktkosh.mohfw.gov.in" target="_blank" rel="noopener noreferrer"
-                            class="btn-primary flex items-center justify-center">
-                            Find a Blood Bank
-                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
-                                </path>
-                            </svg>
-                        </a>
+
+                            <!-- Donation Type -->
+                            <div>
+                                <label class="block font-medium mb-2 text-sm" for="donation-type">Type of Last
+                                    Donation</label>
+                                <select id="donation-type" class="form-input w-full bg-white text-sm" required>
+                                    <option value="" disabled selected>Select type...</option>
+                                    <option value="whole">Whole Blood</option>
+                                    <option value="sdp">Single Donor Platelets (SDP)</option>
+                                    <option value="plasma">Plasma (Apheresis)</option>
+                                    <option value="drc">Double Red Cell</option>
+                                    <option value="prbc">pRBC</option>
+                                    <option value="wbc">WBC (Leukapheresis)</option>
+                                    <option value="unsure">I'm Not Sure</option>
+                                </select>
+                                <p id="type-error" class="text-red-600 text-xs mt-1 hidden">Please select a donation
+                                    type.</p>
+                                <div id="helper-guide" class="bg-gray-50 p-3 rounded text-xs text-gray-600 mt-2 hidden">
+                                    <strong>Not sure?</strong> Most people donate Whole Blood. Single Donor Platelets
+                                    (SDP) is a specialized donation.
+                                </div>
+                            </div>
+
+                            <!-- Gender -->
+                            <div id="gender-section" class="hidden">
+                                <label class="block font-medium mb-2 text-sm">Gender</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center text-sm cursor-pointer"><input type="radio"
+                                            name="gender" value="male" class="mr-2"> Male</label>
+                                    <label class="flex items-center text-sm cursor-pointer"><input type="radio"
+                                            name="gender" value="female" class="mr-2"> Female</label>
+                                </div>
+                                <p id="gender-error" class="text-red-600 text-xs mt-1 hidden">Please select your gender
+                                    to continue.</p>
+                            </div>
+
+                            <button type="submit" id="calculate-btn" class="btn-primary w-full text-sm py-3">Check
+                                Eligibility</button>
+                        </form>
                     </div>
 
-                    <!-- Share Section -->
-                    <div class="mt-12 text-center">
-                        <h3 class="text-lg font-semibold mb-4 text-gray-800">Share with a Friend</h3>
-                        <div class="flex justify-center gap-4">
-                            <button id="share-whatsapp"
-                                class="flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-                                aria-label="Share your next eligible date on WhatsApp">
-                                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-                                </svg>
-                                WhatsApp
-                            </button>
-                            <button id="share-copy"
-                                class="flex items-center justify-center px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
-                                aria-label="Copy website link to clipboard">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
-                                    </path>
-                                </svg>
-                                Copy Link
-                            </button>
+                    <!-- Calculator Results (Will appear below form in Col 1) -->
+                    <div id="results-section" class="hidden animate-fade-in">
+                        <div class="card p-6 border-t-4 border-primary">
+                            <h3 class="text-lg font-bold mb-4" id="results-summary">Results</h3>
+                            <div id="eligible-today-banner" class="banner-eligible hidden text-sm mb-4">
+                                You are already eligible to donate <span id="eligible-types-text"
+                                    class="font-bold"></span>! Find a blood bank near you and donate today.
+                            </div>
+                            <div id="not-eligible-banner" class="banner-not-eligible hidden text-sm mb-4">
+                                You are not yet eligible for any donation type. Your next soonest eligibility is on
+                                <span id="next-eligible-date-text" class="font-bold"></span>.
+                            </div>
+                            <div id="results-container" class="mb-6">
+                                <!-- Results will be injected here via JS -->
+                            </div>
+
+                            <div id="sdp-annual-note" class="text-sm text-gray-600 bg-gray-50 p-3 rounded mb-6 hidden">
+                                <strong>Note:</strong> Indian guidelines permit a maximum of 24 SDP donations per year
+                                and no more than 2 per week. Please ensure you are within this limit before donating.
+                            </div>
+
+                            <div id="old-donation-note"
+                                class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 text-blue-800 hidden">
+                                It has been more than 2 years since your last donation. Your body has had plenty of time
+                                to recover. All donation types should be available to you, subject to health screening
+                                on the day.
+                            </div>
+
+                            <!-- Medical Disclaimer -->
+                            <div class="bg-warning-100 border-l-4 border-warning p-6 mt-8">
+                                <div class="flex items-start">
+                                    <svg class="w-6 h-6 text-warning mr-3 mt-1 flex-shrink-0" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd"
+                                            d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                            clip-rule="evenodd" />
+                                    </svg>
+                                    <div>
+                                        <h3 class="text-lg font-semibold text-warning mb-2">Important Disclaimer</h3>
+                                        <p class="text-text-secondary text-sm">
+                                            These dates are the minimum waiting periods as per NBTC and CDSCO guidelines
+                                            for Indian blood donors. Your actual eligibility on the day of donation is
+                                            determined by a qualified medical officer at the blood bank through a health
+                                            screening. Factors such as haemoglobin levels (minimum 12.5 g/dL), body
+                                            weight (minimum 45 kg), blood pressure, recent illness, vaccination,
+                                            medication, or travel history may result in a temporary deferral even if the
+                                            waiting period has passed. This tool does not constitute medical advice.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Action Buttons -->
+                            <div class="flex flex-col sm:flex-row gap-4 justify-center mt-6">
+                                <button id="recalculate-btn"
+                                    class="btn-outline border-rose-600 text-rose-600 hover:bg-rose-50 font-bold px-6 py-3 rounded-lg transition-all">Check
+                                    Again / New Calculation</button>
+                                <a href="https://eraktkosh.mohfw.gov.in" target="_blank" rel="noopener noreferrer"
+                                    class="btn-primary blood-gradient flex items-center justify-center font-bold px-6 py-3 rounded-lg shadow-lg">
+                                    Find a Blood Bank
+                                    <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14">
+                                        </path>
+                                    </svg>
+                                </a>
+                            </div>
+
+                            <!-- Share Section -->
+                            <div class="mt-12 text-center">
+                                <h3 class="text-lg font-semibold mb-4 text-gray-800">Share with a Friend</h3>
+                                <div class="flex justify-center gap-4">
+                                    <button id="share-whatsapp"
+                                        class="flex items-center justify-center px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-bold shadow-md">
+                                        <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                                            <path
+                                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                                        </svg>
+                                        WhatsApp
+                                    </button>
+                                    <button id="share-copy"
+                                        class="flex items-center justify-center px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-bold shadow-sm">
+                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1">
+                                            </path>
+                                        </svg>
+                                        Copy Link
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Column 2: Smart Donation Planner -->
+                <div class="space-y-8">
+                    <div class="card p-8 border-t-4 border-rose-600">
+                        <h2 class="text-2xl font-bold mb-2 text-primary">Smart Roadmap Planner</h2>
+                        <p class="text-text-secondary mb-6 text-sm">A strategic schedule to maximize your life-saving
+                            impact while staying safe.</p>
+
+                        <div class="space-y-6">
+                            <div>
+                                <label
+                                    class="block font-medium mb-3 text-xs uppercase tracking-wider text-gray-500">Gender</label>
+                                <div class="planner-toggle-container">
+                                    <button type="button" id="plan-gen-male" onclick="setPlannerGender('male')"
+                                        class="planner-toggle-btn active">Male</button>
+                                    <button type="button" id="plan-gen-female" onclick="setPlannerGender('female')"
+                                        class="planner-toggle-btn">Female</button>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block font-bold mb-2 text-[10px] uppercase text-rose-600">Last Whole
+                                        Blood</label>
+                                    <div class="planner-input-wrapper">
+                                        <input type="date" id="plannerLastWB" class="form-input text-sm w-full pr-12"
+                                            required>
+                                        <button type="button"
+                                            onclick="document.getElementById('plannerLastWB').value=''"
+                                            class="reset-field-btn">✕</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block font-bold mb-2 text-[10px] uppercase text-emerald-600">Last SDP
+                                        (Optional)</label>
+                                    <div class="planner-input-wrapper">
+                                        <input type="date" id="plannerLastSDP" class="form-input text-sm w-full pr-12">
+                                        <button type="button"
+                                            onclick="document.getElementById('plannerLastSDP').value=''"
+                                            class="reset-field-btn">✕</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" onclick="generateSmartRoadmap()"
+                                class="btn-primary w-full text-sm py-3">Generate
+                                Roadmap</button>
+
+                            <div id="planner-error"
+                                class="hidden banner-not-eligible text-xs mt-4 p-3 rounded-lg flex items-start border-l-4 border-red-600 bg-red-50 text-red-800">
+                                <svg class="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd"
+                                        d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                                <span><strong>Error:</strong> Guidelines require at least 28 days gap between Whole
+                                    Blood and SDP donations. Please check your dates.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Roadmap Result Area -->
+                    <div id="roadmap-section" class="hidden animate-fade-in">
+                        <div class="card p-6 border-t-4 border-rose-600">
+                            <div class="text-center mb-6">
+                                <h3 class="text-2xl font-bold mb-2 text-primary">Your Life-Saving Plan</h3>
+                                <p class="text-text-secondary mb-6 text-sm">A strategic schedule to maximize your
+                                    life-saving impact while staying safe.</p>
+                            </div>
+                            <div id="roadmap-timeline" class="space-y-3 mb-8"></div>
+
+                            <!-- Advice -->
+                            <div class="grid grid-cols-1 gap-4 pt-6 border-t border-gray-100">
+                                <div class="planner-advice-card">
+                                    <p class="planner-advice-title text-rose-400">Donor Guidelines</p>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <ul class="planner-list">
+                                            <li>Hydrate (500ml water)</li>
+                                            <li>Iron-rich foods</li>
+                                        </ul>
+                                        <ul class="planner-list">
+                                            <li>Avoid Alcohol 24h</li>
+                                            <li>Good sleep (7h+)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+
+
+
+
+        </div>
         </div>
     </section>
 
@@ -762,6 +803,33 @@
                     return;
                 }
 
+                if (typeVal === 'wbc') {
+                    // Special case for WBC
+                    const resultsContainer = document.getElementById('results-container');
+                    const resultsSummary = document.getElementById('results-summary');
+                    const eligibleBanner = document.getElementById('eligible-today-banner');
+                    const notEligibleBanner = document.getElementById('not-eligible-banner');
+                    const sdpNote = document.getElementById('sdp-annual-note');
+
+                    eligibleBanner.classList.add('hidden');
+                    notEligibleBanner.classList.add('hidden');
+                    sdpNote.classList.add('hidden');
+                    document.getElementById('old-donation-note').classList.add('hidden');
+
+                    resultsSummary.textContent = "Information about your Leukapheresis (WBC) donation:";
+                    resultsContainer.innerHTML = `
+                        <div class="bg-blue-50 border-l-4 border-blue-600 p-6 rounded-lg text-blue-900 leading-relaxed shadow-sm">
+                            <p class="font-medium">
+                                Because Leukapheresis (WBC donation) is a specialised procedure, your next eligible dates depend on your specific health screening results. Please contact your blood bank's medical officer directly for your personalised waiting period.
+                            </p>
+                        </div>
+                    `;
+
+                    resultsSection.classList.remove('hidden');
+                    resultsSection.scrollIntoView({ behavior: 'smooth' });
+                    return;
+                }
+
                 // Validate 5 years old limit
                 const fiveYearsAgo = new Date(today);
                 fiveYearsAgo.setFullYear(today.getFullYear() - 5);
@@ -781,7 +849,7 @@
                 const WAITING_PERIODS = {
                     'whole': { wb: genderVal === 'male' ? 90 : 120, sdp: 28, plasma: 28, drc: 180 },
                     'prbc': { wb: genderVal === 'male' ? 90 : 120, sdp: 28, plasma: 28, drc: 180 },
-                    'sdp': { wb: 28, sdp: 2, plasma: 7, drc: 28 },
+                    'sdp': { wb: 28, sdp: 15, plasma: 7, drc: 28 },
                     'plasma': { wb: 28, sdp: 7, plasma: 14, drc: 28 },
                     'drc': { wb: 180, sdp: 28, plasma: 28, drc: 180 }
                 };
@@ -1099,6 +1167,159 @@ END:VCALENDAR`;
                 copyToClipboard('https://lifesaversunited.org/next_eligible_date');
             });
         });
+
+        // --- Smart Donation Planner Logic ---
+        let plannerGender = 'male';
+
+        function setPlannerGender(g) {
+            plannerGender = g;
+            const maleBtn = document.getElementById('plan-gen-male');
+            const femaleBtn = document.getElementById('plan-gen-female');
+
+            if (g === 'male') {
+                maleBtn.classList.add('active');
+                femaleBtn.classList.remove('active');
+            } else {
+                femaleBtn.classList.add('active');
+                maleBtn.classList.remove('active');
+            }
+        }
+
+        function generateSmartRoadmap() {
+            const lastWBVal = document.getElementById('plannerLastWB').value;
+            const lastSDPVal = document.getElementById('plannerLastSDP').value;
+
+            if (!lastWBVal) {
+                alert("Please enter your Last Whole Blood donation date.");
+                return;
+            }
+
+            // Normalize today to midnight
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // Normalize Last WB to midnight
+            const lastWbDate = new Date(lastWBVal);
+            lastWbDate.setHours(0, 0, 0, 0);
+
+            const plannerError = document.getElementById('planner-error');
+            plannerError.classList.add('hidden');
+
+            if (lastSDPVal) {
+                const lastSdpDate = new Date(lastSDPVal);
+                lastSdpDate.setHours(0, 0, 0, 0);
+
+                // VALIDATION: Check for 28-day gap
+                const gapDays = Math.abs(lastWbDate.getTime() - lastSdpDate.getTime()) / 86400000;
+                if (gapDays < 28) {
+                    plannerError.classList.remove('hidden');
+                    document.getElementById('roadmap-section').classList.add('hidden');
+                    return;
+                }
+            }
+
+            const wbGap = plannerGender === 'male' ? 90 : 120;
+            let targetWbDate = new Date(lastWbDate.getTime() + wbGap * 86400000);
+            targetWbDate.setHours(0, 0, 0, 0);
+
+            const timeline = document.getElementById('roadmap-timeline');
+            timeline.innerHTML = '';
+
+            // Earliest SDP is 28 days after WB
+            let runner = new Date(lastWbDate.getTime() + 28 * 86400000);
+            runner.setHours(0, 0, 0, 0);
+
+            if (lastSDPVal) {
+                let lastSdpDate = new Date(lastSDPVal);
+                lastSdpDate.setHours(0, 0, 0, 0);
+
+                let sdpNext = new Date(lastSdpDate.getTime() + 15 * 86400000);
+                if (sdpNext > runner) {
+                    runner = new Date(sdpNext);
+                    runner.setHours(0, 0, 0, 0);
+                }
+
+                // Buffer: Next WB must be at least 28 days after last SDP
+                let minWb = new Date(lastSdpDate.getTime() + 28 * 86400000);
+                if (minWb > targetWbDate) {
+                    targetWbDate = new Date(minWb);
+                    targetWbDate.setHours(0, 0, 0, 0);
+                }
+            }
+
+            let sdpCount = 1;
+            // Buffer check: Can we fit an SDP before the next WB (need 28 days gap after SDP)?
+            while ((targetWbDate.getTime() - runner.getTime()) / 86400000 >= 28) {
+                addRoadmapStep(timeline, new Date(runner), `Platelets (SDP) #${sdpCount++}`, 'sdp');
+                runner.setDate(runner.getDate() + 15);
+                runner.setHours(0, 0, 0, 0);
+            }
+
+            // Final Whole Blood Step
+            addRoadmapStep(timeline, targetWbDate, 'Next Whole Blood Donation', 'wb');
+
+            document.getElementById('roadmap-section').classList.remove('hidden');
+            document.getElementById('roadmap-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function addRoadmapStep(container, date, label, type) {
+            const isWB = type === 'wb';
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const d1 = new Date(date);
+            d1.setHours(0, 0, 0, 0);
+            const daysRemaining = Math.round((d1 - today) / (1000 * 3600 * 24));
+
+            const formattedDate = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            const isoDate = date.toISOString().split('T')[0];
+            const gcalTitle = `Blood Donation: ${label}`;
+            const gcalDesc = `Reminder from LifeSavers United. Guidelines: Drink 500ml water, eat well, avoid alcohol 24h prior.`;
+            const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(gcalTitle)}&dates=${isoDate.replace(/-/g, '')}T090000Z/${isoDate.replace(/-/g, '')}T100000Z&details=${encodeURIComponent(gcalDesc)}`;
+
+            let statusText = daysRemaining <= 0 ? 'Eligible Now' : 'Upcoming';
+            let statusColorClass = daysRemaining <= 0 ? 'ned-status-green' : 'ned-status-orange';
+            let daysText = daysRemaining <= 0 ? 'Eligible Now' : `${daysRemaining} days remaining`;
+
+            let actionHtml = '';
+            if (daysRemaining <= 0) {
+                actionHtml = `
+                    <a href="https://eraktkosh.mohfw.gov.in" target="_blank" rel="noopener noreferrer" class="btn-primary text-sm py-1 px-3 flex items-center justify-center whitespace-nowrap" aria-label="Find donation center for ${label}">
+                        Find Center
+                    </a>
+                `;
+            } else {
+                // Using a simpler version of the reminder for roadmap to keep it compact
+                actionHtml = `
+                    <a href="${gcalUrl}" target="_blank" rel="noopener noreferrer" class="btn-outline text-sm py-1 px-3 border-gray-300 flex items-center whitespace-nowrap" aria-label="Set calendar reminder for ${label}">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        Reminder
+                    </a>
+                `;
+            }
+
+            const row = document.createElement('div');
+            row.className = 'ned-results-row';
+            row.innerHTML = `
+                <div class="ned-col-type font-medium text-gray-800">
+                    ${label}
+                    <div class="ned-tooltip-icon" aria-label="Information about ${label}" tabindex="0">?
+                        <span class="ned-tooltip-text">${isWB ? 'The standard donation where a full unit of blood is collected.' : 'Only platelets are collected using an apheresis machine.'}</span>
+                    </div>
+                </div>
+                <div class="ned-col-date text-gray-700">
+                    ${formattedDate}
+                </div>
+                <div class="ned-col-status">
+                    <span class="${statusColorClass}">${statusText}</span>
+                    <span class="ned-days-remaining">${daysText}</span>
+                </div>
+                <div class="ned-col-action">
+                    ${actionHtml}
+                </div>
+            `;
+            container.appendChild(row);
+        }
+
     </script>
     <script src="scripts/mobile-menu.js"></script>
     <script id="dhws-dataInjector" src="/public/dhws-data-injector.js"></script>

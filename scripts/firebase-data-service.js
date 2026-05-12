@@ -67,6 +67,7 @@ export async function fetchEmergencyRequestsFromFirebase(options = {}) {
                 inquiryDate: data.reopenedAt
                     ? (data.reopenedAt.seconds ? new Date(data.reopenedAt.seconds * 1000) : new Date(data.reopenedAt))
                     : (data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : null),
+                realCreatedAt: data.createdAt ? (data.createdAt.seconds ? new Date(data.createdAt.seconds * 1000) : new Date(data.createdAt)) : null,
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
@@ -88,7 +89,13 @@ export async function fetchEmergencyRequestsFromFirebase(options = {}) {
                 createdBy: data.createdByName || 'Unknown',
                 closureReason: data.closureReason || '',
                 fulfilledDate: data.fulfilledAt || '',
-                reopenCount: data.reopenCount || 0
+                reopenCount: data.reopenCount || 0,
+                donationLogIds: data.donationLogIds || [],
+                allDonationLogIds: data.allDonationLogIds || [],
+                closedBy: data.closedBy || '',
+                closedAt: data.closedAt || '',
+                reopenedBy: data.reopenedBy || '',
+                reopenedAt: data.reopenedAt || ''
             });
         });
 
@@ -942,9 +949,10 @@ export async function createNewRequestInFirebase(requestData, currentUser = null
                 updatedAt: serverTimestamp(),
                 lastUpdatedByName: currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Public',
                 lastUpdatedAt: serverTimestamp(),
-                createdAt: serverTimestamp(), // Bring to top of list
                 source: requestData.source || currentData.source || (currentUser ? 'web_form' : 'web_form_public'),
                 reopenedAt: serverTimestamp(),
+                reopenedBy: currentUser?.displayName || requestData.createdBy || requestData.patientName || 'Public',
+                reopenedByUid: currentUser?.uid || requestData.createdByUid || 'public',
 
                 // Store Telegram metadata if present
                 ...(requestData.telegramUserId && {

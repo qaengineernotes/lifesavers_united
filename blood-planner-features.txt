@@ -1,0 +1,47 @@
+# LifeSavers United - Blood Donation Planner Feature Document
+
+## 1. Core Features
+- **Smart Roadmap Generator:** Unlike a simple calculator, this tool generates a complete timeline (roadmap) showing multiple donation opportunities (Whole Blood + Platelets) over a 3-4 month period.
+- **Multilingual UI:** Full support for 4 languages (English, Hindi, Marathi, Gujarati) with real-time switching of all labels, tips, and even date formats.
+- **Interleaved Donation Strategy:** Specifically designed to maximize donor impact by scheduling Single Donor Platelets (SDP) in the recovery window between Whole Blood donations.
+- **Google Calendar Integration:** One-click "Add to Calendar" buttons for every scheduled step in the roadmap, including pre-filled health tips and diet advice in the event description.
+- **Health & Diet Command Center:** Dynamic advice section providing:
+    - Pre-Donation Tips (Hydration, Sleep, Alcohol avoidance).
+    - Post-Donation Tips (Rest, Fluid intake, Activity restrictions).
+    - Recommended Diet (Iron-rich, Vitamin C, Protein).
+- **Gender-Aware Calculations:** Automatically toggles calculation parameters based on Male/Female biological recovery requirements.
+
+---
+
+## 2. Calculation Logic
+The "Smart Roadmap" is built using the following mathematical constraints:
+
+### A. Whole Blood (WB) Intervals
+- **Male:** 90 days (3 months) gap required between WB donations.
+- **Female:** 120 days (4 months) gap required between WB donations.
+
+### B. Platelet (SDP) Intervals
+- **SDP to SDP:** 15 days gap required.
+- **WB to SDP:** Minimum 28 days (4 weeks) gap required after a Whole Blood donation before starting SDP.
+- **SDP to WB:** Minimum 28 days (4 weeks) gap required after the last SDP donation before donating Whole Blood.
+
+### C. Roadmap Generation Algorithm
+1. **Target Date:** Set `Target WB Date` = `Last WB Date` + (90 or 120 days).
+2. **Start Point:** Set `Runner Date` = `Last WB Date` + 28 days.
+3. **SDP Loop:** 
+    - While (`Target WB Date` - `Runner Date`) >= 28 days:
+    - Add an SDP Step to the roadmap.
+    - Increment `Runner Date` by 15 days.
+4. **Final Step:** Add the `Target WB Date` as the final Whole Blood donation step.
+
+---
+
+## 3. Edge Case Handling
+- **Missing Required Input:** The system blocks calculation if `Last WB Date` is empty, as it is the anchor for the entire roadmap.
+- **Recent SDP Donation:** 
+    - If the user provides a `Last SDP Date`, the algorithm checks if it is more recent than the "WB+28" start point. 
+    - If yes, the roadmap starts 15 days after that SDP instead.
+- **Buffer Protection (SDP to WB):** If an SDP donation is scheduled too close to the `Target WB Date` (less than 28 days), the algorithm automatically stops adding SDP steps to ensure the donor has enough recovery time for the main WB donation.
+- **Target Date Extension:** If a recent SDP donation was made so late that the 28-day recovery period exceeds the original 90/120 day WB target, the `Target WB Date` is dynamically pushed forward to the earliest safe date (Last SDP + 28 days).
+- **Historical Context:** The UI displays "None" for SDP history if the optional field is left blank, preventing "Invalid Date" errors in the summary card.
+- **Language Persistence:** If a user generates a roadmap in English and switches to Hindi, the roadmap is automatically re-generated in Hindi without requiring the user to click "Calculate" again.
