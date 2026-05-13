@@ -1,179 +1,137 @@
 /**
  * Recent Donors Gallery Loader for Index Page
- * Fetches and displays recent donation-related images from Google Drive
+ * Fetches and displays the 4 latest donor images from Firebase Storage
  */
+
+import { storage, ref, listAll, getDownloadURL, getMetadata } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const recentDonorsContainer = document.getElementById('recent-donors-gallery');
     const loadingIndicator = document.getElementById('recent-donors-loading');
 
-    if (!recentDonorsContainer) {
-        return; // Exit if container doesn't exist on this page
+    if (!recentDonorsContainer) return;
+
+    // Smart Title Cleaning Logic (Same as main gallery)
+    function cleanImageTitle(filename) {
+        let cleanName = filename.replace(/\.[^/.]+$/, ''); // Remove extension
+        
+        // 1. Identify and protect dates
+        const datePattern = /\d{1,2}[-\/]\d{1,2}[-\/]\d{4}/;
+        const dateMatch = cleanName.match(datePattern);
+        const foundDate = dateMatch ? dateMatch[0] : null;
+        
+        if (foundDate) cleanName = cleanName.replace(foundDate, '||DATE||');
+        
+        // 2. Remove trailing duplicate numbers
+        cleanName = cleanName.replace(/-\d+$/, '');
+        
+        // 3. Title Case
+        cleanName = cleanName.replace(/[-_]/g, ' ')
+                             .split(' ')
+                             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                             .join(' ');
+        
+        if (foundDate) cleanName = cleanName.replace('||date||', foundDate).replace('||Date||', foundDate);
+        return cleanName;
     }
 
-    try {
-        const scriptUrl = 'https://script.google.com/macros/s/AKfycbyqSr5tm8V9tp4v1Jsq9LPzOQDIr51g2iMPOd2liWyi4VfpBZB01P19HoJ-zm5IRF0W/exec';
-
-        // Fetch images from "Blood Donors" and "Donation Camps" categories
-        const categories = ['Blood Donors', 'Donation Camps'];
-        let allDonationImages = [];
-
-        for (const category of categories) {
-            const response = await fetch(`${scriptUrl}?category=${encodeURIComponent(category)}&t=${new Date().getTime()}`);
-
-            if (response.ok) {
-                const data = await response.json();
-                if (Array.isArray(data)) {
-                    allDonationImages = allDonationImages.concat(data);
+    // Helper to fetch images from a folder
+    const fetchImagesFromFolder = async (folderPath) => {
+        try {
+            const folderRef = ref(storage, folderPath);
+            const result = await listAll(folderRef);
+            
+            const imagePromises = result.items.map(async (itemRef) => {
+                try {
+                    const [url, metadata] = await Promise.all([
+                        getDownloadURL(itemRef),
+                        getMetadata(itemRef).catch(() => ({}))
+                    ]);
+                    
+                    return {
+                        id: itemRef.fullPath,
+                        src: url,
+                        title: cleanImageTitle(itemRef.name),
+                        date: metadata.customMetadata?.sortDate || metadata.timeCreated || new Date().toISOString()
+                    };
+                } catch (err) {
+                    console.warn(`Failed to load ${itemRef.fullPath}:`, err);
+                    return null;
                 }
-            }
-        }
+            });
 
-        if (allDonationImages.length === 0) {
-            // Hide loader
-            if (loadingIndicator) {
-                loadingIndicator.style.display = 'none';
-            }
+            return (await Promise.all(imagePromises)).filter(img => img !== null);
+        } catch (error) {
+            console.error(`Error fetching ${folderPath}:`, error);
+            return [];
+        }
+    };
+
+    try {
+        // Fetch from both relevant folders
+        const [donorImages, campImages] = await Promise.all([
+            fetchImagesFromFolder('gallery/blood-donors'),
+            fetchImagesFromFolder('gallery/donation-camps')
+        ]);
+
+        let allImages = [...donorImages, ...campImages];
+
+        if (allImages.length === 0) {
+            if (loadingIndicator) loadingIndicator.style.display = 'none';
             recentDonorsContainer.innerHTML = '<p class="text-center text-text-secondary col-span-full">No recent donor images available.</p>';
             return;
         }
 
-        // Helper function to convert Google Drive URL to viewable format
-        const convertDriveUrlToViewable = (url) => {
-            if (!url) return '';
+        // Sort by date (newest first) and take the latest 4
+        allImages.sort((a, b) => new Date(b.date) - new Date(a.date));
+        const recentImages = allImages.slice(0, 4);
 
-            // If URL is already in googleusercontent format, use it as-is
-            if (url.includes('googleusercontent.com')) {
-                return url;
-            }
-
-            // Extract file ID from various Google Drive URL formats
-            let fileId = null;
-
-            // Handle Google Drive uc?id= format
-            if (url.includes('drive.google.com/uc') || url.includes('drive.google.com')) {
-                const idMatch = url.match(/[?&]id=([^&]+)/);
-                if (idMatch && idMatch[1]) {
-                    fileId = idMatch[1];
-                }
-            }
-
-            // Handle standard Google Drive file URLs
-            if (!fileId) {
-                const fileIdMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/);
-                if (fileIdMatch && fileIdMatch[1]) {
-                    fileId = fileIdMatch[1];
-                }
-            }
-
-            // If we found a file ID, convert to viewable format
-            if (fileId) {
-                return `https://lh3.googleusercontent.com/d/${fileId}=w800`;
-            }
-
-            return url;
-        };
-
-        // Process and sort images by date (newest first)
-        const processedImages = allDonationImages.map((img) => ({
-            id: img.id || Date.now() + Math.random(),
-            src: convertDriveUrlToViewable(img.url || ''),
-            category: img.category || 'Donation',
-            title: img.name ? img.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') : 'Donor Image',
-            date: img.date ? new Date(img.date) : new Date()
-        }));
-
-        // Sort by date (newest first) and take only the 4 most recent
-        processedImages.sort((a, b) => b.date - a.date);
-        const recentImages = processedImages.slice(0, 4);
-
-        // Clear the container
+        // Clear and Render
         recentDonorsContainer.innerHTML = '';
-
-        // Render each image
         recentImages.forEach((image) => {
-            const imageCard = createImageCard(image);
-            recentDonorsContainer.appendChild(imageCard);
+            const card = document.createElement('div');
+            card.className = 'gallery-item';
+            card.innerHTML = `
+                <img src="${image.src}" 
+                    alt="${image.title}" 
+                    class="gallery-item-image"
+                    loading="lazy"
+                    onerror="this.src='https://images.pexels.com/photos/5452268/pexels-photo-5452268.jpeg?auto=compress&cs=tinysrgb&w=800'; this.onerror=null;" />
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-caption">
+                        <h3 class="font-bold text-lg mb-1">${image.title}</h3>
+                        <p class="text-sm opacity-90">${formatImageDate(new Date(image.date))}</p>
+                    </div>
+                </div>
+            `;
+            card.addEventListener('click', () => { window.location.href = '/gallery'; });
+            recentDonorsContainer.appendChild(card);
         });
 
-        // Hide loader after images are loaded
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'none';
-        }
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
 
     } catch (error) {
-        console.error('Error loading recent donor images:', error);
-        // Hide loader on error
-        if (loadingIndicator) {
-            loadingIndicator.style.display = 'none';
-        }
+        console.error('Error loading recent donors:', error);
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
         recentDonorsContainer.innerHTML = '<p class="text-center text-text-secondary col-span-full">Unable to load recent donor images.</p>';
     }
 });
 
-/**
- * Creates an image card element with gallery-style hover animation
- * @param {Object} image - Image data object
- * @returns {HTMLElement} Image card element
- */
-function createImageCard(image) {
-    const card = document.createElement('div');
-    card.className = 'gallery-item';
-
-    // Format the date
-    const formattedDate = formatImageDate(image.date);
-
-    card.innerHTML = `
-        <img src="${image.src}" 
-            alt="${image.title}" 
-            class="gallery-item-image"
-            loading="lazy"
-            onerror="this.src='https://images.pexels.com/photos/5452268/pexels-photo-5452268.jpeg?auto=compress&cs=tinysrgb&w=800'; this.onerror=null;" />
-        <div class="gallery-item-overlay">
-            <div class="gallery-item-caption">
-                <h3 class="font-bold text-lg mb-1">${image.title}</h3>
-                <p class="text-sm opacity-90">${formattedDate}</p>
-            </div>
-        </div>
-    `;
-
-    // Add click event to open gallery page
-    card.addEventListener('click', () => {
-        window.location.href = '/gallery';
-    });
-
-    return card;
-}
-
-/**
- * Formats a date to a readable format
- * @param {Date} date - Date object to format
- * @returns {string} Formatted date
- */
 function formatImageDate(date) {
     if (!date) return 'Recently';
-
-    // Compare calendar dates at midnight to avoid time-of-day skewing the result
     const now = new Date();
-    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const dateMidnight = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(date.getFullYear(), date.getMonth(), date.getDate())) / (1000 * 60 * 60 * 24));
 
-    const diffMs = todayMidnight - dateMidnight;
-    const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
-
-    if (diffDays <= 0) {
-        return 'Today';
-    } else if (diffDays === 1) {
-        return 'Yesterday';
-    } else if (diffDays < 7) {
-        return `${diffDays} days ago`;
-    } else if (diffDays < 30) {
+    if (diffDays <= 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) {
         const weeks = Math.floor(diffDays / 7);
         return `${weeks} ${weeks === 1 ? 'week' : 'weeks'} ago`;
-    } else if (diffDays < 365) {
+    }
+    if (diffDays < 365) {
         const months = Math.floor(diffDays / 30);
         return `${months} ${months === 1 ? 'month' : 'months'} ago`;
-    } else {
-        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
     }
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short' });
 }

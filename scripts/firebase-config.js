@@ -2,6 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, getCountFromServer, addDoc, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, onSnapshot, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
 
@@ -21,6 +22,7 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase services
 const auth = getAuth(app);
 const db = getFirestore(app);
+const storage = getStorage(app);
 const analytics = getAnalytics(app);
 const functions = getFunctions(app);
 
@@ -75,6 +77,7 @@ export {
     app,
     auth,
     db,
+    storage,
     analytics,
     functions,
     // Auth functions
@@ -100,7 +103,13 @@ export {
     onSnapshot,
     serverTimestamp,
     arrayUnion,
+    // Storage functions
+    ref,
+    listAll,
+    getDownloadURL,
+    getMetadata,
     // Cloud Functions
     httpsCallable,
     initAppCheck
 };
+

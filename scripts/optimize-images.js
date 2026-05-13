@@ -3,7 +3,9 @@ const path = require('path');
 const sharp = require('sharp');
 const chokidar = require('chokidar');
 
-const imgsDir = path.join(__dirname, '../imgs');
+// Check for custom directory in arguments
+const customDir = process.argv.find(arg => !arg.startsWith('--') && arg !== process.argv[0] && arg !== process.argv[1]);
+const imgsDir = customDir ? path.resolve(customDir) : path.join(__dirname, '../imgs');
 
 const isWatchMode = process.argv.includes('--watch');
 
@@ -30,6 +32,10 @@ const convertToWebp = async (filePath) => {
 };
 
 const processDirectory = (dir) => {
+    if (!fs.existsSync(dir)) {
+        console.error(`❌ Directory not found: ${dir}`);
+        return;
+    }
     fs.readdirSync(dir).forEach(file => {
         const fullPath = path.join(dir, file);
         if (fs.statSync(fullPath).isDirectory()) {
@@ -57,3 +63,4 @@ if (isWatchMode) {
     console.log(`\n🚀 Starting one-time image optimization in ${imgsDir}...\n`);
     processDirectory(imgsDir);
 }
+
