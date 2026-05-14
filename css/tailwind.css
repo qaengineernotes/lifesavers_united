@@ -190,4 +190,22 @@
   .bg-gradient-success {
     background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-success) 100%);
   }
+
+  /* Volunteer Link Card Styles */
+  .link-card:nth-child(8) {
+    animation-delay: 0.40s;
+  }
+
+  .link-card--volunteer {
+    border-color: rgba(245, 158, 11, 0.18);
+  }
+
+  .link-card--volunteer .link-icon-wrap {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .link-card--volunteer:hover {
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18);
+  }
 }

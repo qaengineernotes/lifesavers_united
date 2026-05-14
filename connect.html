@@ -4,22 +4,22 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Connect With Us - LifeSavers United | Links & Social Media</title>
+    <title>LifeSavers United — Blood Donation Community India | Connect & Save Lives</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Connect with LifeSavers United on Instagram, Facebook, YouTube, WhatsApp and more. Register as a blood donor or submit an emergency blood request. Join our life-saving community today.">
+        content="Join India's largest blood donation community. Register as a donor, submit emergency blood requests, or connect with us on Instagram, WhatsApp & YouTube. Every drop counts — act now.">
     <meta name="keywords"
-        content="LifeSavers United, blood donation, social media, Instagram, Facebook, YouTube, WhatsApp, donor registration, emergency blood request, India blood donation">
+        content="blood donation India, blood donor registration, emergency blood request, free blood donation, blood bank India, LifeSavers United, volunteer blood donor, urgent blood needed, O positive donor, blood donation community">
     <meta name="author" content="LifeSavers United">
     <meta name="robots" content="index, follow">
     <meta name="language" content="English">
     <meta name="theme-color" content="#dc2626">
 
     <!-- Open Graph Meta Tags (WhatsApp, Facebook, LinkedIn) -->
-    <meta property="og:title" content="🩸 LifeSavers United — Connect & Save Lives">
+    <meta property="og:title" content="LifeSavers United — India's Blood Donation Community | Connect & Save Lives">
     <meta property="og:description"
-        content="Follow us on Instagram, Facebook, YouTube & join our WhatsApp community. Register as a blood donor or submit an emergency blood request. Every connection saves a life!">
+        content="Someone needs blood every 2 seconds in India. Register as a donor, submit an emergency request, or join our WhatsApp community. Be a lifesaver today.">
     <meta property="og:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
     <meta property="og:image:secure_url" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
     <meta property="og:image:width" content="1200">
@@ -37,7 +37,7 @@
     <meta name="twitter:creator" content="@lifesaversunit">
     <meta name="twitter:title" content="🩸 LifeSavers United — Connect & Save Lives">
     <meta name="twitter:description"
-        content="Follow us, join our WhatsApp community, register as a donor or submit an emergency blood request.">
+        content="Someone needs blood every 2 seconds in India. Register as a donor, post an emergency request, or join our community. Save a life today — it takes 30 minutes.">
     <meta name="twitter:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
     <meta name="twitter:image:alt" content="LifeSavers United - Connect & Save Lives">
 
@@ -81,29 +81,29 @@
     <!-- Microsoft Tiles -->
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="imgs/favicon/ms-icon-144x144.png">
-    <meta name="web-app-manifest" content="imgs/favicon/browserconfig.xml">
+    <meta name="msapplication-config" content="imgs/favicon/browserconfig.xml">
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="imgs/favicon/manifest.json">
 
     <!-- Optimized CSS and Fonts Loading -->
+    <link rel="preload" href="imgs/lifesavers-United.webp" as="image" fetchpriority="high">
     <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link rel="preload" as="style" href="css/main.css">
         <link rel="stylesheet" href="css/main.css">
     </noscript>
 
     <!-- Preconnect for Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <!-- Load combined fonts with display=swap + preload trick to prevent render blocking -->
     <link rel="preload"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-        as="style" />
+        as="style" crossorigin />
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
-        media="print" onload="this.media='all'" />
+        media="print" onload="this.media='all'" crossorigin />
     <noscript>
         <link rel="stylesheet"
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" />
@@ -134,28 +134,19 @@
 
     <!-- User Profile UI -->
     <script type="module">
-        import('./scripts/user-profile-ui.js').then(module => {
-            module.initializeUserProfileUI();
-        }).catch(error => {
-            console.error('Failed to load user profile UI:', error);
+        window.addEventListener('load', () => {
+            import('./scripts/user-profile-ui.js').then(module => {
+                module.initializeUserProfileUI();
+            }).catch(error => {
+                console.error('Failed to load user profile UI:', error);
+            });
         });
     </script>
-
-    <!-- Microsoft Clarity -->
-    <script type="text/javascript">
-        (function (c, l, a, r, i, t, y) {
-            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
-            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
-            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
-        })(window, document, "clarity", "script", "vv2e6pv1i7");
-    </script>
-
-
 
     <script defer src="https://cloud.umami.is/script.js"
         data-website-id="7f971a01-0c53-4b99-87d8-4f507e85b6b7"></script>
     <!-- LCP Preload for Important Announcement Popup -->
-    
+
 </head>
 
 <body class="links-page-body">
@@ -293,6 +284,27 @@
                 </svg>
             </a>
 
+            <!-- Become Volunteer -->
+            <a id="link-volunteer" href="https://lifesaversunited.org/volunteers#join-form"
+                class="link-card link-card--volunteer" target="_blank" rel="noopener noreferrer"
+                aria-label="Become a Volunteer">
+                <div class="link-icon-wrap">
+                    <!-- Volunteer / Hand icon -->
+                    <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+                <div class="link-text">
+                    <div class="link-title">Become Volunteer</div>
+                    <div class="link-subtitle">Join our community of lifesavers</div>
+                </div>
+                <svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+
             <!-- Social Media -->
             <p class="links-section-heading">Follow Us</p>
 
@@ -381,7 +393,7 @@
             <!-- Footer note -->
             <p class="links-footer-note">
                 Visit our full website at <a href="https://lifesaversunited.org" target="_blank"
-                    rel="noopener noreferrer" rel="noopener noreferrer">lifesaversunited.org</a>
+                    rel="noopener noreferrer">lifesaversunited.org</a>
             </p>
         </div>
     </main>
@@ -504,14 +516,22 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
         </svg>
     </a>
-
+    <script>
+        window.addEventListener('load', function () {
+            (function (c, l, a, r, i, t, y) {
+                c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+                t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+                y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+            })(window, document, "clarity", "script", "vv2e6pv1i7");
+        });
+    </script>
     <script>
         // Set current year in footer
         document.getElementById('currentYear').textContent = new Date().getFullYear();
     </script>
-    <script src="scripts/mobile-menu.js"></script>
-    <script src="scripts/common-page-functions.js"></script>
-    <script id="dhws-dataInjector" src="/public/dhws-data-injector.js"></script>
+    <script src="scripts/mobile-menu.js" defer></script>
+    <script src="scripts/common-page-functions.js" defer></script>
+    <script id="dhws-dataInjector" src="/public/dhws-data-injector.js" defer></script>
 </body>
 
 </html>

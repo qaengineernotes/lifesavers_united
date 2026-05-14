@@ -5428,6 +5428,10 @@ article.py-16 {
   animation-delay: 0.35s;
 }
 
+.link-card:nth-child(8) {
+  animation-delay: 0.40s;
+}
+
 @keyframes card-slide-up {
   from {
     opacity: 0;
@@ -5595,6 +5599,20 @@ article.py-16 {
 .link-card--request:hover {
   border-color: rgba(30, 64, 175, 0.35);
   box-shadow: 0 8px 24px rgba(30, 64, 175, 0.18);
+}
+
+/* Volunteer — Amber/Orange */
+.link-card--volunteer {
+  border-color: rgba(245, 158, 11, 0.18);
+}
+
+.link-card--volunteer .link-icon-wrap {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.link-card--volunteer:hover {
+  border-color: rgba(245, 158, 11, 0.35);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18);
 }
 
 /* Footer note */
