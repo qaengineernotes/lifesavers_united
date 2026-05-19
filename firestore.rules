@@ -10,12 +10,14 @@ service cloud.firestore {
     // Helper: Check if user is approved by admin
     function isApproved() {
       return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.status == 'approved';
     }
 
     // Helper: Check if user is a superuser
     function isSuperuser() {
       return isAuthenticated() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'superuser';
     }
 
@@ -60,15 +62,15 @@ service cloud.firestore {
     // Updates/deletes restricted to approved users (coordinators), EXCEPT for public reopens.
     match /emergency_requests/{requestId} {
       allow read: if true; // Allow public read for duplicate detection
-      allow create: if isVerifiedApp(); // Public form submissions allowed with App Check
-      allow update: if isApproved() || isVerifiedApp(); // Allow coordinators or public reopens/updates
-      allow delete: if isApproved();
+      allow create: if isVerifiedApp() || isApproved() || isSuperuser(); // Public form submissions allowed with App Check or authenticated coordinators
+      allow update: if isApproved() || isVerifiedApp() || isSuperuser(); // Allow coordinators or public reopens/updates
+      allow delete: if isApproved() || isSuperuser();
 
       // History entries also require App Check for public submissions
       match /updates/{updateId} {
         allow read: if isAuthenticated();
-        allow create: if isVerifiedApp();
-        allow update, delete: if isApproved();
+        allow create: if isVerifiedApp() || isApproved() || isSuperuser();
+        allow update, delete: if isApproved() || isSuperuser();
       }
     }
 
@@ -77,22 +79,22 @@ service cloud.firestore {
     // Public can register as a donor.
     match /donors/{donorId} {
       allow read: if true; // Public read needed for duplicate-detection on registration
-      allow create: if isVerifiedApp(); // Public donor registration allowed with App Check
-      allow update: if isSuperuser() || isVerifiedApp(); // Only superuser or public registration retry
+      allow create: if isVerifiedApp() || isApproved() || isSuperuser(); // Public donor registration allowed with App Check or coordinator/superuser
+      allow update: if isSuperuser() || isApproved() || isVerifiedApp(); // Only superuser, coordinator, or public registration retry
       allow delete: if isSuperuser();
     }
 
     // Requests collection (secondary/legacy?)
     match /requests/{requestId} {
       allow read: if true; // Public read for now
-      allow create, update: if isApproved() || isVerifiedApp(); 
+      allow create, update: if isApproved() || isVerifiedApp() || isSuperuser(); 
       allow delete: if isSuperuser();
     }
 
     // Donation Logs collection
     match /donation_logs/{logId} {
       allow read: if isAuthenticated();
-      allow create: if isApproved();
+      allow create: if isApproved() || isSuperuser();
       allow update, delete: if isSuperuser();
     }
   }

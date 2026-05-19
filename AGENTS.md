@@ -75,6 +75,9 @@ npm run build:css
 ```
 NOT bare `npx tailwindcss` which would miss the component tagging.
 
+**CRITICAL RULE FOR RUNNING `npm run build:css`:**
+Before running `npm run build:css`, you MUST check if any custom, plain CSS rules are getting deleted from `css/main.css` (e.g. by comparing the differences). Check if the deleted CSS classes/selectors are used anywhere in the project. If they are used anywhere, do NOT run the build command. Instead, ask the user to manually add the custom CSS rules to `css/tailwind.css` first.
+
 ### Local Development
 - Use `server.py` for local dev - it handles CORS and proxies to Google Apps Script
 - Direct file:// won't work due to CORS restrictions
