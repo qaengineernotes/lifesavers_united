@@ -5,28 +5,19 @@
  *   1. A beautiful HTML welcome email to the donor (if email provided)
  *   2. An admin notification to lifesaversunited.india@gmail.com
  *
- * Required env variable (CF Pages dashboard → Settings → Environment Variables):
- *   RESEND_API_KEY  →  your API key from resend.com (free: 3,000 emails/month)
+ * Uses the Free Provider Waterfall: Resend → Brevo → Mailjet
+ * Required env variables (CF Pages → Settings → Environment Variables):
+ *   RESEND_API_KEY     — resend.com        (100 emails/day free)
+ *   BREVO_API_KEY      — brevo.com         (300 emails/day free)
+ *   MAILJET_API_KEY    — mailjet.com       (200 emails/day free)
+ *   MAILJET_SECRET_KEY — mailjet.com secret
  *
- * The sender domain (lifesaversunited.org) must be verified in Resend.
+ * The sender domain (lifesaversunited.org) must be verified in each provider.
  */
 
-const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
-const FROM        = 'LifeSavers United <noreply@lifesaversunited.org>';
-const RESEND_API  = 'https://api.resend.com/emails';
+import { sendEmail } from './_email-sender.js';
 
-// ── Helper: send one email via Resend ────────────────────────────────────────
-async function sendEmail(apiKey, { to, subject, html }) {
-    const res = await fetch(RESEND_API, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ from: FROM, to, subject, html }),
-    });
-    return { ok: res.ok, status: res.status, body: await res.json() };
-}
+const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
 
 // ── CORS headers ─────────────────────────────────────────────────────────────
 const CORS = {
@@ -75,26 +66,25 @@ export async function onRequestPost(context) {
             timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short',
         });
 
-        const apiKey = context.env.RESEND_API_KEY;
         const results = [];
 
         // 1. Welcome email → donor (only if email provided)
         if (safeEmail && safeEmail.includes('@')) {
-            const r = await sendEmail(apiKey, {
+            const r = await sendEmail(context.env, {
                 to: [safeEmail],
                 subject: `🩸 Welcome to LifeSavers United, ${safeName.split(' ')[0]}! You're Now a Registered Donor`,
                 html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime),
             });
-            results.push({ type: 'donor', ...r });
+            results.push({ type: 'donor', provider: r.provider, ok: r.ok });
         }
 
         // 2. Admin notification → always
-        const r2 = await sendEmail(apiKey, {
+        const r2 = await sendEmail(context.env, {
             to: [ADMIN_EMAIL],
             subject: `🩸 New Donor: ${safeName} (${safeBlood}) from ${safeCity || 'Unknown City'}`,
             html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeDob, safeEmerg, safePref, istTime),
         });
-        results.push({ type: 'admin', ...r2 });
+        results.push({ type: 'admin', provider: r2.provider, ok: r2.ok });
 
         return Response.json({ success: true, results }, { status: 200, headers: CORS });
 

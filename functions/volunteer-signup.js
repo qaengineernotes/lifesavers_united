@@ -2,13 +2,19 @@
  * Cloudflare Pages Function: /volunteer-signup
  *
  * Receives volunteer form data via POST (JSON), validates it,
- * and sends a notification email using Cloudflare Email Routing.
+ * and sends a notification email using the Free Provider Waterfall.
  *
- * Required binding (set in CF Pages dashboard):
- *   - Email binding named: EMAIL
- *   - Sender address:      noreply@lifesaversunited.org
- *   - Destination:         lifesaversunited.india@gmail.com
+ * Uses the Free Provider Waterfall: Resend → Brevo → Mailjet
+ * Required env variables (CF Pages → Settings → Environment Variables):
+ *   RESEND_API_KEY     — resend.com        (100 emails/day free)
+ *   BREVO_API_KEY      — brevo.com         (300 emails/day free)
+ *   MAILJET_API_KEY    — mailjet.com       (200 emails/day free)
+ *   MAILJET_SECRET_KEY — mailjet.com secret
+ *
+ * The sender domain (lifesaversunited.org) must be verified in each provider.
  */
+
+import { sendEmail } from './_email-sender.js';
 
 export async function onRequestPost(context) {
     // ── CORS headers (allow your own domain only) ──────────────────────────
@@ -156,35 +162,21 @@ export async function onRequestPost(context) {
 </body>
 </html>`;
 
-        // ── Send via Resend API ──────────────────────────────────────────────
-        const resendApiKey = context.env.RESEND_API_KEY;
-
-        if (!resendApiKey) {
-            console.error('[volunteer-signup] Missing RESEND_API_KEY');
-            throw new Error('Email service not configured.');
-        }
-
-        const resendResponse = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${resendApiKey}`,
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                from: 'Lifesavers United <noreply@lifesaversunited.org>',
-                to: ['lifesaversunited.india@gmail.com'],
-                subject: `🩸 New Volunteer: ${safeName} from ${safeCity}`,
-                html: htmlBody,
-                text: textBody,
-                reply_to: safeEmail || undefined,
-            }),
+        // ── Send via Waterfall (Resend → Brevo → Mailjet) ──────────────────────────
+        const result = await sendEmail(context.env, {
+            to:      ['lifesaversunited.india@gmail.com'],
+            subject: `🩸 New Volunteer: ${safeName} from ${safeCity}`,
+            html:    htmlBody,
+            text:    textBody,
+            replyTo: safeEmail || undefined,
         });
 
-        if (!resendResponse.ok) {
-            const errorData = await resendResponse.json();
-            console.error('[volunteer-signup] Resend Error:', errorData);
+        if (!result.ok) {
+            console.error('[volunteer-signup] All providers failed:', result.allAttempts);
             throw new Error('Email delivery failed.');
         }
+
+        console.log(`[volunteer-signup] Email sent via ${result.provider}`);
 
         return Response.json(
             { success: true, message: 'Application received! We\'ll reach out within 24 hours.' },

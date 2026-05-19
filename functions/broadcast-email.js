@@ -1,19 +1,26 @@
 /**
  * Cloudflare Pages Function: /functions/broadcast-email
- * 
+ *
  * Sends a personalized broadcast email to all registered donors.
- * 
+ *
  * Flow:
  * 1. Verify that the requester is an authorized Superuser.
  * 2. Fetch all donors from Firestore.
  * 3. Personalize the message using {{name}} placeholder.
  * 4. Wrap the message in the official Header/Footer template.
- * 5. Send in batches of 100 via Resend.
+ * 5. Send via the Free Provider Waterfall: Resend → Brevo → Mailjet
+ *    - Resend batch API (100/call) is used first for efficiency.
+ *    - If Resend's daily quota is hit, remaining emails fall back
+ *      to Brevo (300/day) then Mailjet (200/day).
+ *
+ * Required env variables (CF Pages → Settings → Environment Variables):
+ *   RESEND_API_KEY     — resend.com        (100 emails/day free)
+ *   BREVO_API_KEY      — brevo.com         (300 emails/day free)
+ *   MAILJET_API_KEY    — mailjet.com       (200 emails/day free)
+ *   MAILJET_SECRET_KEY — mailjet.com secret
  */
 
-const FROM = 'LifeSavers United <noreply@lifesaversunited.org>';
-const RESEND_BATCH_API = 'https://api.resend.com/emails/batch';
-const FIREBASE_PROJECT_ID = 'lifesavers-united-org';
+import { sendBatch } from './_email-sender.js';
 
 // ── CORS headers ─────────────────────────────────────────────────────────────
 const CORS = {
@@ -30,11 +37,6 @@ export async function onRequestOptions() {
 // ── Main POST handler ─────────────────────────────────────────────────────────
 export async function onRequestPost(context) {
     try {
-        const apiKey = context.env.RESEND_API_KEY;
-        if (!apiKey) {
-            return Response.json({ success: false, error: 'Resend API key not configured.' }, { status: 500, headers: CORS });
-        }
-
         let data;
         try {
             data = await context.request.json();
@@ -49,17 +51,18 @@ export async function onRequestPost(context) {
         }
 
         // --- STEP 1: Identify Recipients ---
-        // Recipients are now passed directly from the authenticated frontend to bypass 403 issues.
+        // Recipients are passed directly from the authenticated frontend.
         const recipients = donorList;
 
         if (recipients.length === 0) {
             return Response.json({ success: true, message: 'No recipients provided.' }, { headers: CORS });
         }
 
-        // --- STEP 2: Prepare Batch Emails ---
-        const emailBatch = [];
+        // --- STEP 2: Build personalised email list ---
+        const emailList = [];
         for (const recipient of recipients) {
             const { email, name } = recipient;
+            if (!email) continue;
 
             // Personalize the message
             const personalizedBody = message.replace(/\{\{name\}\}/g, name);
@@ -67,39 +70,24 @@ export async function onRequestPost(context) {
             // Wrap in official Template Sandwich
             const html = buildBroadcastTemplate(name, personalizedBody);
 
-            emailBatch.push({
-                from: FROM,
-                to: email,
+            emailList.push({
+                to:      email,
                 subject: isTest ? `[TEST] ${subject}` : subject,
-                html: html
+                html,
             });
         }
 
-        if (emailBatch.length === 0) {
+        if (emailList.length === 0) {
             return Response.json({ success: true, message: 'No valid donor emails found.' }, { headers: CORS });
         }
 
-        // 4. Send in Batches of 100 (Resend limit)
-        const batchSize = 100;
-        const sendResults = [];
-        for (let i = 0; i < emailBatch.length; i += batchSize) {
-            const chunk = emailBatch.slice(i, i + batchSize);
-            const res = await fetch(RESEND_BATCH_API, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(chunk),
-            });
-            const result = await res.json();
-            sendResults.push({ status: res.status, data: result });
-        }
+        // --- STEP 3: Send via Waterfall (Resend batch → Brevo → Mailjet) ---
+        const batchResult = await sendBatch(context.env, emailList);
 
         return Response.json({
-            success: true,
-            message: `Broadcast initiated. Sent to ${emailBatch.length} donors.`,
-            details: sendResults
+            success: batchResult.ok,
+            message: `Broadcast complete. Sent: ${batchResult.sent}, Failed: ${batchResult.failed} (of ${emailList.length} total).`,
+            details: batchResult.results,
         }, { headers: CORS });
 
     } catch (err) {
