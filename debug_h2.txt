@@ -1,0 +1,1 @@
+'               <h2\n                        class="text-4xl font-bold text-gray-900 mt-16 mb-8 pb-3 border-b-4 border-primary flex items-center">\n                        <span class="mr-4 text-primary"'

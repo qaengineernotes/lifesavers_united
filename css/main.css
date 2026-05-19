@@ -8071,3 +8071,87 @@ article.py-16 {
   color: #e11d48 !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
 }
+
+/* ============================================================
+   Blog Post H2 Red Underline
+   Applies the 4px primary-red bottom border to H2 headings
+   inside blog article sections (mirrors border-b-4 border-primary)
+   ============================================================ */
+article.prose-lg section h2 {
+  border-bottom-width: 4px;
+  border-bottom-style: solid;
+  border-bottom-color: #dc2626;
+  padding-bottom: 0.75rem;
+}
+
+/* ============================================================
+   Blog Share Section Buttons
+   Explicit colors for share buttons (Tailwind purges these
+   color utilities when blog HTML files are not in content scan)
+   ============================================================ */
+
+/* Share section container */
+article.prose-lg .blog-share-section {
+  margin-top: 6rem;
+  padding: 3rem;
+  border-radius: 2rem;
+  text-align: center;
+}
+
+/* Share buttons row */
+article.prose-lg .blog-share-section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+/* Share button base */
+article.prose-lg .blog-share-section a {
+  flex: 1;
+  min-width: 180px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+article.prose-lg .blog-share-section a:hover {
+  transform: scale(1.05);
+}
+
+/* Share heading */
+article.prose-lg .blog-share-section h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+a[aria-label="Share on WhatsApp"] {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+a[aria-label="Share on WhatsApp"]:hover {
+  background-color: #15803d;
+}
+a[aria-label="Share on Twitter"] {
+  background-color: #60a5fa;
+  color: #ffffff;
+}
+a[aria-label="Share on Twitter"]:hover {
+  background-color: #3b82f6;
+}
+a[aria-label="Share on Facebook"] {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+a[aria-label="Share on Facebook"]:hover {
+  background-color: #1e40af;
+}
