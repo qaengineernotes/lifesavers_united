@@ -214,3 +214,10 @@
     border-bottom-width: 4px;
   }
 }
+
+/* Mobile header section responsive overrides */
+@media (max-width: 639px) {
+  .mobile-header-section .mobile-refresh-btn:not(.hidden) {
+    display: flex !important;
+  }
+}

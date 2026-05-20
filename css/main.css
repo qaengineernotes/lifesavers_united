@@ -4144,7 +4144,7 @@ footer .flex.items-center.mb-3 img {
   }
 
   /* Each button (All Requests, All Donors, Refresh) fills the row */
-  .mobile-header-section .mobile-refresh-btn {
+  .mobile-header-section .mobile-refresh-btn:not(.hidden) {
     width: 100% !important;
     display: flex !important;
     align-items: center !important;

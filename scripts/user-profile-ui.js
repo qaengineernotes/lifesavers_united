@@ -39,8 +39,10 @@ function toggleAllRequestsButton(user) {
             allRequestsButtonContainer.style.display = 'inline-flex';
             allRequestsButtonContainer.style.visibility = 'visible';
             allRequestsButtonContainer.style.opacity = '1';
+            allRequestsButtonContainer.classList.remove('hidden');
         } else {
             allRequestsButtonContainer.style.display = 'none';
+            allRequestsButtonContainer.classList.add('hidden');
         }
     }
 
@@ -52,8 +54,10 @@ function toggleAllRequestsButton(user) {
             allDonorsButtonContainer.style.display = 'inline-flex';
             allDonorsButtonContainer.style.visibility = 'visible';
             allDonorsButtonContainer.style.opacity = '1';
+            allDonorsButtonContainer.classList.remove('hidden');
         } else {
             allDonorsButtonContainer.style.display = 'none';
+            allDonorsButtonContainer.classList.add('hidden');
         }
     }
 

@@ -95,10 +95,10 @@
     <link rel="manifest" href="imgs/favicon/manifest.json">
 
     <!-- Optimized CSS Loading -->
-    <link rel="preload" href="css/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="css/main.css?v=2" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript>
-        <link rel="preload" as="style" href="css/main.css">
-        <link rel="stylesheet" href="css/main.css">
+        <link rel="preload" as="style" href="css/main.css?v=2">
+        <link rel="stylesheet" href="css/main.css?v=2">
     </noscript>
 
     <!-- Mobile Controls Responsive Fix -->
@@ -122,8 +122,8 @@
             }
 
             /* All Requests & All Donors & Refresh buttons — full width */
-            #emergencyControlsRow a.mobile-refresh-btn,
-            #emergencyControlsRow button.mobile-refresh-btn {
+            #emergencyControlsRow a.mobile-refresh-btn:not(.hidden),
+            #emergencyControlsRow button.mobile-refresh-btn:not(.hidden) {
                 width: 100% !important;
                 display: flex !important;
                 align-items: center !important;
