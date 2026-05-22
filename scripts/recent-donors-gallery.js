@@ -3,7 +3,7 @@
  * Fetches and displays the 4 latest donor images from Firebase Storage
  */
 
-import { storage, ref, listAll, getDownloadURL, getMetadata } from './firebase-config.js';
+import { storage, ref, listAll, getMetadata } from './firebase-config.js';
 
 document.addEventListener('DOMContentLoaded', async function () {
     const recentDonorsContainer = document.getElementById('recent-donors-gallery');
@@ -43,10 +43,9 @@ document.addEventListener('DOMContentLoaded', async function () {
             
             const imagePromises = result.items.map(async (itemRef) => {
                 try {
-                    const [url, metadata] = await Promise.all([
-                        getDownloadURL(itemRef),
-                        getMetadata(itemRef).catch(() => ({}))
-                    ]);
+                    const filePath = encodeURIComponent(itemRef.fullPath);
+                    const url = `https://firebasestorage.googleapis.com/v0/b/${itemRef.bucket}/o/${filePath}?alt=media`;
+                    const metadata = await getMetadata(itemRef).catch(() => ({}));
                     
                     return {
                         id: itemRef.fullPath,

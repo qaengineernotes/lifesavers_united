@@ -728,3 +728,375 @@ exports.postRequestToTwitter = functions.https.onCall(async (data, context) => {
         );
     }
 });
+
+// Export HTTP Callable Function for Donor Registration
+exports.submitDonorRegistration = functions.https.onCall(async (data, context) => {
+    try {
+        console.log("📥 Donor registration request received");
+
+        if (!data || !data.donorData) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'Donor data is required'
+            );
+        }
+
+        const donorData = data.donorData;
+
+        // Validate mandatory fields
+        if (!donorData.fullName || !donorData.contactNumber) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'Full Name and Contact Number are required'
+            );
+        }
+
+        const db = admin.firestore();
+        const donorsRef = db.collection('donors');
+        let existingDonor = null;
+        let donorId = null;
+
+        const searchName = (donorData.fullName || '').trim();
+        const searchContact = normalizePhoneNumber(donorData.contactNumber);
+
+        // 1. Search by Contact Number
+        if (searchContact) {
+            const snapshot = await donorsRef.where('contactNumber', '==', searchContact).get();
+            if (!snapshot.empty) {
+                existingDonor = snapshot.docs[0];
+                donorId = existingDonor.id;
+            }
+        }
+
+        // 2. Search by Name
+        if (!existingDonor && searchName) {
+            const snapshot = await donorsRef.where('fullName', '==', searchName).get();
+            if (!snapshot.empty) {
+                existingDonor = snapshot.docs[0];
+                donorId = existingDonor.id;
+            }
+        }
+
+        // Generate donor ID if new
+        if (!donorId) {
+            const cleanName = searchName.toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cleanContact = searchContact.replace(/[^0-9]/g, '');
+            donorId = `${cleanName}_${cleanContact}_${Date.now()}`;
+        }
+
+        // Calculate age
+        let age = 0;
+        if (donorData.dateOfBirth) {
+            const birthDate = new Date(donorData.dateOfBirth);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+        }
+
+        // Track who registered
+        let registeredBy = '';
+        let registeredByUid = null;
+
+        if (context.auth) {
+            registeredBy = context.auth.token.name || context.auth.token.phone_number || context.auth.token.email || 'User';
+            registeredByUid = context.auth.uid;
+        } else {
+            registeredBy = donorData.fullName;
+            registeredByUid = null;
+        }
+
+        // Prepare Firestore data
+        const firestoreData = {
+            fullName: donorData.fullName || '',
+            contactNumber: searchContact,
+            bloodGroup: donorData.bloodGroup || donorData.bloodType || '',
+            area: donorData.area || '',
+            emergencyAvailable: donorData.emergencyAvailable || donorData.isEmergencyAvailable || 'No',
+            isEmergencyAvailable: donorData.emergencyAvailable || donorData.isEmergencyAvailable || 'No',
+            dateOfBirth: donorData.dateOfBirth || '',
+            gender: donorData.gender || '',
+            preferredContact: donorData.preferredContact || 'call',
+            age: age || 0,
+            weight: donorData.weight || '',
+            lastDonation: donorData.lastDonation || donorData.lastDonatedAt || '',
+            lastDonatedAt: donorData.lastDonation || donorData.lastDonatedAt || '',
+            medicalHistory: donorData.medicalHistory || '',
+            email: donorData.email || '',
+            city: donorData.city || '',
+            registeredBy: registeredBy,
+            registeredByUid: registeredByUid,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+            updatedBy: registeredBy || 'System'
+        };
+
+        if (existingDonor) {
+            const existingData = existingDonor.data();
+            
+            if (existingData.registeredAt) {
+                firestoreData.registeredAt = existingData.registeredAt;
+            } else {
+                firestoreData.registeredAt = admin.firestore.FieldValue.serverTimestamp();
+            }
+
+            if (existingData.createdAt) {
+                firestoreData.createdAt = existingData.createdAt;
+            } else {
+                firestoreData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+            }
+
+            if (existingData.createdBy) {
+                firestoreData.createdBy = existingData.createdBy;
+            } else {
+                firestoreData.createdBy = registeredBy || 'System (Public Registration)';
+            }
+
+            if (existingData.createdByUid !== undefined) {
+                firestoreData.createdByUid = existingData.createdByUid;
+            } else {
+                firestoreData.createdByUid = registeredByUid || null;
+            }
+
+            if (existingData.source) {
+                firestoreData.source = existingData.source;
+            } else {
+                firestoreData.source = 'public_registration';
+            }
+        } else {
+            // New donor - set all fields
+            firestoreData.registeredAt = admin.firestore.FieldValue.serverTimestamp();
+            firestoreData.createdAt = admin.firestore.FieldValue.serverTimestamp();
+            firestoreData.createdBy = registeredBy || 'System (Public Registration)';
+            firestoreData.createdByUid = registeredByUid || null;
+            firestoreData.source = donorData.source || (context.auth ? 'web_form' : 'web_form_public');
+        }
+
+        // Write to Firestore using Admin SDK
+        await donorsRef.doc(donorId).set(firestoreData, { merge: true });
+        console.log(`✅ Donor ${donorId} registered successfully`);
+
+        return { success: true, donorId };
+
+    } catch (error) {
+        console.error("❌ Error in submitDonorRegistration:", error);
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+        throw new functions.https.HttpsError(
+            'internal',
+            error.message || 'Failed to register donor'
+        );
+    }
+});
+
+// Export HTTP Callable Function for Emergency Request
+exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, context) => {
+    try {
+        console.log("📥 Emergency blood request received");
+
+        if (!data || !data.requestData) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                'Request data is required'
+            );
+        }
+
+        const requestData = data.requestData;
+
+        // Validate required fields
+        const requiredFields = ['patientName', 'contactNumber', 'bloodType', 'hospitalName'];
+        const missingFields = requiredFields.filter(field => !requestData[field]);
+
+        if (missingFields.length > 0) {
+            throw new functions.https.HttpsError(
+                'invalid-argument',
+                `Missing required fields: ${missingFields.join(', ')}`
+            );
+        }
+
+        const db = admin.firestore();
+        const requestsRef = db.collection('emergency_requests');
+        let existingDoc = null;
+        let requestId = null;
+
+        const searchName = (requestData.patientName || '').trim();
+        const searchContact = normalizePhoneNumber(requestData.contactNumber);
+
+        // 1. Search by Contact Number
+        if (searchContact) {
+            const snapshot = await requestsRef.where('contactNumber', '==', searchContact).get();
+            if (!snapshot.empty) {
+                existingDoc = snapshot.docs[0];
+            }
+        }
+
+        // 2. Search by Patient Name (Fallback)
+        if (!existingDoc && searchName) {
+            const snapshot = await requestsRef.where('patientName', '==', searchName).get();
+            if (!snapshot.empty) {
+                existingDoc = snapshot.docs[0];
+            }
+        }
+
+        // Track who created
+        let createdByName = '';
+        let createdByUid = null;
+        let source = '';
+
+        if (context.auth) {
+            createdByName = context.auth.token.name || context.auth.token.phone_number || context.auth.token.email || 'User';
+            createdByUid = context.auth.uid;
+            source = 'web_form';
+        } else {
+            createdByName = requestData.patientName;
+            createdByUid = null;
+            source = 'web_form_public';
+        }
+
+        if (existingDoc) {
+            requestId = existingDoc.id;
+            const currentData = existingDoc.data();
+
+            // Check if request is active
+            if (currentData.status === 'Open' || currentData.status === 'Verified' || currentData.status === 'Reopened') {
+                return { success: false, error: 'DUPLICATE_ACTIVE_REQUEST', existingRequest: { id: requestId, status: currentData.status } };
+            }
+
+            // Prepare update data for Reopen
+            const updateData = {
+                patientAge: requestData.patientAge || currentData.patientAge || '',
+                patientSufferingFrom: requestData.diagnosis || currentData.patientSufferingFrom || '',
+                requiredBloodGroup: requestData.bloodType || currentData.requiredBloodGroup || '',
+                unitsRequired: requestData.unitsRequired || currentData.unitsRequired || '',
+                unitsFulfilled: 0,
+                donorSummary: '',
+                donationLogIds: [],
+                hospitalName: requestData.hospitalName || currentData.hospitalName || '',
+                hospitalAddress: requestData.hospitalAddress || currentData.hospitalAddress || '',
+                hospitalCity: requestData.city || requestData.hospitalCity || currentData.hospitalCity || '',
+                contactPerson: requestData.contactPerson || currentData.contactPerson || '',
+                contactNumber: searchContact || currentData.contactNumber || '',
+                contactEmail: requestData.contactEmail || currentData.contactEmail || '',
+                status: 'Reopened',
+                urgencyLevel: requestData.urgency || requestData.urgencyLevel || currentData.urgencyLevel || 'Normal',
+                additionalInfo: requestData.additionalInfo || currentData.additionalInfo || '',
+                updatedBy: createdByName,
+                updatedByUid: createdByUid || 'public',
+                updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                lastUpdatedByName: createdByName,
+                lastUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+                source: source,
+                reopenedAt: admin.firestore.FieldValue.serverTimestamp(),
+                reopenedBy: createdByName,
+                reopenedByUid: createdByUid || 'public',
+                reopenCount: admin.firestore.FieldValue.increment(1)
+            };
+
+            // Preserve donation history
+            if (currentData.donationLogIds && currentData.donationLogIds.length > 0) {
+                const currentAllDonations = currentData.allDonationLogIds || [];
+                updateData.allDonationLogIds = [...currentAllDonations, ...currentData.donationLogIds];
+            }
+
+            // Update the doc
+            await requestsRef.doc(requestId).update(updateData);
+
+            // Add history entry for reopen
+            const historyRef = requestsRef.doc(requestId).collection('updates');
+            await historyRef.add({
+                timestamp: admin.firestore.FieldValue.serverTimestamp(),
+                type: 'REOPENED',
+                userName: createdByName,
+                userUid: createdByUid || 'public',
+                note: context.auth 
+                    ? `Request reopened by ${createdByName} via web form`
+                    : `Request reopened via public form`
+            });
+
+            return { success: true, requestId, action: 'REOPENED' };
+        }
+
+        // Create new request
+        const generateRequestId = (pName, cNumber) => {
+            const cleanName = (pName || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+            const cleanContact = (cNumber || '').toString().replace(/[^0-9]/g, '');
+            return `${cleanName}_${cleanContact}_${Date.now()}`;
+        };
+
+        requestId = generateRequestId(requestData.patientName, searchContact);
+
+        const firestoreData = {
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
+            patientName: requestData.patientName || '',
+            patientAge: requestData.patientAge || '',
+            patientSufferingFrom: requestData.diagnosis || '',
+            requiredBloodGroup: requestData.bloodType || '',
+            unitsRequired: requestData.unitsRequired || '',
+            unitsFulfilled: 0,
+            hospitalName: requestData.hospitalName || '',
+            hospitalAddress: requestData.hospitalAddress || '',
+            hospitalCity: requestData.city || '',
+            contactPerson: requestData.contactPerson || '',
+            contactNumber: searchContact,
+            contactEmail: requestData.contactEmail || '',
+            urgencyLevel: requestData.urgency || requestData.urgencyLevel || 'Normal',
+            status: 'Open',
+            additionalInfo: requestData.additionalInfo || '',
+            createdByName: createdByName,
+            createdByUid: createdByUid || 'public',
+            verifiedByName: '',
+            verifiedByUid: '',
+            verifiedAt: null,
+            closedBy: '',
+            closedByUid: '',
+            closedAt: null,
+            closureReason: '',
+            closureType: '',
+            fulfilledAt: '',
+            reopenedAt: null,
+            reopenCount: 0,
+            donorSummary: '',
+            donationLogIds: [],
+            allDonationLogIds: [],
+            lastDonationAt: null,
+            updatedBy: '',
+            updatedByUid: '',
+            updatedAt: null,
+            lastUpdatedByName: '',
+            lastUpdatedByUid: '',
+            lastUpdatedAt: null,
+            closureHistory: [],
+            totalClosures: 0,
+            source: source
+        };
+
+        await requestsRef.doc(requestId).set(firestoreData);
+
+        // Add history entry for creation
+        const historyRef = requestsRef.doc(requestId).collection('updates');
+        await historyRef.add({
+            timestamp: admin.firestore.FieldValue.serverTimestamp(),
+            type: 'CREATED',
+            userName: createdByName,
+            userUid: createdByUid || 'public',
+            note: context.auth
+                ? `Request created by ${createdByName} via web form`
+                : `Request submitted via public form`
+        });
+
+        return { success: true, requestId, action: 'CREATED' };
+
+    } catch (error) {
+        console.error("❌ Error in submitEmergencyBloodRequest:", error);
+        if (error instanceof functions.https.HttpsError) {
+            throw error;
+        }
+        throw new functions.https.HttpsError(
+            'internal',
+            error.message || 'Failed to submit emergency request'
+        );
+    }
+});
+

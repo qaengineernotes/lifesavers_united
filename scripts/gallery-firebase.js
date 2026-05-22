@@ -1,4 +1,4 @@
-import { storage, ref, listAll, getDownloadURL, getMetadata } from './firebase-config.js';
+import { storage, ref, listAll, getMetadata } from './firebase-config.js';
 
 // Hide loading indicator function
 function hideLoadingIndicator() {
@@ -82,10 +82,9 @@ document.addEventListener('DOMContentLoaded', function () {
             
             const imagePromises = result.items.map(async (itemRef) => {
                 try {
-                    const [url, metadata] = await Promise.all([
-                        getDownloadURL(itemRef),
-                        getMetadata(itemRef).catch(() => ({}))
-                    ]);
+                    const filePath = encodeURIComponent(itemRef.fullPath);
+                    const url = `https://firebasestorage.googleapis.com/v0/b/${itemRef.bucket}/o/${filePath}?alt=media`;
+                    const metadata = await getMetadata(itemRef).catch(() => ({}));
                     
                     // Smart Title Cleaning Logic
                     let cleanName = itemRef.name.replace(/\.[^/.]+$/, ''); // Remove extension

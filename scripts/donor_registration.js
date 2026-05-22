@@ -432,26 +432,19 @@ async function handleFormSubmission(e) {
         // --- 1. ALWAYS Save to Firebase (Primary) ---
         let firebaseResult = { success: false };
         try {
+            const { functions, httpsCallable } = await import('./firebase-config.js');
+            const submitDonorRegistration = httpsCallable(functions, 'submitDonorRegistration');
+            const response = await submitDonorRegistration({ donorData: data });
 
-            // Get current logged-in user if available
-            const { auth } = await import('./firebase-config.js');
-            const currentUser = auth.currentUser;
-
-            // Track who registered
-            if (currentUser) {
-                data.registeredBy = currentUser.displayName || 'User';
-                data.registeredByUid = currentUser.uid;
+            if (response.data && response.data.success) {
+                firebaseResult = { success: true, donorId: response.data.donorId };
             } else {
-                data.registeredBy = data.fullName; // Use donor name if not logged in
-                data.registeredByUid = null;
+                console.error('❌ Firebase Cloud Function returned failure:', response.data?.error);
+                firebaseResult = { success: false, error: response.data?.error };
             }
-
-            const firebaseModule = await import('./firebase-data-service.js');
-            await firebaseModule.registerDonorInFirebase(data);
-            firebaseResult = { success: true };
-
         } catch (firebaseError) {
             console.error('❌ Firebase donor registration failed:', firebaseError);
+            firebaseResult = { success: false, error: firebaseError.message };
         }
 
         // --- 2. ALSO Sync to Google Sheets (Secondary/Backup) ---

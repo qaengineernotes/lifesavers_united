@@ -159,35 +159,23 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
 
         // --- 1. ALWAYS Save to Firebase (Primary) ---
         try {
+            const { functions, httpsCallable } = await import('./firebase-config.js');
+            const submitEmergencyBloodRequest = httpsCallable(functions, 'submitEmergencyBloodRequest');
+            const response = await submitEmergencyBloodRequest({ requestData: data });
 
-            const firebaseModule = await import('./firebase-data-service.js');
-
-            // Get current logged-in user if available
-            const { auth } = await import('./firebase-config.js');
-            const currentUser = auth.currentUser;
-
-            // Track who created this request
-            if (currentUser) {
-                // For logged-in users: use displayName, or phone number, or email, or 'User' as last resort
-                const userName = currentUser.displayName || currentUser.phoneNumber || currentUser.email || 'User';
-                data.createdBy = userName;
-                data.createdByName = userName; // Alias for compatibility
-                data.createdByUid = currentUser.uid;
-                data.source = 'web_form';
+            if (response.data && response.data.success) {
+                firebaseResult = response.data; // contains success, action, requestId
             } else {
-                // For public submissions: use patient's name
-                data.createdBy = data.patientName;
-                data.createdByName = data.patientName; // Alias for compatibility
-                data.createdByUid = null;
-                data.source = 'web_form_public';
+                console.error('❌ Firebase Cloud Function returned failure:', response.data?.error);
+                firebaseResult = { 
+                    success: false, 
+                    error: response.data?.error || 'Cloud Function failed' 
+                };
             }
-
-            firebaseResult = await firebaseModule.createNewRequestInFirebase(data, currentUser);
 
             // Post to Twitter if Firebase save was successful
             if (firebaseResult.success && firebaseResult.action === 'CREATED') {
                 try {
-                    const { functions, httpsCallable } = await import('./firebase-config.js');
                     const postToTwitter = httpsCallable(functions, 'postRequestToTwitter');
 
                     // Prepare data for Twitter (map field names)
