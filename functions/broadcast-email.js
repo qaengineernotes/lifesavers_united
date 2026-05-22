@@ -68,11 +68,11 @@ export async function onRequestPost(context) {
             const personalizedBody = message.replace(/\{\{name\}\}/g, name);
 
             // Wrap in official Template Sandwich
-            const html = buildBroadcastTemplate(name, personalizedBody);
+            const html = buildBroadcastTemplate(personalizedBody);
 
             emailList.push({
                 to:      email,
-                subject: isTest ? `[TEST] ${subject}` : subject,
+                subject: subject,
                 html,
             });
         }
@@ -97,7 +97,7 @@ export async function onRequestPost(context) {
 }
 
 // ── Official Template Sandwich ────────────────────────────────────────────────
-function buildBroadcastTemplate(name, content) {
+function buildBroadcastTemplate(content) {
     return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LifeSavers United Update</title></head>
@@ -113,7 +113,6 @@ function buildBroadcastTemplate(name, content) {
 
   <!-- CONTENT -->
   <tr><td style="padding:40px 32px;">
-    <h2 style="margin:0 0 20px;color:#1a1a1a;font-size:20px;font-weight:700;">Dear ${name},</h2>
     <div style="color:#444;font-size:16px;line-height:1.8;white-space: pre-wrap;">
 ${content}
     </div>

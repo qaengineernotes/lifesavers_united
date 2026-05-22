@@ -91,12 +91,36 @@ export function initializeBroadcastSystem() {
     if (testToggle) {
         testToggle.addEventListener('change', () => {
             if (testToggle.checked) {
-                testContainer.style.display = 'block';
+                testContainer.style.display = 'flex';
                 testContainer.classList.remove('hidden');
                 fetchDonorEmails(); // Fetch when enabled
             } else {
                 testContainer.style.display = 'none';
                 testContainer.classList.add('hidden');
+            }
+        });
+    }
+
+    // Auto-populate recipient name from selected donor email
+    if (testInput) {
+        testInput.addEventListener('input', () => {
+            const emailValue = testInput.value.trim();
+            const nameInput = document.getElementById('recipientNameInput');
+            if (nameInput && emailValue) {
+                const options = datalist.querySelectorAll('option');
+                let foundName = '';
+                for (const opt of options) {
+                    if (opt.value === emailValue) {
+                        const parts = opt.textContent.split(' (');
+                        if (parts.length > 0) {
+                            foundName = parts[0];
+                        }
+                        break;
+                    }
+                }
+                if (foundName) {
+                    nameInput.value = foundName;
+                }
             }
         });
     }
@@ -111,12 +135,15 @@ export function initializeBroadcastSystem() {
             confirmStep.style.display = 'none';
             confirmStep.classList.add('hidden');
             
-            // Reset test toggle
+            // Reset test toggle and inputs
             if (testToggle) {
                 testToggle.checked = false;
                 testContainer.style.display = 'none';
                 testContainer.classList.add('hidden');
             }
+            if (testInput) testInput.value = '';
+            const nameInput = document.getElementById('recipientNameInput');
+            if (nameInput) nameInput.value = '';
 
             modal.style.setProperty('display', 'flex', 'important');
             modal.classList.remove('hidden');
@@ -132,6 +159,8 @@ export function initializeBroadcastSystem() {
             modal.classList.add('hidden');
             document.body.style.overflow = '';
             form.reset();
+            const nameInput = document.getElementById('recipientNameInput');
+            if (nameInput) nameInput.value = '';
         }
     };
 
@@ -142,6 +171,7 @@ export function initializeBroadcastSystem() {
             const message = document.getElementById('broadcastMessage').value.trim();
             const isTest = testToggle ? testToggle.checked : false;
             const testEmail = testInput ? testInput.value.trim() : '';
+            const recipientName = document.getElementById('recipientNameInput') ? document.getElementById('recipientNameInput').value.trim() : '';
             
             if (!subject || !message) {
                 showToast('Wait!', 'Please fill in both subject and message first.', 'error');
@@ -149,13 +179,54 @@ export function initializeBroadcastSystem() {
             }
 
             if (isTest && !testEmail) {
-                showToast('Email Required', 'Please enter a test email address.', 'error');
+                showToast('Email Required', 'Please enter a recipient email address.', 'error');
                 return;
             }
 
-            // Populate previews
-            previewSubject.textContent = isTest ? `[TEST] ${subject}` : subject;
-            previewMessage.textContent = message;
+            // Populate previews (no [TEST] automatic prefix anymore)
+            previewSubject.textContent = subject;
+            
+            let previewText = message;
+            if (isTest) {
+                const nameToUse = recipientName || 'Recipient';
+                previewText = message.replace(/\{\{name\}\}/g, nameToUse);
+            } else {
+                previewText = message.replace(/\{\{name\}\}/g, 'Donor');
+            }
+            previewMessage.textContent = previewText;
+
+            // Update confirmation warning text and button styles dynamically
+            const confirmWarning = document.getElementById('broadcastConfirmWarning');
+            const confirmTitle = document.getElementById('broadcastConfirmTitle');
+            const confirmDesc = document.getElementById('broadcastConfirmDesc');
+            
+            if (isTest) {
+                if (confirmWarning) {
+                    confirmWarning.style.background = '#f0fdf4';
+                    confirmWarning.style.borderColor = '#bbf7d0';
+                    confirmWarning.style.color = '#166534';
+                }
+                if (confirmTitle) confirmTitle.textContent = 'Confirm Send';
+                if (confirmDesc) confirmDesc.innerHTML = `You are about to send an email to a single recipient: <strong>${testEmail}</strong>.`;
+                if (submitBtn) {
+                    submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    submitBtn.style.boxShadow = '0 4px 12px rgba(16,185,129,0.3)';
+                }
+                if (btnText) btnText.textContent = 'Yes, Send Email';
+            } else {
+                if (confirmWarning) {
+                    confirmWarning.style.background = '#fdf2f2';
+                    confirmWarning.style.borderColor = '#fbd5d5';
+                    confirmWarning.style.color = '#c81e1e';
+                }
+                if (confirmTitle) confirmTitle.textContent = 'Final Confirmation';
+                if (confirmDesc) confirmDesc.textContent = 'You are about to send an email to every registered donor in the database. This action cannot be undone.';
+                if (submitBtn) {
+                    submitBtn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+                    submitBtn.style.boxShadow = '0 4px 12px rgba(239,68,68,0.3)';
+                }
+                if (btnText) btnText.textContent = 'Yes, Send to Everyone';
+            }
 
             // Switch views
             formControls.style.display = 'none';
@@ -200,29 +271,20 @@ export function initializeBroadcastSystem() {
         const message = document.getElementById('broadcastMessage').value.trim();
         const isTest = testToggle ? testToggle.checked : false;
         const testEmail = testInput ? testInput.value.trim() : '';
+        const recipientName = document.getElementById('recipientNameInput') ? document.getElementById('recipientNameInput').value.trim() : '';
         
         let donorList = [];
 
         // Loading state
         submitBtn.disabled = true;
-        btnText.textContent = isTest ? 'Sending Test...' : 'Preparing Broadcast...';
+        btnText.textContent = isTest ? 'Sending Email...' : 'Preparing Broadcast...';
         btnLoader.classList.remove('hidden');
 
         try {
             // --- STEP 1: Get Recipients (Client-side fetch to bypass 403 issues) ---
             if (isTest) {
-                // Find the donor name from our local list if it's a test
-                let testName = 'Test Admin';
-                if (testEmail) {
-                    const options = datalist.querySelectorAll('option');
-                    for (const opt of options) {
-                        if (opt.value === testEmail) {
-                            const parts = opt.textContent.split(' (');
-                            if (parts.length > 0) testName = parts[0];
-                            break;
-                        }
-                    }
-                }
+                // If it is a test/single recipient, use the manually typed/auto-populated name
+                const testName = recipientName || 'Recipient';
                 donorList = [{ email: testEmail, name: testName }];
             } else {
                 // Fetch ALL donors from Firebase using the authenticated SDK
@@ -280,7 +342,7 @@ export function initializeBroadcastSystem() {
             showToast('Error', error.message || 'Failed to connect to the broadcast service.', 'error');
         } finally {
             submitBtn.disabled = false;
-            btnText.textContent = 'Yes, Send to Everyone';
+            btnText.textContent = isTest ? 'Yes, Send Email' : 'Yes, Send to Everyone';
             btnLoader.classList.add('hidden');
         }
     });

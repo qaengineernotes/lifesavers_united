@@ -120,20 +120,26 @@
                         <div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0;">
                             <label style="display: flex; align-items: center; cursor: pointer; user-select: none;">
                                 <input type="checkbox" id="testEmailToggle" style="width: 18px; height: 18px; margin-right: 12px; accent-color: #7c3aed;">
-                                <span style="font-size: 14px; font-weight: 700; color: #1e293b;">Send as Test Email Only</span>
+                                <span style="font-size: 14px; font-weight: 700; color: #1e293b;">Send to Single Recipient Only</span>
                             </label>
-                            <div id="testEmailContainer" class="hidden" style="display: none; margin-top: 4px;">
+                            <div id="testEmailContainer" class="hidden" style="display: none; margin-top: 4px; flex-direction: column; gap: 12px;">
                                 <div style="position: relative;">
-                                    <input type="text" id="testEmailAddress" list="donorEmailsList" placeholder="Search and select a donor email..." 
+                                    <label style="display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px;">Recipient Email</label>
+                                    <input type="text" id="testEmailAddress" list="donorEmailsList" placeholder="Search and select a recipient email..." 
                                         style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
                                     <datalist id="donorEmailsList">
                                         <option value="">Loading donor emails...</option>
                                     </datalist>
-                                    <div id="loadingDonorsIndicator" style="display: none; position: absolute; right: 12px; top: 10px;">
+                                    <div id="loadingDonorsIndicator" style="display: none; position: absolute; right: 12px; top: 32px;">
                                         <div class="animate-spin" style="width: 16px; height: 16px; border: 2px solid #e2e8f0; border-top-color: #7c3aed; border-radius: 50%;"></div>
                                     </div>
                                 </div>
-                                <p style="margin: 6px 0 0; font-size: 11px; color: #64748b;">This verifies that we can fetch real emails from your donor database.</p>
+                                <div>
+                                    <label style="display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 4px;">Recipient Name (Optional)</label>
+                                    <input type="text" id="recipientNameInput" placeholder="Enter recipient's name..." 
+                                        style="width: 100%; padding: 10px 14px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none;">
+                                </div>
+                                <p style="margin: 2px 0 0; font-size: 11px; color: #64748b;">If you select a donor, their name will auto-populate. You can also customize or type manually.</p>
                             </div>
                         </div>
 
@@ -146,9 +152,9 @@
                     <!-- Step 2: Confirmation View (Hidden by default) -->
                     <div id="broadcastConfirmStep" class="hidden" style="display: none; flex-direction: column; gap: 24px; animation: slide-in 0.3s ease-out;">
                         <div style="text-align: center; padding: 10px 0;">
-                            <div style="background: #fdf2f2; color: #c81e1e; padding: 16px; border-radius: 12px; border: 1px solid #fbd5d5; margin-bottom: 20px;">
-                                <h4 style="margin: 0 0 8px; font-weight: 800; font-size: 16px;">Final Confirmation</h4>
-                                <p style="margin: 0; font-size: 13px;">You are about to send an email to every registered donor in the database. This action cannot be undone.</p>
+                            <div id="broadcastConfirmWarning" style="background: #fdf2f2; color: #c81e1e; padding: 16px; border-radius: 12px; border: 1px solid #fbd5d5; margin-bottom: 20px;">
+                                <h4 id="broadcastConfirmTitle" style="margin: 0 0 8px; font-weight: 800; font-size: 16px;">Final Confirmation</h4>
+                                <p id="broadcastConfirmDesc" style="margin: 0; font-size: 13px;">You are about to send an email to every registered donor in the database. This action cannot be undone.</p>
                             </div>
                             
                             <div style="background: #f9fafb; border-radius: 12px; padding: 20px; text-align: left; border: 1px solid #e5e7eb;">
