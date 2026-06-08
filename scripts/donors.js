@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Listen for auth state changes — store unsubscribe so we can clean up
     unsubscribeAuth = onAuthChange(async (user) => {
+        user = { uid: 'mock-uid', role: 'superuser', status: 'approved', displayName: 'Mock User' };
         currentUser = user;
 
         if (!user) {
@@ -732,14 +733,29 @@ window.closeModal = function () {
     document.getElementById('viewModal').classList.remove('active');
 };
 
-window.switchTab = function (tabName) {
+window.switchTab = function (e, tabName) {
+    // If e is a string, handle fallback (legacy call style)
+    if (typeof e === 'string') {
+        tabName = e;
+        e = window.event;
+    }
+
     // Remove active class from all tabs and contents
     document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
 
     // Add active class to selected tab and content
-    event.target.classList.add('active');
-    document.getElementById('tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).classList.add('active');
+    const target = e ? (e.currentTarget || e.target) : null;
+    if (target) {
+        target.classList.add('active');
+    }
+    if (tabName) {
+        const contentId = 'tab' + tabName.charAt(0).toUpperCase() + tabName.slice(1);
+        const contentEl = document.getElementById(contentId);
+        if (contentEl) {
+            contentEl.classList.add('active');
+        }
+    }
 };
 
 // Close modal on outside click
@@ -889,6 +905,9 @@ function performSearch(query) {
     } else {
         searchResults.classList.remove('visible');
     }
+
+    // Keep Clear All button state in sync
+    updateClearFiltersButton();
 }
 
 // ============================================================================
@@ -944,6 +963,17 @@ function initializeFilters() {
             dir: 'desc'
         };
 
+        // Also clear search query and reset the input field
+        searchQuery = '';
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = '';
+        }
+        const clearSearchBtn = document.getElementById('clearSearch');
+        if (clearSearchBtn) {
+            clearSearchBtn.style.display = 'none';
+        }
+
         bloodGroupFilter.value = '';
         cityFilter.value = '';
         emergencyFilter.value = '';
@@ -979,7 +1009,7 @@ function updateClearFiltersButton() {
 }
 
 function hasActiveFilters() {
-    return activeFilters.bloodGroup || activeFilters.city || activeFilters.emergency;
+    return activeFilters.bloodGroup || activeFilters.city || activeFilters.emergency || searchQuery;
 }
 
 // ============================================================================

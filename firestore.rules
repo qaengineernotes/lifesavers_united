@@ -97,5 +97,11 @@ service cloud.firestore {
       allow create: if isApproved() || isSuperuser();
       allow update, delete: if isSuperuser();
     }
+
+    // Broadcast Logs collection
+    match /broadcast_logs/{logId} {
+      allow read, create: if isSuperuser();
+      allow update, delete: if false; // Immutable logs
+    }
   }
 }

@@ -277,6 +277,242 @@ window.viewRequest = function (index) {
 };
 
 // ============================================================================
+// CUSTOM DIALOGS (CONFIRM AND ALERT)
+// ============================================================================
+function initCustomPopupStyles() {
+    if (!document.getElementById('custom-popup-styles')) {
+        const style = document.createElement('style');
+        style.id = 'custom-popup-styles';
+        style.textContent = `
+            @keyframes customFadeIn {
+                from {
+                    opacity: 0;
+                }
+                to {
+                    opacity: 1;
+                }
+            }
+            @keyframes customPopIn {
+                from {
+                    opacity: 0;
+                    transform: scale(0.95);
+                }
+                to {
+                    opacity: 1;
+                    transform: scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+}
+
+function showCustomConfirm(title, message, proceedText = 'Confirm', cancelText = 'Cancel') {
+    initCustomPopupStyles();
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.id = 'customConfirmModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            backdrop-filter: blur(4px);
+            animation: customFadeIn 0.2s ease-out;
+        `;
+
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 440px;
+            width: 95%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+            animation: customPopIn 0.2s ease-out;
+        `;
+
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: #fee2e2; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    <svg style="width: 32px; height: 32px; color: #dc2626;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                    </svg>
+                </div>
+                <h3 style="font-size: 22px; font-weight: 700; color: #1f2937; margin-bottom: 12px; font-family: 'Inter', sans-serif;">${title}</h3>
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.5; font-family: 'Inter', sans-serif; margin: 0;">${message}</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px;">
+                <button id="confirmCancelBtn" style="flex: 1; padding: 12px 16px; border: 1.5px solid #d1d5db; border-radius: 10px; color: #374151; font-weight: 600; font-size: 14px; background-color: white; cursor: pointer; transition: all 0.2s ease; outline: none; font-family: 'Inter', sans-serif;">
+                    ${cancelText}
+                </button>
+                <button id="confirmProceedBtn" style="flex: 1; padding: 12px 16px; background-color: #dc2626; color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; outline: none; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);">
+                    ${proceedText}
+                </button>
+            </div>
+        `;
+
+        const cancelBtn = modalContent.querySelector('#confirmCancelBtn');
+        const proceedBtn = modalContent.querySelector('#confirmProceedBtn');
+
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.backgroundColor = '#f3f4f6';
+            cancelBtn.style.borderColor = '#9ca3af';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.backgroundColor = 'white';
+            cancelBtn.style.borderColor = '#d1d5db';
+        });
+
+        proceedBtn.addEventListener('mouseenter', () => {
+            proceedBtn.style.backgroundColor = '#b91c1c';
+        });
+        proceedBtn.addEventListener('mouseleave', () => {
+            proceedBtn.style.backgroundColor = '#dc2626';
+        });
+
+        const handleCancel = () => {
+            modal.remove();
+            resolve(false);
+        };
+
+        const handleConfirm = () => {
+            modal.remove();
+            resolve(true);
+        };
+
+        cancelBtn.addEventListener('click', handleCancel);
+        proceedBtn.addEventListener('click', handleConfirm);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) handleCancel();
+        });
+
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', escHandler);
+                handleCancel();
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        setTimeout(() => {
+            proceedBtn.focus();
+        }, 50);
+    });
+}
+
+function showCustomAlert(title, message, isSuccess = true) {
+    initCustomPopupStyles();
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.id = 'customAlertModal';
+        modal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 999999;
+            backdrop-filter: blur(4px);
+            animation: customFadeIn 0.2s ease-out;
+        `;
+
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+            background-color: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 440px;
+            width: 95%;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            position: relative;
+            z-index: 1000000;
+            animation: customPopIn 0.2s ease-out;
+        `;
+
+        const iconBgColor = isSuccess ? '#d1fae5' : '#fee2e2';
+        const iconColor = isSuccess ? '#10b981' : '#dc2626';
+        const okBgColor = isSuccess ? '#10b981' : '#dc2626';
+        const okHoverColor = isSuccess ? '#059669' : '#b91c1c';
+        const iconSVG = isSuccess 
+            ? `<svg style="width: 32px; height: 32px; color: ${iconColor};" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+               </svg>`
+            : `<svg style="width: 32px; height: 32px; color: ${iconColor};" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                   <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+               </svg>`;
+
+        modalContent.innerHTML = `
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div style="width: 64px; height: 64px; background-color: ${iconBgColor}; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+                    ${iconSVG}
+                </div>
+                <h3 style="font-size: 22px; font-weight: 700; color: #1f2937; margin-bottom: 12px; font-family: 'Inter', sans-serif;">${title}</h3>
+                <p style="color: #4b5563; font-size: 15px; line-height: 1.5; font-family: 'Inter', sans-serif; margin: 0;">${message}</p>
+            </div>
+            
+            <div style="display: flex;">
+                <button id="alertOkBtn" style="flex: 1; padding: 12px 16px; background-color: ${okBgColor}; color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; outline: none; font-family: 'Inter', sans-serif; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);">
+                    OK
+                </button>
+            </div>
+        `;
+
+        const okBtn = modalContent.querySelector('#alertOkBtn');
+
+        okBtn.addEventListener('mouseenter', () => {
+            okBtn.style.backgroundColor = okHoverColor;
+        });
+        okBtn.addEventListener('mouseleave', () => {
+            okBtn.style.backgroundColor = okBgColor;
+        });
+
+        const handleClose = () => {
+            modal.remove();
+            resolve();
+        };
+
+        okBtn.addEventListener('click', handleClose);
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) handleClose();
+        });
+
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                document.removeEventListener('keydown', escHandler);
+                handleClose();
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+
+        setTimeout(() => {
+            okBtn.focus();
+        }, 50);
+    });
+}
+
+// ============================================================================
 // REOPEN REQUEST
 // ============================================================================
 window.reopenRequest = async function (index) {
@@ -285,11 +521,16 @@ window.reopenRequest = async function (index) {
     const request = requestsToDisplay[actualIndex];
 
     if (!request || !request.id) {
-        alert('Request data not found.');
+        await showCustomAlert('Error', 'Request data not found.', false);
         return;
     }
 
-    if (!confirm(`Are you sure you want to REOPEN the request for ${request.patientName}? This will reset the current cycle progress and move it to the top of the list.`)) {
+    const isConfirmed = await showCustomConfirm(
+        'Reopen Request',
+        `Are you sure you want to REOPEN the request for <strong>${escapeHtml(request.patientName)}</strong>?<br><br>This will reset the current cycle progress and move it to the top of the list.`,
+        'Yes, Reopen'
+    );
+    if (!isConfirmed) {
         return;
     }
 
@@ -345,13 +586,13 @@ window.reopenRequest = async function (index) {
             note: `Request reopened (Cycle ${currentReopenCount + 2})`
         });
 
-        alert('Request reopened successfully! The request is now back at the top of the list.');
+        await showCustomAlert('Success', 'Request reopened successfully! The request is now back at the top of the list.', true);
         
         // 3. Refresh the table
         await loadAllRequests();
     } catch (error) {
         console.error('Error reopening request:', error);
-        alert('Failed to reopen request: ' + error.message);
+        await showCustomAlert('Error', 'Failed to reopen request: ' + error.message, false);
     }
 };
 

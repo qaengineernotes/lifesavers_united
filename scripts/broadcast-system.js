@@ -1,6 +1,6 @@
 // Broadcast Email System for Admin Dashboard
 import { getCurrentUser, onAuthChange } from './firebase-auth-service.js';
-import { db, collection, getDocs, query, limit } from './firebase-config.js';
+import { db, collection, getDocs, query, limit, addDoc, serverTimestamp } from './firebase-config.js';
 
 export function initializeBroadcastSystem() {
     const broadcastBtnContainer = document.getElementById('broadcastButtonContainer');
@@ -332,7 +332,60 @@ export function initializeBroadcastSystem() {
             const result = await response.json();
 
             if (result.success) {
-                showToast('Success!', result.message, 'success');
+                // Calculate detailed provider stats from waterfall results
+                let resendSent = 0;
+                let brevoSent = 0;
+                let mailjetSent = 0;
+                let failedCount = 0;
+
+                if (result.details && Array.isArray(result.details)) {
+                    result.details.forEach(item => {
+                        const provider = item.provider;
+                        const isOk = item.ok;
+                        const count = typeof item.count === 'number' ? item.count : 1;
+
+                        if (isOk) {
+                            if (provider === 'resend') resendSent += count;
+                            else if (provider === 'brevo') brevoSent += count;
+                            else if (provider === 'mailjet') mailjetSent += count;
+                        } else {
+                            // Skip Resend rate limit attempts that successfully fall back
+                            if (!(provider === 'resend' && item.isRateLimit)) {
+                                failedCount += count;
+                            }
+                        }
+                    });
+                }
+
+                // Log the broadcast attempt to Firestore
+                try {
+                    const logsRef = collection(db, 'broadcast_logs');
+                    await addDoc(logsRef, {
+                        subject,
+                        message,
+                        senderUid: user.uid,
+                        sentAt: serverTimestamp(),
+                        totalRecipients: donorList.length,
+                        isTest,
+                        stats: {
+                            resend: resendSent,
+                            brevo: brevoSent,
+                            mailjet: mailjetSent,
+                            failed: failedCount
+                        }
+                    });
+                    console.log('Broadcast log successfully stored in Firestore.');
+                } catch (logError) {
+                    console.error('Failed to log broadcast to Firestore:', logError);
+                    // Do not block UI success state if only logging fails
+                }
+
+                // Construct a detailed success message
+                let successMessage = `Broadcast complete. Sent: ${result.sent}, Failed: ${result.failed} (of ${donorList.length} total).`;
+                if (!isTest) {
+                    successMessage += `<br>Breakdown: Resend (${resendSent}), Brevo (${brevoSent}), Mailjet (${mailjetSent})`;
+                }
+                showToast('Success!', successMessage, 'success');
                 closeModal();
             } else {
                 showToast('Failed', result.error || 'Something went wrong.', 'error');

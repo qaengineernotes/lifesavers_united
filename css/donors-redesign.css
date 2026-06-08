@@ -179,6 +179,8 @@ body.donors-page {
     align-items: center;
     border-radius: 50%;
     transition: color 0.2s;
+    z-index: 10;
+    pointer-events: auto;
 }
 
 .clear-search-btn:hover {
