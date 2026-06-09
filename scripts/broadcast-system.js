@@ -404,42 +404,65 @@ export function initializeBroadcastSystem() {
 // ── Helper: Simple Toast Notification ────────────────────────────────────────
 function showToast(title, message, type = 'success') {
     const toast = document.createElement('div');
-    const bgColor = type === 'success' ? 'bg-green-600' : 'bg-red-600';
+    const bgColor = type === 'success' ? '#10B981' : '#EF4444';
     
-    toast.className = `fixed bottom-8 right-8 ${bgColor} text-white px-6 py-4 rounded-2xl shadow-2xl z-[1000] flex items-center animate-slide-up`;
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: ${bgColor};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        z-index: 9999;
+        font-weight: 600;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        max-width: 450px;
+        word-wrap: break-word;
+        font-family: 'Inter', sans-serif;
+        animation: toastSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    `;
+
+    const iconSVG = type === 'success' 
+        ? `<svg style="width: 24px; height: 24px; margin-right: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+           </svg>`
+        : `<svg style="width: 24px; height: 24px; margin-right: 12px; flex-shrink: 0;" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+           </svg>`;
+
     toast.innerHTML = `
-        <div class="mr-3">
-            ${type === 'success' 
-                ? '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>'
-                : '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
-            }
-        </div>
+        ${iconSVG}
         <div>
-            <div class="font-bold">${title}</div>
-            <div class="text-sm opacity-90">${message}</div>
+            <div style="font-weight: 700; font-size: 15px; margin-bottom: 2px;">${title}</div>
+            <div style="font-weight: 500; font-size: 13.5px; opacity: 0.95; line-height: 1.4;">${message}</div>
         </div>
     `;
 
     document.body.appendChild(toast);
 
     // Style for toast animation
-    if (!document.getElementById('toast-styles')) {
+    if (!document.getElementById('toast-styles-css')) {
         const style = document.createElement('style');
-        style.id = 'toast-styles';
+        style.id = 'toast-styles-css';
         style.textContent = `
-            @keyframes slide-up {
-                from { transform: translateY(100%); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
+            @keyframes toastSlideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
             }
-            .animate-slide-up { animation: slide-up 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+            @keyframes toastFadeOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
         `;
         document.head.appendChild(style);
     }
 
+    // Auto-remove after 5 seconds
     setTimeout(() => {
-        toast.style.opacity = '0';
-        toast.style.transform = 'translateY(20px)';
-        toast.style.transition = 'all 0.3s ease';
+        toast.style.animation = 'toastFadeOut 0.3s ease-in forwards';
         setTimeout(() => toast.remove(), 300);
     }, 5000);
 }

@@ -30,3 +30,12 @@ This document records new features and fixes implemented in the LifeSavers Unite
 * **Reopen Request Integration**: Configured the reopen flow in `reopenRequest` to use `showCustomConfirm` with the customized label `'Yes, Reopen'` and `showCustomAlert` for success/error states, completely eliminating legacy browser-native `confirm()` and `alert()` calls.
 * **Script Cache Busting**: Updated [all_requests.html](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/all_requests.html) to append a version cache buster query parameter (`?v=1.0.1`) to the script import tag, ensuring users immediately receive the new theme-based popup logic instead of running cached legacy code.
 
+---
+
+### [2026-06-09] — Update Email Broadcast Toast Notification Styling & Positioning
+
+* **Alignment with Theme Success Messages**: Redesigned `showToast` in [broadcast-system.js](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/scripts/broadcast-system.js) using inline style positioning (`top: 20px; right: 20px;`) and HSL/theme-aligned colors (`#10B981` success, `#EF4444` error) to perfectly match toast notifications used on other pages.
+* **Premium Transitions & Animation**: Integrated smooth CSS keyframe slide-in and fade-out animations (`toastSlideIn` and `toastFadeOut`) and custom checkmark/alert SVGs for a polished user experience.
+* **Script Cache Busting**: Updated the dynamic import in [donors.html](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/donors.html) to request `scripts/broadcast-system.js?v=1.0.1` to force browsers to load the fresh styled module.
+
+
