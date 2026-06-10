@@ -37,5 +37,7 @@ This document records new features and fixes implemented in the LifeSavers Unite
 * **Alignment with Theme Success Messages**: Redesigned `showToast` in [broadcast-system.js](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/scripts/broadcast-system.js) using inline style positioning (`top: 20px; right: 20px;`) and HSL/theme-aligned colors (`#10B981` success, `#EF4444` error) to perfectly match toast notifications used on other pages.
 * **Premium Transitions & Animation**: Integrated smooth CSS keyframe slide-in and fade-out animations (`toastSlideIn` and `toastFadeOut`) and custom checkmark/alert SVGs for a polished user experience.
 * **Script Cache Busting**: Updated the dynamic import in [donors.html](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/donors.html) to request `scripts/broadcast-system.js?v=1.0.1` to force browsers to load the fresh styled module.
+* **Fix Success Toast Undefined Placeholders**: Resolved an issue in [broadcast-system.js](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/scripts/broadcast-system.js) where the success toast displayed `undefined` for sent and failed counts due to referencing `result.sent` and `result.failed` properties not present in the Cloudflare Pages function response. Configured the success toast message to dynamically fetch the returned `result.message` or fall back to calculated provider totals.
+
 
 

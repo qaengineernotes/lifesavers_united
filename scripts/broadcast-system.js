@@ -381,7 +381,7 @@ export function initializeBroadcastSystem() {
                 }
 
                 // Construct a detailed success message
-                let successMessage = `Broadcast complete. Sent: ${result.sent}, Failed: ${result.failed} (of ${donorList.length} total).`;
+                let successMessage = result.message || `Broadcast complete. Sent: ${resendSent + brevoSent + mailjetSent}, Failed: ${failedCount} (of ${donorList.length} total).`;
                 if (!isTest) {
                     successMessage += `<br>Breakdown: Resend (${resendSent}), Brevo (${brevoSent}), Mailjet (${mailjetSent})`;
                 }
