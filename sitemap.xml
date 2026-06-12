@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 
     <!-- Homepage -->
     <url>
@@ -68,9 +69,876 @@
     <!-- Gallery -->
     <url>
         <loc>https://lifesaversunited.org/gallery</loc>
-        <lastmod>2026-01-01</lastmod>
+        <lastmod>2026-06-12</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
+        <!-- START_GALLERY_IMAGES -->
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvraj-patel-1.webp?alt=media</image:loc>
+            <image:title>Vraj Patel - LifeSavers United</image:title>
+            <image:caption>Vraj Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fparin-shah.webp?alt=media</image:loc>
+            <image:title>Parin Shah - LifeSavers United</image:title>
+            <image:caption>Parin Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkushal-mehta.webp?alt=media</image:loc>
+            <image:title>Kushal Mehta - LifeSavers United</image:title>
+            <image:caption>Kushal Mehta - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fjigar-zala.webp?alt=media</image:loc>
+            <image:title>Jigar Zala - LifeSavers United</image:title>
+            <image:caption>Jigar Zala - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fjay-trivedi-2.webp?alt=media</image:loc>
+            <image:title>Jay Trivedi - LifeSavers United</image:title>
+            <image:caption>Jay Trivedi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain-5.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fashish-raythaththa.webp?alt=media</image:loc>
+            <image:title>Ashish Raythaththa - LifeSavers United</image:title>
+            <image:caption>Ashish Raythaththa - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkaran-shroff-4.webp?alt=media</image:loc>
+            <image:title>Karan Shroff - LifeSavers United</image:title>
+            <image:caption>Karan Shroff - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Ftejendra-patel-2.webp?alt=media</image:loc>
+            <image:title>Tejendra Patel - LifeSavers United</image:title>
+            <image:caption>Tejendra Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-6.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fankush-rawlani.webp?alt=media</image:loc>
+            <image:title>Ankush Rawlani - LifeSavers United</image:title>
+            <image:caption>Ankush Rawlani - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja-4.webp?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmayank-vaishnav-2.webp?alt=media</image:loc>
+            <image:title>Mayank Vaishnav - LifeSavers United</image:title>
+            <image:caption>Mayank Vaishnav - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2FBlood%20Donation%20and%20Awareness%20camp%20organized%20by%20LifeSavers%20United%20at%20the%20Help%20Voluntary%20Blood%20Center%20on%20May%2024th%2C%202026%203.webp?alt=media</image:loc>
+            <image:title>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 3</image:title>
+            <image:caption>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 3 - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2FBlood%20Donation%20and%20Awareness%20camp%20organized%20by%20LifeSavers%20United%20at%20the%20Help%20Voluntary%20Blood%20Center%20on%20May%2024th%2C%202026.webp?alt=media</image:loc>
+            <image:title>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026</image:title>
+            <image:caption>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2FBlood%20Donation%20and%20Awareness%20camp%20organized%20by%20LifeSavers%20United%20at%20the%20Help%20Voluntary%20Blood%20Center%20on%20May%2024th%2C%202026%201.webp?alt=media</image:loc>
+            <image:title>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 1</image:title>
+            <image:caption>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 1 - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2FBlood%20Donation%20and%20Awareness%20camp%20organized%20by%20LifeSavers%20United%20at%20the%20Help%20Voluntary%20Blood%20Center%20on%20May%2024th%2C%202026%202.webp?alt=media</image:loc>
+            <image:title>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 2</image:title>
+            <image:caption>Blood Donation And Awareness Camp Organized By Lifesavers United At The Help Voluntary Blood Center On May 24th, 2026 2 - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fgopan-shah-2.webp?alt=media</image:loc>
+            <image:title>Gopan Shah - LifeSavers United</image:title>
+            <image:caption>Gopan Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fchirag-patel.webp?alt=media</image:loc>
+            <image:title>Chirag Patel - LifeSavers United</image:title>
+            <image:caption>Chirag Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Froank-divan.webp?alt=media</image:loc>
+            <image:title>Roank Divan - LifeSavers United</image:title>
+            <image:caption>Roank Divan - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fyug-shah.webp?alt=media</image:loc>
+            <image:title>Yug Shah - LifeSavers United</image:title>
+            <image:caption>Yug Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fsaumya-thakkar.webp?alt=media</image:loc>
+            <image:title>Saumya Thakkar - LifeSavers United</image:title>
+            <image:caption>Saumya Thakkar - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmanish-patel.webp?alt=media</image:loc>
+            <image:title>Manish Patel - LifeSavers United</image:title>
+            <image:caption>Manish Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fnirav-mali.webp?alt=media</image:loc>
+            <image:title>Nirav Mali - LifeSavers United</image:title>
+            <image:caption>Nirav Mali - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmanthan-shah.webp?alt=media</image:loc>
+            <image:title>Manthan Shah - LifeSavers United</image:title>
+            <image:caption>Manthan Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fpavan-makhija.webp?alt=media</image:loc>
+            <image:title>Pavan Makhija - LifeSavers United</image:title>
+            <image:caption>Pavan Makhija - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fdhairya-tulsian.webp?alt=media</image:loc>
+            <image:title>Dhairya Tulsian - LifeSavers United</image:title>
+            <image:caption>Dhairya Tulsian - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmeet-panchal.webp?alt=media</image:loc>
+            <image:title>Meet Panchal - LifeSavers United</image:title>
+            <image:caption>Meet Panchal - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fsagar-shah.webp?alt=media</image:loc>
+            <image:title>Sagar Shah - LifeSavers United</image:title>
+            <image:caption>Sagar Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fjitendra-bachanai.webp?alt=media</image:loc>
+            <image:title>Jitendra Bachanai - LifeSavers United</image:title>
+            <image:caption>Jitendra Bachanai - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Ftapan-shah.webp?alt=media</image:loc>
+            <image:title>Tapan Shah - LifeSavers United</image:title>
+            <image:caption>Tapan Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fnaman-shah.webp?alt=media</image:loc>
+            <image:title>Naman Shah - LifeSavers United</image:title>
+            <image:caption>Naman Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fparth-divan.webp?alt=media</image:loc>
+            <image:title>Parth Divan - LifeSavers United</image:title>
+            <image:caption>Parth Divan - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fdhairya-patel.webp?alt=media</image:loc>
+            <image:title>Dhairya Patel - LifeSavers United</image:title>
+            <image:caption>Dhairya Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fkeyur-divan.webp?alt=media</image:loc>
+            <image:title>Keyur Divan - LifeSavers United</image:title>
+            <image:caption>Keyur Divan - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fkishan-patel.webp?alt=media</image:loc>
+            <image:title>Kishan Patel - LifeSavers United</image:title>
+            <image:caption>Kishan Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fsaurabh-patel.webp?alt=media</image:loc>
+            <image:title>Saurabh Patel - LifeSavers United</image:title>
+            <image:caption>Saurabh Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Ftirth-panchal.webp?alt=media</image:loc>
+            <image:title>Tirth Panchal - LifeSavers United</image:title>
+            <image:caption>Tirth Panchal - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Faarav-shah.webp?alt=media</image:loc>
+            <image:title>Aarav Shah - LifeSavers United</image:title>
+            <image:caption>Aarav Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fparth-thakor.webp?alt=media</image:loc>
+            <image:title>Parth Thakor - LifeSavers United</image:title>
+            <image:caption>Parth Thakor - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain-4.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkautul-raval-2.webp?alt=media</image:loc>
+            <image:title>Kautul Raval - LifeSavers United</image:title>
+            <image:caption>Kautul Raval - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-5.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Frakesh-mistri.jpeg?alt=media</image:loc>
+            <image:title>Rakesh Mistri - LifeSavers United</image:title>
+            <image:caption>Rakesh Mistri - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja.jpeg?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fninank-kapadia.jpeg?alt=media</image:loc>
+            <image:title>Ninank Kapadia - LifeSavers United</image:title>
+            <image:caption>Ninank Kapadia - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain.jpeg?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvijay-parmar-4.webp?alt=media</image:loc>
+            <image:title>Vijay Parmar - LifeSavers United</image:title>
+            <image:caption>Vijay Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-4.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fbhavik-jayswal-1.webp?alt=media</image:loc>
+            <image:title>Bhavik Jayswal - LifeSavers United</image:title>
+            <image:caption>Bhavik Jayswal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Flaxmansingh-khariwal-2.webp?alt=media</image:loc>
+            <image:title>Laxmansingh Khariwal - LifeSavers United</image:title>
+            <image:caption>Laxmansingh Khariwal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja-3.webp?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Fvolunteer-meeting-at-riverfront-on-12-4-2026.webp?alt=media</image:loc>
+            <image:title>Volunteer Meeting At Riverfront On 12-4-2026 - LifeSavers United</image:title>
+            <image:caption>Volunteer Meeting At Riverfront On 12-4-2026 - Events - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Frakesh-mistry-2.webp?alt=media</image:loc>
+            <image:title>Rakesh Mistry - LifeSavers United</image:title>
+            <image:caption>Rakesh Mistry - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvijay-parmar-3.webp?alt=media</image:loc>
+            <image:title>Vijay Parmar - LifeSavers United</image:title>
+            <image:caption>Vijay Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain-3.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja-2.webp?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvraj-patel.webp?alt=media</image:loc>
+            <image:title>Vraj Patel - LifeSavers United</image:title>
+            <image:caption>Vraj Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fgopan-shah-1.webp?alt=media</image:loc>
+            <image:title>Gopan Shah - LifeSavers United</image:title>
+            <image:caption>Gopan Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkautul-raval-1.webp?alt=media</image:loc>
+            <image:title>Kautul Raval - LifeSavers United</image:title>
+            <image:caption>Kautul Raval - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-3.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fumang-panchal.webp?alt=media</image:loc>
+            <image:title>Umang Panchal - LifeSavers United</image:title>
+            <image:caption>Umang Panchal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Faangi-shah.webp?alt=media</image:loc>
+            <image:title>Aangi Shah - LifeSavers United</image:title>
+            <image:caption>Aangi Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fabhishek-doshi.webp?alt=media</image:loc>
+            <image:title>Abhishek Doshi - LifeSavers United</image:title>
+            <image:caption>Abhishek Doshi - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fankit-sanghvi.webp?alt=media</image:loc>
+            <image:title>Ankit Sanghvi - LifeSavers United</image:title>
+            <image:caption>Ankit Sanghvi - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fdixit-jain.webp?alt=media</image:loc>
+            <image:title>Dixit Jain - LifeSavers United</image:title>
+            <image:caption>Dixit Jain - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fhet-purohit.webp?alt=media</image:loc>
+            <image:title>Het Purohit - LifeSavers United</image:title>
+            <image:caption>Het Purohit - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fhitesh-shah.webp?alt=media</image:loc>
+            <image:title>Hitesh Shah - LifeSavers United</image:title>
+            <image:caption>Hitesh Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fjenil-shah.webp?alt=media</image:loc>
+            <image:title>Jenil Shah - LifeSavers United</image:title>
+            <image:caption>Jenil Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fkesha-shah.webp?alt=media</image:loc>
+            <image:title>Kesha Shah - LifeSavers United</image:title>
+            <image:caption>Kesha Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fkrish-shah.webp?alt=media</image:loc>
+            <image:title>Krish Shah - LifeSavers United</image:title>
+            <image:caption>Krish Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmanav-shah-1.webp?alt=media</image:loc>
+            <image:title>Manav Shah - LifeSavers United</image:title>
+            <image:caption>Manav Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmanav-shah.webp?alt=media</image:loc>
+            <image:title>Manav Shah - LifeSavers United</image:title>
+            <image:caption>Manav Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmanju-soni.webp?alt=media</image:loc>
+            <image:title>Manju Soni - LifeSavers United</image:title>
+            <image:caption>Manju Soni - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fparth-gondaliya.webp?alt=media</image:loc>
+            <image:title>Parth Gondaliya - LifeSavers United</image:title>
+            <image:caption>Parth Gondaliya - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fpriyank-kapadia.webp?alt=media</image:loc>
+            <image:title>Priyank Kapadia - LifeSavers United</image:title>
+            <image:caption>Priyank Kapadia - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Frajvi-shah.webp?alt=media</image:loc>
+            <image:title>Rajvi Shah - LifeSavers United</image:title>
+            <image:caption>Rajvi Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fridham-shah.webp?alt=media</image:loc>
+            <image:title>Ridham Shah - LifeSavers United</image:title>
+            <image:caption>Ridham Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Ftathya-seth.webp?alt=media</image:loc>
+            <image:title>Tathya Seth - LifeSavers United</image:title>
+            <image:caption>Tathya Seth - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Ftirth-shah.webp?alt=media</image:loc>
+            <image:title>Tirth Shah - LifeSavers United</image:title>
+            <image:caption>Tirth Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Futsav-gupte.webp?alt=media</image:loc>
+            <image:title>Utsav Gupte - LifeSavers United</image:title>
+            <image:caption>Utsav Gupte - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmanav-barot.webp?alt=media</image:loc>
+            <image:title>Manav Barot - LifeSavers United</image:title>
+            <image:caption>Manav Barot - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkaran-shroff-3.webp?alt=media</image:loc>
+            <image:title>Karan Shroff - LifeSavers United</image:title>
+            <image:caption>Karan Shroff - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja-1.webp?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-2.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Ftejendra-patel-1.webp?alt=media</image:loc>
+            <image:title>Tejendra Patel - LifeSavers United</image:title>
+            <image:caption>Tejendra Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhappy-parmar-1.webp?alt=media</image:loc>
+            <image:title>Happy Parmar - LifeSavers United</image:title>
+            <image:caption>Happy Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fbhavik-jayswal.webp?alt=media</image:loc>
+            <image:title>Bhavik Jayswal - LifeSavers United</image:title>
+            <image:caption>Bhavik Jayswal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvinayak-baraiya.webp?alt=media</image:loc>
+            <image:title>Vinayak Baraiya - LifeSavers United</image:title>
+            <image:caption>Vinayak Baraiya - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain-2.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkunal-parikh.webp?alt=media</image:loc>
+            <image:title>Kunal Parikh - LifeSavers United</image:title>
+            <image:caption>Kunal Parikh - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkaran-shroff-2.webp?alt=media</image:loc>
+            <image:title>Karan Shroff - LifeSavers United</image:title>
+            <image:caption>Karan Shroff - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fketan-akhaja.webp?alt=media</image:loc>
+            <image:title>Ketan Akhaja - LifeSavers United</image:title>
+            <image:caption>Ketan Akhaja - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fpragnesh-mewada.webp?alt=media</image:loc>
+            <image:title>Pragnesh Mewada - LifeSavers United</image:title>
+            <image:caption>Pragnesh Mewada - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Fvolunteer-meeting-at-riverfront-on-22-2-2026(2).webp?alt=media</image:loc>
+            <image:title>Volunteer Meeting At Riverfront On 22-2-2026(2) - LifeSavers United</image:title>
+            <image:caption>Volunteer Meeting At Riverfront On 22-2-2026(2) - Events - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Fvolunteer-meeting-at-riverfront-on-22-2-2026.webp?alt=media</image:loc>
+            <image:title>Volunteer Meeting At Riverfront On 22-2-2026 - LifeSavers United</image:title>
+            <image:caption>Volunteer Meeting At Riverfront On 22-2-2026 - Events - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvijay-parmar-2.webp?alt=media</image:loc>
+            <image:title>Vijay Parmar - LifeSavers United</image:title>
+            <image:caption>Vijay Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fbharat-vaghela.webp?alt=media</image:loc>
+            <image:title>Bharat Vaghela - LifeSavers United</image:title>
+            <image:caption>Bharat Vaghela - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fninank-kapadia-1.webp?alt=media</image:loc>
+            <image:title>Ninank Kapadia - LifeSavers United</image:title>
+            <image:caption>Ninank Kapadia - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fpunit-jadwani.webp?alt=media</image:loc>
+            <image:title>Punit Jadwani - LifeSavers United</image:title>
+            <image:caption>Punit Jadwani - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Frakesh-patel.webp?alt=media</image:loc>
+            <image:title>Rakesh Patel - LifeSavers United</image:title>
+            <image:caption>Rakesh Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fdarshan-bhatt-1.webp?alt=media</image:loc>
+            <image:title>Darshan Bhatt - LifeSavers United</image:title>
+            <image:caption>Darshan Bhatt - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Frakesh-mistry-1.webp?alt=media</image:loc>
+            <image:title>Rakesh Mistry - LifeSavers United</image:title>
+            <image:caption>Rakesh Mistry - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Ftapan-shah-1.webp?alt=media</image:loc>
+            <image:title>Tapan Shah - LifeSavers United</image:title>
+            <image:caption>Tapan Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fgopan-shah.webp?alt=media</image:loc>
+            <image:title>Gopan Shah - LifeSavers United</image:title>
+            <image:caption>Gopan Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmayank-vaishnav-1.webp?alt=media</image:loc>
+            <image:title>Mayank Vaishnav - LifeSavers United</image:title>
+            <image:caption>Mayank Vaishnav - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fanuj-mishra.webp?alt=media</image:loc>
+            <image:title>Anuj Mishra - LifeSavers United</image:title>
+            <image:caption>Anuj Mishra - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain-1.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fjay-trivedi-1.webp?alt=media</image:loc>
+            <image:title>Jay Trivedi - LifeSavers United</image:title>
+            <image:caption>Jay Trivedi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fbhavesh-jayswal.webp?alt=media</image:loc>
+            <image:title>Bhavesh Jayswal - LifeSavers United</image:title>
+            <image:caption>Bhavesh Jayswal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhiral-jain.webp?alt=media</image:loc>
+            <image:title>Hiral Jain - LifeSavers United</image:title>
+            <image:caption>Hiral Jain - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Ftejendra-patel.webp?alt=media</image:loc>
+            <image:title>Tejendra Patel - LifeSavers United</image:title>
+            <image:caption>Tejendra Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvijay-parmar-1.webp?alt=media</image:loc>
+            <image:title>Vijay Parmar - LifeSavers United</image:title>
+            <image:caption>Vijay Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fatul-chauhan.webp?alt=media</image:loc>
+            <image:title>Atul Chauhan - LifeSavers United</image:title>
+            <image:caption>Atul Chauhan - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fforam-trivedi-1.webp?alt=media</image:loc>
+            <image:title>Foram Trivedi - LifeSavers United</image:title>
+            <image:caption>Foram Trivedi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fchandresh-chavda.webp?alt=media</image:loc>
+            <image:title>Chandresh Chavda - LifeSavers United</image:title>
+            <image:caption>Chandresh Chavda - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkautul-raval.webp?alt=media</image:loc>
+            <image:title>Kautul Raval - LifeSavers United</image:title>
+            <image:caption>Kautul Raval - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fharsh-shah.webp?alt=media</image:loc>
+            <image:title>Harsh Shah - LifeSavers United</image:title>
+            <image:caption>Harsh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fsagar-dafda.webp?alt=media</image:loc>
+            <image:title>Sagar Dafda - LifeSavers United</image:title>
+            <image:caption>Sagar Dafda - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Ftejas-soni.webp?alt=media</image:loc>
+            <image:title>Tejas Soni - LifeSavers United</image:title>
+            <image:caption>Tejas Soni - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkhush-chavan.webp?alt=media</image:loc>
+            <image:title>Khush Chavan - LifeSavers United</image:title>
+            <image:caption>Khush Chavan - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fnainesh-shah.webp?alt=media</image:loc>
+            <image:title>Nainesh Shah - LifeSavers United</image:title>
+            <image:caption>Nainesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkishan-kumar.webp?alt=media</image:loc>
+            <image:title>Kishan Kumar - LifeSavers United</image:title>
+            <image:caption>Kishan Kumar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvijay-parmar.webp?alt=media</image:loc>
+            <image:title>Vijay Parmar - LifeSavers United</image:title>
+            <image:caption>Vijay Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah-1.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Flaxmansingh-khariwal-1.webp?alt=media</image:loc>
+            <image:title>Laxmansingh Khariwal - LifeSavers United</image:title>
+            <image:caption>Laxmansingh Khariwal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fforam-trivedi.webp?alt=media</image:loc>
+            <image:title>Foram Trivedi - LifeSavers United</image:title>
+            <image:caption>Foram Trivedi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fnikunj-mistri-1.webp?alt=media</image:loc>
+            <image:title>Nikunj Mistri - LifeSavers United</image:title>
+            <image:caption>Nikunj Mistri - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fashish-jadav.webp?alt=media</image:loc>
+            <image:title>Ashish Jadav - LifeSavers United</image:title>
+            <image:caption>Ashish Jadav - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fvishal-patel.webp?alt=media</image:loc>
+            <image:title>Vishal Patel - LifeSavers United</image:title>
+            <image:caption>Vishal Patel - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhappy-parmar.webp?alt=media</image:loc>
+            <image:title>Happy Parmar - LifeSavers United</image:title>
+            <image:caption>Happy Parmar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhari-om-raghuvanshi.webp?alt=media</image:loc>
+            <image:title>Hari Om Raghuvanshi - LifeSavers United</image:title>
+            <image:caption>Hari Om Raghuvanshi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fhitesh-thakkar.webp?alt=media</image:loc>
+            <image:title>Hitesh Thakkar - LifeSavers United</image:title>
+            <image:caption>Hitesh Thakkar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fashish-shah.webp?alt=media</image:loc>
+            <image:title>Ashish Shah - LifeSavers United</image:title>
+            <image:caption>Ashish Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fbharat-vaghela.webp?alt=media</image:loc>
+            <image:title>Bharat Vaghela - LifeSavers United</image:title>
+            <image:caption>Bharat Vaghela - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fhetan-shah.webp?alt=media</image:loc>
+            <image:title>Hetan Shah - LifeSavers United</image:title>
+            <image:caption>Hetan Shah - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fhitesh-thakkar.webp?alt=media</image:loc>
+            <image:title>Hitesh Thakkar - LifeSavers United</image:title>
+            <image:caption>Hitesh Thakkar - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fjagdish-goswami.webp?alt=media</image:loc>
+            <image:title>Jagdish Goswami - LifeSavers United</image:title>
+            <image:caption>Jagdish Goswami - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fkishan-rathod.webp?alt=media</image:loc>
+            <image:title>Kishan Rathod - LifeSavers United</image:title>
+            <image:caption>Kishan Rathod - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Flalit-munot.webp?alt=media</image:loc>
+            <image:title>Lalit Munot - LifeSavers United</image:title>
+            <image:caption>Lalit Munot - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmayank-vaishnav.webp?alt=media</image:loc>
+            <image:title>Mayank Vaishnav - LifeSavers United</image:title>
+            <image:caption>Mayank Vaishnav - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fmeha-patel.webp?alt=media</image:loc>
+            <image:title>Meha Patel - LifeSavers United</image:title>
+            <image:caption>Meha Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fnamrata-patel.webp?alt=media</image:loc>
+            <image:title>Namrata Patel - LifeSavers United</image:title>
+            <image:caption>Namrata Patel - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fnikunj-mistri.webp?alt=media</image:loc>
+            <image:title>Nikunj Mistri - LifeSavers United</image:title>
+            <image:caption>Nikunj Mistri - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-team.webp?alt=media</image:loc>
+            <image:title>Lifesavers United Team</image:title>
+            <image:caption>Lifesavers United Team - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fdonation-camps%2Fhappy-parmar.webp?alt=media</image:loc>
+            <image:title>Happy Parmar - LifeSavers United</image:title>
+            <image:caption>Happy Parmar - Donation Camps - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fawards%2FRaktVeer%20Award%202025.webp?alt=media</image:loc>
+            <image:title>Raktveer Award 2025 - LifeSavers United</image:title>
+            <image:caption>Raktveer Award 2025 - Awards &amp; Recognition - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fawards%2Fgujarat-samachar-east-07-02-2026.webp?alt=media</image:loc>
+            <image:title>Gujarat Samachar East 07-02-2026 - LifeSavers United</image:title>
+            <image:caption>Gujarat Samachar East 07-02-2026 - Awards &amp; Recognition - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fawards%2Fgujarat-samachar-plus-06-02-2026.webp?alt=media</image:loc>
+            <image:title>Gujarat Samachar Plus 06-02-2026 - LifeSavers United</image:title>
+            <image:caption>Gujarat Samachar Plus 06-02-2026 - Awards &amp; Recognition - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fawards%2Fraktveer-award-2025.webp?alt=media</image:loc>
+            <image:title>Raktveer Award - LifeSavers United</image:title>
+            <image:caption>Raktveer Award - Awards &amp; Recognition - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fakash-gupta.webp?alt=media</image:loc>
+            <image:title>Akash Gupta - LifeSavers United</image:title>
+            <image:caption>Akash Gupta - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fashokbhai-darji.webp?alt=media</image:loc>
+            <image:title>Ashokbhai Darji - LifeSavers United</image:title>
+            <image:caption>Ashokbhai Darji - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fdarshan-bhatt.webp?alt=media</image:loc>
+            <image:title>Darshan Bhatt - LifeSavers United</image:title>
+            <image:caption>Darshan Bhatt - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fdipak-koshti.webp?alt=media</image:loc>
+            <image:title>Dipak Koshti - LifeSavers United</image:title>
+            <image:caption>Dipak Koshti - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fjay-trivedi.webp?alt=media</image:loc>
+            <image:title>Jay Trivedi - LifeSavers United</image:title>
+            <image:caption>Jay Trivedi - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkaran-shroff-1.webp?alt=media</image:loc>
+            <image:title>Karan Shroff - LifeSavers United</image:title>
+            <image:caption>Karan Shroff - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fkaran-shroff.webp?alt=media</image:loc>
+            <image:title>Karan Shroff - LifeSavers United</image:title>
+            <image:caption>Karan Shroff - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Flaxmansingh-khariwal.webp?alt=media</image:loc>
+            <image:title>Laxmansingh Khariwal - LifeSavers United</image:title>
+            <image:caption>Laxmansingh Khariwal - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmahendra-raktkranti.webp?alt=media</image:loc>
+            <image:title>Mahendra Raktkranti - LifeSavers United</image:title>
+            <image:caption>Mahendra Raktkranti - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmitul-gajjar.webp?alt=media</image:loc>
+            <image:title>Mitul Gajjar - LifeSavers United</image:title>
+            <image:caption>Mitul Gajjar - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fmoxesh-shah.webp?alt=media</image:loc>
+            <image:title>Moxesh Shah - LifeSavers United</image:title>
+            <image:caption>Moxesh Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fninank-kapadia.webp?alt=media</image:loc>
+            <image:title>Ninank Kapadia - LifeSavers United</image:title>
+            <image:caption>Ninank Kapadia - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fparinbhai-shah.webp?alt=media</image:loc>
+            <image:title>Parinbhai Shah - LifeSavers United</image:title>
+            <image:caption>Parinbhai Shah - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Frakesh-mistry.webp?alt=media</image:loc>
+            <image:title>Rakesh Mistry - LifeSavers United</image:title>
+            <image:caption>Rakesh Mistry - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fblood-donors%2Fsuhas-desai.webp?alt=media</image:loc>
+            <image:title>Suhas Desai - LifeSavers United</image:title>
+            <image:caption>Suhas Desai - Blood Donors - LifeSavers United</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-1.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-3.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-4.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-5.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-6.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-7.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-8.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <image:image>
+            <image:loc>https://firebasestorage.googleapis.com/v0/b/lifesavers-united-org.firebasestorage.app/o/gallery%2Fevents%2Flifesavers-united-9.webp?alt=media</image:loc>
+            <image:title>Lifesavers United</image:title>
+            <image:caption>Lifesavers United - Events</image:caption>
+        </image:image>
+        <!-- END_GALLERY_IMAGES -->
     </url>
 
     <!-- Stories -->

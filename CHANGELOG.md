@@ -4,6 +4,16 @@ This document records new features and fixes implemented in the LifeSavers Unite
 
 ---
 
+### [2026-06-12] — Gallery SEO Optimization (Option A with Brand and Schema Enhancements)
+
+* **Build Automation Script**: Created [update-gallery-seo.js](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/scripts/update-gallery-seo.js) to automate fetching image files recursively from Firebase Storage, converting names to title case, and rendering them statically.
+* **Build Integration**: Added the shortcut `"update:gallery-seo"` in [package.json](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/package.json) to execute the SEO generation pipeline with one command.
+* **Pre-rendered Noscript Image Grid**: Prepared [gallery.html](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/gallery.html) with injection markers. The automation script populates this block with `<noscript>` static `<img>` tags representing all gallery images with brand-augmented `alt` tags (e.g., `alt="[Name] - LifeSavers United"`).
+* **SEO Image Sitemap**: Enhanced [sitemap.xml](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/sitemap.xml) with the Google Image schema namespace, and configured the script to generate detailed `<image:image>` entries containing `<image:title>` and `<image:caption>` with the brand name.
+* **Structured Data Schema**: Integrated an `ImageGallery` JSON-LD schema markup block in [gallery.html](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/gallery.html) declaring the gallery ownership by LifeSavers United.
+
+---
+
 ### [2026-06-05] — Email Broadcast Detailed Metrics and Firestore Logging
 
 * **Detailed Delivery Breakdown**: Added client-side results parsing in [broadcast-system.js](file:///d:/Lifesavers%20United/life_savers_donors/life_savers_donors/scripts/broadcast-system.js) to compute exactly how many emails were successfully delivered by each provider (`resend`, `brevo`, `mailjet`) and how many failed.
