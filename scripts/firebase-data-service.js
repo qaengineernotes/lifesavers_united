@@ -533,10 +533,10 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 
             // Generate donor ID for linking with duplicate detection
             let donorId = null;
+            let existingDonor = null;
             if (donationInfo.donorName && donationInfo.donorContact) {
                 // --- DUPLICATE DETECTION: Search by Name OR Contact Number ---
                 const donorsRef = collection(db, 'donors');
-                let existingDonor = null;
 
                 const searchName = (donationInfo.donorName || '').trim().toLowerCase();
                 const searchContact = (donationInfo.donorContact || '').toString().trim();
@@ -720,7 +720,8 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                 success: true,
                 autoClosed: willClose,
                 unitsRemaining: totalUnitsRequired - newUnitsFulfilled,
-                closureType: 'fulfilled'
+                closureType: 'fulfilled',
+                donorEmail: existingDonor ? (existingDonor.data().email || '') : ''
             };
         }
 

@@ -999,6 +999,36 @@ async function logDonation(requestData, button) {
         }
 
         if (result.success) {
+            // --- Send Thank You Email (Non-blocking, only for Type = 'donor') ---
+            if (donationInfo.donorType === 'donor') {
+                let donorEmail = donationInfo.donorEmail || result.donorEmail || '';
+                if (!donorEmail && donationInfo.donorContact && donationInfo.donorContact.includes('@')) {
+                    donorEmail = donationInfo.donorContact.trim();
+                }
+
+                if (donorEmail && donorEmail.includes('@')) {
+                    const formattedDate = new Date().toLocaleDateString('en-IN', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    fetch('/send-thank-you-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            donorEmail: donorEmail,
+                            donorName: donationInfo.donorName || 'Donor',
+                            donationDate: formattedDate,
+                            patientName: requestData.patientName || 'Patient',
+                            hospitalName: requestData.hospitalName || 'Hospital'
+                        })
+                    }).then(r => r.json())
+                      .then(emailRes => console.log('📧 Thank you email status:', emailRes))
+                      .catch(emailErr => console.error('📧 Failed to send thank you email:', emailErr));
+                }
+            }
+
             const card = button.closest('.emergency-request-card');
 
             if (result.autoClosed) {
@@ -1819,6 +1849,7 @@ function showDonationPopup(requestData) {
                         ✅ <span id="donorLinkedBadgeText"></span>
                     </div>
                     <input type="hidden" id="donorLinkedId">
+                    <input type="hidden" id="donorLinkedEmail">
                 </div>
                 <div>
                     <label style="display: block; font-size: 14px; font-weight: 500; margin-bottom: 8px;">Contact (Optional)</label>
@@ -1882,6 +1913,8 @@ function showDonationPopup(requestData) {
                 nameInput.value = d.fullName || '';
                 contactInput.value = d.contactNumber || '';
                 if (linkedId) linkedId.value = d.id || '';
+                const emailInput = document.getElementById('donorLinkedEmail');
+                if (emailInput) emailInput.value = d.email || '';
                 const info = [d.fullName, d.bloodGroup, d.city].filter(Boolean).join(' · ');
                 if (badgeText) badgeText.textContent = 'Linked: ' + info;
                 if (badge) badge.style.display = 'block';
@@ -1891,6 +1924,8 @@ function showDonationPopup(requestData) {
             nameInput.addEventListener('input', () => {
                 if (badge) badge.style.display = 'none';
                 if (linkedId) linkedId.value = '';
+                const emailInput = document.getElementById('donorLinkedEmail');
+                if (emailInput) emailInput.value = '';
                 clearTimeout(_timer);
                 const term = nameInput.value.trim().toLowerCase();
                 if (term.length < 2) { closeDropdown(); return; }
@@ -2036,13 +2071,15 @@ function showDonationPopup(requestData) {
                 return;
             }
 
+            const donorEmail = document.getElementById('donorLinkedEmail')?.value || '';
             document.body.removeChild(modal);
             resolve({
                 units: selectedUnits,
                 donorType: donorType,
                 donorName: toTitleCase(donorName),
                 donorContact: donorContact,
-                closureReason: closureReason
+                closureReason: closureReason,
+                donorEmail: donorEmail
             });
         });
 

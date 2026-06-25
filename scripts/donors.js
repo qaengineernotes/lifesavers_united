@@ -1675,6 +1675,25 @@ window.saveLogDonation = async function () {
 
                 await updateDoc(requestRef, requestUpdateData);
 
+                // --- Send Thank You Email (Non-blocking) ---
+                if (donor && donor.email && donor.email.includes('@')) {
+                    const formattedDate = formatLogDate(donationDate);
+
+                    fetch('/send-thank-you-email', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            donorEmail: donor.email,
+                            donorName: donor.fullName || 'Donor',
+                            donationDate: formattedDate,
+                            patientName: requestData.patientName || patientName || 'Patient',
+                            hospitalName: requestData.hospitalName || 'Hospital'
+                        })
+                    }).then(r => r.json())
+                      .then(emailRes => console.log('📧 Thank you email status:', emailRes))
+                      .catch(emailErr => console.error('📧 Failed to send thank you email:', emailErr));
+                }
+
                 // Add history entry
                 await addHistoryEntry(linkedReqId, {
                     type: willClose ? 'CLOSED' : 'DONATION',
