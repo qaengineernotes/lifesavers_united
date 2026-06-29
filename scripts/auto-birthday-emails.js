@@ -12,6 +12,9 @@
 const admin = require('firebase-admin');
 const axios = require('axios');
 
+// Helper to pause execution to respect API rate limits
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
 // Check for required environment variables
 if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
     console.error('❌ Missing FIREBASE_SERVICE_ACCOUNT environment variable');
@@ -98,11 +101,18 @@ async function run() {
 
             console.log(`✉️ Sending birthday email to ${donor.fullName} (${donor.email})...`);
             const success = await sendBirthdayEmail(donor);
-            if (success) sentList.push(donor);
+            if (success) {
+                sentList.push(donor);
+            }
+            
+            // Wait 1.5 seconds to respect Resend's rate limit of 2 requests per second
+            await delay(1500);
         }
 
         // SEND SUMMARY TO ADMIN (only if emails were sent)
         if (sentList.length > 0) {
+            // Small delay before sending the final admin report
+            await delay(1000);
             await sendAdminSummary(sentList);
         }
 
