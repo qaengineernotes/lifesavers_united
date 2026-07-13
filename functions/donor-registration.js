@@ -21,92 +21,92 @@ const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
 
 // ── CORS headers ─────────────────────────────────────────────────────────────
 const CORS = {
-    'Access-Control-Allow-Origin':  'https://lifesaversunited.org',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Origin': 'https://lifesaversunited.org',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
 };
 
 // ── Preflight ─────────────────────────────────────────────────────────────────
 export async function onRequestOptions() {
-    return new Response(null, { status: 204, headers: CORS });
+  return new Response(null, { status: 204, headers: CORS });
 }
 
 // ── Main POST handler ─────────────────────────────────────────────────────────
 export async function onRequestPost(context) {
-    try {
-        let data;
-        try { data = await context.request.json(); }
-        catch {
-            return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
-        }
-
-        const { fullName, bloodGroup, city, area, email, contactNumber,
-                dateOfBirth, emergencyAvailable, preferredContact } = data;
-
-        if (!fullName || !bloodGroup || !contactNumber) {
-            return Response.json(
-                { success: false, error: 'Missing required fields.' },
-                { status: 422, headers: CORS }
-            );
-        }
-
-        // Sanitise
-        const c = (s) => String(s ?? '').replace(/[<>]/g, '').trim().slice(0, 500);
-        const safeName     = c(fullName);
-        const safeBlood    = c(bloodGroup);
-        const safeCity     = c(city);
-        const safeArea     = c(area);
-        const safeEmail    = c(email);
-        const safePhone    = c(contactNumber);
-        const safeDob      = c(dateOfBirth);
-        const safeEmerg    = c(emergencyAvailable);
-        const safePref     = c(preferredContact);
-
-        const istTime = new Date().toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short',
-        });
-
-        const results = [];
-
-        // 1. Welcome email → donor (only if email provided)
-        if (safeEmail && safeEmail.includes('@')) {
-            const r = await sendEmail(context.env, {
-                to: [safeEmail],
-                subject: `🩸 Welcome to LifeSavers United, ${safeName.split(' ')[0]}! You're Now a Registered Donor`,
-                html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime),
-            });
-            results.push({ type: 'donor', provider: r.provider, ok: r.ok });
-        }
-
-        // 2. Admin notification → always
-        const r2 = await sendEmail(context.env, {
-            to: [ADMIN_EMAIL],
-            subject: `🩸 New Donor: ${safeName} (${safeBlood}) from ${safeCity || 'Unknown City'}`,
-            html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeDob, safeEmerg, safePref, istTime),
-        });
-        results.push({ type: 'admin', provider: r2.provider, ok: r2.ok });
-
-        return Response.json({ success: true, results }, { status: 200, headers: CORS });
-
-    } catch (err) {
-        console.error('[donor-registration]', err);
-        return Response.json(
-            { success: false, error: 'Email send failed. Your registration is still saved.' },
-            { status: 500, headers: CORS }
-        );
+  try {
+    let data;
+    try { data = await context.request.json(); }
+    catch {
+      return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
     }
+
+    const { fullName, bloodGroup, city, area, email, contactNumber,
+      dateOfBirth, emergencyAvailable, preferredContact } = data;
+
+    if (!fullName || !bloodGroup || !contactNumber) {
+      return Response.json(
+        { success: false, error: 'Missing required fields.' },
+        { status: 422, headers: CORS }
+      );
+    }
+
+    // Sanitise
+    const c = (s) => String(s ?? '').replace(/[<>]/g, '').trim().slice(0, 500);
+    const safeName = c(fullName);
+    const safeBlood = c(bloodGroup);
+    const safeCity = c(city);
+    const safeArea = c(area);
+    const safeEmail = c(email);
+    const safePhone = c(contactNumber);
+    const safeDob = c(dateOfBirth);
+    const safeEmerg = c(emergencyAvailable);
+    const safePref = c(preferredContact);
+
+    const istTime = new Date().toLocaleString('en-IN', {
+      timeZone: 'Asia/Kolkata', dateStyle: 'full', timeStyle: 'short',
+    });
+
+    const results = [];
+
+    // 1. Welcome email → donor (only if email provided)
+    if (safeEmail && safeEmail.includes('@')) {
+      const r = await sendEmail(context.env, {
+        to: [safeEmail],
+        subject: `🩸 Welcome to LifeSavers United, ${safeName.split(' ')[0]}! You're Now a Registered Donor`,
+        html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime),
+      });
+      results.push({ type: 'donor', provider: r.provider, ok: r.ok });
+    }
+
+    // 2. Admin notification → always
+    const r2 = await sendEmail(context.env, {
+      to: [ADMIN_EMAIL],
+      subject: `🩸 New Donor: ${safeName} (${safeBlood}) from ${safeCity || 'Unknown City'}`,
+      html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeDob, safeEmerg, safePref, istTime),
+    });
+    results.push({ type: 'admin', provider: r2.provider, ok: r2.ok });
+
+    return Response.json({ success: true, results }, { status: 200, headers: CORS });
+
+  } catch (err) {
+    console.error('[donor-registration]', err);
+    return Response.json(
+      { success: false, error: 'Email send failed. Your registration is still saved.' },
+      { status: 500, headers: CORS }
+    );
+  }
 }
 
 // ── Donor Welcome Email ───────────────────────────────────────────────────────
 function buildDonorEmail(name, blood, city, area, emergency, time) {
-    const first = name.split(' ')[0];
-    const bloodColors = {
-        'A+': '#e74c3c','A-': '#c0392b','B+': '#e74c3c','B-': '#c0392b',
-        'AB+': '#8e44ad','AB-': '#7d3c98','O+': '#e74c3c','O-': '#c0392b',
-    };
-    const bColor = bloodColors[blood] || '#c0392b';
+  const first = name.split(' ')[0];
+  const bloodColors = {
+    'A+': '#e74c3c', 'A-': '#c0392b', 'B+': '#e74c3c', 'B-': '#c0392b',
+    'AB+': '#8e44ad', 'AB-': '#7d3c98', 'O+': '#e74c3c', 'O-': '#c0392b',
+  };
+  const bColor = bloodColors[blood] || '#c0392b';
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Welcome to LifeSavers United</title></head>
 <body style="margin:0;padding:0;background:#f0f0f0;font-family:'Segoe UI',Arial,sans-serif;">
@@ -241,7 +241,7 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
     <span style="color:#ccc;">•</span>
     <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">X (Twitter)</a>
     <span style="color:#ccc;">•</span>
-    <a href="https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">WhatsApp Group</a>
+    <a href="https://chat.whatsapp.com/HYqsKngbuVAEOvViGF8p6L" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">WhatsApp Group</a>
   </td></tr>
 
   <!-- FOOTER -->
@@ -264,13 +264,13 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 
 // ── Admin Notification Email ──────────────────────────────────────────────────
 function buildAdminEmail(name, blood, city, area, email, phone, dob, emergency, preferred, time) {
-    const row = (label, value) => `
+  const row = (label, value) => `
       <tr><td style="padding:10px 0;border-bottom:1px solid #f0f0f0;">
         <span style="color:#999;font-size:12px;text-transform:uppercase;letter-spacing:1px;display:block;">${label}</span>
         <span style="color:#222;font-size:15px;font-weight:600;">${value || '<em style="color:#bbb;">Not provided</em>'}</span>
       </td></tr>`;
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en">
 <head><meta charset="UTF-8"><title>New Donor Registration</title></head>
 <body style="margin:0;padding:0;background:#f4f4f4;font-family:Arial,sans-serif;">

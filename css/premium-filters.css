@@ -358,3 +358,25 @@
         padding-top: 8px;
     }
 }
+
+@media (max-width: 640px) {
+    .sort-section-premium {
+        flex-wrap: wrap;
+        padding: 10px 12px;
+        gap: 6px;
+        margin-bottom: 16px;
+    }
+
+    .sort-label-premium {
+        width: 100%;
+        margin-bottom: 6px;
+        margin-right: 0;
+    }
+
+    .sort-chip-premium {
+        flex: 1;
+        justify-content: center;
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+}

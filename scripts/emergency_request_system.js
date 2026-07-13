@@ -1024,8 +1024,8 @@ async function logDonation(requestData, button) {
                             hospitalName: requestData.hospitalName || 'Hospital'
                         })
                     }).then(r => r.json())
-                      .then(emailRes => console.log('📧 Thank you email status:', emailRes))
-                      .catch(emailErr => console.error('📧 Failed to send thank you email:', emailErr));
+                        .then(emailRes => console.log('📧 Thank you email status:', emailRes))
+                        .catch(emailErr => console.error('📧 Failed to send thank you email:', emailErr));
                 }
             }
 
@@ -2222,7 +2222,7 @@ function formatRequestDataForCopy(requestData) {
         '',
         '🩸 Connect with LifeSavers United - Your community blood donation network',
         '🌐 Visit: https://lifesaversunited.org/',
-        '💬 WhatsApp: https://chat.whatsapp.com/HRP2oqTxwbfKRHyH9BxtPw'
+        '💬 WhatsApp: https://chat.whatsapp.com/HYqsKngbuVAEOvViGF8p6L'
     ].join('\n');
 }
 
