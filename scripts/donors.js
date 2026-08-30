@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Listen for auth state changes — store unsubscribe so we can clean up
     unsubscribeAuth = onAuthChange(async (user) => {
-        user = { uid: 'mock-uid', role: 'superuser', status: 'approved', displayName: 'Mock User' };
         currentUser = user;
 
         if (!user) {
@@ -77,6 +76,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // User is logged in and approved
+        const accessDenied = document.getElementById('accessDenied');
+        if (accessDenied) accessDenied.style.display = 'none';
+
+        const statsGrid = document.getElementById('statsGrid');
+        if (statsGrid) statsGrid.style.display = 'grid';
+
         updateStatistics();
         populateCityFilter();
         initializeSearchAndFilters();
@@ -102,6 +107,11 @@ window.addEventListener('pagehide', () => {
 function showAccessDenied(message) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('tableContainer').style.display = 'none';
+    const searchFilters = document.getElementById('searchFiltersContainer');
+    if (searchFilters) searchFilters.style.display = 'none';
+    const statsGrid = document.getElementById('statsGrid');
+    if (statsGrid) statsGrid.style.display = 'none';
+
     const accessDenied = document.getElementById('accessDenied');
     accessDenied.style.display = 'block';
     accessDenied.querySelector('p').textContent = message;

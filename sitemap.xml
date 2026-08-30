@@ -1077,4 +1077,52 @@
         <priority>0.8</priority>
     </url>
 
+    <!-- Blog: Revised Blood Donor Selection & Referral Criteria Feb 2025 -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-revised-blood-donation-rules-india-2025</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    <!-- Blog: Blood Donation Waiting Periods: Tattoos, Piercings, Dental Work & Surgeries -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-blood-donation-deferrals-tattoos-surgery</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Can You Donate Blood with Diabetes, High BP, Thyroid or Heart Conditions? -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-blood-donation-diabetes-high-bp-chronic-illness</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Blood Donation Medication & Vaccine Deferral Chart -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-blood-donation-medications-vaccines-waiting-time</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Women’s Health & Blood Donation Rules -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-womens-health-blood-donation-rules</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    <!-- Blog: Blood Screening, TTI Test Recall & ICTC Referral Protocol -->
+    <url>
+        <loc>https://lifesaversunited.org/blog-blood-screening-tti-recall-ic-tc-referral</loc>
+        <lastmod>2026-08-30</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
 </urlset>

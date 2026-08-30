@@ -407,30 +407,41 @@
 
     <!-- Hero Section with Carousel -->
     <main>
-        <section class="relative bg-gradient-hero text-white py-20" role="banner">
+        <section class="relative bg-gradient-hero text-white py-12 lg:py-16" role="banner">
             <div class="absolute inset-0 bg-black opacity-20"></div>
             <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div class="grid lg:grid-cols-2 gap-10 items-center">
                     <!-- Hero Content -->
                     <div class="text-center lg:text-left">
-                        <h1 class="text-hero mb-6">
+                        <h1 class="text-hero text-white mb-4 lg:mb-6">
                             Emergency Blood Donation in Ahmedabad, Gujarat & India Save Lives Today
                         </h1>
-                        <p class="text-xl mb-8 opacity-90">
+                        <p class="text-lg lg:text-xl text-white mb-6 opacity-90">
                             Join thousands of blood donors across India. Submit emergency blood requests and connect
                             with verified donors in Gujarat, Ahmedabad, Nadiad, Mumbai, and beyond available 24/7.
                         </p>
 
-                        <!-- Registration CTAs -->
-                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                            <a href="/donor_registration" class="btn-primary text-lg px-8 py-4">
-                                <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
+                        <!-- Dual-Intent Hero CTAs (Emergency vs Donor) -->
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start items-center">
+                            <!-- Primary High-Contrast CTA (Red / Emergency) -->
+                            <a href="/emergency_blood_request" class="hero-btn-emergency group">
+                                <svg class="w-6 h-6 shrink-0 text-white animate-pulse" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>Need Blood Urgently? (Submit Request)</span>
+                            </a>
+
+                            <!-- Secondary CTA (Outline / Solid White) -->
+                            <a href="/donor_registration" class="hero-btn-donor group">
+                                <svg class="w-5 h-5 shrink-0 text-primary group-hover:scale-110 transition-transform"
+                                    fill="currentColor" viewBox="0 0 20 20">
                                     <path
                                         d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
                                 </svg>
-                                Become a Donor
+                                <span>Register as a Donor</span>
                             </a>
-
                         </div>
                     </div>
 
@@ -442,7 +453,7 @@
                                     class="w-16 h-16 rounded-full object-cover mr-4" loading="lazy"
                                     onerror="this.src='https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'; this.onerror=null;" />
                                 <div>
-                                    <h3 class="font-semibold text-lg">Samantbhai Parmar</h3>
+                                    <h3 class="font-semibold text-lg text-white">Samantbhai Parmar</h3>
                                     <p class="text-accent-200 text-sm">Donor & Recipient Connected</p>
                                 </div>
                             </div>

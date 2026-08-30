@@ -1,0 +1,741 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Primary Colors */
+  --color-primary: #dc2626;
+  /* red-600 - Empowering life-force, heroic action */
+  --color-primary-50: #fef2f2;
+  /* red-50 */
+  --color-primary-100: #fee2e2;
+  /* red-100 */
+  --color-primary-200: #fecaca;
+  /* red-200 */
+  --color-primary-300: #fca5a5;
+  /* red-300 */
+  --color-primary-400: #f87171;
+  /* red-400 */
+  --color-primary-500: #ef4444;
+  /* red-500 */
+  --color-primary-600: #dc2626;
+  /* red-600 */
+  --color-primary-700: #b91c1c;
+  /* red-700 */
+  --color-primary-800: #991b1b;
+  /* red-800 */
+  --color-primary-900: #7f1d1d;
+  /* red-900 */
+
+  /* Secondary Colors */
+  --color-secondary: #1e40af;
+  /* blue-700 - Trustworthy medical authority */
+  --color-secondary-50: #eff6ff;
+  /* blue-50 */
+  --color-secondary-100: #dbeafe;
+  /* blue-100 */
+  --color-secondary-200: #bfdbfe;
+  /* blue-200 */
+  --color-secondary-300: #93c5fd;
+  /* blue-300 */
+  --color-secondary-400: #60a5fa;
+  /* blue-400 */
+  --color-secondary-500: #3b82f6;
+  /* blue-500 */
+  --color-secondary-600: #2563eb;
+  /* blue-600 */
+  --color-secondary-700: #1d4ed8;
+  /* blue-700 */
+  --color-secondary-800: #1e3a8a;
+  /* blue-800 */
+  --color-secondary-900: #1e40af;
+  /* blue-900 */
+
+  /* Accent Colors */
+  --color-accent: #059669;
+  /* emerald-600 - Positive health outcomes */
+  --color-accent-50: #ecfdf5;
+  /* emerald-50 */
+  --color-accent-100: #d1fae5;
+  /* emerald-100 */
+  --color-accent-200: #a7f3d0;
+  /* emerald-200 */
+  --color-accent-300: #6ee7b7;
+  /* emerald-300 */
+  --color-accent-400: #34d399;
+  /* emerald-400 */
+  --color-accent-500: #10b981;
+  /* emerald-500 */
+  --color-accent-600: #059669;
+  /* emerald-600 */
+  --color-accent-700: #047857;
+  /* emerald-700 */
+  --color-accent-800: #065f46;
+  /* emerald-800 */
+  --color-accent-900: #064e3b;
+  /* emerald-900 */
+
+  /* Background Colors */
+  --color-background: #fefefe;
+  /* neutral-50 - Clean medical canvas */
+  --color-surface: #f8fafc;
+  /* slate-50 - Subtle content elevation */
+
+  /* Text Colors */
+  --color-text-primary: #1f2937;
+  /* gray-800 - Extended reading comfort */
+  --color-text-secondary: #6b7280;
+  /* gray-500 - Clear supporting hierarchy */
+
+  /* Status Colors */
+  --color-success: #10b981;
+  /* emerald-500 - Celebration of life-saving impact */
+  --color-warning: #f59e0b;
+  /* amber-500 - Important medical attention */
+  --color-error: #ef4444;
+  /* red-500 - Helpful medical concern */
+
+  /* Shadow Variables */
+  --shadow-minimal: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-card: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+
+  /* Border Variables */
+  --border-color: #e5e7eb;
+  /* gray-200 */
+  --border-input: #d1d5db;
+  /* gray-300 */
+}
+
+/* Base Styles */
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+    color: var(--color-text-primary);
+    background-color: var(--color-background);
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--color-text-primary);
+  }
+
+  .font-accent {
+    font-family: 'Crimson Text', serif;
+  }
+}
+
+/* Component Styles */
+@layer components {
+  .btn-primary {
+    @apply bg-primary text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 ease-out hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-secondary text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 ease-out hover:bg-secondary-800 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2;
+  }
+
+  .btn-outline {
+    @apply border-2 border-primary text-primary font-semibold py-3 px-6 rounded-lg transition-all duration-300 ease-out hover:bg-primary hover:text-white focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-card p-6 border border-gray-100;
+  }
+
+  .form-input {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 ease-out;
+  }
+
+  .text-hero {
+    @apply text-4xl md:text-5xl lg:text-6xl font-bold leading-tight;
+  }
+
+  .text-section {
+    @apply text-2xl md:text-3xl font-semibold;
+  }
+
+  .text-body {
+    @apply text-base leading-relaxed;
+  }
+
+  .text-small {
+    @apply text-sm text-text-secondary;
+  }
+}
+
+/* Utility Classes */
+@layer utilities {
+  .shadow-minimal {
+    box-shadow: var(--shadow-minimal);
+  }
+
+  .transition-smooth {
+    transition: all 300ms ease-out;
+  }
+
+  .bg-gradient-hero {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
+  }
+
+  .bg-gradient-hero h1,
+  .bg-gradient-hero h2,
+  .bg-gradient-hero h3,
+  .bg-gradient-hero h4,
+  .bg-gradient-hero h5,
+  .bg-gradient-hero h6,
+  .bg-gradient-hero .text-hero {
+    color: #ffffff !important;
+  }
+
+  .bg-gradient-success {
+    background: linear-gradient(135deg, var(--color-accent) 0%, var(--color-success) 100%);
+  }
+
+  /* Volunteer Link Card Styles */
+  .link-card:nth-child(8) {
+    animation-delay: 0.40s;
+  }
+
+  .link-card--volunteer {
+    border-color: rgba(245, 158, 11, 0.18);
+  }
+
+  .link-card--volunteer .link-icon-wrap {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+
+  .link-card--volunteer:hover {
+    border-color: rgba(245, 158, 11, 0.35);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18);
+  }
+
+  /* Blog H2 underline utility — always keep in output */
+  .border-b-4 {
+    border-bottom-width: 4px;
+  }
+}
+
+/* Mobile header section responsive overrides */
+@media (max-width: 639px) {
+  .mobile-header-section .mobile-refresh-btn:not(.hidden) {
+    display: flex !important;
+  }
+}
+
+/* ============================================================
+   Dual-Intent Hero Buttons & Helpline Badge Styles
+   ============================================================ */
+.hero-btn-emergency {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  padding: 0.875rem 1.5rem !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  box-shadow: 0 10px 15px -3px rgba(185, 28, 28, 0.4), 0 4px 6px -2px rgba(185, 28, 28, 0.2) !important;
+  transition: all 0.25s ease !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.hero-btn-emergency:hover {
+  background-color: #b91c1c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 14px 20px -3px rgba(185, 28, 28, 0.5) !important;
+}
+
+.hero-btn-donor {
+  background-color: #ffffff !important;
+  color: #dc2626 !important;
+  font-weight: 700 !important;
+  font-size: 1.05rem !important;
+  padding: 0.875rem 1.5rem !important;
+  border-radius: 0.75rem !important;
+  border: 1px solid #ffffff !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+  transition: all 0.25s ease !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+.hero-btn-donor:hover {
+  background-color: #f8fafc !important;
+  color: #b91c1c !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+.hero-helpline-badge {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.625rem !important;
+  background-color: rgba(0, 0, 0, 0.35) !important;
+  color: #ffffff !important;
+  padding: 0.625rem 1.25rem !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  backdrop-filter: blur(8px) !important;
+  font-size: 0.9375rem !important;
+  font-weight: 500 !important;
+  text-decoration: none !important;
+  transition: all 0.25s ease !important;
+}
+
+.hero-helpline-badge:hover {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border-color: rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Next Eligible Date & Smart Donation Planner Custom Styles */
+.banner-eligible {
+  background: #ecfdf5 !important;
+  border: 1px solid #d1fae5 !important;
+  color: #065f46 !important;
+  padding: 1.25rem 1.25rem 1.25rem 3.5rem !important;
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 1.5rem !important;
+  position: relative !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  line-height: 1.6 !important;
+}
+
+.banner-eligible::before {
+  content: "🎉";
+  position: absolute !important;
+  left: 1.25rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 1.5rem;
+}
+
+.banner-not-eligible {
+  background: #fef2f2 !important;
+  border: 1px solid #fee2e2 !important;
+  color: #991b1b !important;
+  padding: 1.25rem 1.25rem 1.25rem 3.5rem !important;
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+  margin-bottom: 1.5rem !important;
+  position: relative !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  line-height: 1.6 !important;
+}
+
+.banner-not-eligible::before {
+  content: "⏳";
+  position: absolute !important;
+  left: 1.25rem !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  font-size: 1.5rem;
+}
+
+#share-whatsapp {
+  background-color: #25d366 !important;
+  color: white !important;
+  border: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.625rem 1.25rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  transition: background-color 0.2s !important;
+}
+
+#share-whatsapp:hover {
+  background-color: #128c7e !important;
+}
+
+#share-copy {
+  background-color: #f3f4f6 !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0.625rem 1.25rem !important;
+  border-radius: 0.5rem !important;
+  font-weight: 600 !important;
+  transition: background-color 0.2s !important;
+}
+
+#share-copy:hover {
+  background-color: #e5e7eb !important;
+}
+
+#share-whatsapp svg,
+#share-copy svg {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin-right: 0.5rem !important;
+  display: block !important;
+}
+
+#copied-toast {
+  position: fixed;
+  top: 2rem;
+  right: 2rem;
+  transform: translateX(200%);
+  background-color: #10B981;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+#copied-toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.blood-gradient {
+  background: linear-gradient(135deg, #e11d48 0%, #9f1239 100%);
+}
+
+.roadmap-card {
+  background-color: #ffffff !important;
+  color: #1f2937 !important;
+  padding: 1.5rem;
+  border-radius: 1.25rem;
+  border-top: 4px solid #e11d48;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.roadmap-step {
+  position: relative;
+  padding-left: 2rem;
+  margin-bottom: 1.5rem;
+  border-left: 2px solid #e2e8f0;
+}
+
+.roadmap-step::before {
+  content: '';
+  position: absolute;
+  left: -9px;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #e11d48;
+  border: 4px solid #ffffff;
+  box-shadow: 0 0 0 1px #e2e8f0;
+}
+
+.roadmap-step.wb-step::before {
+  background-color: #e11d48;
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.3);
+}
+
+.roadmap-step.sdp-step::before {
+  background-color: #10b981;
+}
+
+.planner-advice-card {
+  background-color: #f8fafc;
+  border-radius: 1rem;
+  padding: 1.25rem;
+  border: 1px solid #f1f5f9;
+}
+
+.planner-advice-title {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+  color: #e11d48;
+}
+
+.planner-list {
+  font-size: 0.8125rem;
+  color: #64748b;
+  list-style-type: disc;
+  margin-left: 1.25rem;
+}
+
+.planner-list li {
+  margin-bottom: 0.5rem;
+}
+
+.planner-input-wrapper {
+  position: relative !important;
+  width: 100% !important;
+}
+
+.reset-field-btn {
+  position: absolute !important;
+  right: 8px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  z-index: 30 !important;
+  cursor: pointer !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  color: #64748b !important;
+  font-size: 12px !important;
+  line-height: 1 !important;
+}
+
+.reset-field-btn:hover {
+  background: #fee2e2 !important;
+  color: #ef4444 !important;
+}
+
+.planner-toggle-container {
+  display: flex !important;
+  background: #f1f5f9 !important;
+  padding: 4px !important;
+  border-radius: 12px !important;
+  gap: 4px !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.planner-toggle-btn {
+  flex: 1 !important;
+  padding: 10px 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  transition: all 0.2s ease !important;
+  color: #64748b !important;
+  background: transparent !important;
+  cursor: pointer !important;
+}
+
+.planner-toggle-btn.active {
+  background: white !important;
+  color: #e11d48 !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
+article.prose-lg section h2 {
+  border-bottom-width: 4px;
+  border-bottom-style: solid;
+  border-bottom-color: #dc2626;
+  padding-bottom: 0.75rem;
+}
+
+article.prose-lg .blog-share-section {
+  margin-top: 6rem;
+  padding: 3rem;
+  border-radius: 2rem;
+  text-align: center;
+}
+
+article.prose-lg .blog-share-section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+article.prose-lg .blog-share-section a {
+  flex: 1;
+  min-width: 180px;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-radius: 1rem;
+  font-weight: 700;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+article.prose-lg .blog-share-section a:hover {
+  transform: scale(1.05);
+}
+
+article.prose-lg .blog-share-section h2 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 2.5rem;
+  border-bottom: none !important;
+  padding-bottom: 0 !important;
+}
+
+a[aria-label="Share on WhatsApp"] {
+  background-color: #16a34a;
+  color: #ffffff;
+}
+a[aria-label="Share on WhatsApp"]:hover {
+  background-color: #15803d;
+}
+a[aria-label="Share on Twitter"] {
+  background-color: #60a5fa;
+  color: #ffffff;
+}
+a[aria-label="Share on Twitter"]:hover {
+  background-color: #3b82f6;
+}
+a[aria-label="Share on Facebook"] {
+  background-color: #1d4ed8;
+  color: #ffffff;
+}
+a[aria-label="Share on Facebook"]:hover {
+  background-color: #1e40af;
+}
+
+/* Sticky Emergency Blood Request Button Styles */
+.sticky-emergency-button {
+  animation: emergencyPulse 2s infinite !important;
+  box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4) !important;
+  position: fixed !important;
+  bottom: 1.5rem !important;
+  right: 1.5rem !important;
+  z-index: 9999 !important;
+  border-radius: 9999px !important;
+  background-color: #f59e0b !important;
+  color: white !important;
+  text-decoration: none !important;
+  display: flex !important;
+  align-items: center !important;
+  padding: 1rem 1.5rem !important;
+  transition: all 0.3s ease !important;
+  transform: scale(1) !important;
+}
+
+.sticky-emergency-button:hover {
+  animation: none !important;
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.5) !important;
+  background-color: #ef4444 !important;
+  transform: scale(1.1) !important;
+}
+
+@keyframes emergencyPulse {
+
+  0%,
+  100% {
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 10px 30px rgba(245, 158, 11, 0.8), 0 0 20px rgba(245, 158, 11, 0.6);
+  }
+}
+
+/* Mobile responsive adjustments for sticky button */
+@media (max-width: 768px) {
+  .sticky-emergency-button {
+    bottom: 1rem !important;
+    right: 1rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+
+  .sticky-emergency-button .text-sm {
+    font-size: 0.75rem;
+  }
+
+  .sticky-emergency-button .text-xs {
+    font-size: 0.625rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .sticky-emergency-button {
+    bottom: 0.5rem !important;
+    right: 0.5rem !important;
+    padding: 0.5rem 0.75rem !important;
+  }
+
+  .sticky-emergency-button .space-x-3>*+* {
+    margin-left: 0.5rem;
+  }
+}
+
+/* ============================================================
+   Gallery Item Hover Overlay Styles (Matching gallery.html)
+   ============================================================ */
+.gallery-item {
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  height: 280px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  position: relative;
+}
+
+.gallery-item-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.gallery-item-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top,
+      rgba(220, 38, 38, 0.95) 0%,
+      rgba(220, 38, 38, 0.85) 50%,
+      rgba(220, 38, 38, 0.4) 80%,
+      transparent 100%);
+  transform: translateY(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1.5rem 1rem 1rem;
+  display: flex;
+  align-items: flex-end;
+  min-height: 40%;
+}
+
+.gallery-item-caption {
+  color: white;
+  text-align: center;
+  width: 100%;
+  transform: translateY(10px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.gallery-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.gallery-item:hover .gallery-item-image {
+  transform: scale(1.1);
+}
+
+.gallery-item:hover .gallery-item-overlay {
+  transform: translateY(0);
+}
+
+.gallery-item:hover .gallery-item-caption {
+  transform: translateY(0);
+  opacity: 1;
+}

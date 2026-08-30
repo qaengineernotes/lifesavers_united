@@ -51,6 +51,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 function showAccessDenied(message) {
     document.getElementById('loadingState').style.display = 'none';
     document.getElementById('tableContainer').style.display = 'none';
+    const searchContainer = document.getElementById('searchContainer');
+    if (searchContainer) searchContainer.style.display = 'none';
+    const statsGrid = document.getElementById('statsGrid');
+    if (statsGrid) statsGrid.style.display = 'none';
+
     const accessDenied = document.getElementById('accessDenied');
     accessDenied.style.display = 'block';
     accessDenied.querySelector('p').textContent = message;
@@ -64,6 +69,8 @@ async function loadAllRequests() {
         document.getElementById('loadingState').style.display = 'block';
         document.getElementById('accessDenied').style.display = 'none';
         document.getElementById('tableContainer').style.display = 'none';
+        const statsGrid = document.getElementById('statsGrid');
+        if (statsGrid) statsGrid.style.display = 'grid';
         const response = await fetchEmergencyRequestsFromFirebase({ includeClosed: true });
 
         if (response.success && response.requests) {
