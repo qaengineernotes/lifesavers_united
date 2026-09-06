@@ -2564,6 +2564,8 @@ footer .flex.items-center.mb-3 img {
   font-size: 1rem;
   outline: none;
   transition: border-color 0.2s;
+  color: #1f2937;
+  background-color: #ffffff;
 }
 
 .search-input:focus {
