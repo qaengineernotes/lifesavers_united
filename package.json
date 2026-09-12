@@ -22,7 +22,8 @@
     "watch-images": "node scripts/optimize-images.js --watch",
     "replace-html-images": "node scripts/replace-html-images.js",
     "optimize-fonts": "node scripts/optimize-fonts.js",
-    "update:gallery-seo": "node scripts/update-gallery-seo.js"
+    "update:gallery-seo": "node scripts/update-gallery-seo.js",
+    "batch-optimize": "node scripts/optimize-and-rename.js"
   },
   "author": "",
   "license": "MIT",

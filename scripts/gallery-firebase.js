@@ -428,6 +428,51 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to apply a filter and optionally update the browser URL
+    function applyFilter(category, updateUrl = true) {
+        if (!category) category = 'ALL';
+
+        // Find matching filter button (supports exact match or folder map match)
+        let matchedBtn = Array.from(filterButtons).find(btn => 
+            btn.dataset.filter.toLowerCase() === category.toLowerCase()
+        );
+
+        if (!matchedBtn) {
+            // Check in filterToFolderMap
+            for (const [btnName, folder] of Object.entries(filterToFolderMap)) {
+                if (folder.toLowerCase() === category.toLowerCase()) {
+                    matchedBtn = Array.from(filterButtons).find(btn => btn.dataset.filter === btnName);
+                    break;
+                }
+            }
+        }
+
+        const activeCat = matchedBtn ? matchedBtn.dataset.filter : 'ALL';
+        currentFilter = activeCat;
+
+        // Update button visual states
+        filterButtons.forEach(btn => {
+            if (btn === matchedBtn || (activeCat === 'ALL' && btn.dataset.filter === 'ALL')) {
+                btn.classList.remove('bg-gray-200', 'text-gray-700');
+                btn.classList.add('bg-primary', 'text-white');
+            } else {
+                btn.classList.remove('bg-primary', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            }
+        });
+
+        // Update URL in address bar if requested
+        if (updateUrl) {
+            if (activeCat === 'ALL') {
+                history.pushState({ filter: 'ALL' }, '', window.location.pathname);
+            } else {
+                history.pushState({ filter: activeCat }, '', `?filter=${encodeURIComponent(activeCat)}`);
+            }
+        }
+
+        loadGalleryData(activeCat);
+    }
+
     // Setup event listeners
     function setupEventListeners() {
         filterButtons.forEach(button => {
@@ -435,16 +480,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const clickedCategory = button.dataset.filter;
                 if (clickedCategory === currentFilter) return;
 
-                filterButtons.forEach(btn => {
-                    btn.classList.remove('bg-primary', 'text-white');
-                    btn.classList.add('bg-gray-200', 'text-gray-700');
-                });
-
-                button.classList.remove('bg-gray-200', 'text-gray-700');
-                button.classList.add('bg-primary', 'text-white');
-
-                currentFilter = clickedCategory;
-                loadGalleryData(currentFilter);
+                applyFilter(clickedCategory, true);
             });
         });
 
@@ -463,8 +499,18 @@ document.addEventListener('DOMContentLoaded', function () {
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) closeLightbox();
         });
+
+        // Handle browser Back / Forward buttons
+        window.addEventListener('popstate', () => {
+            const params = new URLSearchParams(window.location.search);
+            const navFilter = params.get('filter') || params.get('category') || 'ALL';
+            applyFilter(navFilter, false);
+        });
     }
 
-    // Initial load
-    loadGalleryData('ALL');
+    // Initial load: parse URL parameters (e.g. ?filter=Events)
+    setupEventListeners();
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialFilter = urlParams.get('filter') || urlParams.get('category') || 'ALL';
+    applyFilter(initialFilter, false);
 });

@@ -101,12 +101,29 @@
             "image": "/imgs/volunteer-Vijay-parmar-blood-donation.webp",
             "featured": true,
             "testimonial": "Donating SDP gives a feeling of joy that I can serve the society."
+        },
+        {
+            "id": 7,
+            "type": "donor",
+            "title": "From 2005 to 60+ Donations: Gopan Shah's Journey of Lifesaving & Advocacy",
+            "name": "Gopan Shah",
+            "donationCount": "60",
+            "donationType": "Blood & SDP",
+            "yearsActive": 21,
+            "location": "Ahmedabad",
+            "date": "2026-09-06",
+            "excerpt": "Active blood donor since 2005 with 60+ donations. Inspired by Moxesh bhai, Gopan Shah joined <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> as a donor and volunteer, advocating for both blood donation and spreading awareness to save lives.",
+            "fullStory": "I started donating blood from early 2005. Most of my donations were in blood banks specifically for children with Thalassemia, blood camps and for known patients. Over a period of years I came across few incidents when the same blood bank denied us blood when we required for medical emergencies. But that didn't deter me from helping out others and I kept my donations on regularly. I joined <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> as a donor/ volunteer after getting inspired by the wonderful work done by Moxesh bhai and getting aware about the actual situation of shortage of blood donors for medical emergencies. Going strong with 60+ donations so far and working towards inspiring more individuals to join us in this life saving journey, it is my humble request to everyone to not only donate blood but also donate some time for spreading awareness about this important life saving activity.\n\nDonate Blood, Save Lives - Someone's tomorrow depends on your today!!",
+            "motivation": "It is my humble request to everyone to not only donate blood but also donate some time for spreading awareness about this important life saving activity.",
+            "image": "/imgs/volunteer-gopan-shah-blood-donation.webp",
+            "featured": true,
+            "testimonial": "Donate Blood, Save Lives - Someone's tomorrow depends on your today!!"
         }
     ],
     "stats": {
-        "totalStories": 6,
+        "totalStories": 7,
         "totalLivesSaved": 0,
-        "totalDonors": 5,
+        "totalDonors": 6,
         "totalPatients": 1,
         "totalEmergencies": 0
     }

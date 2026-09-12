@@ -131,6 +131,14 @@ class MobileMenu {
     }
 
     isActivePage(href, currentPage) {
+        if (!href) return false;
+        // Handle clean URLs (e.g. /events matching events or events.html)
+        const cleanHref = href.split('#')[0].split('?')[0].replace(/^\/+|\/+$/g, '').replace(/\.html$/, '');
+        const cleanCurrent = (currentPage || '').split('#')[0].split('?')[0].replace(/^\/+|\/+$/g, '').replace(/\.html$/, '');
+
+        if (cleanHref === cleanCurrent) return true;
+        if ((cleanHref === '' || cleanHref === 'index') && (cleanCurrent === '' || cleanCurrent === 'index')) return true;
+
         // Handle different href formats
         if (href === currentPage) return true;
         if (href === 'index.html' && (currentPage === 'index.html' || currentPage === '')) return true;
@@ -139,8 +147,8 @@ class MobileMenu {
 
         // Handle pages in subfolders
         if (href.includes('/') && currentPage.includes('/')) {
-            const hrefFile = href.split('/').pop();
-            const currentFile = currentPage.split('/').pop();
+            const hrefFile = href.split('/').pop().replace(/\.html$/, '');
+            const currentFile = currentPage.split('/').pop().replace(/\.html$/, '');
             return hrefFile === currentFile;
         }
 

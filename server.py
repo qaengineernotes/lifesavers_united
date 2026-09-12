@@ -47,6 +47,9 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
         super().end_headers()
     
     def do_OPTIONS(self):
@@ -238,11 +241,13 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({'success': False, 'error': str(e)}).encode('utf-8'))
             return
         else:
-            if '.' not in os.path.basename(self.path) and not self.path.endswith('/'):
-                html_path = self.path + '.html'
+            parsed_path = urllib.parse.urlparse(self.path)
+            clean_path = parsed_path.path
+            if '.' not in os.path.basename(clean_path) and not clean_path.endswith('/'):
+                html_path = clean_path + '.html'
                 file_path = os.path.join(DIRECTORY, html_path.lstrip('/'))
                 if os.path.isfile(file_path):
-                    self.path = html_path
+                    self.path = html_path + ('?' + parsed_path.query if parsed_path.query else '')
             super().do_GET()
 
 def main():

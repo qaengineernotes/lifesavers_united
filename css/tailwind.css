@@ -6002,7 +6002,8 @@ a[aria-label="Share on Facebook"]:hover {
   box-shadow: 0 10px 15px -3px rgba(185, 28, 28, 0.4), 0 4px 6px -2px rgba(185, 28, 28, 0.2) !important;
   transition: all 0.25s ease !important;
   text-decoration: none !important;
-  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .hero-btn-emergency:hover {
@@ -6026,7 +6027,8 @@ a[aria-label="Share on Facebook"]:hover {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
   transition: all 0.25s ease !important;
   text-decoration: none !important;
-  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  max-width: 100% !important;
 }
 
 .hero-btn-donor:hover {
@@ -6034,6 +6036,35 @@ a[aria-label="Share on Facebook"]:hover {
   color: #b91c1c !important;
   transform: translateY(-1px) !important;
   box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.15) !important;
+}
+
+@media (min-width: 640px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    white-space: nowrap !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0.8125rem 1rem !important;
+    font-size: 0.95rem !important;
+    white-space: normal !important;
+    text-align: center !important;
+    line-height: 1.35 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    padding: 0.75rem 0.625rem !important;
+    font-size: 0.875rem !important;
+    gap: 0.375rem !important;
+  }
 }
 
 .hero-helpline-badge {
@@ -6510,3 +6541,187 @@ a[aria-label="Share on Facebook"]:hover {
     right: 0 !important;
   }
 }
+
+/* ============================================================
+   RESPONSIVE HERO BUTTONS & TYPOGRAPHY
+   ============================================================ */
+.text-hero {
+  font-size: clamp(1.85rem, 5vw, 3.5rem) !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+}
+
+.hero-btn-emergency,
+.hero-btn-donor {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
+  text-decoration: none !important;
+  border-radius: 0.75rem !important;
+  transition: all 0.25s ease !important;
+}
+
+@media (min-width: 640px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    white-space: nowrap !important;
+    font-size: 1.05rem !important;
+    padding: 0.875rem 1.5rem !important;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    width: 100% !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+    padding: 0.8125rem 1rem !important;
+    font-size: 0.95rem !important;
+    line-height: 1.35 !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .hero-btn-emergency,
+  .hero-btn-donor {
+    padding: 0.7rem 0.625rem !important;
+    font-size: 0.875rem !important;
+    gap: 0.375rem !important;
+  }
+}
+
+/* ============================================================
+   COMMUNITY IMPACT & FLAGSHIP EVENT STYLES
+   ============================================================ */
+.flagship-event-card {
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 1.5rem;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+  border: 1px solid #fee2e2;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.flagship-event-card:hover {
+  box-shadow: 0 20px 35px -10px rgba(220, 38, 38, 0.15);
+}
+
+.flagship-card-media {
+  position: relative;
+  width: 100%;
+  min-height: 320px;
+  background-color: #f8fafc;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.flagship-card-media img.main-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.flagship-event-card:hover .flagship-card-media img.main-img {
+  transform: scale(1.04);
+}
+
+.flagship-card-content {
+  width: 100%;
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-sizing: border-box;
+  background: #ffffff;
+}
+
+@media (min-width: 1024px) {
+  .flagship-event-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+
+  .flagship-card-media {
+    width: 53%;
+    min-height: 480px;
+  }
+
+  .flagship-card-content {
+    width: 47%;
+    padding: 2.25rem;
+  }
+}
+
+.event-companion-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .event-companion-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.flagship-milestone-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 1.15rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.25);
+}
+
+.event-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.event-location-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid #e5e7eb;
+}
+
+.event-date-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.9rem;
+  background-color: #fef2f2;
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  border: 1px solid #fee2e2;
+}
+
