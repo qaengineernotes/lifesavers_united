@@ -237,7 +237,7 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
   <!-- SOCIAL -->
   <tr><td style="padding:0 32px 32px;" align="center">
     <p style="margin:0 0 12px;color:#888;font-size:13px;">Spread the word — help us save more lives 🙏</p>
-    <a href="https://www.instagram.com/lifesavers_blooddonors" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">Instagram</a>
+    <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">Instagram</a>
     <span style="color:#ccc;">•</span>
     <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;font-size:13px;font-weight:600;margin:0 8px;">X (Twitter)</a>
     <span style="color:#ccc;">•</span>

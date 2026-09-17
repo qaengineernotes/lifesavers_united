@@ -86,7 +86,7 @@ export async function onRequestPost(context) {
             '',
             '─'.repeat(50),
             '📧 lifesaversunited.india@gmail.com',
-            '📸 Instagram: https://www.instagram.com/lifesavers_blooddonors',
+            '📸 Instagram: https://www.instagram.com/lifesaversunited_blooddonors/',
             '🐦 X (Twitter): https://x.com/lifesaversunit',
             '─'.repeat(50),
         ].join('\r\n');
@@ -218,7 +218,7 @@ function buildThankYouTemplate(donorName, firstName, date, patientName, hospital
                             <div style="margin-bottom:20px;">
                                 <a href="mailto:lifesaversunited.india@gmail.com" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Email Us</a>
                                 <span style="color:#ddd;">|</span>
-                                <a href="https://www.instagram.com/lifesavers_blooddonors" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
+                                <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
                                 <span style="color:#ddd;">|</span>
                                 <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Twitter (X)</a>
                             </div>

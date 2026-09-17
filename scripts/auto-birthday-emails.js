@@ -272,7 +272,7 @@ function buildBirthdayTemplate(name, blood) {
                     <tr>
                         <td style="background-color:#f9f9f9;padding:30px 40px;text-align:center;">
                             <div style="margin-bottom:20px;">
-                                <a href="https://www.instagram.com/lifesavers_blooddonors" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
+                                <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
                                 <span style="color:#ddd;">|</span>
                                 <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Twitter</a>
                                 <span style="color:#ddd;">|</span>
