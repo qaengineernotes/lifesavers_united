@@ -79,7 +79,7 @@
             "location": "Ahmedabad",
             "date": "2026-02-25",
             "excerpt": "When I needed bypass surgery at EPIC Hospital, <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> arranged blood within hours through a stranger's kindness, letting my family focus on what mattered most: my recovery.",
-            "fullStory": "When I had to undergo bypass surgery at EPIC Hospital, it was a challenging and emotional time for me and my family. Along with preparing for the surgery, we were informed about the hospital policy requiring two bottles of blood to be arranged.\n\nMy daughter reached out to her friend Naman, and the request was immediately shared in the <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> WhatsApp group. Within a very short time, Gopan bhai stepped forward and helped arrange the blood donation. I was deeply touched by the kindness and prompt support shown by someone who didn't even know me personally.\n\nBecause of this timely help, everything was managed smoothly, and my family could focus on my recovery without additional stress. What makes this experience even more meaningful is that I have been a regular blood donor myself.\n\nI have always believed that donating blood is a small act that can save lives, and this time, I experienced that truth personally.\n\n<a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> is truly a blessing for people in need. It is not just a group, but a community built on compassion and humanity. I will always remain grateful for the support I received during one of the most critical moments of my life.\n\nThank you once again, <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>.",
+            "fullStory": "When I had to undergo bypass surgery at EPIC Hospital, it was a challenging and emotional time for me and my family. Along with preparing for the surgery, we were informed about the hospital policy requiring two bottles of blood to be arranged.\n\nMy daughter reached out to her friend Naman, and the request was immediately shared in the <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>. Within a very short time, Gopan bhai stepped forward and helped arrange the blood donation. I was deeply touched by the kindness and prompt support shown by someone who didn't even know me personally.\n\nBecause of this timely help, everything was managed smoothly, and my family could focus on my recovery without additional stress. What makes this experience even more meaningful is that I have been a regular blood donor myself.\n\nI have always believed that donating blood is a small act that can save lives, and this time, I experienced that truth personally.\n\n<a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a> is truly a blessing for people in need. It is not just a group, but a community built on compassion and humanity. I will always remain grateful for the support I received during one of the most critical moments of my life.\n\nThank you once again, <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>.",
             "motivation": "I have always believed that donating blood is a small act that can save lives, and this time, I experienced that truth personally.",
             "image": "/imgs/Ashish-Trivedi.webp",
             "featured": true,
@@ -118,13 +118,31 @@
             "image": "/imgs/volunteer-gopan-shah-blood-donation.webp",
             "featured": true,
             "testimonial": "Donate Blood, Save Lives - Someone's tomorrow depends on your today!!"
+        },
+        {
+            "id": 8,
+            "type": "patient",
+            "title": "A Beacon of Hope: A Family's Gratitude for Umaben Birenkumar Shah",
+            "name": "Parshwa Birenkumar Shah",
+            "donationCount": null,
+            "donationType": "Whole Blood",
+            "yearsActive": null,
+            "location": "Ahmedabad",
+            "hospital": "GCRI Asarwa, Ahmedabad",
+            "date": "2026-09-19",
+            "excerpt": "During Umaben Birenkumar Shah's ongoing battle against Acute Myeloid Leukemia at GCRI Asarwa, lifesaver Mr. Rakeshkumar Ramanbhai Pat provided a timely whole blood donation coordinated by <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>.",
+            "fullStory": "We are deeply moved by the incredible support for my mother, Umaben Birenkumar Shah, in her ongoing battle against Acute Myeloid Leukemia at GCRI Asarwa, Ahmedabad, Gujarat.\n\nA heartfelt thank you to our lifesaver, Mr. Rakeshkumar Patel, for your generous whole blood donation today! Your selflessness is a true beacon of hope for our family.\n\nHuge appreciation to the <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>, and specially to Nikunjbhai & Team for your flawless administration. Your dedication to bridging the gap between an urgent need and timely help is truly divine.\n\nTo the donor, the management, and the entire team: please keep this noble, humanitarian work going. You are not just arranging blood; you are gifting life, time, and smiles to families in their darkest hours.\n\n\"A single drop of blood can create an ocean of hope.\"\n\nThank you once again for being the angels we needed! Keep shining and saving lives!\n\nWith endless gratitude,\nParshwa & Family",
+            "motivation": "A single drop of blood can create an ocean of hope. You are not just arranging blood; you are gifting life, time, and smiles to families in their darkest hours.",
+            "image": "/imgs/parshwa-birenkumar-shah.webp",
+            "featured": true,
+            "testimonial": "You are not just arranging blood; you are gifting life, time, and smiles to families in their darkest hours. A single drop of blood can create an ocean of hope."
         }
     ],
     "stats": {
-        "totalStories": 7,
+        "totalStories": 8,
         "totalLivesSaved": 0,
         "totalDonors": 6,
-        "totalPatients": 1,
+        "totalPatients": 2,
         "totalEmergencies": 0
     }
 }
