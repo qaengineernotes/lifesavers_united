@@ -12,9 +12,16 @@ const EMERGENCY_API_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe
 async function loadEmergencyStatistics() {
     // 1. Try fetching from Firebase first (most accurate and consistent)
     try {
-        // Dynamically import firebase-data-service to avoid loading it on pages that don't need it
-        // and to handle cases where it might not be present.
-        const firebaseModule = await import('./firebase-data-service.js').catch(() => null);
+        let firebaseModule = null;
+        try {
+            firebaseModule = await import('/scripts/firebase-data-service.js');
+        } catch (e1) {
+            try {
+                firebaseModule = await import('./scripts/firebase-data-service.js');
+            } catch (e2) {
+                firebaseModule = await import('./firebase-data-service.js').catch(() => null);
+            }
+        }
 
         if (firebaseModule && typeof firebaseModule.fetchEmergencyRequestsFromFirebase === 'function') {
             const data = await firebaseModule.fetchEmergencyRequestsFromFirebase();

@@ -470,12 +470,13 @@ async function handleFormSubmission(e) {
         const finalResult = firebaseResult.success ? firebaseResult : sheetsResult;
 
         if (finalResult.success) {
-            showSuccessMessage();
+            const cleanPhone = (data.contactNumber || '').toString().replace(/\D/g, '').slice(-10);
+            showSuccessMessage(cleanPhone);
             e.target.reset(); // Reset form on success
 
             // Trigger the social sharing poster modal
             if (data.fullName && data.bloodGroup) {
-                showDonorPosterModal(data.fullName, data.bloodGroup);
+                showDonorPosterModal(data.fullName, data.bloodGroup, cleanPhone);
             }
 
             // --- Send confirmation emails (fire-and-forget, non-blocking) ---
@@ -533,29 +534,39 @@ async function handleFormSubmission(e) {
 }
 
 // Show success message
-function showSuccessMessage() {
+function showSuccessMessage(phone = '') {
     // Create a success message element
     const successDiv = document.createElement('div');
     successDiv.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #10b981;
+        background: #059669;
         color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
+        padding: 1.25rem 1.5rem;
+        border-radius: 0.75rem;
         z-index: 9999;
-        font-weight: 600;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        font-weight: 500;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
         animation: slideIn 0.3s ease-out;
-        max-width: 400px;
+        max-width: 420px;
+        width: 90%;
     `;
+    const portalUrl = `/donor_portal${phone ? '?phone=' + encodeURIComponent(phone) : ''}`;
     successDiv.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-            </svg>
-            <span>Registration successful! Thank you for joining our donor community.</span>
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div style="display: flex; align-items: flex-start; gap: 0.6rem;">
+                <svg width="22" height="22" fill="currentColor" viewBox="0 0 20 20" style="flex-shrink: 0; margin-top: 2px;">
+                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                </svg>
+                <div>
+                    <strong style="display: block; font-size: 15px; font-weight: 700; margin-bottom: 2px;">Registration Successful! 🎉</strong>
+                    <span style="font-size: 13px; line-height: 1.4; opacity: 0.95;">Thank you for joining our donor community. Your digital donor card is ready.</span>
+                </div>
+            </div>
+            <a href="${portalUrl}" style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 14px; background: white; color: #047857; border-radius: 6px; font-size: 13.5px; font-weight: 700; text-decoration: none; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: background 0.15s;" onmouseover="this.style.background='#f0fdf4'" onmouseout="this.style.background='white'">
+                Go to My Donor Portal & Card →
+            </a>
         </div>
     `;
 
@@ -571,16 +582,32 @@ function showSuccessMessage() {
 
     document.body.appendChild(successDiv);
 
-    // Reset the form
+    // Also display persistent in-page celebration card above the form
     const form = document.getElementById('donorRegistrationForm');
-    if (form) form.reset();
+    if (form) {
+        form.reset();
+        let existingBanner = document.getElementById('postRegCard');
+        if (!existingBanner) {
+            existingBanner = document.createElement('div');
+            existingBanner.id = 'postRegCard';
+            existingBanner.style.cssText = 'background: #ecfdf5; border: 1.5px solid #10b981; border-radius: 12px; padding: 20px; margin-bottom: 24px; text-align: center; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);';
+            form.parentNode.insertBefore(existingBanner, form);
+        }
+        existingBanner.innerHTML = `
+            <div style="font-size: 19px; font-weight: 800; color: #065f46; margin-bottom: 6px;">🎉 Welcome to LifeSavers United!</div>
+            <p style="font-size: 14px; color: #047857; margin: 0 0 16px 0; line-height: 1.5;">Your donor profile is now active. Access your official digital donor card, check donation intervals, and log your donations in your portal.</p>
+            <a href="${portalUrl}" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px; background: #059669; color: white; padding: 11px 22px; border-radius: 8px; font-weight: 700; font-size: 15px; text-decoration: none; box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3); transition: background 0.15s;" onmouseover="this.style.background='#047857'" onmouseout="this.style.background='#059669'">
+                Go to My Donor Portal & Digital Card →
+            </a>
+        `;
+    }
     generateCaptcha(); // Generate new CAPTCHA
 
-    // Remove the message after 5 seconds
+    // Remove the toast after 8 seconds
     setTimeout(() => {
         successDiv.remove();
         style.remove();
-    }, 5000);
+    }, 8000);
 }
 
 // Show error message
@@ -747,7 +774,7 @@ function setupCityDropdown() {
 }
 
 // Show the dynamic "Proud Donor" Poster Modal
-async function showDonorPosterModal(name, bloodGroup) {
+async function showDonorPosterModal(name, bloodGroup, phone = '') {
     // Create modal container
     const modal = document.createElement('div');
     modal.className = 'custom-donor-modal';
@@ -773,6 +800,7 @@ async function showDonorPosterModal(name, bloodGroup) {
         const { generateDonorPoster } = await import('./donor-poster-generator.js');
         const blob = await generateDonorPoster(name, bloodGroup);
         const imageUrl = URL.createObjectURL(blob);
+        const portalUrl = `/donor_portal${phone ? '?phone=' + encodeURIComponent(phone) : ''}`;
 
         // Update modal with the generated image
         modal.innerHTML = `
@@ -781,14 +809,18 @@ async function showDonorPosterModal(name, bloodGroup) {
                 
                 <div style="text-align: center; margin-bottom: 1rem; margin-top: 0.5rem;">
                     <h3 style="font-size: 1.5rem; font-weight: bold; color: #dc2626; margin: 0 0 0.25rem 0;">You are a Hero! 🎉</h3>
-                    <p style="color: #4b5563; font-size: 0.875rem; margin: 0;">Share your pledge and inspire others.</p>
+                    <p style="color: #4b5563; font-size: 0.875rem; margin: 0;">Share your pledge and access your donor card.</p>
                 </div>
                 
-                <div style="background: #f3f4f6; border-radius: 0.75rem; padding: 0.5rem; margin-bottom: 1.5rem; display: flex; justify-content: center; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);">
-                    <img src="${imageUrl}" alt="Proud Donor Badge" style="max-width: 100%; height: auto; max-height: 45vh; object-fit: contain; border-radius: 0.5rem;">
+                <div style="background: #f3f4f6; border-radius: 0.75rem; padding: 0.5rem; margin-bottom: 1.25rem; display: flex; justify-content: center; box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.06);">
+                    <img src="${imageUrl}" alt="Proud Donor Badge" style="max-width: 100%; height: auto; max-height: 40vh; object-fit: contain; border-radius: 0.5rem;">
                 </div>
                 
                 <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                    <a href="${portalUrl}" id="goToPortalBtn" style="width: 100%; box-sizing: border-box; padding: 0.85rem 1rem; background: linear-gradient(135deg, #dc2626, #b91c1c); color: white; border-radius: 0.5rem; font-weight: 700; font-size: 1rem; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3); transition: transform 0.15s ease, box-shadow 0.15s ease;" onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 6px 16px rgba(220,38,38,0.4)'" onmouseout="this.style.transform='none';this.style.boxShadow='0 4px 12px rgba(220,38,38,0.3)'">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                        Go to My Donor Portal & Digital Card →
+                    </a>
                     <button id="sharePosterBtn" class="custom-donor-btn-primary">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
                         Share on Social Media

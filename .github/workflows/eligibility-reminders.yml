@@ -1,0 +1,38 @@
+name: Daily Eligibility Reminder Emails
+
+on:
+  schedule:
+    # Run at 20:30 UTC every day (02:00 AM IST)
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: 'Send a test reminder to this email (Leave blank for real run)'
+        required: false
+        default: ''
+
+concurrency:
+  group: eligibility-reminders
+  cancel-in-progress: false
+
+jobs:
+  send-eligibility-reminders:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install firebase-admin axios
+
+      - name: Run eligibility reminder script
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          TEST_EMAIL: ${{ github.event.inputs.test_email }}
+        run: node scripts/auto-eligibility-reminders.js

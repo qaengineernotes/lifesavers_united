@@ -10,6 +10,7 @@ import {
 } from './firebase-config.js';
 
 import { db, doc, setDoc, getDoc, getDocs, onSnapshot, serverTimestamp, collection, query, where, updateDoc, initAppCheck } from './firebase-config.js';
+import { normalizePhoneNumber } from './phone-normalizer.js';
 
 // Current user state
 let currentUser = null;
@@ -90,15 +91,48 @@ export function initializeAuth() {
                         console.error('Error listening to user doc (phone-matched):', error);
                     });
                 } else {
-                    // Truly new user — no document by UID or phone number
-                    currentUser = {
-                        uid: user.uid,
-                        phoneNumber: user.phoneNumber,
-                        displayName: null,
-                        status: 'pending',
-                        role: 'volunteer',
-                        isNewUser: true
-                    };
+                    // Check if this user is a registered Donor in the 'donors' collection
+                    const cleanPhone = normalizePhoneNumber(user.phoneNumber || '');
+                    let donorMatch = null;
+                    if (cleanPhone) {
+                        try {
+                            const donorQ = query(collection(db, 'donors'), where('contactNumber', 'in', [
+                                cleanPhone,
+                                '+91' + cleanPhone,
+                                '91' + cleanPhone,
+                                Number(cleanPhone)
+                            ].filter(v => v !== undefined && !Number.isNaN(v))));
+                            const donorSnap = await getDocs(donorQ);
+                            if (!donorSnap.empty) {
+                                donorMatch = donorSnap.docs[0].data();
+                            }
+                        } catch (err) {
+                            console.warn('Could not check donor collection for user:', err);
+                        }
+                    }
+
+                    if (donorMatch) {
+                        // User is a registered Donor
+                        currentUser = {
+                            uid: user.uid,
+                            phoneNumber: user.phoneNumber,
+                            displayName: donorMatch.fullName || null,
+                            status: 'approved',
+                            role: 'donor',
+                            bloodGroup: donorMatch.bloodGroup || null,
+                            isDonor: true
+                        };
+                    } else {
+                        // Truly new user — no document in users or donors
+                        currentUser = {
+                            uid: user.uid,
+                            phoneNumber: user.phoneNumber,
+                            displayName: null,
+                            status: 'pending',
+                            role: 'volunteer',
+                            isNewUser: true
+                        };
+                    }
                     authStateListeners.forEach(callback => callback(currentUser));
                 }
             }
@@ -133,14 +167,32 @@ export function onAuthChange(callback) {
 // GET CURRENT USER
 // ============================================================================
 export function getCurrentUser() {
-    return currentUser;
+    if (currentUser) return currentUser;
+    try {
+        const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
+        if (stored) {
+            const donor = JSON.parse(stored);
+            if (donor) {
+                return {
+                    uid: donor.authUid || donor.id,
+                    phoneNumber: donor.contactNumber || donor.phoneNumber,
+                    displayName: donor.fullName || donor.displayName,
+                    role: 'donor',
+                    status: 'approved',
+                    isDonor: true,
+                    ...donor
+                };
+            }
+        }
+    } catch (e) {}
+    return null;
 }
 
 // ============================================================================
 // CHECK IF USER IS AUTHENTICATED
 // ============================================================================
 export function isAuthenticated() {
-    return currentUser !== null;
+    return getCurrentUser() !== null;
 }
 
 // ============================================================================
@@ -188,7 +240,36 @@ async function getUserProfile(uid, phoneNumber) {
             };
         }
 
-        // Step 3: Truly new user — no document by UID or phone
+        // Step 2.5: Check if user is a registered Donor in the 'donors' collection
+        const cleanPhone = normalizePhoneNumber(phoneNumber || '');
+        if (cleanPhone) {
+            try {
+                const donorQ = query(collection(db, 'donors'), where('contactNumber', 'in', [
+                    cleanPhone,
+                    '+91' + cleanPhone,
+                    '91' + cleanPhone,
+                    Number(cleanPhone)
+                ].filter(v => v !== undefined && !Number.isNaN(v))));
+                const donorSnap = await getDocs(donorQ);
+                if (!donorSnap.empty) {
+                    const donorData = donorSnap.docs[0].data();
+                    return {
+                        uid: uid,
+                        phoneNumber: phoneNumber,
+                        displayName: donorData.fullName || null,
+                        status: 'approved',
+                        role: 'donor',
+                        bloodGroup: donorData.bloodGroup || null,
+                        isDonor: true,
+                        ...donorData
+                    };
+                }
+            } catch (err) {
+                console.warn('Could not check donor collection in getUserProfile:', err);
+            }
+        }
+
+        // Step 3: Truly new user — no document by UID, phone, or donors collection
         return {
             uid: uid,
             phoneNumber: phoneNumber,
@@ -568,6 +649,10 @@ export async function signOut() {
     try {
         await auth.signOut();
         currentUser = null;
+        try {
+            localStorage.removeItem('lsu_donor_session');
+            sessionStorage.removeItem('lsu_donor_session');
+        } catch (e) {}
 
         return true;
     } catch (error) {

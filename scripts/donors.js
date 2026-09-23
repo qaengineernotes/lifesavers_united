@@ -17,6 +17,103 @@ function toTitleCase(str) {
     }).join(' ');
 }
 
+/**
+ * Checks if a donor is currently on Temporary Rest (Snoozed) Mode.
+ * Returns null if not resting, or { date, dateStr, reason } if active rest mode is in effect.
+ * @param {Object} donor - Donor object from Firestore
+ * @returns {Object|null}
+ */
+function getActiveRestMode(donor) {
+    if (!donor) return null;
+    let restData = donor.temporaryRest || donor.temporary_rest || null;
+    let untilVal = null;
+    let reason = 'Medical Recovery';
+
+    // Check local sync storage (for instant cross-tab sync and local test accounts)
+    const cleanPhone = donor.contactNumber ? String(donor.contactNumber).replace(/\D/g, '').slice(-10) : '';
+    let localRest = null;
+    try {
+        const stored = (cleanPhone && localStorage.getItem('donor_rest_' + cleanPhone)) ||
+                       (donor.id && localStorage.getItem('donor_rest_' + donor.id));
+        if (stored) {
+            localRest = JSON.parse(stored);
+        } else {
+            // Also check lsu_donor_session if it belongs to this donor
+            const sessStr = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
+            if (sessStr) {
+                const sess = JSON.parse(sessStr);
+                const sessPhone = String(sess.contactNumber || sess.phoneNumber || '').replace(/\D/g, '').slice(-10);
+                if ((cleanPhone && sessPhone === cleanPhone) || (donor.id && sess.id === donor.id)) {
+                    if (sess.temporaryRest) {
+                        localRest = sess.temporaryRest;
+                    }
+                }
+            }
+        }
+    } catch (e) {}
+
+    if (localRest && (localRest.until || localRest.untilDate || localRest.date)) {
+        restData = localRest;
+    }
+
+    if (restData && typeof restData === 'object' && !(restData instanceof Date) && !restData.toDate && restData.seconds === undefined && restData._seconds === undefined) {
+        untilVal = restData.until || restData.untilDate || restData.date || restData.restUntil || null;
+        reason = restData.reason || reason;
+    } else if (restData) {
+        untilVal = restData;
+    } else if (donor.restUntil) {
+        untilVal = donor.restUntil;
+        reason = donor.restReason || reason;
+    }
+
+    if (!untilVal) return null;
+
+    let restDate = null;
+    if (typeof untilVal.toDate === 'function') {
+        restDate = untilVal.toDate();
+    } else if (untilVal.seconds !== undefined) {
+        restDate = new Date(untilVal.seconds * 1000);
+    } else if (untilVal._seconds !== undefined) {
+        restDate = new Date(untilVal._seconds * 1000);
+    } else if (untilVal instanceof Date) {
+        restDate = untilVal;
+    } else if (typeof untilVal === 'string') {
+        const parsed = new Date(untilVal);
+        if (!isNaN(parsed.getTime())) {
+            restDate = parsed;
+        } else {
+            const parts = untilVal.trim().split(/[-/.]/).map(Number);
+            if (parts.length === 3 && !parts.some(isNaN)) {
+                let y, m, d;
+                if (parts[0] > 1000) {
+                    [y, m, d] = parts;
+                } else if (parts[2] > 1000) {
+                    [d, m, y] = parts;
+                } else {
+                    [y, m, d] = parts;
+                }
+                restDate = new Date(y, m - 1, d, 23, 59, 59);
+            }
+        }
+    } else if (typeof untilVal === 'number') {
+        restDate = new Date(untilVal > 1e11 ? untilVal : untilVal * 1000);
+    }
+
+    if (restDate && !isNaN(restDate.getTime()) && restDate.getTime() > Date.now()) {
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const day = restDate.getDate();
+        const month = months[restDate.getMonth()];
+        const year = restDate.getFullYear();
+        return {
+            date: restDate,
+            dateStr: `${day} ${month} ${year}`,
+            reason: reason
+        };
+    }
+    return null;
+}
+
+
 // ============================================================================
 // CONSTANTS
 // ============================================================================
@@ -345,8 +442,15 @@ function renderTable() {
 function createTableRow(donor, index) {
     const tr = document.createElement('tr');
 
+    // Check Temporary Rest (Snooze) Mode
+    const activeRest = getActiveRestMode(donor);
+
     // 1. Donor Name
-    const donorName = escapeHtml(donor.fullName || 'Unknown');
+    const donorNameText = escapeHtml(donor.fullName || 'Unknown');
+    const restNameBadge = activeRest
+        ? `<span class="rest-mode-badge" title="Temporary Rest Mode active until ${activeRest.dateStr} (${escapeHtml(activeRest.reason)})">🛌 On Rest</span>`
+        : '';
+    const donorName = `<div style="display:flex; align-items:center; flex-wrap:wrap; gap:4px;"><span>${donorNameText}</span>${restNameBadge}</div>`;
 
     // 2. Blood Group — CSS class for colour
     const bloodGroup = `<strong class="cell-blood-group">${donor.bloodGroup || 'N/A'}</strong>`;
@@ -374,9 +478,17 @@ function createTableRow(donor, index) {
 
     // 9. Emergency Available
     const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
-    const emergencyBadge = isEmergency
-        ? '<span class="status-badge open">✓ YES</span>'
-        : '<span class="status-badge closed">✗ NO</span>';
+    let emergencyBadge = '';
+    if (activeRest) {
+        emergencyBadge = `
+            <span class="status-badge rest" title="Resting until ${activeRest.dateStr} (${escapeHtml(activeRest.reason)})">⏸ SNOOZED</span>
+            <div class="rest-until-text">Until ${activeRest.dateStr}</div>
+        `;
+    } else {
+        emergencyBadge = isEmergency
+            ? '<span class="status-badge open">✓ YES</span>'
+            : '<span class="status-badge closed">✗ NO</span>';
+    }
 
     // 10. Registered Date
     const regDate = donor.registeredAt || donor.createdAt;
@@ -461,8 +573,32 @@ async function populateModal(donor) {
 function createOverviewTab(donor) {
     const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
     const regDate = donor.registeredAt || donor.createdAt;
+    const activeRest = getActiveRestMode(donor);
+
+    const restBannerHtml = activeRest ? `
+        <div style="background: #fffbeb; border: 1.5px solid #f59e0b; border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);">
+            <div style="font-size: 26px; line-height: 1; flex-shrink: 0;">🛌</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; font-size: 14px; color: #92400e; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                    <span>Rest Mode Active</span>
+                    <span style="background: #fde68a; color: #78350f; font-size: 11px; padding: 2px 8px; border-radius: 9999px; font-weight: 700;">⏸ Snoozed until ${activeRest.dateStr}</span>
+                </div>
+                <div style="font-size: 12px; color: #b45309; margin-top: 3px;">
+                    Reason: <strong>${escapeHtml(activeRest.reason)}</strong> • Donor is temporarily taking a rest from donation requests.
+                </div>
+            </div>
+        </div>
+    ` : '';
+
+    let emergencyValueHtml = '';
+    if (activeRest) {
+        emergencyValueHtml = `<span style="color: #f59e0b; font-weight: 700; font-size: 14px;">⏸ SNOOZED</span><div style="font-size: 11px; opacity: 0.85; margin-top: 2px;">Until ${activeRest.dateStr}</div>`;
+    } else {
+        emergencyValueHtml = `<span style="color: ${isEmergency ? '#86efac' : '#fca5a5'};">${isEmergency ? '✓ YES' : '✗ NO'}</span>`;
+    }
 
     return `
+        ${restBannerHtml}
         <div class="info-card" style="background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); color: white;">
             <h3 style="color: rgba(255,255,255,0.75); margin-bottom: 12px;">👤 ${escapeHtml(donor.fullName || 'Unknown')}</h3>
             <div class="info-fields-grid cols-3">
@@ -476,7 +612,7 @@ function createOverviewTab(donor) {
                 </div>
                 <div class="info-field" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
                     <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Emergency</div>
-                    <div class="info-field-value" style="color:${isEmergency ? '#86efac' : '#fca5a5'};">${isEmergency ? '✓ YES' : '✗ NO'}</div>
+                    <div class="info-field-value">${emergencyValueHtml}</div>
                 </div>
                 <div class="info-field full" style="background:rgba(255,255,255,0.15); border-color:rgba(255,255,255,0.2);">
                     <div class="info-field-label" style="color:rgba(255,255,255,0.65);">Registered</div>
@@ -568,7 +704,30 @@ function createPersonalTab(donor) {
 
 function createMedicalTab(donor) {
     const isEmergency = String(donor.isEmergencyAvailable || '').toLowerCase() === 'yes';
+    const activeRest = getActiveRestMode(donor);
+
+    const restMedicalCard = activeRest ? `
+        <div class="info-card" style="border-left: 4px solid #f59e0b; background: #fffbeb;">
+            <h3 style="color: #92400e;">🛌 Temporary Rest / Deferral Status</h3>
+            <div class="info-fields-grid">
+                <div class="info-field" style="background:#fff;">
+                    <div class="info-field-label">Status</div>
+                    <div class="info-field-value" style="color: #b45309; font-weight:700;">⏸ Active Rest (Snoozed)</div>
+                </div>
+                <div class="info-field" style="background:#fff;">
+                    <div class="info-field-label">Resting Until</div>
+                    <div class="info-field-value" style="color: #b45309; font-weight:700;">${activeRest.dateStr}</div>
+                </div>
+                <div class="info-field full" style="background:#fff;">
+                    <div class="info-field-label">Reason</div>
+                    <div class="info-field-value" style="color: #374151;">${escapeHtml(activeRest.reason)}</div>
+                </div>
+            </div>
+        </div>
+    ` : '';
+
     return `
+        ${restMedicalCard}
         <div class="info-card">
             <h3>🩸 Blood Information</h3>
             <div class="info-fields-grid cols-3">
@@ -1313,7 +1472,20 @@ window.editDonor = function (donorId) {
     document.getElementById('edm-tag-blood').textContent = `🩸 ${blood}`;
     document.getElementById('edm-tag-city').textContent = `📍 ${city}`;
     document.getElementById('edm-tag-phone').textContent = `📞 ${phone}`;
-    document.getElementById('edm-tag-emergency').textContent = `🚨 Emergency: ${emrg}`;
+
+    const activeRest = getActiveRestMode(donor);
+    const emrgTag = document.getElementById('edm-tag-emergency');
+    if (emrgTag) {
+        if (activeRest) {
+            emrgTag.className = 'edm-tag rest';
+            emrgTag.textContent = `⏸ Snoozed: Until ${activeRest.dateStr}`;
+            emrgTag.title = `Rest Mode Reason: ${escapeHtml(activeRest.reason)}`;
+        } else {
+            emrgTag.className = 'edm-tag';
+            emrgTag.textContent = `🚨 Emergency: ${emrg}`;
+            emrgTag.title = '';
+        }
+    }
 
     // ── Populate Edit Profile form fields ────────────────────
     document.getElementById('editDonorId').value = donor.id;

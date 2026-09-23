@@ -15,30 +15,67 @@ function toTitleCase(str) {
 }
 let verifierNames = []; // Store unique verifier names for autocomplete
 
+/**
+ * Helper to check if current visitor is a logged-in Donor
+ */
+function isDonorUser() {
+    try {
+        const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
+        if (stored) {
+            const donor = JSON.parse(stored);
+            if (donor) return true;
+        }
+    } catch (e) {}
+
+    try {
+        if (window.firebaseAuthService && typeof window.firebaseAuthService.getCurrentUser === 'function') {
+            const cur = window.firebaseAuthService.getCurrentUser();
+            if (cur && cur.role === 'donor') return true;
+        }
+    } catch (e) {}
+
+    return false;
+}
+
 // Data Source Configuration
 const FETCH_FROM_FIREBASE = true; // LOCKED: Always fetch from Firebase
 const USE_FIREBASE = true;      // For backward compatibility
 
+// Helper for dynamic imports in emergency_request_system
+async function importLocalModule(name) {
+    const clean = name.replace(/^\.\//, '').replace(/^scripts\//, '');
+    try {
+        return await import('/scripts/' + clean);
+    } catch (e1) {
+        try {
+            return await import('./scripts/' + clean);
+        } catch (e2) {
+            return await import('./' + clean);
+        }
+    }
+}
+
 // Import Firebase data service
 let firebaseDataService = null;
-import('./firebase-data-service.js').then(module => {
+importLocalModule('firebase-data-service.js').then(module => {
     firebaseDataService = module;
 
-
     // --- NEW: User Approval Workflow ---
-    import('./firebase-auth-service.js').then(authModule => {
+    importLocalModule('firebase-auth-service.js').then(authModule => {
+        window.firebaseAuthService = authModule;
         authModule.onAuthChange((user) => {
             updateUIForUserStatus(user);
         });
+        // Run initial UI state check
+        updateUIForUserStatus(authModule.getCurrentUser());
     });
 }).catch(error => {
     console.error('Failed to load Firebase data service:', error);
 });
 
 // Initialize user profile UI (always try to load if authenticated)
-import('./user-profile-ui.js').then(module => {
+importLocalModule('user-profile-ui.js').then(module => {
     module.initializeUserProfileUI();
-
 }).catch(error => {
     console.error('Failed to load user profile UI:', error);
 });
@@ -82,12 +119,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     if (yearEl) yearEl.textContent = new Date().getFullYear();
 
     // Trigger load (it will wait for Firebase service inside the function)
-    loadEmergencyRequests();
+    loadEmergencyRequests().finally(() => {
+        updateUIForUserStatus();
+    });
 
     // Add event listeners for verify and close buttons
     document.addEventListener('click', function (e) {
         if (e.target.closest('.verify-btn')) {
             const button = e.target.closest('.verify-btn');
+
+            // Check if user is a Donor
+            if (isDonorUser() || button.hasAttribute('data-donor')) {
+                showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or verify blood requests, you must be a registered Volunteer.', 'warning');
+                return;
+            }
 
             // Re-check approval status
             if (button.hasAttribute('data-pending')) {
@@ -119,6 +164,12 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (e.target.closest('.log-donation-btn')) {
             const button = e.target.closest('.log-donation-btn');
+
+            // Check if user is a Donor
+            if (isDonorUser() || button.hasAttribute('data-donor')) {
+                showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or log donations, you must be a registered Volunteer.', 'warning');
+                return;
+            }
 
             // Re-check approval status
             if (button.hasAttribute('data-pending')) {
@@ -173,6 +224,12 @@ document.addEventListener('DOMContentLoaded', async function () {
         } if (e.target.closest('.edit-btn')) {
             const button = e.target.closest('.edit-btn');
 
+            // Check if user is a Donor
+            if (isDonorUser() || button.hasAttribute('data-donor')) {
+                showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
+                return;
+            }
+
             // Re-check approval status
             if (button.hasAttribute('data-pending')) {
                 showSuccessMessage('Your account is awaiting admin approval.', 'warning');
@@ -198,6 +255,13 @@ document.addEventListener('DOMContentLoaded', async function () {
 
         if (e.target.closest('.close-request-btn')) {
             const button = e.target.closest('.close-request-btn');
+
+            // Check if user is a Donor
+            if (isDonorUser() || button.hasAttribute('data-donor')) {
+                showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or close blood requests, you must be a registered Volunteer.', 'warning');
+                return;
+            }
+
             if (!button.disabled) {
                 isButtonActionInProgress = true;
                 const card = button.closest('.emergency-request-card');
@@ -398,6 +462,10 @@ function createRequestCard(request) {
 
     // Calculate time since request
     const timeSince = calculateTimeSince(request.inquiryDate);
+
+    // Check if user is a logged-in Donor
+    const isDonor = isDonorUser();
+    const donorAttr = isDonor ? ' data-donor="true" title="Action Restricted: You are currently logged in as a Donor. Volunteer access required to perform this action."' : '';
 
     // Check stored button states and request status
     const cardKey = `${request.patientName}-${request.bloodType}`;
@@ -615,19 +683,19 @@ function createRequestCard(request) {
     </div>
 
     <div class="btn-container mobile-buttons">
-        <button class="btn-outline edit-btn mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}">
+        <button class="btn-outline edit-btn mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}"${donorAttr}>
             <svg class="w-5 h-5 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
             <span>Edit</span>
         </button>
-        <button class="${verifyButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}>
+        <button class="${verifyButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${verifyButtonDisabled}${donorAttr}>
             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
             </svg>
             <span>${verifyButtonText}</span>
         </button>
-        <button class="${closeButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${closeButtonDisabled}>
+        <button class="${closeButtonClass} mobile-button" data-patient-name="${request.patientName}" data-blood-type="${request.bloodType}" ${closeButtonDisabled}${donorAttr}>
             <svg class="w-5 h-5 mr-2 inline" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM6.293 6.707a1 1 0 010-1.414l3-3a1 1 0 011.414 0l3 3a1 1 0 01-1.414 1.414L11 5.414V13a1 1 0 11-2 0V5.414L7.707 6.707a1 1 0 01-1.414 0z" clip-rule="evenodd" />
             </svg>
@@ -782,7 +850,7 @@ async function verifyRequest(requestData, button) {
 
     // Get verifier name from logged-in user (Firebase) or ask for it (Google Sheets)
     let verifierName;
-    const authModule = await import('./firebase-auth-service.js');
+    const authModule = await importLocalModule('firebase-auth-service.js');
     const currentUser = authModule.getCurrentUser();
 
     if (currentUser) {
@@ -821,7 +889,7 @@ async function verifyRequest(requestData, button) {
             // --- 1. ALWAYS Update Firebase (Primary) ---
             if (firebaseDataService) {
                 try {
-                    const authModule = await import('./firebase-auth-service.js');
+                    const authModule = await importLocalModule('firebase-auth-service.js');
                     const currentUser = authModule.getCurrentUser();
 
                     result = await firebaseDataService.updateRequestStatusInFirebase(
@@ -961,7 +1029,7 @@ async function logDonation(requestData, button) {
         // --- 1. ALWAYS Update Firebase (Primary) ---
         if (firebaseDataService) {
             try {
-                const authModule = await import('./firebase-auth-service.js');
+                const authModule = await importLocalModule('firebase-auth-service.js');
                 const currentUser = authModule.getCurrentUser();
 
                 result = await firebaseDataService.logDonationToFirebase(
@@ -1108,7 +1176,7 @@ async function closeRequestDirectly(requestData, button) {
         // --- 1. ALWAYS Update Firebase (Primary) ---
         if (firebaseDataService) {
             try {
-                const authModule = await import('./firebase-auth-service.js');
+                const authModule = await importLocalModule('firebase-auth-service.js');
                 const currentUser = authModule.getCurrentUser();
 
                 result = await firebaseDataService.updateRequestStatusInFirebase(
@@ -1238,24 +1306,40 @@ async function checkAuthorization() {
         return true; // User has access via URL
     }
 
+    // Check if user is a Donor before showing any prompt
+    if (isDonorUser()) {
+        showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
+        return false;
+    }
+
     // If using Firebase, use phone authentication
     if (firebaseDataService) {
         try {
             // Dynamically import auth service
-            const authModule = await import('./firebase-auth-service.js');
+            const authModule = await importLocalModule('firebase-auth-service.js');
+            const currentUser = authModule.getCurrentUser();
+
+            if (currentUser && currentUser.role === 'donor') {
+                showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
+                return false;
+            }
 
             // Check if user is already authenticated
             if (authModule.isAuthenticated()) {
-                const user = authModule.getCurrentUser();
+                const user = currentUser;
+
+                if (user && user.role === 'donor') {
+                    showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
+                    return false;
+                }
+
                 // Allow approved users, superusers, OR legacy users (undefined status)
                 // Strictly block 'pending' users
                 const isApproved = user && (user.status === 'approved' || !user.status || user.role === 'superuser');
 
                 if (isApproved) {
-
                     return true;
                 } else {
-
                     updateUIForUserStatus(user);
                     showSuccessMessage('Action Restricted: Your account is awaiting admin approval.', 'warning');
                     return false;
@@ -1263,14 +1347,17 @@ async function checkAuthorization() {
             }
 
             // Show phone login modal
-
             const user = await authModule.showPhoneLoginModal();
 
             if (user) {
+                if (user.role === 'donor') {
+                    showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
+                    return false;
+                }
+
                 // Allow approved users, superusers, OR legacy users (undefined status)
                 const isApproved = user.status === 'approved' || !user.status || user.role === 'superuser';
                 if (!isApproved) {
-
                     updateUIForUserStatus(user);
                     showSuccessMessage('Account Created! Please wait for admin approval to perform this action.', 'warning');
                     return false;
@@ -1886,23 +1973,22 @@ function showDonationPopup(requestData) {
             let _cache = null;
 
             async function getDonors() {
-                if (_cache) return _cache;
+                if (_cache && _cache.length > 0) return _cache;
                 try {
-                    if (firebaseDataService && typeof firebaseDataService.getAllDonors === 'function') {
-                        _cache = await firebaseDataService.getAllDonors();
-                    } else {
-                        // firebase-config.js re-exports db, collection, getDocs at the correct version
-                        const cfg = await import('./firebase-config.js');
+                    const cfg = await importLocalModule('firebase-config.js');
+                    if (cfg && cfg.initAppCheck) {
+                        await cfg.initAppCheck().catch(() => {});
+                    }
+                    if (cfg && cfg.getDocs && cfg.collection && cfg.db) {
                         const snap = await cfg.getDocs(cfg.collection(cfg.db, 'donors'));
                         _cache = snap.docs.map(d => ({ id: d.id, ...d.data() }));
                     }
                 } catch (e) {
                     console.error('Donor search error:', e);
-                    _cache = [];
+                    _cache = null;
                 }
-                return _cache;
+                return _cache || [];
             }
-
 
             function closeDropdown() {
                 dropdown.style.display = 'none';
@@ -1910,12 +1996,27 @@ function showDonationPopup(requestData) {
             }
 
             function pickDonor(d) {
-                nameInput.value = d.fullName || '';
-                contactInput.value = d.contactNumber || '';
+                // Check if donor is in active Temporary Rest Mode
+                if (d.temporaryRest && d.temporaryRest.until) {
+                    const restDate = d.temporaryRest.until.seconds
+                        ? new Date(d.temporaryRest.until.seconds * 1000)
+                        : (typeof d.temporaryRest.until.toDate === 'function'
+                            ? d.temporaryRest.until.toDate()
+                            : new Date(d.temporaryRest.until));
+                    if (restDate && !isNaN(restDate.getTime()) && restDate.getTime() > Date.now()) {
+                        const dateStr = restDate.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+                        alert(`❌ Cannot link this donor:\n\n${d.fullName || 'This donor'} is currently on Temporary Rest Mode until ${dateStr} (${d.temporaryRest.reason || 'Medical Recovery'}).\n\nDonations cannot be logged for resting donors. Rest mode must be canceled first.`);
+                        closeDropdown();
+                        return;
+                    }
+                }
+
+                nameInput.value = d.fullName || d.displayName || '';
+                contactInput.value = d.contactNumber || d.phone || '';
                 if (linkedId) linkedId.value = d.id || '';
                 const emailInput = document.getElementById('donorLinkedEmail');
                 if (emailInput) emailInput.value = d.email || '';
-                const info = [d.fullName, d.bloodGroup, d.city].filter(Boolean).join(' · ');
+                const info = [d.fullName || d.displayName, d.bloodGroup, d.city].filter(Boolean).join(' · ');
                 if (badgeText) badgeText.textContent = 'Linked: ' + info;
                 if (badge) badge.style.display = 'block';
                 closeDropdown();
@@ -1932,7 +2033,13 @@ function showDonationPopup(requestData) {
 
                 _timer = setTimeout(async () => {
                     const all = await getDonors();
-                    const hits = all.filter(d => (d.fullName || '').toLowerCase().includes(term)).slice(0, 8);
+                    const hits = all.filter(d => {
+                        const fullName = (d.fullName || '').toLowerCase();
+                        const displayName = (d.displayName || '').toLowerCase();
+                        const contact = (d.contactNumber || d.phone || '').toString().toLowerCase();
+                        const email = (d.email || '').toLowerCase();
+                        return fullName.includes(term) || displayName.includes(term) || contact.includes(term) || email.includes(term);
+                    }).slice(0, 8);
 
                     if (hits.length === 0) {
                         dropdown.innerHTML = '<div style="padding:10px 14px;color:#9ca3af;font-size:13px;">No donor found — you can still type the name manually</div>';
@@ -1944,7 +2051,7 @@ function showDonationPopup(requestData) {
                         '<div data-idx="' + i + '" style="padding:10px 14px;cursor:pointer;border-bottom:1px solid #f3f4f6;display:flex;align-items:center;gap:10px;background:#fff" onmouseover="this.style.background=\'#fef2f2\'" onmouseout="this.style.background=\'#fff\'">' +
                         '<div style="width:32px;height:32px;border-radius:50%;background:#fee2e2;color:#dc2626;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">' + (d.bloodGroup || '?') + '</div>' +
                         '<div>' +
-                        '<div style="font-weight:600;font-size:14px;color:#1f2937;">' + escapeHtml(d.fullName || 'Unknown') + '</div>' +
+                        '<div style="font-weight:600;font-size:14px;color:#1f2937;">' + escapeHtml(d.fullName || d.displayName || 'Unknown') + '</div>' +
                         '<div style="font-size:11px;color:#6b7280;">' + (d.contactNumber ? '📞 ' + escapeHtml(d.contactNumber) : '') + (d.city ? ' · 📍 ' + escapeHtml(d.city) : '') + '</div>' +
                         '</div></div>'
                     ).join('');
@@ -2318,7 +2425,7 @@ async function editRequest(requestData, button) {
         // --- 1. ALWAYS Update Firebase (Primary) ---
         if (firebaseDataService) {
             try {
-                const authModule = await import('./firebase-auth-service.js');
+                const authModule = await importLocalModule('firebase-auth-service.js');
                 const currentUser = authModule.getCurrentUser();
 
                 result = await firebaseDataService.updateRequestInFirebase(
@@ -2987,19 +3094,28 @@ https://lifesaversunited.org
  * UI Helper: Updates buttons and shows notifications based on user approval status
  */
 function updateUIForUserStatus(user) {
-    const isApproved = user && (user.status === 'approved' || user.role === 'superuser');
-    const isPending = user && user.status === 'pending' && !isApproved;
+    if (!user && window.firebaseAuthService && typeof window.firebaseAuthService.getCurrentUser === 'function') {
+        user = window.firebaseAuthService.getCurrentUser();
+    }
+    const isDonor = (user && user.role === 'donor') || isDonorUser();
+    const isApproved = user && (user.status === 'approved' || user.role === 'superuser') && !isDonor;
+    const isPending = user && user.status === 'pending' && !isApproved && !isDonor;
 
     // Find all action buttons
-    const actionButtons = document.querySelectorAll('.verify-btn, .log-donation-btn, .edit-btn');
+    const actionButtons = document.querySelectorAll('.verify-btn, .log-donation-btn, .edit-btn, .close-request-btn');
 
     actionButtons.forEach(btn => {
-        if (isPending) {
+        if (isDonor) {
+            btn.title = "Action Restricted: You are currently logged in as a Donor. Volunteer access required to perform this action.";
+            btn.setAttribute('data-donor', 'true');
+            btn.removeAttribute('data-pending');
+        } else if (isPending) {
             btn.disabled = true;
             btn.title = "Awaiting admin approval";
             btn.style.opacity = '0.5';
             btn.style.cursor = 'not-allowed';
             btn.setAttribute('data-pending', 'true');
+            btn.removeAttribute('data-donor');
         } else {
             // Restore if previously disabled by pending status
             if (btn.hasAttribute('data-pending')) {
@@ -3009,6 +3125,7 @@ function updateUIForUserStatus(user) {
                 btn.style.cursor = 'pointer';
                 btn.removeAttribute('data-pending');
             }
+            btn.removeAttribute('data-donor');
         }
     });
 
@@ -3089,7 +3206,7 @@ async function showAvailableDonorsPopup(requestData) {
 async function fetchEligibleDonors(requestData) {
     try {
         // Import Firebase modules
-        const { db, collection, getDocs, query, where } = await import('./firebase-config.js');
+        const { db, collection, getDocs, query, where } = await importLocalModule('firebase-config.js');
 
         const bloodType = requestData.bloodType;
         const unitsRequiredText = requestData.unitsRequiredText || '';
@@ -3126,6 +3243,24 @@ async function fetchEligibleDonors(requestData) {
             // Check if donor has contact number
             if (!donor.contactNumber) {
                 return; // Skip donors without contact
+            }
+
+            // Exclude donors who have activated Temporary Rest / Deferral Mode
+            if (donor.temporaryRest && donor.temporaryRest.until) {
+                const restDate = donor.temporaryRest.until.seconds
+                    ? new Date(donor.temporaryRest.until.seconds * 1000)
+                    : (typeof donor.temporaryRest.until.toDate === 'function'
+                        ? donor.temporaryRest.until.toDate()
+                        : new Date(donor.temporaryRest.until));
+                if (restDate && !isNaN(restDate.getTime()) && restDate.getTime() > Date.now()) {
+                    return; // Skip resting donor completely
+                }
+            }
+
+            // Exclude donors who marked emergency availability as 'no'
+            if (String(donor.isEmergencyAvailable || '').toLowerCase() === 'no' ||
+                String(donor.emergencyAvailable || '').toLowerCase() === 'no') {
+                return; // Skip unavailable donor
             }
 
             // Check last donation date eligibility

@@ -18,6 +18,14 @@
         <priority>0.9</priority>
     </url>
 
+    <!-- Donor Portal -->
+    <url>
+        <loc>https://lifesaversunited.org/donor_portal</loc>
+        <lastmod>2026-09-21</lastmod>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
     <!-- Emergency Request System -->
     <url>
         <loc>https://lifesaversunited.org/emergency_request_system</loc>

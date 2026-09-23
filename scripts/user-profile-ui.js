@@ -3,10 +3,18 @@
 
 import { getCurrentUser, onAuthChange, signOut } from './firebase-auth-service.js';
 
+let isInitialized = false;
+
 // ============================================================================
 // INITIALIZE USER PROFILE UI
 // ============================================================================
 export function initializeUserProfileUI() {
+    if (isInitialized) {
+        checkAndShowDonorSession();
+        return;
+    }
+    isInitialized = true;
+
     // Listen for auth state changes
     onAuthChange((user) => {
         if (user) {
@@ -14,8 +22,7 @@ export function initializeUserProfileUI() {
             // Show/hide All Requests button based on user status
             toggleAllRequestsButton(user);
         } else {
-            hideUserProfile();
-            toggleAllRequestsButton(null);
+            checkAndShowDonorSession();
         }
     });
 
@@ -24,7 +31,48 @@ export function initializeUserProfileUI() {
     if (currentUser) {
         showUserProfile(currentUser);
         toggleAllRequestsButton(currentUser);
+    } else {
+        checkAndShowDonorSession();
     }
+
+    // Listen for custom donor auth change event (from donor-auth-service)
+    window.addEventListener('lsu_donor_auth_change', (e) => {
+        if (e.detail) {
+            showUserProfile(e.detail);
+        } else {
+            const cur = getCurrentUser();
+            if (cur) showUserProfile(cur);
+            else hideUserProfile();
+        }
+    });
+}
+
+/**
+ * Check if a donor session exists in localStorage and render profile avatar
+ */
+function checkAndShowDonorSession() {
+    try {
+        const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
+        if (stored) {
+            const donor = JSON.parse(stored);
+            if (donor) {
+                showUserProfile({
+                    uid: donor.authUid || donor.id,
+                    phoneNumber: donor.contactNumber || donor.phoneNumber,
+                    displayName: donor.fullName || donor.displayName,
+                    role: 'donor',
+                    status: 'approved',
+                    ...donor
+                });
+                return true;
+            }
+        }
+    } catch (e) {
+        console.warn('Error reading donor session in user-profile-ui:', e);
+    }
+    hideUserProfile();
+    toggleAllRequestsButton(null);
+    return false;
 }
 
 // ============================================================================
@@ -35,7 +83,7 @@ function toggleAllRequestsButton(user) {
     const allRequestsButtonContainer = document.getElementById('allRequestsButtonContainer');
 
     if (allRequestsButtonContainer) {
-        if (user && user.status === 'approved') {
+        if (user && user.status === 'approved' && user.role !== 'donor') {
             allRequestsButtonContainer.style.display = 'inline-flex';
             allRequestsButtonContainer.style.visibility = 'visible';
             allRequestsButtonContainer.style.opacity = '1';
@@ -50,7 +98,7 @@ function toggleAllRequestsButton(user) {
     const allDonorsButtonContainer = document.getElementById('allDonorsButtonContainer');
 
     if (allDonorsButtonContainer) {
-        if (user && user.status === 'approved') {
+        if (user && user.status === 'approved' && user.role !== 'donor') {
             allDonorsButtonContainer.style.display = 'inline-flex';
             allDonorsButtonContainer.style.visibility = 'visible';
             allDonorsButtonContainer.style.opacity = '1';
@@ -64,7 +112,7 @@ function toggleAllRequestsButton(user) {
     // Also handle the old navigation link if it exists (for backward compatibility)
     const allRequestsLink = document.getElementById('allRequestsLink');
     if (allRequestsLink) {
-        if (user && user.status === 'approved') {
+        if (user && user.status === 'approved' && user.role !== 'donor') {
             allRequestsLink.style.display = 'inline';
         } else {
             allRequestsLink.style.display = 'none';
@@ -75,20 +123,51 @@ function toggleAllRequestsButton(user) {
 // ============================================================================
 // SHOW USER PROFILE INDICATOR
 // ============================================================================
-function showUserProfile(user) {
+export function showUserProfile(user) {
+    if (!user) return;
+    if (!document.body) {
+        document.addEventListener('DOMContentLoaded', () => showUserProfile(user));
+        return;
+    }
+
     // Remove existing profile if any
     const existing = document.getElementById('userProfileIndicator');
     if (existing) existing.remove();
 
-    // Get initials from display name
-    const initials = getInitials(user.displayName || user.phoneNumber);
+    const isDonor = user.role === 'donor';
+    const isSuperuser = user.role === 'superuser';
+
+    // Get initials from display name or phone
+    const nameOrPhone = user.displayName || user.fullName || (isDonor ? 'Donor' : user.phoneNumber);
+    const initials = getInitials(nameOrPhone);
+
+    // Dynamic gradient and shadow according to role
+    const bgGradient = isDonor
+        ? 'linear-gradient(135deg, #dc2626 0%, #991b1b 100%)'
+        : (isSuperuser
+            ? 'linear-gradient(135deg, #d97706 0%, #b45309 100%)'
+            : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)');
+    const shadowColor = isDonor
+        ? 'rgba(220, 38, 38, 0.4)'
+        : (isSuperuser ? 'rgba(217, 119, 6, 0.4)' : 'rgba(102, 126, 234, 0.4)');
+    const hoverShadowColor = isDonor
+        ? 'rgba(220, 38, 38, 0.6)'
+        : (isSuperuser ? 'rgba(217, 119, 6, 0.6)' : 'rgba(102, 126, 234, 0.6)');
+
+    let roleBadge = '<span style="font-size: 11px; font-weight: 700; background: #dbeafe; color: #1e40af; padding: 2px 8px; border-radius: 9999px;">🤝 Volunteer</span>';
+    if (isSuperuser) {
+        roleBadge = '<span style="font-size: 11px; font-weight: 700; background: #fef3c7; color: #92400e; padding: 2px 8px; border-radius: 9999px;">⭐ Admin</span>';
+    } else if (isDonor) {
+        const bgGroupBadge = user.bloodGroup ? `<span style="font-size: 11px; font-weight: 800; background: #fee2e2; color: #b91c1c; padding: 2px 6px; border-radius: 6px; margin-right: 4px;">${escapeHtml(user.bloodGroup)}</span>` : '';
+        roleBadge = `<div style="display: flex; align-items: center; gap: 4px;">${bgGroupBadge}<span style="font-size: 11px; font-weight: 700; background: #fee2e2; color: #dc2626; padding: 2px 8px; border-radius: 9999px;">🩸 Donor</span></div>`;
+    }
 
     // Create profile container
     const profileContainer = document.createElement('div');
     profileContainer.id = 'userProfileIndicator';
     profileContainer.style.cssText = `
         position: fixed;
-        top: 5px;
+        top: 8px;
         right: 20px;
         z-index: 10000;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -100,7 +179,7 @@ function showUserProfile(user) {
         width: 48px;
         height: 48px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: ${bgGradient};
         color: white;
         display: flex;
         align-items: center;
@@ -108,17 +187,18 @@ function showUserProfile(user) {
         font-weight: 600;
         font-size: 18px;
         cursor: pointer;
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        box-shadow: 0 4px 12px ${shadowColor};
         transition: all 0.3s ease;
         border: 3px solid white;
+        user-select: none;
     `;
     profileButton.textContent = initials;
-    profileButton.title = user.displayName || user.phoneNumber;
+    profileButton.title = user.displayName || user.fullName || user.phoneNumber || 'User Profile';
 
     // Hover effect
     profileButton.addEventListener('mouseenter', () => {
         profileButton.style.transform = 'scale(1.1)';
-        profileButton.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.6)';
+        profileButton.style.boxShadow = `0 6px 20px ${hoverShadowColor}`;
         showDropdown();
     });
 
@@ -132,7 +212,7 @@ function showUserProfile(user) {
         background: white;
         border-radius: 12px;
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
-        min-width: 240px;
+        min-width: 250px;
         opacity: 0;
         visibility: hidden;
         transform: translateY(-10px);
@@ -142,17 +222,57 @@ function showUserProfile(user) {
 
     dropdown.innerHTML = `
         <div style="padding: 16px; border-bottom: 1px solid #e5e7eb;">
-            <div style="font-weight: 600; color: #1f2937; font-size: 16px; margin-bottom: 4px;">
-                ${escapeHtml(user.displayName || 'User')}
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px;">
+                <div style="font-weight: 600; color: #1f2937; font-size: 15px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                    ${escapeHtml(user.displayName || user.fullName || (isDonor ? 'Hero Donor' : 'User'))}
+                </div>
+                ${roleBadge}
             </div>
             <div style="font-size: 13px; color: #6b7280;">
-                ${escapeHtml(user.phoneNumber || '')}
+                ${escapeHtml(user.phoneNumber || user.contactNumber || '')}
             </div>
         </div>
         <div style="padding: 8px;">
+            <a href="/donor_portal" style="
+                width: 100%;
+                padding: 10px 16px;
+                background: transparent;
+                border: none;
+                border-radius: 8px;
+                color: #374151;
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                box-sizing: border-box;
+            " onmouseover="this.style.backgroundColor='#fef2f2'; this.style.color='#dc2626'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#374151'">
+                <span>🩸 Donor Portal</span>
+            </a>
+            ${!isDonor ? `
+            <a href="/emergency_request_system" style="
+                width: 100%;
+                padding: 10px 16px;
+                background: transparent;
+                border: none;
+                border-radius: 8px;
+                color: #374151;
+                font-weight: 500;
+                text-decoration: none;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 14px;
+                box-sizing: border-box;
+            " onmouseover="this.style.backgroundColor='#eff6ff'; this.style.color='#2563eb'" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#374151'">
+                <span>📋 Emergency Requests</span>
+            </a>` : ''}
             <button id="logoutBtn" style="
                 width: 100%;
-                padding: 12px 16px;
+                padding: 10px 16px;
                 background: transparent;
                 border: none;
                 border-radius: 8px;
@@ -164,6 +284,7 @@ function showUserProfile(user) {
                 align-items: center;
                 gap: 8px;
                 font-size: 14px;
+                box-sizing: border-box;
             ">
                 <svg style="width: 18px; height: 18px;" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
@@ -173,13 +294,30 @@ function showUserProfile(user) {
         </div>
     `;
 
-    // Hover effects for dropdown
+    // Click toggle for profile button (works on mobile and touch devices)
+    profileButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (dropdown.style.visibility === 'visible') {
+            hideDropdown();
+        } else {
+            showDropdown();
+        }
+    });
+
+    // Hover effects for dropdown on desktop
     profileContainer.addEventListener('mouseenter', () => {
         showDropdown();
     });
 
     profileContainer.addEventListener('mouseleave', () => {
         hideDropdown();
+    });
+
+    // Close on outside click
+    document.addEventListener('click', (e) => {
+        if (!profileContainer.contains(e.target)) {
+            hideDropdown();
+        }
     });
 
     function showDropdown() {
@@ -211,12 +349,12 @@ function showUserProfile(user) {
             confirmLabel: 'Yes, Logout',
             cancelLabel: 'Cancel',
             onConfirm: async () => {
-                const success = await signOut();
-                if (success) {
-                    hideUserProfile();
-                    showSuccessToast('Logged out successfully');
-                    setTimeout(() => { location.reload(); }, 1000);
-                }
+                try { localStorage.removeItem('lsu_donor_session'); } catch (e) {}
+                try { sessionStorage.removeItem('lsu_donor_session'); } catch (e) {}
+                try { await signOut(); } catch (e) {}
+                hideUserProfile();
+                showSuccessToast('Logged out successfully');
+                setTimeout(() => { location.reload(); }, 600);
             }
         });
     });
@@ -230,7 +368,7 @@ function showUserProfile(user) {
 // ============================================================================
 // HIDE USER PROFILE INDICATOR
 // ============================================================================
-function hideUserProfile() {
+export function hideUserProfile() {
     const existing = document.getElementById('userProfileIndicator');
     if (existing) {
         existing.remove();

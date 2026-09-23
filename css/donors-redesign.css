@@ -447,6 +447,37 @@ body.donors-page {
     color: #991b1b;
 }
 
+.status-badge.rest {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+}
+
+.rest-mode-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-left: 6px;
+    vertical-align: middle;
+    white-space: nowrap;
+    box-shadow: 0 1px 2px rgba(180, 83, 9, 0.06);
+}
+
+.rest-until-text {
+    font-size: 10px;
+    color: #b45309;
+    margin-top: 3px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
 /* ── Action Buttons ── */
 .action-btn {
     width: 32px;
@@ -1142,6 +1173,13 @@ body.donors-page {
     color: #dc2626;
     border-color: white;
     font-size: 13px;
+}
+
+.edm-tag.rest {
+    background: #fffbeb;
+    color: #b45309;
+    border-color: #fcd34d;
+    font-weight: 700;
 }
 
 #edm-close {

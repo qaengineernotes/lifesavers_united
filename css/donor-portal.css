@@ -1,0 +1,991 @@
+/**
+ * LifeSavers United - Donor Portal Stylesheet
+ * External CSS for donor_portal.html
+ */
+
+/* Container & Layout */
+body.donor-portal-container {
+  min-height: 100vh;
+  background-color: #f8fafc;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+/* Sticky Main Navigation Header (matches index.html behavior) */
+body.donor-portal-container nav,
+body.donor-portal-container nav.sticky {
+  position: -webkit-sticky !important;
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  background-color: #ffffff !important;
+}
+
+.donor-portal-container > main {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.donor-portal-container > footer {
+  width: 100%;
+  max-width: 100%;
+}
+
+.portal-header-bar {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+.donor-badge-blood {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  min-height: 56px;
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.25rem;
+  line-height: 1;
+  border-radius: 50%;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.25);
+}
+
+@media (min-width: 640px) {
+  .donor-badge-blood {
+    width: 64px;
+    height: 64px;
+    min-width: 64px;
+    min-height: 64px;
+    font-size: 1.5rem;
+  }
+}
+
+/* Donor Title & Tier Badge in Header */
+.donor-header-title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  column-gap: 0.875rem;
+  row-gap: 0.5rem;
+}
+
+#donorHeaderName {
+  margin: 0;
+  margin-right: 0.875rem;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+.donor-badge-tier {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.tier-bronze { background-color: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+.tier-silver { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+.tier-gold { background-color: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+.tier-platinum { background: linear-gradient(135deg, #e0e7ff 0%, #ede9fe 100%); color: #4338ca; border: 1px solid #c7d2fe; }
+
+
+/* Stat Cards */
+.portal-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+.portal-stat-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.portal-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.08);
+  border-color: #fecaca;
+}
+
+@media (max-width: 640px) {
+  .portal-stats-grid {
+    gap: 0.375rem;
+    margin-bottom: 1.25rem;
+  }
+  .portal-stat-card {
+    padding: 0.75rem 0.375rem;
+    text-align: center;
+    border-radius: 0.75rem;
+  }
+  .portal-stat-card span {
+    font-size: 0.625rem;
+    line-height: 1.2;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: normal;
+  }
+  .portal-stat-card div {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    margin-top: 0.25rem;
+  }
+  .portal-stat-card p {
+    font-size: 0.625rem;
+    line-height: 1.2;
+    margin-top: 0.25rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Eligibility Countdown Cards */
+.eligibility-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .eligibility-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.eligibility-card {
+  background: #ffffff;
+  border-radius: 0.875rem;
+  border: 1px solid #e2e8f0;
+  padding: 1.25rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.eligibility-card.status-ready {
+  border-color: #a7f3d0;
+  background: linear-gradient(to bottom, #f0fdf4, #ffffff);
+}
+
+.eligibility-card.status-waiting {
+  border-color: #fed7aa;
+  background: linear-gradient(to bottom, #fffbeb, #ffffff);
+}
+
+.eligibility-pill-ready {
+  background-color: #d1fae5;
+  color: #065f46;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+.eligibility-pill-waiting {
+  background-color: #ffedd5;
+  color: #9a3412;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  display: inline-block;
+}
+
+/* Rest Mode / Deferral Banner */
+.deferral-banner {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  border: 1px solid #bfdbfe;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  color: #1e40af;
+}
+
+/* Donation Timeline */
+.timeline-item {
+  position: relative;
+  padding-left: 2rem;
+  padding-bottom: 1.75rem;
+  border-left: 2px solid #e2e8f0;
+}
+
+.timeline-item:last-child {
+  border-left: 2px solid transparent;
+  padding-bottom: 0;
+}
+
+.timeline-dot {
+  position: absolute;
+  left: -0.5625rem;
+  top: 0;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  background-color: #dc2626;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 2px #dc2626;
+}
+
+.timeline-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.timeline-card:hover {
+  border-color: #cbd5e1;
+}
+
+@media (max-width: 640px) {
+  .timeline-item {
+    padding-left: 1.25rem;
+    padding-bottom: 1.25rem;
+  }
+  .timeline-dot {
+    left: -0.5rem;
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+  .timeline-card {
+    padding: 0.875rem;
+    border-radius: 0.75rem;
+  }
+}
+
+.source-badge-official {
+  background-color: #dbeafe;
+  color: #1e40af;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.source-badge-manual {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.375rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Digital Donor Card Preview */
+#digitalDonorCardWrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#digitalDonorCardWrapper > div {
+  width: 100%;
+  max-width: 440px;
+}
+
+#digitalDonorCardImage {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.digital-donor-card {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  background: linear-gradient(135deg, #991b1b 0%, #dc2626 50%, #b91c1c 100%);
+  color: #ffffff;
+  border-radius: 1.25rem;
+  padding: 1.75rem;
+  box-shadow: 0 20px 25px -5px rgba(220, 38, 38, 0.3), 0 8px 10px -6px rgba(220, 38, 38, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.card-watermark {
+  position: absolute;
+  right: -1rem;
+  bottom: -2rem;
+  font-size: 9rem;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.07);
+  pointer-events: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.digital-card-logo {
+  height: 2.25rem;
+  width: auto;
+}
+
+/* Certificate Preview */
+#certificateWrapper {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#certificateWrapper > div {
+  width: 100%;
+  max-width: 768px;
+}
+
+#certificateImagePreview {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.certificate-preview-container {
+  background: #ffffff;
+  border: 8px double #cbd5e1;
+  border-radius: 0.5rem;
+  padding: 2.5rem 2rem;
+  text-align: center;
+  max-width: 650px;
+  width: 100%;
+  margin: 0 auto;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  color: #0f172a;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .certificate-preview-container {
+    padding: 1.5rem 0.75rem;
+    border-width: 4px;
+  }
+  #certDonorName {
+    font-size: 1.35rem !important;
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    max-width: 100%;
+    word-break: break-word;
+  }
+}
+
+.certificate-header-seal {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 1rem auto;
+}
+
+/* Modal Overlay & Dialogs */
+.portal-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.portal-modal-backdrop.hidden {
+  display: none !important;
+}
+
+.portal-modal-box {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  max-width: 520px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  border: 1px solid #e2e8f0;
+}
+
+/* Form Styles */
+.portal-form-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  margin-bottom: 0.375rem;
+}
+
+.portal-form-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
+  color: #0f172a;
+  background-color: #ffffff;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.portal-form-input:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.portal-form-input.input-error {
+  border-color: #ef4444;
+}
+
+/* Phone Input Group with +91 prefix */
+.phone-input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+}
+
+.phone-prefix-addon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1rem;
+  background-color: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-right: none;
+  border-top-left-radius: 0.5rem;
+  border-bottom-left-radius: 0.5rem;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9375rem;
+  white-space: nowrap;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.phone-input-group .portal-form-input {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  flex: 1 1 auto;
+}
+
+/* Blood Drop Icon */
+.portal-blood-icon {
+  font-size: 2.25rem;
+  line-height: 1;
+  text-align: center;
+  margin: 0 auto 0.625rem auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  width: auto;
+  height: auto;
+}
+
+.error-banner-box {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+.success-banner-box {
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+}
+
+/* Tabs */
+.portal-tab-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  max-width: 100%;
+  scrollbar-width: none;
+  flex-wrap: nowrap;
+}
+
+.portal-tab-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.portal-tab-btn {
+  padding: 0.625rem 1rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0.625rem;
+  color: #64748b;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  user-select: none;
+}
+
+.portal-tab-btn.active {
+  background-color: #dc2626;
+  color: #ffffff;
+}
+
+.portal-tab-btn:hover:not(.active) {
+  background-color: #f1f5f9;
+  color: #0f172a;
+}
+
+/* ==========================================================================
+   First-Time Donor Empty State & Onboarding Experience
+   ========================================================================== */
+.first-time-onboarding {
+  background: #ffffff;
+  border-radius: 1.25rem;
+  border: 1px solid #e2e8f0;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 640px) {
+  .first-time-onboarding {
+    padding: 1.25rem 1rem;
+  }
+}
+
+.onboarding-hero-banner {
+  background: linear-gradient(135deg, #fef2f2 0%, #fff7ed 50%, #f0fdf4 100%);
+  border: 1px solid #fecaca;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.onboarding-step-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: #fee2e2;
+  color: #991b1b;
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
+/* Checklist */
+.checklist-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.checklist-progress-bar-wrap {
+  width: 100%;
+  height: 0.625rem;
+  background-color: #e2e8f0;
+  border-radius: 9999px;
+  overflow: hidden;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.checklist-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b 0%, #10b981 100%);
+  width: 0%;
+  transition: width 0.35s ease;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  margin-bottom: 0.625rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.checklist-item:hover {
+  border-color: #cbd5e1;
+  background-color: #fafafa;
+}
+
+.checklist-item.checked {
+  border-color: #86efac;
+  background-color: #f0fdf4;
+}
+
+.checklist-item input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #16a34a;
+  margin-top: 0.15rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+/* Health Tools Grid */
+.health-tools-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 640px) {
+  .health-tools-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .health-tools-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.health-tool-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
+}
+
+.health-tool-card:hover {
+  transform: translateY(-2px);
+  border-color: #fca5a5;
+  box-shadow: 0 8px 16px -4px rgba(220, 38, 38, 0.1);
+}
+
+/* Urgent Emergency Requests Feed */
+.urgent-feed-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .urgent-feed-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.urgent-request-card {
+  background: #ffffff;
+  border: 1px solid #fee2e2;
+  border-left: 4px solid #dc2626;
+  border-radius: 0.875rem;
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 1px 3px 0 rgba(220, 38, 38, 0.05);
+  transition: all 0.2s ease;
+}
+
+.urgent-request-card:hover {
+  border-color: #f87171;
+  box-shadow: 0 6px 12px -2px rgba(220, 38, 38, 0.12);
+}
+
+.urgent-blood-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.625rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.875rem;
+  border-radius: 0.5rem;
+}
+
+.urgent-badge-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background-color: #fef2f2;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid #fecaca;
+}
+
+.urgent-badge-live::before {
+  content: '';
+  display: inline-block;
+  width: 0.45rem;
+  height: 0.45rem;
+  background-color: #dc2626;
+  border-radius: 50%;
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.2); }
+}
+
+/* Modal Form Buttons */
+.portal-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 140px;
+  padding: 0.625rem 1.5rem;
+  background-color: #dc2626;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.portal-btn-primary:hover {
+  background-color: #b91c1c;
+  box-shadow: 0 4px 6px -1px rgba(220, 38, 38, 0.25);
+}
+
+.portal-btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.portal-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.625rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.portal-btn-secondary:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+}
+
+.portal-btn-secondary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Custom Confirmation Modal Animations */
+@keyframes portalFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes portalPopIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.portal-confirm-modal-box {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  max-width: 420px;
+  width: 90%;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  animation: portalPopIn 0.2s ease-out;
+  text-align: center;
+}
+
+/* Rest Mode Buttons & Actions */
+.portal-btn-blue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background-color: #2563eb;
+  color: #ffffff !important;
+  font-size: 0.875rem;
+  font-weight: 700;
+  border-radius: 0.5rem;
+  border: 1px solid #1d4ed8;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(37, 99, 235, 0.2);
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.portal-btn-blue:hover {
+  background-color: #1d4ed8;
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.portal-btn-blue:disabled {
+  background-color: #93c5fd;
+  border-color: #bfdbfe;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Rest Mode Status Badge */
+.rest-active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+}
+
+.rest-active-badge.hidden,
+#restModeStatusBadge.hidden {
+  display: none !important;
+}
+
+.error-banner-box {
+  background-color: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+.success-banner-box {
+  background-color: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+}
+
+/* Modern iOS-Style Toggle Switch */
+.portal-toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 48px;
+  height: 26px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.portal-toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+  pointer-events: none;
+}
+
+.portal-toggle-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 9999px;
+}
+
+.portal-toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: #ffffff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.portal-toggle-switch input:checked + .portal-toggle-slider {
+  background-color: #16a34a;
+}
+
+.portal-toggle-switch input:checked + .portal-toggle-slider:before {
+  transform: translateX(22px);
+}
+
+.portal-toggle-switch input:focus-visible + .portal-toggle-slider {
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.3);
+}
+
+
+
+

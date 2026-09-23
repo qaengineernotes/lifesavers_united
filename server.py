@@ -13,6 +13,7 @@ import urllib.request
 import urllib.parse
 import json
 import re
+import subprocess
 
 # Configuration
 PORT = 8000
@@ -179,7 +180,7 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
 
-        elif self.path == '/donor-registration-email':
+        elif self.path == '/donor-registration' or self.path == '/donor-registration-email':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:
@@ -207,16 +208,45 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
 
-        elif self.path == '/send-thank-you-email':
+        elif self.path == '/send-thank-you-email' or self.path == '/send-eligibility-email':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Thank you email sent!"}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Eligibility email sent!"}).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+            return
+
+        elif self.path == '/api/update-donor-rest-mode':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                proc = subprocess.run(
+                    ['node', str(DIRECTORY / 'scripts' / 'set-donor-rest.js')],
+                    input=post_data.decode('utf-8'),
+                    text=True,
+                    capture_output=True
+                )
+                if proc.returncode == 0:
+                    resp_json = proc.stdout.strip() or '{"success": true}'
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(resp_json.encode('utf-8'))
+                else:
+                    err_msg = proc.stderr.strip() or proc.stdout.strip() or 'Failed to update rest mode'
+                    self.send_response(500)
+                    self.send_header('Content-Type', 'application/json')
+                    self.end_headers()
+                    self.wfile.write(json.dumps({"success": False, "error": err_msg}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.send_header('Content-Type', 'application/json')
                 self.end_headers()
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
@@ -248,6 +278,11 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 file_path = os.path.join(DIRECTORY, html_path.lstrip('/'))
                 if os.path.isfile(file_path):
                     self.path = html_path + ('?' + parsed_path.query if parsed_path.query else '')
+            clean_file = clean_path.lstrip('/')
+            if clean_file and not os.path.exists(os.path.join(DIRECTORY, clean_file)):
+                scripts_file = os.path.join(DIRECTORY, 'scripts', clean_file)
+                if os.path.isfile(scripts_file):
+                    self.path = '/scripts/' + clean_file + ('?' + parsed_path.query if parsed_path.query else '')
             super().do_GET()
 
 def main():

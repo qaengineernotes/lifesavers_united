@@ -80,7 +80,11 @@ service cloud.firestore {
     match /donors/{donorId} {
       allow read: if true; // Public read needed for duplicate-detection on registration
       allow create: if isVerifiedApp() || isApproved() || isSuperuser(); // Public donor registration allowed with App Check or coordinator/superuser
-      allow update: if isSuperuser() || isApproved() || isVerifiedApp(); // Only superuser, coordinator, or public registration retry
+      allow update: if isSuperuser() || isApproved() || isVerifiedApp() ||
+                    (isAuthenticated() && 
+                     (string(resource.data.contactNumber) == request.auth.token.phone_number ||
+                      ('+91' + string(resource.data.contactNumber)) == request.auth.token.phone_number)) ||
+                    request.resource.data.diff(resource.data).affectedKeys().hasOnly(['temporaryRest', 'isEmergencyAvailable', 'emergencyAvailable', 'updatedAt']);
       allow delete: if isSuperuser();
     }
 
@@ -91,11 +95,47 @@ service cloud.firestore {
       allow delete: if isSuperuser();
     }
 
+    // Helper: Check if authenticated user owns the referenced donor profile document
+    function isDonorProfileOwner(donorDocId) {
+      return donorDocId is string &&
+        exists(/databases/$(database)/documents/donors/$(donorDocId)) &&
+        (string(get(/databases/$(database)/documents/donors/$(donorDocId)).data.contactNumber) == request.auth.token.phone_number ||
+         ('+91' + string(get(/databases/$(database)/documents/donors/$(donorDocId)).data.contactNumber)) == request.auth.token.phone_number ||
+         ('+' + string(get(/databases/$(database)/documents/donors/$(donorDocId)).data.contactNumber)) == request.auth.token.phone_number);
+    }
+
     // Donation Logs collection
     match /donation_logs/{logId} {
-      allow read: if isAuthenticated();
-      allow create: if isApproved() || isSuperuser();
-      allow update, delete: if isSuperuser();
+      // Allow reading donation logs for donor portal history, stats, and verification
+      allow read: if true;
+      // Allow coordinators/superusers, verified app, or authenticated donor to create their self-reported log
+      allow create: if isApproved() || isSuperuser() || isVerifiedApp() ||
+                    (request.resource.data.source == 'donor_self_reported' &&
+                     request.resource.data.status == 'self_reported' &&
+                     !('verifiedBy' in request.resource.data)) ||
+                    (isAuthenticated() && 
+                     request.resource.data.source == 'donor_self_reported' &&
+                     request.resource.data.status == 'self_reported' &&
+                     !('verifiedBy' in request.resource.data) &&
+                     isDonorProfileOwner(request.resource.data.donorId) &&
+                     (string(request.resource.data.donorContact) == request.auth.token.phone_number ||
+                      ('+91' + string(request.resource.data.donorContact)) == request.auth.token.phone_number));
+      // Donors can update or delete their own self-reported logs. System-logged records are strictly protected.
+      allow update: if isSuperuser() || isApproved() || isVerifiedApp() ||
+                    (isAuthenticated() && 
+                     resource.data.source == 'donor_self_reported' &&
+                     request.resource.data.source == resource.data.source &&
+                     request.resource.data.donorContact == resource.data.donorContact &&
+                     request.resource.data.donorId == resource.data.donorId &&
+                     request.resource.data.get('status', 'self_reported') == resource.data.get('status', 'self_reported') &&
+                     !('verifiedBy' in request.resource.data) &&
+                     (string(resource.data.donorContact) == request.auth.token.phone_number ||
+                      ('+91' + string(resource.data.donorContact)) == request.auth.token.phone_number)) ||
+                    (resource.data.source == 'donor_self_reported' &&
+                     request.resource.data.source == resource.data.source &&
+                     !('verifiedBy' in request.resource.data));
+      allow delete: if isSuperuser() || isApproved() || isVerifiedApp() ||
+                    (resource.data.source == 'donor_self_reported');
     }
 
     // Broadcast Logs collection

@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Donor Portal & Blood Donation History | LifeSavers United</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description"
+        content="Access your LifeSavers United Donor Portal. View your blood donation records, track lives saved, check your next eligible donation countdown, manage availability, and download your digital donor card." />
+    <meta name="keywords"
+        content="donor portal, blood donation history, donor dashboard, next eligible donation date, blood donor card, lifesavers united donor, blood donation records, platelets donation history" />
+    <meta name="author" content="LifeSavers United" />
+    <meta name="robots" content="index, follow" />
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://lifesaversunited.org/donor_portal" />
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Donor Portal & Blood Donation History | LifeSavers United" />
+    <meta property="og:description"
+        content="Track your blood donations, check your next eligible donation date, manage your emergency availability, and download your digital donor card." />
+    <meta property="og:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg" />
+    <meta property="og:url" content="https://lifesaversunited.org/donor_portal" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="LifeSavers United" />
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Donor Portal & Blood Donation History | LifeSavers United" />
+    <meta name="twitter:description"
+        content="Track your blood donations, check your next eligible donation date, and download your digital donor card." />
+    <meta name="twitter:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg" />
+    <meta name="twitter:site" content="@lifesaversunit" />
+
+    <!-- Theme Color & Mobile App -->
+    <meta name="theme-color" content="#dc2626" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Donor Portal" />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="imgs/favicon/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="16x16" href="imgs/favicon/favicon-16x16.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="imgs/favicon/favicon-32x32.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Alex+Brush&family=Cinzel:wght@700;800;900&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet" />
+
+    <!-- Stylesheets (External Only) -->
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/donor-portal.css?v=1.0.4" />
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@graph": [
+            {
+                "@type": "Organization",
+                "@id": "https://lifesaversunited.org/#organization",
+                "name": "LifeSavers United",
+                "url": "https://lifesaversunited.org",
+                "logo": "https://lifesaversunited.org/imgs/lifesavers-United.jpg",
+                "contactPoint": {
+                    "@type": "ContactPoint",
+                    "telephone": "+91-9979260393",
+                    "contactType": "Emergency Blood Hotline",
+                    "areaServed": "IN",
+                    "availableLanguage": ["English", "Hindi", "Gujarati"]
+                }
+            },
+            {
+                "@type": "WebPage",
+                "@id": "https://lifesaversunited.org/donor_portal#webpage",
+                "url": "https://lifesaversunited.org/donor_portal",
+                "name": "Donor Portal & Blood Donation History | LifeSavers United",
+                "isPartOf": { "@id": "https://lifesaversunited.org/#website" },
+                "description": "Secure donor dashboard for registered blood donors to view donation history, check next eligible donation date, and manage availability.",
+                "breadcrumb": {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Home",
+                            "item": "https://lifesaversunited.org"
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": "Donor Portal",
+                            "item": "https://lifesaversunited.org/donor_portal"
+                        }
+                    ]
+                }
+            },
+            {
+                "@type": "MedicalWebPage",
+                "name": "Blood Donor Eligibility & Donation Records",
+                "aspect": ["Overview", "Health Requirements", "Recovery Intervals"],
+                "audience": {
+                    "@type": "PeopleAudience",
+                    "audienceType": "Blood Donors"
+                }
+            }
+        ]
+    }
+    </script>
+</head>
+
+<body class="bg-gray-50 text-gray-900 font-sans antialiased donor-portal-container">
+
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-card sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <a href="/">
+                        <img src="imgs/Life-saver-united-logo.png"
+                            alt="LifeSavers United Free Blood Donation Platform India" class="h-10 w-auto mr-3">
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="/" class="text-text-secondary hover:text-primary transition-smooth">Home</a>
+                    <a href="/donor_registration"
+                        class="text-text-secondary hover:text-primary transition-smooth">Donate</a>
+                    <a href="/donor_portal"
+                        class="text-primary font-semibold">Donor Portal</a>
+                    <a href="/emergency_request_system"
+                        class="text-text-secondary hover:text-primary transition-smooth">Emergency</a>
+                    <a href="/emergency_blood_request"
+                        class="text-text-secondary hover:text-primary transition-smooth">Submit Request</a>
+                    <a href="/events" class="text-text-secondary hover:text-primary transition-smooth">Events</a>
+                    <a href="/blood_information_center"
+                        class="text-text-secondary hover:text-primary transition-smooth">Learn</a>
+                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About Us</a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button class="text-text-secondary hover:text-primary" aria-label="Open navigation menu">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main View Container -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ==================================================================== -->
+        <!-- VIEW 1: LOGIN STATE (When donor is not signed in) -->
+        <!-- ==================================================================== -->
+        <section id="loginSection" class="py-12">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-10">
+                    <span class="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
+                        Registered Donors Only
+                    </span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
+                        Welcome to Your <span class="text-red-600">Donor Portal</span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+                        Log in using the exact mobile number you added while registering to view your donation history, check your next eligible donation date, and download your digital donor card.
+                    </p>
+                </div>
+
+                <!-- Login Box -->
+                <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
+
+                    <!-- Phone Input Step -->
+                    <div id="phoneFormContainer">
+                        <div class="text-center mb-6">
+                            <div class="portal-blood-icon" aria-hidden="true">🩸</div>
+                            <h2 class="text-xl font-bold text-gray-900">Donor Mobile Verification</h2>
+                            <p class="text-sm text-gray-500 mt-1">Enter your 10-digit registered mobile number</p>
+                        </div>
+
+                        <div id="loginErrorBox" class="error-banner-box hidden"></div>
+
+                        <form id="donorLoginForm" class="space-y-4">
+                            <div>
+                                <label for="donorPhoneNumber" class="portal-form-label">Mobile Number</label>
+                                <div class="phone-input-group">
+                                    <span class="phone-prefix-addon">
+                                        +91
+                                    </span>
+                                    <input type="tel" id="donorPhoneNumber" name="phoneNumber"
+                                        placeholder="9876543210" maxlength="10" required
+                                        class="portal-form-input" />
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1.5">We will send a secure one-time verification code (OTP).</p>
+                            </div>
+
+                            <div id="recaptcha-container"></div>
+
+                            <button type="submit" id="sendOtpBtn"
+                                class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-red-700 transition-colors shadow-sm">
+                                Send Verification Code
+                            </button>
+                        </form>
+
+                        <div class="mt-6 pt-6 border-t border-gray-100 text-center">
+                            <p class="text-sm text-gray-600">
+                                Not registered yet?
+                                <a href="/donor_registration" class="font-bold text-red-600 hover:text-red-700 underline ml-1">
+                                    Register as a Blood Donor →
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- OTP Verification Step -->
+                    <div id="otpFormContainer" class="hidden">
+                        <div class="text-center mb-6">
+                            <div class="portal-blood-icon" aria-hidden="true">📲</div>
+                            <h2 class="text-xl font-bold text-gray-900">Enter Verification Code</h2>
+                            <p class="text-sm text-gray-500 mt-1">
+                                Sent to <span id="otpSentPhoneDisplay" class="font-semibold text-gray-800"></span>
+                            </p>
+                        </div>
+
+                        <div id="otpErrorBox" class="error-banner-box hidden"></div>
+
+                        <form id="donorOtpForm" class="space-y-4">
+                            <div>
+                                <label for="otpCodeInput" class="portal-form-label">6-Digit Code (OTP)</label>
+                                <input type="text" id="otpCodeInput" name="otpCode"
+                                    placeholder="123456" maxlength="6" pattern="[0-9]{6}" required
+                                    class="portal-form-input text-center text-2xl tracking-widest font-mono" />
+                            </div>
+
+                            <button type="submit" id="verifyOtpBtn"
+                                class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-red-700 transition-colors shadow-sm">
+                                Verify Code & Access Portal
+                            </button>
+
+                            <button type="button" id="backToPhoneBtn"
+                                class="w-full bg-gray-100 text-gray-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm">
+                                ← Change Mobile Number
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+
+                <!-- Informational Features Banner -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pt-8 border-t border-gray-200 text-center">
+                    <div class="p-4">
+                        <div class="text-3xl mb-2">📋</div>
+                        <h3 class="font-bold text-gray-900 mb-1">Complete Donation History</h3>
+                        <p class="text-sm text-gray-600">Access every unit of blood, platelets, and plasma you have donated with hospital records.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="text-3xl mb-2">⏳</div>
+                        <h3 class="font-bold text-gray-900 mb-1">Smart Recovery Countdown</h3>
+                        <p class="text-sm text-gray-600">Know exactly when your body is eligible to donate again based on Indian DGHS guidelines.</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="text-3xl mb-2">🎖️</div>
+                        <h3 class="font-bold text-gray-900 mb-1">Digital Lifesaver Card</h3>
+                        <p class="text-sm text-gray-600">Download your verified blood donor ID card and share your milestone badges with pride.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================================================================== -->
+        <!-- VIEW 2: AUTHENTICATED DASHBOARD (Shown when donor is logged in) -->
+        <!-- ==================================================================== -->
+        <section id="dashboardSection" class="hidden">
+
+            <!-- Donor Profile Header Bar -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm mb-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div id="donorHeaderBlood" class="donor-badge-blood">
+                            O+
+                        </div>
+                        <div class="min-w-0 flex-1">
+                            <div class="donor-header-title-row">
+                                <h1 id="donorHeaderName" class="text-xl sm:text-3xl font-extrabold text-gray-900">Donor Name</h1>
+                                <span id="donorHeaderTier" class="donor-badge-tier tier-bronze">Bronze Lifesaver</span>
+                            </div>
+                            <p id="donorHeaderCity" class="text-xs sm:text-sm text-gray-500 mt-1">📍 Ahmedabad, Gujarat</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <button type="button" id="openLogDonationBtn"
+                            class="flex-1 sm:flex-initial justify-center bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2.5 rounded-xl text-sm transition-colors flex items-center gap-2 shadow-sm">
+                            <span>＋</span> Log a Donation
+                        </button>
+                        <button type="button" id="portalLogoutBtn"
+                            class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-4 py-2.5 rounded-xl text-sm transition-colors">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Temporary Rest Banner (If Active) -->
+                <div id="donorRestBanner" class="deferral-banner mt-6 hidden">
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl">🛌</span>
+                        <div>
+                            <strong class="font-bold">Temporary Rest Mode Active:</strong>
+                            <span id="restReasonDisplay">Medical Recovery</span> until <span id="restUntilDateDisplay" class="font-semibold underline"></span>.
+                            <p class="text-xs text-blue-700 mt-0.5">Emergency notifications are paused to let your body fully recover.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Impact Metric Cards Grid (Single Row on Desktop, Tablet & Mobile) -->
+            <div class="portal-stats-grid">
+                <div class="portal-stat-card">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Donations</span>
+                    <div id="statTotalDonations" class="text-2xl sm:text-3xl font-extrabold text-gray-900 mt-1">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Recorded in your profile</p>
+                </div>
+                <div class="portal-stat-card">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Units Donated</span>
+                    <div id="statTotalUnits" class="text-2xl sm:text-3xl font-extrabold text-red-600 mt-1">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Blood, Platelets & Plasma</p>
+                </div>
+                <div class="portal-stat-card">
+                    <span class="text-xs font-bold text-gray-500 uppercase tracking-wider">Estimated Lives Saved</span>
+                    <div id="statLivesSaved" class="text-2xl sm:text-3xl font-extrabold text-green-600 mt-1">0</div>
+                    <p class="text-xs text-gray-500 mt-1">Direct community impact</p>
+                </div>
+            </div>
+
+            <!-- Tab Navigation Bar -->
+            <div class="portal-tab-bar flex items-center gap-2 overflow-x-auto pb-2 mb-6 border-b border-gray-200 w-full max-w-full">
+                <button type="button" class="portal-tab-btn active" data-tab="history">
+                    📋 Donation History
+                </button>
+                <button type="button" class="portal-tab-btn" data-tab="card">
+                    🪪 Digital Donor Card
+                </button>
+                <button type="button" class="portal-tab-btn" data-tab="certificate">
+                    📜 Appreciation Certificate
+                </button>
+                <button type="button" class="portal-tab-btn" data-tab="settings">
+                    ⚙️ Profile & Availability
+                </button>
+            </div>
+
+            <!-- ================================================================ -->
+            <!-- TAB 1: DONATION HISTORY -->
+            <!-- ================================================================ -->
+            <div id="tab-history" class="portal-tab-content">
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm">
+                    <!-- Filters & Sub-header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900">Your Blood Donations</h3>
+                            <p class="text-xs text-gray-500">Official coordinator-verified records are locked; self-reported entries can be edited.</p>
+                        </div>
+                        <div class="flex flex-wrap items-center gap-2">
+                            <button type="button" id="toggleFirstTimeViewBtn" class="px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold transition-colors flex items-center gap-1.5">
+                                <span>🌱</span> <span id="toggleFirstTimeViewText">Preview First-Time Onboarding</span>
+                            </button>
+                            <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-xl text-xs font-semibold overflow-x-auto max-w-full">
+                                <button type="button" class="history-filter-btn px-3 py-1.5 rounded-lg bg-red-600 text-white flex-shrink-0" data-filter="all">All</button>
+                                <button type="button" class="history-filter-btn px-3 py-1.5 rounded-lg text-gray-600 flex-shrink-0" data-filter="whole_blood">Whole Blood</button>
+                                <button type="button" class="history-filter-btn px-3 py-1.5 rounded-lg text-gray-600 flex-shrink-0" data-filter="platelets_sdp">Platelets</button>
+                                <button type="button" class="history-filter-btn px-3 py-1.5 rounded-lg text-gray-600 flex-shrink-0" data-filter="plasma">Plasma</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Container -->
+                    <div id="donationHistoryList" class="space-y-4"></div>
+
+                    <!-- Pagination -->
+                    <div id="donationPagination" class="mt-8 flex justify-center items-center gap-2"></div>
+
+                    <!-- First-Time Donor Inspiring Onboarding Experience (When 0 Donations Recorded) -->
+                    <div id="historyEmptyState" class="first-time-onboarding hidden">
+
+                        <!-- Inspiring Hero Banner -->
+                        <div class="onboarding-hero-banner">
+                            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                                <div>
+                                    <span class="onboarding-step-badge">
+                                        🌟 First-Time Hero Onboarding
+                                    </span>
+                                    <h4 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight mb-2">
+                                        Your Journey to Saving Lives Begins Today!
+                                    </h4>
+                                    <p class="text-sm sm:text-base text-gray-600 max-w-2xl">
+                                        Welcome, hero! You haven't logged any donations yet, and that's wonderful — every lifesaver started right where you are now. Complete the readiness checklist, explore our clinical guides, and review active local emergencies waiting for your blood type.
+                                    </p>
+                                </div>
+                                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-shrink-0">
+                                    <button type="button" onclick="document.getElementById('openLogDonationBtn').click()"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-bold px-5 py-2.5 rounded-xl text-sm transition-colors shadow-sm flex items-center justify-center gap-2">
+                                        <span>＋</span> Log a Past Donation
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Clinical Readiness & Eligibility Checklist -->
+                        <div class="checklist-card">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
+                                <div>
+                                    <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Step 1: Clinical Readiness</span>
+                                    <h5 class="text-lg font-bold text-gray-900">Pre-Donation Eligibility Checklist (DGHS India)</h5>
+                                </div>
+                                <div class="text-right">
+                                    <span id="checklistScoreDisplay" class="text-sm font-extrabold text-gray-800 bg-white px-3 py-1 rounded-full border border-gray-200">
+                                        0 of 5 Ready
+                                    </span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-2">
+                                Tick each box to verify you meet the clinical criteria established by the National Blood Transfusion Council (NBTC) and DGHS:
+                            </p>
+
+                            <!-- Progress Bar -->
+                            <div class="checklist-progress-bar-wrap">
+                                <div id="checklistProgressFill" class="checklist-progress-fill"></div>
+                            </div>
+                            <div id="checklistStatusMessage" class="text-xs font-semibold text-gray-600 mb-4">
+                                ⏳ Complete the checklist items below to verify your readiness.
+                            </div>
+
+                            <!-- Interactive Items -->
+                            <div class="space-y-2">
+                                <label class="checklist-item" id="checkItem-1">
+                                    <input type="checkbox" class="onboarding-check" data-item="1" />
+                                    <div>
+                                        <strong class="text-sm text-gray-900 block font-bold">1. Age & Body Weight (≥ 45 kg)</strong>
+                                        <span class="text-xs text-gray-600">I am between 18 and 65 years old, and my body weight is at least 45 kg (or ≥ 50 kg for Platelet SDP).</span>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" id="checkItem-2">
+                                    <input type="checkbox" class="onboarding-check" data-item="2" />
+                                    <div>
+                                        <strong class="text-sm text-gray-900 block font-bold">2. Hemoglobin & Vital Signs (Hb ≥ 12.5 g/dL)</strong>
+                                        <span class="text-xs text-gray-600">I feel healthy with normal blood pressure. A free Hb test will be done at the camp to confirm Hb ≥ 12.5 g/dL.</span>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" id="checkItem-3">
+                                    <input type="checkbox" class="onboarding-check" data-item="3" />
+                                    <div>
+                                        <strong class="text-sm text-gray-900 block font-bold">3. Hydration & Nutrition (No Empty Stomach)</strong>
+                                        <span class="text-xs text-gray-600">I have had (or will have) 500ml of water and a healthy light meal 2–3 hours before donating blood.</span>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" id="checkItem-4">
+                                    <input type="checkbox" class="onboarding-check" data-item="4" />
+                                    <div>
+                                        <strong class="text-sm text-gray-900 block font-bold">4. Restful Sleep & Zero Alcohol</strong>
+                                        <span class="text-xs text-gray-600">I have slept at least 7–8 hours last night and have consumed no alcohol in the past 24 hours.</span>
+                                    </div>
+                                </label>
+                                <label class="checklist-item" id="checkItem-5">
+                                    <input type="checkbox" class="onboarding-check" data-item="5" />
+                                    <div>
+                                        <strong class="text-sm text-gray-900 block font-bold">5. No Recent Medical Deferrals</strong>
+                                        <span class="text-xs text-gray-600">No tattoos/body piercings in the past 6 months, no dental extractions in 72 hours, and no antibiotics in 14 days.</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Health Assessment & Clinical Educational Tools -->
+                        <div class="mb-8">
+                            <div class="flex items-center justify-between gap-2 mb-4">
+                                <div>
+                                    <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Step 2: Knowledge & Prep</span>
+                                    <h5 class="text-lg font-bold text-gray-900">Essential Health Assessment & Clinical Tools</h5>
+                                </div>
+                            </div>
+
+                            <div class="health-tools-grid">
+                                <!-- Tool 1 -->
+                                <div class="health-tool-card">
+                                    <div>
+                                        <div class="text-3xl mb-3">🩺</div>
+                                        <span class="text-xs font-bold text-red-600 uppercase tracking-wider block mb-1">Assessment Tool</span>
+                                        <h6 class="font-bold text-gray-900 text-base mb-1.5">Health & Deferral Checker</h6>
+                                        <p class="text-xs text-gray-600 mb-4">
+                                            Comprehensive questionnaire covering medical conditions, prescription drugs, and travel guidelines.
+                                        </p>
+                                    </div>
+                                    <a href="/health_assessment_tools" class="text-xs font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1">
+                                        Launch Health Checker →
+                                    </a>
+                                </div>
+
+                                <!-- Tool 2 -->
+                                <div class="health-tool-card">
+                                    <div>
+                                        <div class="text-3xl mb-3">🩸</div>
+                                        <span class="text-xs font-bold text-red-600 uppercase tracking-wider block mb-1">Compatibility</span>
+                                        <h6 class="font-bold text-gray-900 text-base mb-1.5">Blood Compatibility Matrix</h6>
+                                        <p class="text-xs text-gray-600 mb-4">
+                                            Find out who can receive your blood group and explore Whole Blood, Platelet SDP, and Plasma differences.
+                                        </p>
+                                    </div>
+                                    <a href="/blood_information_center" class="text-xs font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1">
+                                        Explore Compatibility →
+                                    </a>
+                                </div>
+
+                                <!-- Tool 3 -->
+                                <div class="health-tool-card">
+                                    <div>
+                                        <div class="text-3xl mb-3">📖</div>
+                                        <span class="text-xs font-bold text-red-600 uppercase tracking-wider block mb-1">Clinical Guide</span>
+                                        <h6 class="font-bold text-gray-900 text-base mb-1.5">First-Time Donor FAQ & Myths</h6>
+                                        <p class="text-xs text-gray-600 mb-4">
+                                            What happens during the 10-minute donation? Needle size, copper sulphate test, and recovery debunked.
+                                        </p>
+                                    </div>
+                                    <a href="/medical_information_library" class="text-xs font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1">
+                                        Read First-Time Guide →
+                                    </a>
+                                </div>
+
+                                <!-- Tool 4 -->
+                                <div class="health-tool-card">
+                                    <div>
+                                        <div class="text-3xl mb-3">🥗</div>
+                                        <span class="text-xs font-bold text-red-600 uppercase tracking-wider block mb-1">Nutrition</span>
+                                        <h6 class="font-bold text-gray-900 text-base mb-1.5">Iron & Hemoglobin Diet</h6>
+                                        <p class="text-xs text-gray-600 mb-4">
+                                            Traditional Indian foods, jaggery, beetroot, and green leafy vegetables to boost hemoglobin before donating.
+                                        </p>
+                                    </div>
+                                    <a href="/blog-indian-diet-wellness-guide" class="text-xs font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1">
+                                        Read Diet Guide →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Active Local Emergency Requests Feed -->
+                        <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                                <div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="urgent-badge-live">Live Feed</span>
+                                        <span class="text-xs font-bold text-red-600 uppercase tracking-wider">Step 3: Answer the Call</span>
+                                    </div>
+                                    <h5 class="text-lg font-bold text-gray-900 mt-1">Active Emergency Requests Waiting for Donors</h5>
+                                    <p class="text-xs text-gray-500">
+                                        Urgent patient requests verified by our coordinator network. Reach out directly to help.
+                                    </p>
+                                </div>
+                                <a href="/all_requests" class="text-xs font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1 flex-shrink-0">
+                                    View All Requests →
+                                </a>
+                            </div>
+
+                            <!-- Emergency Feed Container (Dynamically Populated) -->
+                            <div id="firstTimeEmergencyFeed" class="urgent-feed-grid">
+                                <div class="p-8 text-center text-gray-500 col-span-full">Loading active emergency requests...</div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Missing Official Donation Callout -->
+                    <div class="mt-8 pt-6 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-500">
+                        <p>Donated at an emergency call through LifeSavers United but missing your official verified tag?</p>
+                        <a href="https://wa.me/919979260393?text=Hi%20LifeSavers%20United,%20I%20donated%20blood%20recently%20and%20wanted%20to%20verify%20my%20donation%20in%20the%20portal."
+                           target="_blank" rel="noopener noreferrer"
+                           class="font-bold text-red-600 hover:text-red-700 underline flex items-center gap-1 flex-shrink-0">
+                            💬 Verify with Coordinator on WhatsApp →
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Next Eligible Date Countdown Section (Positioned Under Donation History) -->
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm mt-8">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-900">Next Eligible Blood Donation Schedule</h2>
+                            <p class="text-sm text-gray-500 mt-0.5">Calculated according to DGHS & NBTC India medical rest guidelines</p>
+                        </div>
+                    </div>
+
+                    <div class="eligibility-grid">
+                        <!-- Whole Blood -->
+                        <div id="wholeBloodCard" class="eligibility-card status-ready">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-800">Whole Blood</span>
+                                <span id="wholeBloodStatus" class="eligibility-pill-ready">🟢 Eligible Today</span>
+                            </div>
+                            <div id="wholeBloodCount" class="text-2xl font-extrabold text-gray-900 mb-1">Ready to Donate!</div>
+                            <p id="wholeBloodDate" class="text-xs text-gray-500">90-day recovery interval</p>
+                        </div>
+
+                        <!-- Platelets (SDP) -->
+                        <div id="plateletsCard" class="eligibility-card status-ready">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-800">Platelets (SDP)</span>
+                                <span id="plateletsStatus" class="eligibility-pill-ready">🟢 Eligible Today</span>
+                            </div>
+                            <div id="plateletsCount" class="text-2xl font-extrabold text-gray-900 mb-1">Ready to Donate!</div>
+                            <p id="plateletsDate" class="text-xs text-gray-500">14-day recovery interval</p>
+                        </div>
+
+                        <!-- Plasma -->
+                        <div id="plasmaCard" class="eligibility-card status-ready">
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-sm font-bold text-gray-800">Plasma</span>
+                                <span id="plasmaStatus" class="eligibility-pill-ready">🟢 Eligible Today</span>
+                            </div>
+                            <div id="plasmaCount" class="text-2xl font-extrabold text-gray-900 mb-1">Ready to Donate!</div>
+                            <p id="plasmaDate" class="text-xs text-gray-500">28-day recovery interval</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================================ -->
+            <!-- TAB 2: DIGITAL DONOR CARD -->
+            <!-- ================================================================ -->
+            <div id="tab-card" class="portal-tab-content hidden">
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm text-center">
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Your Verified LifeSavers Donor ID Card</h3>
+                    <p class="text-sm text-gray-500 max-w-md mx-auto mb-8">
+                        Carry your digital blood donor card on your phone or share it on WhatsApp to inspire friends and family to donate blood.
+                    </p>
+
+                    <!-- The Card Preview Container (Official 1080x1080 Poster Template) -->
+                    <div id="digitalDonorCardWrapper" class="flex justify-center mb-8 w-full max-w-full">
+                        <div class="relative bg-gray-50 p-2 sm:p-3 rounded-2xl shadow-md border border-gray-200 max-w-md w-full flex flex-col items-center justify-center min-h-[300px]">
+                            <!-- Spinner while generating -->
+                            <div id="digitalCardSpinner" class="py-16 text-center text-gray-500 flex flex-col items-center justify-center w-full">
+                                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent mb-3"></div>
+                                <p class="text-sm font-semibold text-gray-700">Generating your Official Digital Donor Card...</p>
+                                <p class="text-xs text-gray-400 mt-1">High-Resolution 1080×1080 Badge</p>
+                            </div>
+                            <!-- Rendered High-Resolution Poster Image -->
+                            <img id="digitalDonorCardImage" alt="LifeSavers United Official Digital Donor Card"
+                                class="w-full max-w-full h-auto rounded-xl shadow-sm object-contain hidden" />
+                        </div>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
+                        <button type="button" id="downloadCardBtn"
+                            class="w-full sm:w-auto justify-center bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors shadow-sm flex items-center gap-2">
+                            <span>📥</span> Download Card as PNG
+                        </button>
+                        <button type="button" id="shareCardWhatsAppBtn"
+                            class="w-full sm:w-auto justify-center bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors shadow-sm flex items-center gap-2">
+                            <span>💬</span> Share on WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================================ -->
+            <!-- TAB 3: APPRECIATION CERTIFICATE -->
+            <!-- ================================================================ -->
+            <div id="tab-certificate" class="portal-tab-content hidden">
+                <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm text-center">
+                    <div class="text-center mb-6">
+                        <h3 class="text-xl font-bold text-gray-900 mb-1">Official Certificate of Appreciation</h3>
+                        <p class="text-sm text-gray-500 max-w-lg mx-auto">Recognizing your life-saving voluntary blood donation for critically ill patients in need.</p>
+                    </div>
+
+                    <!-- Dropdown to Select Donation Record -->
+                    <div class="max-w-md mx-auto mb-6 text-left" id="certDonationSelectWrapper">
+                        <label for="certificateDonationSelect" class="portal-form-label text-xs">Select Donation Record for Certificate:</label>
+                        <select id="certificateDonationSelect" class="portal-form-input text-sm font-semibold"></select>
+                    </div>
+
+                    <!-- Certificate Preview Box (Official Template) -->
+                    <div id="certificateWrapper" class="flex justify-center mb-6 w-full max-w-full">
+                        <div class="relative bg-gray-50 p-2 sm:p-3 rounded-2xl shadow-md border border-gray-200 max-w-3xl w-full flex flex-col items-center justify-center min-h-[300px]">
+                            <!-- Spinner while rendering -->
+                            <div id="certificateSpinner" class="py-20 text-center text-gray-500 flex flex-col items-center justify-center w-full">
+                                <div class="inline-block animate-spin rounded-full h-10 w-10 border-4 border-red-600 border-t-transparent mb-3"></div>
+                                <p class="text-sm font-semibold text-gray-700">Generating Official Certificate of Appreciation...</p>
+                                <p class="text-xs text-gray-400 mt-1">High-Resolution 2048×1446 Verified Document</p>
+                            </div>
+                            <!-- Rendered High-Resolution Certificate Image -->
+                            <img id="certificateImagePreview" alt="LifeSavers United Certificate of Appreciation"
+                                class="w-full max-w-full h-auto rounded-xl shadow-sm object-contain hidden" />
+                        </div>
+                    </div>
+
+                    <!-- Print & Download Buttons -->
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md mx-auto">
+                        <button type="button" id="downloadCertPngBtn"
+                            class="w-full sm:w-auto justify-center bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors shadow-sm flex items-center gap-2">
+                            <span>📥</span> Download Certificate (PNG)
+                        </button>
+                        <button type="button" id="printCertificateBtn"
+                            class="w-full sm:w-auto justify-center bg-gray-900 hover:bg-black text-white font-bold px-6 py-3 rounded-xl text-sm transition-colors shadow-sm flex items-center gap-2">
+                            <span>🖨️</span> Print / Save as PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================================================================ -->
+            <!-- TAB 4: PROFILE & AVAILABILITY SETTINGS -->
+            <!-- ================================================================ -->
+            <div id="tab-settings" class="portal-tab-content hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- Availability & Rest Mode Card -->
+                    <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Emergency Availability</h3>
+                        <p class="text-xs text-gray-500 mb-6">Control whether our coordinators can contact you for critical matching blood requests.</p>
+
+                        <!-- Toggle Switch -->
+                        <div class="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200 mb-6">
+                            <div>
+                                <span class="font-bold text-gray-900 text-sm block">Available for Emergencies</span>
+                                <span class="text-xs text-gray-500">Receive calls/messages for compatible urgent requests</span>
+                            </div>
+                            <label class="portal-toggle-switch" title="Toggle emergency availability">
+                                <input type="checkbox" id="emergencyAvailabilityToggle" />
+                                <span class="portal-toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <!-- Temporary Rest Mode (Snooze) -->
+                        <div class="pt-6 border-t border-gray-100">
+                            <div class="flex items-center justify-between mb-1">
+                                <h4 class="font-bold text-gray-900 text-sm">Temporary Rest / Deferral Mode</h4>
+                                <span id="restModeStatusBadge" class="rest-active-badge hidden">
+                                    Rest Active
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-4">Temporarily pause emergency calls due to recent tattoo, dental surgery, antibiotics, or travel.</p>
+
+                            <div id="restModeMsgBox" class="hidden"></div>
+
+                            <form id="restModeForm" class="space-y-3">
+                                <div>
+                                    <label for="restReasonSelect" class="portal-form-label text-xs">Reason for Rest</label>
+                                    <select id="restReasonSelect" class="portal-form-input text-sm">
+                                        <option value="Tattoo or Piercing">Tattoo or Body Piercing (6-Month Deferral)</option>
+                                        <option value="Dental Treatment / Minor Surgery">Dental Treatment / Minor Surgery</option>
+                                        <option value="Medication / Antibiotics / Fever">Medication / Antibiotics / Recovery</option>
+                                        <option value="Recent Vaccination">Recent Vaccination (14-Day Pause)</option>
+                                        <option value="Low Hemoglobin / Health Rest">Low Hemoglobin / General Rest</option>
+                                        <option value="Personal Travel / Unavailable">Personal Travel / Busy</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="restUntilDate" class="portal-form-label text-xs">Rest Until Date</label>
+                                    <input type="date" id="restUntilDate" required class="portal-form-input text-sm" />
+                                </div>
+                                <div class="flex items-center gap-3 pt-2 flex-wrap">
+                                    <button type="submit" id="activateRestModeBtn" class="portal-btn-blue">
+                                        Activate Rest Mode
+                                    </button>
+                                    <button type="button" id="cancelRestModeBtn" class="portal-btn-secondary">
+                                        Cancel Rest
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Contact & Location Card -->
+                    <div class="bg-white rounded-2xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Profile Details</h3>
+                        <p class="text-xs text-gray-500 mb-6">Update your email to receive 3-day eligibility roadmap reminders.</p>
+
+                        <div id="profileMsgBox" class="hidden"></div>
+
+                        <form id="donorProfileForm" class="space-y-4">
+                            <div>
+                                <label for="profileFullName" class="portal-form-label text-xs">Full Name</label>
+                                <input type="text" id="profileFullName" disabled class="portal-form-input text-sm bg-gray-50 text-gray-500" />
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="profilePhone" class="portal-form-label text-xs">Mobile Number</label>
+                                    <input type="text" id="profilePhone" disabled class="portal-form-input text-sm bg-gray-50 text-gray-500 font-mono" />
+                                </div>
+                                <div>
+                                    <label for="profileBlood" class="portal-form-label text-xs">Blood Group</label>
+                                    <input type="text" id="profileBlood" disabled class="portal-form-input text-sm bg-gray-50 text-gray-500 font-bold" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="profileEmail" class="portal-form-label text-xs">Email Address (For Eligibility Reminders)</label>
+                                <input type="email" id="profileEmail" placeholder="yourname@gmail.com" class="portal-form-input text-sm" />
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label for="profileCity" class="portal-form-label text-xs">City</label>
+                                    <input type="text" id="profileCity" placeholder="Ahmedabad" class="portal-form-input text-sm" />
+                                </div>
+                                <div>
+                                    <label for="profileArea" class="portal-form-label text-xs">Area / Locality</label>
+                                    <input type="text" id="profileArea" placeholder="Maninagar" class="portal-form-input text-sm" />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 px-4 rounded-xl text-sm transition-colors shadow-sm">
+                                Save Profile Changes
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ==================================================================== -->
+    <!-- MODAL 1: ADD MANUAL DONATION -->
+    <!-- ==================================================================== -->
+    <div id="addDonationModal" class="portal-modal-backdrop hidden">
+        <div class="portal-modal-box p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">＋ Log a Blood Donation</h3>
+                <button type="button" class="modal-close-btn text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">
+                    &times;
+                </button>
+            </div>
+
+            <p class="text-xs text-gray-500 mb-4">
+                Log a donation completed at a camp, blood bank, or hospital. Clinical recovery intervals are validated automatically.
+            </p>
+
+            <div id="modalValidationError" class="error-banner-box hidden"></div>
+
+            <form id="logDonationForm" class="space-y-4">
+                <div>
+                    <label for="logDonationDate" class="portal-form-label">Date of Donation <span class="text-red-600">*</span></label>
+                    <input type="date" id="logDonationDate" required class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="logDonationType" class="portal-form-label">Donation Type <span class="text-red-600">*</span></label>
+                    <select id="logDonationType" required class="portal-form-input">
+                        <option value="whole_blood">Whole Blood (Standard)</option>
+                        <option value="platelets_sdp">Single Donor Platelets (SDP / Apheresis)</option>
+                        <option value="plasma">Plasma (Plasmapheresis)</option>
+                        <option value="prbc">Packed Red Blood Cells (PRBC)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="logDonationHospital" class="portal-form-label">Blood Bank / Hospital / Camp Name <span class="text-red-600">*</span></label>
+                    <input type="text" id="logDonationHospital" placeholder="e.g. Red Cross Blood Centre, Civil Hospital" required class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="logDonationUnits" class="portal-form-label">Units Donated</label>
+                    <input type="number" id="logDonationUnits" min="1" max="4" value="1" class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="logDonationNotes" class="portal-form-label">Notes or Certificate Reference (Optional)</label>
+                    <input type="text" id="logDonationNotes" placeholder="e.g. Voluntary blood drive at university" class="portal-form-input" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" class="modal-close-btn portal-btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveDonationBtn" class="portal-btn-primary">
+                        Save Donation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- MODAL 2: EDIT SELF-REPORTED DONATION -->
+    <!-- ==================================================================== -->
+    <div id="editDonationModal" class="portal-modal-backdrop hidden">
+        <div class="portal-modal-box p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900">✏️ Edit Self-Reported Donation</h3>
+                <button type="button" class="modal-close-btn text-gray-400 hover:text-gray-600 text-2xl font-bold leading-none">
+                    &times;
+                </button>
+            </div>
+
+            <div id="editValidationError" class="error-banner-box hidden"></div>
+
+            <form id="editDonationForm" class="space-y-4">
+                <input type="hidden" id="editDonationId" />
+
+                <div>
+                    <label for="editDonationDate" class="portal-form-label">Date of Donation <span class="text-red-600">*</span></label>
+                    <input type="date" id="editDonationDate" required class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="editDonationType" class="portal-form-label">Donation Type <span class="text-red-600">*</span></label>
+                    <select id="editDonationType" required class="portal-form-input">
+                        <option value="whole_blood">Whole Blood (Standard)</option>
+                        <option value="platelets_sdp">Single Donor Platelets (SDP / Apheresis)</option>
+                        <option value="plasma">Plasma (Plasmapheresis)</option>
+                        <option value="prbc">Packed Red Blood Cells (PRBC)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="editDonationHospital" class="portal-form-label">Blood Bank / Hospital / Camp Name <span class="text-red-600">*</span></label>
+                    <input type="text" id="editDonationHospital" required class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="editDonationUnits" class="portal-form-label">Units Donated</label>
+                    <input type="number" id="editDonationUnits" min="1" max="4" class="portal-form-input" />
+                </div>
+
+                <div>
+                    <label for="editDonationNotes" class="portal-form-label">Notes</label>
+                    <input type="text" id="editDonationNotes" class="portal-form-input" />
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <button type="button" class="modal-close-btn portal-btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" id="updateDonationBtn" class="portal-btn-primary">
+                        Update Donation
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Logo and Mission -->
+                <div>
+                    <div class="flex items-center mb-3">
+                        <img src="imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" class="w-auto mr-3 h-16">
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        Connecting donors, recipients, and hospitals to save lives through the power of community-driven
+                        blood donation.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.instagram.com/lifesaversunited_blooddonors/" target="_blank"
+                            rel="noopener noreferrer" aria-label="Follow LifeSavers United on Instagram"
+                            class="text-gray-300 hover:text-white transition-smooth">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                            </svg>
+                        </a>
+                        <a href="https://chat.whatsapp.com/HYqsKngbuVAEOvViGF8p6L?mode=ac_t" target="_blank"
+                            rel="noopener noreferrer"
+                            class="text-gray-300 hover:text-white transition-smooth">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                            </svg>
+                        </a>
+                        <a href="https://x.com/lifesaversunit" target="_blank" rel="noopener noreferrer"
+                            class="text-gray-300 hover:text-white transition-smooth">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/" class="text-gray-300 hover:text-white transition-smooth">Home</a></li>
+                        <li><a href="/donor_registration"
+                                class="text-gray-300 hover:text-white transition-smooth">Donate</a></li>
+                        <li><a href="/donor_portal"
+                                class="text-white font-bold transition-smooth">Donor Portal</a></li>
+                        <li><a href="/emergency_request_system"
+                                class="text-gray-300 hover:text-white transition-smooth">Emergency</a></li>
+                        <li><a href="/emergency_blood_request"
+                                class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
+                        <li><a href="/events" class="text-gray-300 hover:text-white transition-smooth">Events</a></li>
+                        <li><a href="/volunteers"
+                                class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
+                        <li><a href="/blood_information_center"
+                                class="text-gray-300 hover:text-white transition-smooth">Learn</a></li>
+                        <li><a href="/about_us" class="text-gray-300 hover:text-white transition-smooth">About Us</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- Resources -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-lg font-semibold mb-3">Resources</h3>
+                    <ul class="space-y-2">
+                        <li><a href="/gallery" class="text-gray-300 hover:text-white transition-smooth">Gallery</a></li>
+                        <li><a href="/faq" class="text-gray-300 hover:text-white transition-smooth">FAQs</a></li>
+                        <li><a href="/stories" class="text-gray-300 hover:text-white transition-smooth">Stories</a></li>
+
+                        <li><a href="/blogs" class="text-gray-300 hover:text-white transition-smooth">Blog</a></li>
+                        <li><a href="/health_assessment_tools"
+                                class="text-gray-300 hover:text-white transition-smooth">Health Assessment Tools</a>
+                        </li>
+                        <li><a href="/privacy_policy" class="text-gray-300 hover:text-white transition-smooth">Privacy
+                                Policy</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                <div class="text-center md:text-left">
+                    <h3 class="text-lg font-semibold mb-3">Contact</h3>
+                    <ul class="space-y-2 text-gray-300">
+                        <li class="font-bold text-primary"><a
+                                href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
+                                target="_blank" rel="noopener noreferrer"
+                                class="hover:text-primary-700 transition-smooth">24/7 Emergency:
+                                9979260393</a></li>
+                        <li>Support: <a href="mailto:lifesaversunited.india@gmail.com" class="hover:text-white transition-smooth">lifesaversunited.india@gmail.com</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
+                <p>&copy; <span id="currentYear">2026</span> LifeSavers United. | Made with ❤️ by <a
+                        href="https://qablogs.com" target="_blank" rel="noopener noreferrer"
+                        class="text-gray-300 hover:text-white transition-smooth">QaBlogs</a></p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Module Scripts -->
+    <script type="module" src="scripts/donor-portal.js?v=20260923_3"></script>
+    <script type="module">
+        import('./scripts/user-profile-ui.js').then(module => {
+            module.initializeUserProfileUI();
+        });
+    </script>
+    <script src="scripts/mobile-menu.js"></script>
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+
+</html>

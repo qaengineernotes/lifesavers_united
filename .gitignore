@@ -5,3 +5,6 @@ package-lock.json
 *-firebase-adminsdk-*.json
 .env
 .env.local
+__pycache__/
+scratch/
+*.pyc

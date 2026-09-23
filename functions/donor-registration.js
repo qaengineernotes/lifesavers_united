@@ -73,7 +73,7 @@ export async function onRequestPost(context) {
       const r = await sendEmail(context.env, {
         to: [safeEmail],
         subject: `🩸 Welcome to LifeSavers United, ${safeName.split(' ')[0]}! You're Now a Registered Donor`,
-        html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime),
+        html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime, safePhone),
       });
       results.push({ type: 'donor', provider: r.provider, ok: r.ok });
     }
@@ -98,13 +98,15 @@ export async function onRequestPost(context) {
 }
 
 // ── Donor Welcome Email ───────────────────────────────────────────────────────
-function buildDonorEmail(name, blood, city, area, emergency, time) {
+function buildDonorEmail(name, blood, city, area, emergency, time, phone = '') {
   const first = name.split(' ')[0];
   const bloodColors = {
     'A+': '#e74c3c', 'A-': '#c0392b', 'B+': '#e74c3c', 'B-': '#c0392b',
     'AB+': '#8e44ad', 'AB-': '#7d3c98', 'O+': '#e74c3c', 'O-': '#c0392b',
   };
   const bColor = bloodColors[blood] || '#c0392b';
+  const cleanPhone = String(phone || '').replace(/\D/g, '').slice(-10);
+  const portalUrl = cleanPhone ? `https://lifesaversunited.org/donor_portal?phone=${encodeURIComponent(cleanPhone)}` : 'https://lifesaversunited.org/donor_portal';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -172,8 +174,8 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
             <div style="width:42px;height:42px;background:#fef2f2;border-radius:50%;text-align:center;line-height:42px;font-size:20px;">📋</div>
           </td>
           <td style="padding-left:14px;vertical-align:top;">
-            <strong style="color:#1a1a1a;font-size:15px;display:block;margin-bottom:4px;">1. Profile Activation</strong>
-            <span style="color:#666;font-size:13px;line-height:1.7;">Your profile is now active in our donor database, ensuring we can match you with those in need.</span>
+            <strong style="color:#1a1a1a;font-size:15px;display:block;margin-bottom:4px;">1. Profile Activation & Digital Card</strong>
+            <span style="color:#666;font-size:13px;line-height:1.7;">Your profile is active in our donor network! You can view and download your personalised digital donor card right now on your <a href="${portalUrl}" style="color:#c0392b;font-weight:600;text-decoration:underline;">Donor Portal</a>.</span>
           </td>
         </tr></table>
       </td></tr>
@@ -217,10 +219,24 @@ function buildDonorEmail(name, blood, city, area, emergency, time) {
 
   <!-- CTA -->
   <tr><td style="padding:0 32px 32px;" align="center">
-    <a href="https://lifesaversunited.org/emergency_request_system"
-       style="display:inline-block;background:#c0392b;color:#fff;font-size:15px;font-weight:700;padding:16px 36px;border-radius:10px;text-decoration:none;letter-spacing:0.5px;">
-      View Active Blood Requests →
-    </a>
+    <table width="100%" cellpadding="0" cellspacing="0">
+      <tr>
+        <td align="center" style="padding-bottom:14px;">
+          <a href="${portalUrl}"
+             style="display:inline-block;background:#c0392b;color:#fff;font-size:16px;font-weight:700;padding:16px 36px;border-radius:10px;text-decoration:none;letter-spacing:0.5px;box-shadow:0 4px 12px rgba(192,57,43,0.3);">
+            Access Your Donor Portal & Digital Card →
+          </a>
+        </td>
+      </tr>
+      <tr>
+        <td align="center">
+          <a href="https://lifesaversunited.org/emergency_request_system"
+             style="display:inline-block;color:#666;font-size:13px;font-weight:600;text-decoration:underline;">
+            View Active Emergency Blood Requests
+          </a>
+        </td>
+      </tr>
+    </table>
   </td></tr>
 
   <!-- CONTACT -->
