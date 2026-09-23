@@ -8,7 +8,7 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Access your LifeSavers United Donor Portal. View your blood donation records, track lives saved, check your next eligible donation countdown, manage availability, and download your digital donor card." />
+        content="Log your blood donations, track your history, check your next eligible date, and download your digital donor card — all on the LifeSavers United Donor Portal." />
     <meta name="keywords"
         content="donor portal, blood donation history, donor dashboard, next eligible donation date, blood donor card, lifesavers united donor, blood donation records, platelets donation history" />
     <meta name="author" content="LifeSavers United" />
@@ -50,7 +50,7 @@
 
     <!-- Stylesheets (External Only) -->
     <link rel="stylesheet" href="css/main.css" />
-    <link rel="stylesheet" href="css/donor-portal.css?v=1.0.4" />
+    <link rel="stylesheet" href="css/donor-portal.css?v=1.0.5" />
 
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
@@ -77,24 +77,7 @@
                 "url": "https://lifesaversunited.org/donor_portal",
                 "name": "Donor Portal & Blood Donation History | LifeSavers United",
                 "isPartOf": { "@id": "https://lifesaversunited.org/#website" },
-                "description": "Secure donor dashboard for registered blood donors to view donation history, check next eligible donation date, and manage availability.",
-                "breadcrumb": {
-                    "@type": "BreadcrumbList",
-                    "itemListElement": [
-                        {
-                            "@type": "ListItem",
-                            "position": 1,
-                            "name": "Home",
-                            "item": "https://lifesaversunited.org"
-                        },
-                        {
-                            "@type": "ListItem",
-                            "position": 2,
-                            "name": "Donor Portal",
-                            "item": "https://lifesaversunited.org/donor_portal"
-                        }
-                    ]
-                }
+                "description": "Log your blood donations, track your history, check your next eligible date, and download your digital donor card — all on the LifeSavers United Donor Portal."
             },
             {
                 "@type": "MedicalWebPage",
@@ -106,6 +89,114 @@
                 }
             }
         ]
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://lifesaversunited.org/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Donor Portal",
+          "item": "https://lifesaversunited.org/donor_portal"
+        }
+      ]
+    }
+    </script>
+
+    <!-- HowTo Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "How to Log Your Blood Donation on LifeSavers United",
+      "description": "Steps to verify your mobile number, log a blood donation, and track your eligibility on the LifeSavers United Donor Portal.",
+      "step": [
+        {
+          "@type": "HowToStep",
+          "position": 1,
+          "name": "Verify your mobile number",
+          "text": "Verify your mobile number — the same one you used to register as a donor."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 2,
+          "name": "Log your donations",
+          "text": "Log your donations — add past donations or new ones as you make them."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 3,
+          "name": "Track your eligibility",
+          "text": "Track your eligibility — see exactly when you can donate again."
+        },
+        {
+          "@type": "HowToStep",
+          "position": 4,
+          "name": "Download your donor card and certificate",
+          "text": "Download your donor card and certificate — share your milestone with pride."
+        }
+      ]
+    }
+    </script>
+
+    <!-- FAQPage Schema (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How do I log a blood donation on LifeSavers United?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Verify your registered mobile number with an OTP, then use the Log a Donation button inside the portal to add the date, donation type, and location. Coordinator-verified donations are locked for accuracy; self-reported entries can be edited later."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How do I check when I'm next eligible to donate blood?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Once logged in, your dashboard automatically shows your next eligible date for whole blood, platelets, and plasma, calculated from your last logged donation using DGHS and NBTC India recovery guidelines."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is a digital donor card and how do I download mine?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Your digital donor card is a verified, shareable ID badge showing your blood group and donation milestones. After logging in, go to the Digital Donor Card tab and download it as a high-resolution image, or share it directly on WhatsApp."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is my donation history verified by hospitals or self-reported?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Both. Donations made through LifeSavers United coordinator-organized camps or emergency requests are verified and locked. You can also self-report donations made independently, which you can edit or update anytime."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "I donated but I'm not registered yet — what do I do?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "You'll need to register as a donor first. Register on the donor registration page, then return to the Donor Portal to verify your mobile number and log your donation."
+          }
+        }
+      ]
     }
     </script>
 </head>
@@ -155,129 +246,299 @@
     </nav>
 
     <!-- Main View Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="w-full min-h-[80vh]">
 
         <!-- ==================================================================== -->
         <!-- VIEW 1: LOGIN STATE (When donor is not signed in) -->
         <!-- ==================================================================== -->
-        <section id="loginSection" class="py-12">
-            <div class="max-w-4xl mx-auto">
-                <div class="text-center mb-10">
-                    <span class="inline-block bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
-                        Registered Donors Only
+        <div id="loginSection" class="w-full">
+
+            <!-- Section 1: Hero Section (Standard LifeSavers Hero with Gradient) -->
+            <section class="relative bg-gradient-hero text-white py-16 sm:py-20" role="banner">
+                <div class="absolute inset-0 bg-black opacity-20"></div>
+                <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                    <span class="portal-hero-badge">
+                        <span class="text-sm">🩸</span> Registered Donors Only
                     </span>
-                    <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight mb-4">
-                        Welcome to Your <span class="text-red-600">Donor Portal</span>
+                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight mb-5 drop-shadow-sm max-w-4xl mx-auto">
+                        Log Your Blood Donations & Track Your Donor History
                     </h1>
-                    <p class="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                        Log in using the exact mobile number you added while registering to view your donation history, check your next eligible donation date, and download your digital donor card.
+                    <p class="text-base sm:text-lg lg:text-xl text-white/90 max-w-3xl mx-auto leading-relaxed drop-shadow-sm font-normal mb-8">
+                        Every time you donate blood, platelets, or plasma, log it here to build your official donation record. Track your total lives saved, check your next eligible donation date based on DGHS guidelines, and download your digital donor card — free, in one place.
                     </p>
+                    <div class="flex justify-center">
+                        <a href="#portalLoginArea" class="inline-flex items-center gap-2 bg-white text-primary font-bold px-6 py-3.5 rounded-xl hover:bg-gray-100 transition-smooth shadow-md hover:shadow-lg text-sm sm:text-base">
+                            <span>📲</span> Jump to Mobile Verification
+                        </a>
+                    </div>
                 </div>
+            </section>
 
-                <!-- Login Box -->
-                <div class="max-w-md mx-auto bg-white border border-gray-200 rounded-2xl p-8 shadow-sm">
-
-                    <!-- Phone Input Step -->
-                    <div id="phoneFormContainer">
-                        <div class="text-center mb-6">
-                            <div class="portal-blood-icon" aria-hidden="true">🩸</div>
-                            <h2 class="text-xl font-bold text-gray-900">Donor Mobile Verification</h2>
-                            <p class="text-sm text-gray-500 mt-1">Enter your 10-digit registered mobile number</p>
+            <!-- Section 2: Why Join the Donor Portal -->
+            <section class="py-14 sm:py-16 bg-white">
+                <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="card p-8 md:p-10 border-l-4 border-primary bg-surface shadow-card rounded-2xl">
+                        <div class="flex items-center gap-3 mb-6">
+                            <span class="w-10 h-10 rounded-xl bg-red-100 text-red-600 flex items-center justify-center text-xl flex-shrink-0" aria-hidden="true">❤️</span>
+                            <h2 class="text-2xl sm:text-3xl font-bold text-gray-900">Why Join the Donor Portal</h2>
                         </div>
+                        <div class="space-y-4 text-text-secondary text-base sm:text-lg leading-relaxed">
+                            <p>
+                                Most donors lose track of how many times they've donated or when they're next eligible. The LifeSavers United Donor Portal keeps that record for you. Log each donation — whether you <a href="/events" class="text-primary hover:underline font-semibold">find a donation camp near you</a>, give at a hospital, or visit a blood bank — and we'll calculate your next eligible date automatically using NBTC/DGHS recovery guidelines (90 days for whole blood, 14 for platelets, 28 for plasma).
+                            </p>
+                            <p>
+                                You'll also get a shareable digital donor ID card and a printable certificate of appreciation for every donation, so your contribution is recognized and easy to prove. Learn more about healthy recovery times and criteria in our <a href="/blood_information_center" class="text-primary hover:underline font-semibold">blood compatibility and donation guides</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
 
-                        <div id="loginErrorBox" class="error-banner-box hidden"></div>
+            <!-- Section 3: How It Works -->
+            <section class="py-14 sm:py-16 bg-surface border-y border-gray-200/70">
+                <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <span class="portal-pill-badge mb-3">
+                            Step-By-Step
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">How It Works</h2>
+                        <p class="text-text-secondary max-w-2xl mx-auto text-base">Simple 4-step process to manage and celebrate your life-saving blood donation journey</p>
+                    </div>
+                    <ol class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 list-none p-0 m-0">
+                        <li class="bg-white p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-smooth border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-primary font-extrabold text-base flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                                01
+                            </div>
+                            <strong class="font-bold text-gray-900 text-base mb-2 block">Verify your mobile number</strong>
+                            <p class="text-sm text-text-secondary leading-relaxed m-0">
+                                — the same one you used to register as a donor.
+                            </p>
+                        </li>
+                        <li class="bg-white p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-smooth border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-primary font-extrabold text-base flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                                02
+                            </div>
+                            <strong class="font-bold text-gray-900 text-base mb-2 block">Log your donations</strong>
+                            <p class="text-sm text-text-secondary leading-relaxed m-0">
+                                — add past donations or new ones as you make them.
+                            </p>
+                        </li>
+                        <li class="bg-white p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-smooth border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-primary font-extrabold text-base flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                                03
+                            </div>
+                            <strong class="font-bold text-gray-900 text-base mb-2 block">Track your eligibility</strong>
+                            <p class="text-sm text-text-secondary leading-relaxed m-0">
+                                — see exactly when you can donate again.
+                            </p>
+                        </li>
+                        <li class="bg-white p-6 rounded-2xl shadow-card hover:shadow-card-hover transition-smooth border border-gray-100 flex flex-col h-full relative overflow-hidden">
+                            <div class="w-12 h-12 rounded-xl bg-red-50 text-primary font-extrabold text-base flex items-center justify-center mb-4 border border-red-100 shadow-sm">
+                                04
+                            </div>
+                            <strong class="font-bold text-gray-900 text-base mb-2 block">Download your donor card &amp; certificate</strong>
+                            <p class="text-sm text-text-secondary leading-relaxed m-0">
+                                — share your milestone with pride.
+                            </p>
+                        </li>
+                    </ol>
+                </div>
+            </section>
 
-                        <form id="donorLoginForm" class="space-y-4">
-                            <div>
-                                <label for="donorPhoneNumber" class="portal-form-label">Mobile Number</label>
-                                <div class="phone-input-group">
-                                    <span class="phone-prefix-addon">
-                                        +91
-                                    </span>
-                                    <input type="tel" id="donorPhoneNumber" name="phoneNumber"
-                                        placeholder="9876543210" maxlength="10" required
-                                        class="portal-form-input" />
+            <!-- Section 4: What You Can Do Inside (Feature Cards) -->
+            <section class="py-14 sm:py-16 bg-white">
+                <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <span class="portal-pill-badge mb-3">
+                            Portal Features
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">What You Can Do Inside</h2>
+                        <p class="text-text-secondary max-w-2xl mx-auto text-base">Key features built for registered voluntary blood, platelet, and plasma donors</p>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="p-8 bg-surface rounded-2xl border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth text-center group">
+                            <div class="w-16 h-16 rounded-2xl bg-red-50 text-3xl flex items-center justify-center mx-auto mb-5 border border-red-100 group-hover:scale-110 transition-transform shadow-sm" aria-hidden="true">
+                                📋
+                            </div>
+                            <h3 class="font-bold text-gray-900 text-xl mb-3">Complete Donation History</h3>
+                            <p class="text-sm text-text-secondary leading-relaxed">
+                                Every unit of blood, platelets, or plasma you've donated, recorded and verified against hospital/camp records — your full blood donation history in one place.
+                            </p>
+                        </div>
+                        <div class="p-8 bg-surface rounded-2xl border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth text-center group">
+                            <div class="w-16 h-16 rounded-2xl bg-red-50 text-3xl flex items-center justify-center mx-auto mb-5 border border-red-100 group-hover:scale-110 transition-transform shadow-sm" aria-hidden="true">
+                                ⏳
+                            </div>
+                            <h3 class="font-bold text-gray-900 text-xl mb-3">Smart Recovery Countdown</h3>
+                            <p class="text-sm text-text-secondary leading-relaxed">
+                                Know your exact next eligible donation date, calculated automatically from Indian DGHS recovery guidelines.
+                            </p>
+                        </div>
+                        <div class="p-8 bg-surface rounded-2xl border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth text-center group">
+                            <div class="w-16 h-16 rounded-2xl bg-red-50 text-3xl flex items-center justify-center mx-auto mb-5 border border-red-100 group-hover:scale-110 transition-transform shadow-sm" aria-hidden="true">
+                                🎖️
+                            </div>
+                            <h3 class="font-bold text-gray-900 text-xl mb-3">Digital Lifesaver Card</h3>
+                            <p class="text-sm text-text-secondary leading-relaxed">
+                                Download your verified blood donor ID card and share your donation milestones on WhatsApp or Instagram.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 5: Donor Mobile Verification (Login Box) -->
+            <section class="py-14 sm:py-16 bg-surface border-t border-gray-200/70" id="portalLoginArea">
+                <div class="portal-login-card-wrap max-w-md mx-auto px-4" style="max-width: 440px;">
+                    <div class="portal-login-card bg-white border border-gray-200 rounded-3xl p-6 sm:p-8 shadow-card">
+
+                        <!-- Phone Input Step -->
+                        <div id="phoneFormContainer">
+                            <div class="text-center mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-red-50 text-2xl flex items-center justify-center mx-auto mb-3 border border-red-100 shadow-sm" aria-hidden="true">🩸</div>
+                                <h2 class="text-xl sm:text-2xl font-bold text-gray-900">Donor Mobile Verification</h2>
+                                <p class="text-xs sm:text-sm text-text-secondary mt-1">Enter your 10-digit registered mobile number</p>
+                            </div>
+
+                            <div id="loginErrorBox" class="error-banner-box hidden"></div>
+
+                            <form id="donorLoginForm" class="space-y-4">
+                                <div>
+                                    <label for="donorPhoneNumber" class="portal-form-label font-semibold text-gray-700 text-xs sm:text-sm">Mobile Number</label>
+                                    <div class="phone-input-group mt-1">
+                                        <span class="phone-prefix-addon font-semibold text-gray-600 bg-gray-100 border-r border-gray-300 px-3 py-2 text-sm">
+                                            +91
+                                        </span>
+                                        <input type="tel" id="donorPhoneNumber" name="phoneNumber"
+                                            placeholder="9876543210" maxlength="10" required
+                                            class="portal-form-input text-sm" />
+                                    </div>
+                                    <p class="text-xs text-text-secondary mt-1">We will send a secure one-time verification code (OTP).</p>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-1.5">We will send a secure one-time verification code (OTP).</p>
+
+                                <div id="recaptcha-container"></div>
+
+                                <button type="submit" id="sendOtpBtn"
+                                    class="w-full bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-700 transition-smooth shadow-sm text-sm sm:text-base mt-2">
+                                    Send Verification Code
+                                </button>
+                            </form>
+
+                            <div class="mt-6 pt-5 border-t border-gray-100 text-center">
+                                <p class="text-xs sm:text-sm text-text-secondary">
+                                    Not registered yet?
+                                    <a href="/donor_registration" class="font-bold text-primary hover:underline ml-1">
+                                        Register as a Blood Donor →
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- OTP Verification Step -->
+                        <div id="otpFormContainer" class="hidden">
+                            <div class="text-center mb-6">
+                                <div class="w-14 h-14 rounded-2xl bg-red-50 text-2xl flex items-center justify-center mx-auto mb-3 border border-red-100 shadow-sm" aria-hidden="true">📲</div>
+                                <h3 class="text-xl sm:text-2xl font-bold text-gray-900">Enter Verification Code</h3>
+                                <p class="text-xs sm:text-sm text-text-secondary mt-1">
+                                    Sent to <span id="otpSentPhoneDisplay" class="font-semibold text-gray-800"></span>
+                                </p>
                             </div>
 
-                            <div id="recaptcha-container"></div>
+                            <div id="otpErrorBox" class="error-banner-box hidden"></div>
 
-                            <button type="submit" id="sendOtpBtn"
-                                class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-red-700 transition-colors shadow-sm">
-                                Send Verification Code
-                            </button>
-                        </form>
+                            <form id="donorOtpForm" class="space-y-4">
+                                <div>
+                                    <label for="otpCodeInput" class="portal-form-label font-semibold text-gray-700 text-xs sm:text-sm">6-Digit Code (OTP)</label>
+                                    <input type="text" id="otpCodeInput" name="otpCode"
+                                        placeholder="123456" maxlength="6" pattern="[0-9]{6}" required
+                                        class="portal-form-input text-center text-xl sm:text-2xl tracking-widest font-mono mt-1" />
+                                </div>
 
-                        <div class="mt-6 pt-6 border-t border-gray-100 text-center">
-                            <p class="text-sm text-gray-600">
-                                Not registered yet?
-                                <a href="/donor_registration" class="font-bold text-red-600 hover:text-red-700 underline ml-1">
-                                    Register as a Blood Donor →
-                                </a>
+                                <button type="submit" id="verifyOtpBtn"
+                                    class="w-full bg-primary text-white font-bold py-3 px-4 rounded-xl hover:bg-primary-700 transition-smooth shadow-sm text-sm sm:text-base mt-2">
+                                    Verify Code & Access Portal
+                                </button>
+
+                                <button type="button" id="backToPhoneBtn"
+                                    class="w-full bg-gray-100 text-gray-700 font-semibold py-2 px-4 rounded-xl hover:bg-gray-200 transition-smooth text-xs sm:text-sm">
+                                    ← Change Mobile Number
+                                </button>
+                            </form>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section 6: Frequently Asked Questions -->
+            <section class="py-16 sm:py-20 bg-white border-t border-gray-200/70">
+                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div class="text-center mb-12">
+                        <span class="portal-pill-badge mb-3">
+                            Got Questions?
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-3">Frequently Asked Questions</h2>
+                        <p class="text-text-secondary max-w-2xl mx-auto text-base">Clear answers to help you navigate your voluntary blood donation portal</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-surface rounded-2xl p-6 sm:p-7 border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 flex items-start gap-3">
+                                <span class="text-primary text-xl flex-shrink-0" aria-hidden="true">🩸</span>
+                                <span>How do I log a blood donation on LifeSavers United?</span>
+                            </h3>
+                            <p class="text-sm sm:text-base text-text-secondary leading-relaxed pl-8">
+                                Verify your registered mobile number with an OTP, then use the "Log a Donation" button inside the portal to add the date, donation type, and location. Coordinator-verified donations are locked for accuracy; self-reported entries can be edited later.
+                            </p>
+                        </div>
+
+                        <div class="bg-surface rounded-2xl p-6 sm:p-7 border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 flex items-start gap-3">
+                                <span class="text-primary text-xl flex-shrink-0" aria-hidden="true">⏳</span>
+                                <span>How do I check when I'm next eligible to donate blood?</span>
+                            </h3>
+                            <p class="text-sm sm:text-base text-text-secondary leading-relaxed pl-8">
+                                Once logged in, your dashboard automatically shows your next eligible date for whole blood, platelets, and plasma, calculated from your last logged donation using DGHS and NBTC India recovery guidelines.
+                            </p>
+                        </div>
+
+                        <div class="bg-surface rounded-2xl p-6 sm:p-7 border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 flex items-start gap-3">
+                                <span class="text-primary text-xl flex-shrink-0" aria-hidden="true">🪪</span>
+                                <span>What is a digital donor card and how do I download mine?</span>
+                            </h3>
+                            <p class="text-sm sm:text-base text-text-secondary leading-relaxed pl-8">
+                                Your digital donor card is a verified, shareable ID badge showing your blood group and donation milestones. After logging in, go to the "Digital Donor Card" tab and download it as a high-resolution image, or share it directly on WhatsApp.
+                            </p>
+                        </div>
+
+                        <div class="bg-surface rounded-2xl p-6 sm:p-7 border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 flex items-start gap-3">
+                                <span class="text-primary text-xl flex-shrink-0" aria-hidden="true">🔒</span>
+                                <span>Is my donation history verified by hospitals or self-reported?</span>
+                            </h3>
+                            <p class="text-sm sm:text-base text-text-secondary leading-relaxed pl-8">
+                                Both. Donations made through LifeSavers United coordinator-organized camps or emergency requests are verified and locked. You can also self-report donations made independently, which you can edit or update anytime.
+                            </p>
+                        </div>
+
+                        <div class="bg-surface rounded-2xl p-6 sm:p-7 border border-gray-200/80 shadow-card hover:shadow-card-hover transition-smooth">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-900 mb-2 flex items-start gap-3">
+                                <span class="text-primary text-xl flex-shrink-0" aria-hidden="true">✨</span>
+                                <span>I donated but I'm not registered yet — what do I do?</span>
+                            </h3>
+                            <p class="text-sm sm:text-base text-text-secondary leading-relaxed pl-8">
+                                You'll need to register as a donor first. <a href="/donor_registration" class="text-primary hover:underline font-semibold">Register here</a>, then return to the Donor Portal to verify your mobile number and log your donation.
                             </p>
                         </div>
                     </div>
-
-                    <!-- OTP Verification Step -->
-                    <div id="otpFormContainer" class="hidden">
-                        <div class="text-center mb-6">
-                            <div class="portal-blood-icon" aria-hidden="true">📲</div>
-                            <h2 class="text-xl font-bold text-gray-900">Enter Verification Code</h2>
-                            <p class="text-sm text-gray-500 mt-1">
-                                Sent to <span id="otpSentPhoneDisplay" class="font-semibold text-gray-800"></span>
-                            </p>
-                        </div>
-
-                        <div id="otpErrorBox" class="error-banner-box hidden"></div>
-
-                        <form id="donorOtpForm" class="space-y-4">
-                            <div>
-                                <label for="otpCodeInput" class="portal-form-label">6-Digit Code (OTP)</label>
-                                <input type="text" id="otpCodeInput" name="otpCode"
-                                    placeholder="123456" maxlength="6" pattern="[0-9]{6}" required
-                                    class="portal-form-input text-center text-2xl tracking-widest font-mono" />
-                            </div>
-
-                            <button type="submit" id="verifyOtpBtn"
-                                class="w-full bg-red-600 text-white font-bold py-3 px-4 rounded-xl hover:bg-red-700 transition-colors shadow-sm">
-                                Verify Code & Access Portal
-                            </button>
-
-                            <button type="button" id="backToPhoneBtn"
-                                class="w-full bg-gray-100 text-gray-700 font-semibold py-2.5 px-4 rounded-xl hover:bg-gray-200 transition-colors text-sm">
-                                ← Change Mobile Number
-                            </button>
-                        </form>
-                    </div>
-
                 </div>
-
-                <!-- Informational Features Banner -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16 pt-8 border-t border-gray-200 text-center">
-                    <div class="p-4">
-                        <div class="text-3xl mb-2">📋</div>
-                        <h3 class="font-bold text-gray-900 mb-1">Complete Donation History</h3>
-                        <p class="text-sm text-gray-600">Access every unit of blood, platelets, and plasma you have donated with hospital records.</p>
-                    </div>
-                    <div class="p-4">
-                        <div class="text-3xl mb-2">⏳</div>
-                        <h3 class="font-bold text-gray-900 mb-1">Smart Recovery Countdown</h3>
-                        <p class="text-sm text-gray-600">Know exactly when your body is eligible to donate again based on Indian DGHS guidelines.</p>
-                    </div>
-                    <div class="p-4">
-                        <div class="text-3xl mb-2">🎖️</div>
-                        <h3 class="font-bold text-gray-900 mb-1">Digital Lifesaver Card</h3>
-                        <p class="text-sm text-gray-600">Download your verified blood donor ID card and share your milestone badges with pride.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
         <!-- ==================================================================== -->
         <!-- VIEW 2: AUTHENTICATED DASHBOARD (Shown when donor is logged in) -->
         <!-- ==================================================================== -->
-        <section id="dashboardSection" class="hidden">
+        <section id="dashboardSection" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
 
             <!-- Donor Profile Header Bar -->
             <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm mb-6">
@@ -288,7 +549,7 @@
                         </div>
                         <div class="min-w-0 flex-1">
                             <div class="donor-header-title-row">
-                                <h1 id="donorHeaderName" class="text-xl sm:text-3xl font-extrabold text-gray-900">Donor Name</h1>
+                                <h2 id="donorHeaderName" class="text-xl sm:text-3xl font-extrabold text-gray-900">Donor Name</h2>
                                 <span id="donorHeaderTier" class="donor-badge-tier tier-bronze">Bronze Lifesaver</span>
                             </div>
                             <p id="donorHeaderCity" class="text-xs sm:text-sm text-gray-500 mt-1">📍 Ahmedabad, Gujarat</p>
@@ -589,7 +850,7 @@
                 <div class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-8 shadow-sm mt-8">
                     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
                         <div>
-                            <h2 class="text-xl font-bold text-gray-900">Next Eligible Blood Donation Schedule</h2>
+                            <h3 class="text-xl font-bold text-gray-900">Next Eligible Blood Donation Schedule</h3>
                             <p class="text-sm text-gray-500 mt-0.5">Calculated according to DGHS & NBTC India medical rest guidelines</p>
                         </div>
                     </div>
@@ -649,6 +910,7 @@
                             </div>
                             <!-- Rendered High-Resolution Poster Image -->
                             <img id="digitalDonorCardImage" alt="LifeSavers United Official Digital Donor Card"
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1080 1080'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3C/svg%3E"
                                 class="w-full max-w-full h-auto rounded-xl shadow-sm object-contain hidden" />
                         </div>
                     </div>
@@ -694,6 +956,7 @@
                             </div>
                             <!-- Rendered High-Resolution Certificate Image -->
                             <img id="certificateImagePreview" alt="LifeSavers United Certificate of Appreciation"
+                                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2048 1446'%3E%3Crect width='100%25' height='100%25' fill='%23f3f4f6'/%3E%3C/svg%3E"
                                 class="w-full max-w-full h-auto rounded-xl shadow-sm object-contain hidden" />
                         </div>
                     </div>
