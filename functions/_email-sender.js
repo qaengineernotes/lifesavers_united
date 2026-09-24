@@ -306,6 +306,7 @@ export async function sendBatch(env, emailList) {
     let failed = 0;
 
     for (let i = 0; i < emailList.length; i++) {
+        const email = emailList[i];
         const result = await sendEmail(env, {
             ...email,
             preferredProvider: email.preferredProvider || 'resend'
