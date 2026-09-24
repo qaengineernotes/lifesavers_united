@@ -203,7 +203,8 @@ export async function onRequestPost(context) {
             to: safeEmail,
             subject,
             html,
-            replyTo: 'lifesaversunited.india@gmail.com'
+            replyTo: 'lifesaversunited.india@gmail.com',
+            preferredProvider: 'resend'
         });
 
         return Response.json({ success: true, result }, { status: 200, headers: CORS });

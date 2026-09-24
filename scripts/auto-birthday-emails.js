@@ -59,7 +59,7 @@ async function run() {
             fullName: 'Test Donor',
             email: process.env.TEST_EMAIL,
             bloodGroup: 'O+'
-        }, rotationCounter++);
+        });
         console.log(`✅ Test email completed (via ${result?.provider || 'unknown'}). Skipping database check.`);
         return;
     }
@@ -105,7 +105,7 @@ async function run() {
             }
 
             console.log(`✉️ Sending birthday email to ${donor.fullName} (${donor.email})...`);
-            const sendResult = await sendBirthdayEmail(donor, rotationCounter++);
+            const sendResult = await sendBirthdayEmail(donor);
             if (sendResult?.success) {
                 sentList.push({
                     ...donor,
@@ -195,20 +195,18 @@ async function sendViaProvider(provider, { to, subject, html }) {
     return { ok: false, error: 'Unknown provider' };
 }
 
-async function sendBirthdayEmail(donor, index = 0) {
+async function sendBirthdayEmail(donor) {
     const firstName = donor.fullName.split(' ')[0];
     const bloodGroup = donor.bloodGroup || 'Hero';
     
     const subject = `🎂 Happy Birthday, ${firstName}! You're a True LifeSaver 🩸`;
     const html = buildBirthdayTemplate(donor.fullName, bloodGroup);
 
-    // Build circular fallback chain starting from index % 3
-    const startIdx = Math.abs(index) % PROVIDERS.length;
-    const chain = [
-        PROVIDERS[startIdx],
-        PROVIDERS[(startIdx + 1) % PROVIDERS.length],
-        PROVIDERS[(startIdx + 2) % PROVIDERS.length]
-    ];
+    // Send Birthday emails via Brevo (fallback to Resend, then Mailjet)
+    const chain = ['brevo', 'resend'];
+    if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+        chain.push('mailjet');
+    }
 
     for (const provider of chain) {
         try {
@@ -233,18 +231,23 @@ async function sendAdminSummary(sentList) {
     
     const html = `
         <div style="font-family:sans-serif;padding:20px;border:1px solid #eee;border-radius:10px;">
-            <h2 style="color:#c0392b;">🩸 Daily Birthday Report (Round-Robin Multi-Provider)</h2>
+            <h2 style="color:#c0392b;">🩸 Daily Birthday Report</h2>
             <p>Hello Admin,</p>
-            <p>Today, we successfully sent <strong>${sentList.length}</strong> birthday greeting(s) across our active provider rotation:</p>
+            <p>Today, we successfully sent <strong>${sentList.length}</strong> birthday greeting(s):</p>
             <ul>${names}</ul>
             <p style="color:#777;font-size:12px;margin-top:20px;border-top:1px solid #eee;padding-top:10px;">
-                Automated multi-provider report from LifeSavers United.
+                Automated report from LifeSavers United.
             </p>
         </div>
     `;
 
-    // Try sending summary via any available provider
-    for (const provider of PROVIDERS) {
+    // Admin report sent via Resend (fallback to Brevo)
+    const adminChain = ['resend', 'brevo'];
+    if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+        adminChain.push('mailjet');
+    }
+
+    for (const provider of adminChain) {
         try {
             const res = await sendViaProvider(provider, {
                 to: ADMIN_EMAIL,

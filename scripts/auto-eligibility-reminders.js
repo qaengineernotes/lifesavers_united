@@ -165,13 +165,11 @@ async function sendReminderEmail({ email, fullName, bloodGroup, donationType, el
 </body>
 </html>`;
 
-    // Circular fallback chain starting from index % 3
-    const startIdx = Math.abs(index) % PROVIDERS.length;
-    const chain = [
-        PROVIDERS[startIdx],
-        PROVIDERS[(startIdx + 1) % PROVIDERS.length],
-        PROVIDERS[(startIdx + 2) % PROVIDERS.length]
-    ];
+    // Send Eligibility reminders via Resend (fallback: Brevo, then Mailjet)
+    const chain = ['resend', 'brevo'];
+    if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+        chain.push('mailjet');
+    }
 
     for (const provider of chain) {
         try {
@@ -362,7 +360,13 @@ async function sendAdminSummary(sentList) {
         </div>
     `;
 
-    for (const provider of PROVIDERS) {
+    // Admin report sent via Resend (fallback to Brevo)
+    const adminChain = ['resend', 'brevo'];
+    if (process.env.MAILJET_API_KEY && process.env.MAILJET_SECRET_KEY) {
+        adminChain.push('mailjet');
+    }
+
+    for (const provider of adminChain) {
         try {
             const res = await sendViaProvider(provider, {
                 to: ADMIN_EMAIL,

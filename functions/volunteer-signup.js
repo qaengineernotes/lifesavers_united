@@ -162,13 +162,14 @@ export async function onRequestPost(context) {
 </body>
 </html>`;
 
-        // ── Send via Waterfall (Resend → Brevo → Mailjet) ──────────────────────────
+        // ── Send via Resend (fallback: Brevo) ───────────────────────────────
         const result = await sendEmail(context.env, {
-            to:      ['lifesaversunited.india@gmail.com'],
-            subject: `🩸 New Volunteer: ${safeName} from ${safeCity}`,
-            html:    htmlBody,
-            text:    textBody,
-            replyTo: safeEmail || undefined,
+            to:                ['lifesaversunited.india@gmail.com'],
+            subject:           `🩸 New Volunteer: ${safeName} from ${safeCity}`,
+            html:              htmlBody,
+            text:              textBody,
+            replyTo:           safeEmail || undefined,
+            preferredProvider: 'resend',
         });
 
         if (!result.ok) {

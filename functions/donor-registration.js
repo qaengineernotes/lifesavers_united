@@ -68,21 +68,23 @@ export async function onRequestPost(context) {
 
     const results = [];
 
-    // 1. Welcome email → donor (only if email provided)
+    // 1. Welcome email → donor (via Brevo)
     if (safeEmail && safeEmail.includes('@')) {
       const r = await sendEmail(context.env, {
         to: [safeEmail],
         subject: `🩸 Welcome to LifeSavers United, ${safeName.split(' ')[0]}! You're Now a Registered Donor`,
         html: buildDonorEmail(safeName, safeBlood, safeCity, safeArea, safeEmerg, istTime, safePhone),
+        preferredProvider: 'brevo',
       });
       results.push({ type: 'donor', provider: r.provider, ok: r.ok });
     }
 
-    // 2. Admin notification → always
+    // 2. Admin notification → always (via Resend)
     const r2 = await sendEmail(context.env, {
       to: [ADMIN_EMAIL],
       subject: `🩸 New Donor: ${safeName} (${safeBlood}) from ${safeCity || 'Unknown City'}`,
       html: buildAdminEmail(safeName, safeBlood, safeCity, safeArea, safeEmail, safePhone, safeDob, safeEmerg, safePref, istTime),
+      preferredProvider: 'resend',
     });
     results.push({ type: 'admin', provider: r2.provider, ok: r2.ok });
 

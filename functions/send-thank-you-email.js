@@ -91,12 +91,13 @@ export async function onRequestPost(context) {
             '─'.repeat(50),
         ].join('\r\n');
 
-        // ── Send via Waterfall (Resend → Brevo → Mailjet) ────────────────────
+        // ── Send via Brevo (fallback: Resend) ───────────────────────────────
         const result = await sendEmail(context.env, {
-            to:      [safeEmail],
-            subject: `🩸 Thank You for Saving a Life, ${donorFirstName}! ❤️`,
-            html:    htmlBody,
-            text:    textBody,
+            to:                [safeEmail],
+            subject:           `🩸 Thank You for Saving a Life, ${donorFirstName}! ❤️`,
+            html:              htmlBody,
+            text:              textBody,
+            preferredProvider: 'brevo',
         });
 
         if (!result.ok) {

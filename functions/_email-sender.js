@@ -245,20 +245,17 @@ async function trySendMailjet(apiKey, secretKey, { to, subject, html, text, repl
 export async function sendEmail(env, { to, subject, html, text, replyTo, preferredProvider }) {
     const allAttempts = [];
 
-    // Determine starting index for round-robin rotation
-    let startIndex;
-    if (preferredProvider && PROVIDERS.includes(preferredProvider.toLowerCase())) {
-        startIndex = PROVIDERS.indexOf(preferredProvider.toLowerCase());
-    } else {
-        startIndex = (rotationIndex++) % PROVIDERS.length;
-    }
+    // Service allocation:
+    // - Welcome, Thank you, Birthday -> Brevo (fallback: Resend)
+    // - Other emails (Eligibility reminders, Broadcasts, Admin notifications) -> Resend (fallback: Brevo)
+    const pref = (preferredProvider || '').toLowerCase();
+    const chain = pref === 'brevo'
+        ? ['brevo', 'resend']
+        : ['resend', 'brevo'];
 
-    // Build circular fallback chain for this specific email
-    const chain = [
-        PROVIDERS[startIndex],
-        PROVIDERS[(startIndex + 1) % PROVIDERS.length],
-        PROVIDERS[(startIndex + 2) % PROVIDERS.length],
-    ];
+    if (env.MAILJET_API_KEY && env.MAILJET_SECRET_KEY) {
+        chain.push('mailjet');
+    }
 
     for (const provider of chain) {
         let result;
@@ -309,8 +306,10 @@ export async function sendBatch(env, emailList) {
     let failed = 0;
 
     for (let i = 0; i < emailList.length; i++) {
-        const email = emailList[i];
-        const result = await sendEmail(env, email);
+        const result = await sendEmail(env, {
+            ...email,
+            preferredProvider: email.preferredProvider || 'resend'
+        });
 
         if (result.ok) {
             sent++;
