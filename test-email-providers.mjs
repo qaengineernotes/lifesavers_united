@@ -29,8 +29,10 @@ try {
 }
 
 // ── Config ────────────────────────────────────────────────────────────────────
-const RESEND_API_KEY = process.env.RESEND_API_KEY;
-const BREVO_API_KEY  = process.env.BREVO_API_KEY;
+const RESEND_API_KEY     = process.env.RESEND_API_KEY;
+const BREVO_API_KEY      = process.env.BREVO_API_KEY;
+const MAILJET_API_KEY    = process.env.MAILJET_API_KEY;
+const MAILJET_SECRET_KEY = process.env.MAILJET_SECRET_KEY;
 
 const FROM_NAME  = 'LifeSavers United';
 const FROM_EMAIL = 'noreply@lifesaversunited.org';
@@ -70,7 +72,7 @@ function buildTestEmail(provider) {
   <!-- HERO -->
   <tr><td style="background:linear-gradient(135deg,#c0392b,#e74c3c);padding:32px;text-align:center;">
     <h1 style="color:#fff;margin:0;font-size:24px;font-weight:800;">✅ Email Provider Test</h1>
-    <p style="color:#f5b7b1;margin:10px 0 0;font-size:15px;">This is a test email from the waterfall system</p>
+    <p style="color:#f5b7b1;margin:10px 0 0;font-size:15px;">Testing 3-Provider Round-Robin Rotation System</p>
   </td></tr>
 
   <!-- BODY -->
@@ -91,8 +93,8 @@ function buildTestEmail(provider) {
       <tr><td style="padding:12px 0;">
         <span style="color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Purpose</span><br>
         <span style="color:#444;font-size:14px;line-height:1.7;">
-          Confirming the email waterfall is working.<br>
-          Both Resend and Brevo should deliver from the same sender address.
+          Confirming the 3-Provider Round-Robin engine is operational.<br>
+          Resend, Brevo, and Mailjet all deliver from noreply@lifesaversunited.org.
         </span>
       </td></tr>
     </table>
@@ -115,102 +117,154 @@ function buildTestEmail(provider) {
 
 // ── Test: Resend ──────────────────────────────────────────────────────────────
 async function testResend() {
-    console.log(bold('\n📨  Testing RESEND...'));
+    console.log(bold('\n📨  Testing 1. RESEND...'));
 
     if (!RESEND_API_KEY) {
         console.log(yellow('  ⚠️  RESEND_API_KEY not set in .env — skipping'));
         return { skipped: true };
     }
 
-    const res = await fetch('https://api.resend.com/emails', {
-        method:  'POST',
-        headers: {
-            'Authorization': `Bearer ${RESEND_API_KEY}`,
-            'Content-Type':  'application/json',
-        },
-        body: JSON.stringify({
-            from:    `${FROM_NAME} <${FROM_EMAIL}>`,
-            to:      [TEST_RECIPIENT],
-            subject: '🩸 [Resend Test] LifeSavers United Email Waterfall',
-            html:    buildTestEmail('Resend'),
-        }),
-    });
+    try {
+        const res = await fetch('https://api.resend.com/emails', {
+            method:  'POST',
+            headers: {
+                'Authorization': `Bearer ${RESEND_API_KEY}`,
+                'Content-Type':  'application/json',
+            },
+            body: JSON.stringify({
+                from:    `${FROM_NAME} <${FROM_EMAIL}>`,
+                to:      [TEST_RECIPIENT],
+                subject: '🩸 [Resend Test] LifeSavers United Email Rotator',
+                html:    buildTestEmail('Resend'),
+            }),
+        });
 
-    const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
 
-    if (res.ok) {
-        console.log(green(`  ✅  SUCCESS  (HTTP ${res.status})`));
-        console.log(`      Email ID : ${data.id || 'n/a'}`);
-        console.log(`      To       : ${TEST_RECIPIENT}`);
-        console.log(`      From     : ${FROM_NAME} <${FROM_EMAIL}>`);
-        return { ok: true, data };
-    } else {
-        console.log(red(`  ❌  FAILED   (HTTP ${res.status})`));
-        console.log('      Response :', JSON.stringify(data, null, 6).replace(/^/gm, '      '));
-        return { ok: false, data };
+        if (res.ok) {
+            console.log(green(`  ✅  SUCCESS  (HTTP ${res.status})`));
+            console.log(`      Email ID : ${data.id || 'n/a'}`);
+            console.log(`      To       : ${TEST_RECIPIENT}`);
+            console.log(`      From     : ${FROM_NAME} <${FROM_EMAIL}>`);
+            return { ok: true, data };
+        } else {
+            console.log(red(`  ❌  FAILED   (HTTP ${res.status})`));
+            console.log('      Response :', JSON.stringify(data, null, 6).replace(/^/gm, '      '));
+            return { ok: false, data };
+        }
+    } catch (err) {
+        console.log(red(`  ❌  NETWORK ERROR : ${err.message}`));
+        return { ok: false, error: err.message };
     }
 }
 
 // ── Test: Brevo ───────────────────────────────────────────────────────────────
 async function testBrevo() {
-    console.log(bold('\n📨  Testing BREVO...'));
+    console.log(bold('\n📨  Testing 2. BREVO...'));
 
     if (!BREVO_API_KEY) {
         console.log(yellow('  ⚠️  BREVO_API_KEY not set in .env — skipping'));
         return { skipped: true };
     }
 
-    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method:  'POST',
-        headers: {
-            'api-key':      BREVO_API_KEY,
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            sender:      { name: FROM_NAME, email: FROM_EMAIL },
-            to:          [{ email: TEST_RECIPIENT }],
-            subject:     '🩸 [Brevo Test] LifeSavers United Email Waterfall',
-            htmlContent: buildTestEmail('Brevo'),
-        }),
-    });
+    try {
+        const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+            method:  'POST',
+            headers: {
+                'api-key':      BREVO_API_KEY,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sender:      { name: FROM_NAME, email: FROM_EMAIL },
+                to:          [{ email: TEST_RECIPIENT }],
+                subject:     '🩸 [Brevo Test] LifeSavers United Email Rotator',
+                htmlContent: buildTestEmail('Brevo'),
+            }),
+        });
 
-    const data = await res.json().catch(() => ({}));
+        const data = await res.json().catch(() => ({}));
 
-    if (res.ok) {
-        console.log(green(`  ✅  SUCCESS  (HTTP ${res.status})`));
-        console.log(`      Message ID : ${data.messageId || 'n/a'}`);
-        console.log(`      To         : ${TEST_RECIPIENT}`);
-        console.log(`      From       : ${FROM_NAME} <${FROM_EMAIL}>`);
-        return { ok: true, data };
-    } else {
-        console.log(red(`  ❌  FAILED   (HTTP ${res.status})`));
-        console.log('      Response   :', JSON.stringify(data, null, 6).replace(/^/gm, '      '));
-        return { ok: false, data };
+        if (res.ok) {
+            console.log(green(`  ✅  SUCCESS  (HTTP ${res.status})`));
+            console.log(`      Message ID : ${data.messageId || 'n/a'}`);
+            console.log(`      To         : ${TEST_RECIPIENT}`);
+            console.log(`      From       : ${FROM_NAME} <${FROM_EMAIL}>`);
+            return { ok: true, data };
+        } else {
+            console.log(red(`  ❌  FAILED   (HTTP ${res.status})`));
+            console.log('      Response   :', JSON.stringify(data, null, 6).replace(/^/gm, '      '));
+            return { ok: false, data };
+        }
+    } catch (err) {
+        console.log(red(`  ❌  NETWORK ERROR : ${err.message}`));
+        return { ok: false, error: err.message };
+    }
+}
+
+// ── Test: Mailjet ─────────────────────────────────────────────────────────────
+async function testMailjet() {
+    console.log(bold('\n📨  Testing 3. MAILJET...'));
+
+    if (!MAILJET_API_KEY || !MAILJET_SECRET_KEY) {
+        console.log(yellow('  ⚠️  MAILJET_API_KEY or MAILJET_SECRET_KEY not set in .env — skipping'));
+        return { skipped: true };
+    }
+
+    try {
+        const credentials = Buffer.from(`${MAILJET_API_KEY}:${MAILJET_SECRET_KEY}`).toString('base64');
+        const res = await fetch('https://api.mailjet.com/v3.1/send', {
+            method:  'POST',
+            headers: {
+                'Authorization': `Basic ${credentials}`,
+                'Content-Type':  'application/json',
+            },
+            body: JSON.stringify({
+                Messages: [{
+                    From:     { Email: FROM_EMAIL, Name: FROM_NAME },
+                    To:       [{ Email: TEST_RECIPIENT }],
+                    Subject:  '🩸 [Mailjet Test] LifeSavers United Email Rotator',
+                    HTMLPart: buildTestEmail('Mailjet'),
+                }]
+            }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+            console.log(green(`  ✅  SUCCESS  (HTTP ${res.status})`));
+            console.log(`      Status : ${data.Messages?.[0]?.Status || 'Sent'}`);
+            console.log(`      To     : ${TEST_RECIPIENT}`);
+            console.log(`      From   : ${FROM_NAME} <${FROM_EMAIL}>`);
+            return { ok: true, data };
+        } else {
+            console.log(red(`  ❌  FAILED   (HTTP ${res.status})`));
+            console.log('      Response :', JSON.stringify(data, null, 6).replace(/^/gm, '      '));
+            return { ok: false, data };
+        }
+    } catch (err) {
+        console.log(red(`  ❌  NETWORK ERROR : ${err.message}`));
+        return { ok: false, error: err.message };
     }
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
-console.log(bold('═══════════════════════════════════════════════'));
-console.log(bold('  LifeSavers United — Email Provider Test'));
-console.log(bold('═══════════════════════════════════════════════'));
+console.log(bold('═══════════════════════════════════════════════════════'));
+console.log(bold('  LifeSavers United — 3-Provider Email Rotator Test'));
+console.log(bold('═══════════════════════════════════════════════════════'));
 console.log(`  Recipient : ${TEST_RECIPIENT}`);
 console.log(`  Sender    : ${FROM_NAME} <${FROM_EMAIL}>`);
 
-const resendResult = await testResend();
-const brevoResult  = await testBrevo();
+const resendResult  = await testResend();
+const brevoResult   = await testBrevo();
+const mailjetResult = await testMailjet();
 
-console.log(bold('\n─── Summary ──────────────────────────────────'));
+console.log(bold('\n─── Summary ──────────────────────────────────────────'));
 
-const resendStatus = resendResult.skipped ? yellow('SKIPPED') : resendResult.ok ? green('✅ PASS') : red('❌ FAIL');
-const brevoStatus  = brevoResult.skipped  ? yellow('SKIPPED') : brevoResult.ok  ? green('✅ PASS') : red('❌ FAIL');
+const resendStatus  = resendResult.skipped  ? yellow('SKIPPED (no key)') : resendResult.ok  ? green('✅ PASS') : red('❌ FAIL');
+const brevoStatus   = brevoResult.skipped   ? yellow('SKIPPED (no key)') : brevoResult.ok   ? green('✅ PASS') : red('❌ FAIL');
+const mailjetStatus = mailjetResult.skipped ? yellow('SKIPPED (no key)') : mailjetResult.ok ? green('✅ PASS') : red('❌ FAIL');
 
-console.log(`  Resend : ${resendStatus}`);
-console.log(`  Brevo  : ${brevoStatus}`);
+console.log(`  1. Resend  : ${resendStatus}`);
+console.log(`  2. Brevo   : ${brevoStatus}`);
+console.log(`  3. Mailjet : ${mailjetStatus}`);
 console.log('');
-
-if ((resendResult.ok || resendResult.skipped) && (brevoResult.ok || brevoResult.skipped)) {
-    console.log(green('  Check your inbox at: ' + TEST_RECIPIENT));
-    console.log(green('  Both emails should show noreply@lifesaversunited.org as sender.\n'));
-} else {
-    console.log(red('  One or more providers failed. Check the error above.\n'));
-}

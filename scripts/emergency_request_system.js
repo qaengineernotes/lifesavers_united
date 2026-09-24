@@ -16,21 +16,41 @@ function toTitleCase(str) {
 let verifierNames = []; // Store unique verifier names for autocomplete
 
 /**
+ * Helper to check if current visitor is an Admin (superuser) or approved Volunteer
+ */
+function isUserAdminOrVolunteer() {
+    try {
+        if (window.firebaseAuthService && typeof window.firebaseAuthService.getCurrentUser === 'function') {
+            const cur = window.firebaseAuthService.getCurrentUser();
+            if (cur && (cur.role === 'superuser' || (cur.status === 'approved' && cur.role !== 'donor'))) {
+                return true;
+            }
+        }
+    } catch (e) {}
+    return false;
+}
+
+/**
  * Helper to check if current visitor is a logged-in Donor
  */
 function isDonorUser() {
-    try {
-        const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
-        if (stored) {
-            const donor = JSON.parse(stored);
-            if (donor) return true;
-        }
-    } catch (e) {}
+    // 1. Admins and approved volunteers are NEVER restricted as donors
+    if (isUserAdminOrVolunteer()) {
+        return false;
+    }
 
     try {
         if (window.firebaseAuthService && typeof window.firebaseAuthService.getCurrentUser === 'function') {
             const cur = window.firebaseAuthService.getCurrentUser();
             if (cur && cur.role === 'donor') return true;
+        }
+    } catch (e) {}
+
+    try {
+        const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
+        if (stored) {
+            const donor = JSON.parse(stored);
+            if (donor) return true;
         }
     } catch (e) {}
 
@@ -55,20 +75,21 @@ async function importLocalModule(name) {
     }
 }
 
-// Import Firebase data service
+// Import Firebase services
 let firebaseDataService = null;
+importLocalModule('firebase-auth-service.js').then(authModule => {
+    window.firebaseAuthService = authModule;
+    authModule.onAuthChange((user) => {
+        updateUIForUserStatus(user);
+    });
+    // Run initial UI state check
+    updateUIForUserStatus(authModule.getCurrentUser());
+}).catch(error => {
+    console.error('Failed to load Firebase auth service:', error);
+});
+
 importLocalModule('firebase-data-service.js').then(module => {
     firebaseDataService = module;
-
-    // --- NEW: User Approval Workflow ---
-    importLocalModule('firebase-auth-service.js').then(authModule => {
-        window.firebaseAuthService = authModule;
-        authModule.onAuthChange((user) => {
-            updateUIForUserStatus(user);
-        });
-        // Run initial UI state check
-        updateUIForUserStatus(authModule.getCurrentUser());
-    });
 }).catch(error => {
     console.error('Failed to load Firebase data service:', error);
 });
@@ -128,14 +149,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (e.target.closest('.verify-btn')) {
             const button = e.target.closest('.verify-btn');
 
-            // Check if user is a Donor
-            if (isDonorUser() || button.hasAttribute('data-donor')) {
+            // Check if user is a Donor (skip check if user is admin or volunteer)
+            if (!isUserAdminOrVolunteer() && (isDonorUser() || button.hasAttribute('data-donor'))) {
                 showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or verify blood requests, you must be a registered Volunteer.', 'warning');
                 return;
             }
 
             // Re-check approval status
-            if (button.hasAttribute('data-pending')) {
+            if (!isUserAdminOrVolunteer() && button.hasAttribute('data-pending')) {
                 showSuccessMessage('Your account is awaiting admin approval.', 'warning');
                 return;
             }
@@ -165,14 +186,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (e.target.closest('.log-donation-btn')) {
             const button = e.target.closest('.log-donation-btn');
 
-            // Check if user is a Donor
-            if (isDonorUser() || button.hasAttribute('data-donor')) {
+            // Check if user is a Donor (skip check if user is admin or volunteer)
+            if (!isUserAdminOrVolunteer() && (isDonorUser() || button.hasAttribute('data-donor'))) {
                 showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or log donations, you must be a registered Volunteer.', 'warning');
                 return;
             }
 
             // Re-check approval status
-            if (button.hasAttribute('data-pending')) {
+            if (!isUserAdminOrVolunteer() && button.hasAttribute('data-pending')) {
                 showSuccessMessage('Your account is awaiting admin approval.', 'warning');
                 return;
             }
@@ -224,14 +245,14 @@ document.addEventListener('DOMContentLoaded', async function () {
         } if (e.target.closest('.edit-btn')) {
             const button = e.target.closest('.edit-btn');
 
-            // Check if user is a Donor
-            if (isDonorUser() || button.hasAttribute('data-donor')) {
+            // Check if user is a Donor (skip check if user is admin or volunteer)
+            if (!isUserAdminOrVolunteer() && (isDonorUser() || button.hasAttribute('data-donor'))) {
                 showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or edit blood requests, you must be a registered Volunteer.', 'warning');
                 return;
             }
 
             // Re-check approval status
-            if (button.hasAttribute('data-pending')) {
+            if (!isUserAdminOrVolunteer() && button.hasAttribute('data-pending')) {
                 showSuccessMessage('Your account is awaiting admin approval.', 'warning');
                 return;
             }
@@ -256,8 +277,8 @@ document.addEventListener('DOMContentLoaded', async function () {
         if (e.target.closest('.close-request-btn')) {
             const button = e.target.closest('.close-request-btn');
 
-            // Check if user is a Donor
-            if (isDonorUser() || button.hasAttribute('data-donor')) {
+            // Check if user is a Donor (skip check if user is admin or volunteer)
+            if (!isUserAdminOrVolunteer() && (isDonorUser() || button.hasAttribute('data-donor'))) {
                 showSuccessMessage('Action Restricted: You are currently logged in as a Donor. To access or close blood requests, you must be a registered Volunteer.', 'warning');
                 return;
             }
@@ -1304,6 +1325,11 @@ async function checkAuthorization() {
 
     if (hasAccess === 'true') {
         return true; // User has access via URL
+    }
+
+    // If user is Admin or approved Volunteer, grant access immediately
+    if (isUserAdminOrVolunteer()) {
+        return true;
     }
 
     // Check if user is a Donor before showing any prompt
@@ -3097,8 +3123,12 @@ function updateUIForUserStatus(user) {
     if (!user && window.firebaseAuthService && typeof window.firebaseAuthService.getCurrentUser === 'function') {
         user = window.firebaseAuthService.getCurrentUser();
     }
-    const isDonor = (user && user.role === 'donor') || isDonorUser();
-    const isApproved = user && (user.status === 'approved' || user.role === 'superuser') && !isDonor;
+    const isSuperuser = user && user.role === 'superuser';
+    const isVolunteer = user && user.status === 'approved' && user.role !== 'donor';
+    const isStaffOrAdmin = isSuperuser || isVolunteer;
+
+    const isDonor = !isStaffOrAdmin && ((user && user.role === 'donor') || isDonorUser());
+    const isApproved = isStaffOrAdmin;
     const isPending = user && user.status === 'pending' && !isApproved && !isDonor;
 
     // Find all action buttons
@@ -3117,14 +3147,12 @@ function updateUIForUserStatus(user) {
             btn.setAttribute('data-pending', 'true');
             btn.removeAttribute('data-donor');
         } else {
-            // Restore if previously disabled by pending status
-            if (btn.hasAttribute('data-pending')) {
-                btn.disabled = false;
-                btn.title = "";
-                btn.style.opacity = '1';
-                btn.style.cursor = 'pointer';
-                btn.removeAttribute('data-pending');
-            }
+            // Restore if previously disabled by pending status or marked as donor
+            btn.disabled = false;
+            btn.title = "";
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+            btn.removeAttribute('data-pending');
             btn.removeAttribute('data-donor');
         }
     });

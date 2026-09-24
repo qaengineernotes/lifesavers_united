@@ -21,10 +21,15 @@ if (!process.env.FIREBASE_SERVICE_ACCOUNT) {
     console.error('❌ Missing FIREBASE_SERVICE_ACCOUNT environment variable');
     process.exit(1);
 }
-if (!process.env.RESEND_API_KEY) {
-    console.error('❌ Missing RESEND_API_KEY environment variable');
+if (!process.env.RESEND_API_KEY && !process.env.BREVO_API_KEY && !process.env.MAILJET_API_KEY) {
+    console.error('❌ Missing email API keys. Provide at least one of RESEND_API_KEY, BREVO_API_KEY, or MAILJET_API_KEY');
     process.exit(1);
 }
+
+const FROM_NAME  = 'LifeSavers United';
+const FROM_EMAIL = 'noreply@lifesaversunited.org';
+const PROVIDERS  = ['resend', 'brevo', 'mailjet'];
+let rotationCounter = 0;
 
 try {
     const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -39,7 +44,73 @@ try {
 
 const db = admin.firestore();
 
-async function sendReminderEmail({ email, fullName, bloodGroup, donationType, eligibleDateFormatted }) {
+/**
+ * 3-Provider Rotator sending helper
+ */
+async function sendViaProvider(provider, { to, subject, html, replyTo }) {
+    if (provider === 'resend') {
+        if (!process.env.RESEND_API_KEY) return { ok: false, error: 'No RESEND_API_KEY' };
+        const response = await axios.post('https://api.resend.com/emails', {
+            from: `${FROM_NAME} <${FROM_EMAIL}>`,
+            to: [to],
+            subject: subject,
+            html: html,
+            reply_to: replyTo || 'lifesaversunited.india@gmail.com'
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 15000
+        });
+        return { ok: response.status === 200 || response.status === 201, data: response.data };
+    }
+
+    if (provider === 'brevo') {
+        if (!process.env.BREVO_API_KEY) return { ok: false, error: 'No BREVO_API_KEY' };
+        const response = await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: FROM_NAME, email: FROM_EMAIL },
+            to: [{ email: to }],
+            subject: subject,
+            htmlContent: html,
+            replyTo: { email: replyTo || 'lifesaversunited.india@gmail.com' }
+        }, {
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            },
+            timeout: 15000
+        });
+        return { ok: response.status >= 200 && response.status < 300, data: response.data };
+    }
+
+    if (provider === 'mailjet') {
+        if (!process.env.MAILJET_API_KEY || !process.env.MAILJET_SECRET_KEY) {
+            return { ok: false, error: 'No MAILJET credentials' };
+        }
+        const auth = Buffer.from(`${process.env.MAILJET_API_KEY}:${process.env.MAILJET_SECRET_KEY}`).toString('base64');
+        const response = await axios.post('https://api.mailjet.com/v3.1/send', {
+            Messages: [{
+                From: { Email: FROM_EMAIL, Name: FROM_NAME },
+                To: [{ Email: to }],
+                Subject: subject,
+                HTMLPart: html,
+                ReplyTo: { Email: replyTo || 'lifesaversunited.india@gmail.com' }
+            }]
+        }, {
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 15000
+        });
+        return { ok: response.status >= 200 && response.status < 300, data: response.data };
+    }
+
+    return { ok: false, error: 'Unknown provider' };
+}
+
+async function sendReminderEmail({ email, fullName, bloodGroup, donationType, eligibleDateFormatted }, index = 0) {
     const typeLabel = donationType === 'platelets_sdp' ? 'Platelets (SDP)' : 
                       donationType === 'plasma' ? 'Plasma' : 'Whole Blood';
 
@@ -94,26 +165,35 @@ async function sendReminderEmail({ email, fullName, bloodGroup, donationType, el
 </body>
 </html>`;
 
-    const response = await axios.post(
-        'https://api.resend.com/emails',
-        {
-            from: 'LifeSavers United <noreply@lifesaversunited.org>',
-            to: [email],
-            subject: subject,
-            html: html,
-            reply_to: 'lifesaversunited.india@gmail.com'
-        },
-        {
-            timeout: 15000,
-            headers: {
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        }
-    );
+    // Circular fallback chain starting from index % 3
+    const startIdx = Math.abs(index) % PROVIDERS.length;
+    const chain = [
+        PROVIDERS[startIdx],
+        PROVIDERS[(startIdx + 1) % PROVIDERS.length],
+        PROVIDERS[(startIdx + 2) % PROVIDERS.length]
+    ];
 
-    return response.data;
+    for (const provider of chain) {
+        try {
+            const res = await sendViaProvider(provider, {
+                to: email,
+                subject,
+                html,
+                replyTo: 'lifesaversunited.india@gmail.com'
+            });
+            if (res.ok) {
+                console.log(`✅ Success! Eligibility reminder sent to ${email} via ${provider.toUpperCase()}`);
+                return { success: true, provider };
+            }
+            console.warn(`⚠️ Provider ${provider.toUpperCase()} failed: ${res.error || 'bad status'} — trying next provider...`);
+        } catch (err) {
+            console.warn(`⚠️ Provider ${provider.toUpperCase()} error: ${err.response?.data?.message || err.message} — trying next provider...`);
+        }
+    }
+
+    throw new Error(`All providers failed to send reminder to ${email}`);
 }
+
 
 /**
  * Asia/Kolkata (IST) Calendar Date Helpers
@@ -227,13 +307,13 @@ async function run() {
                 const formattedDate = formatKolkataDate(eligibleMidnight);
 
                 try {
-                    await sendReminderEmail({
+                    const sendRes = await sendReminderEmail({
                         email: donor.email,
                         fullName: donor.fullName || 'Donor',
                         bloodGroup: donor.bloodGroup || '',
                         donationType: target.type,
                         eligibleDateFormatted: formattedDate
-                    });
+                    }, rotationCounter++);
 
                     // Mark reminder as sent
                     await donorDoc.ref.update({
@@ -245,11 +325,12 @@ async function run() {
                         email: donor.email,
                         bloodGroup: donor.bloodGroup || 'N/A',
                         donationType: target.type,
-                        eligibleDate: formattedDate
+                        eligibleDate: formattedDate,
+                        provider: sendRes?.provider || 'unknown'
                     });
 
-                    // Wait 1.5 seconds to respect Resend's rate limit of 2 requests per second
-                    await delay(1500);
+                    // Wait 1.2 seconds to respect provider burst limits
+                    await delay(1200);
                 } catch (err) {
                     console.error(`❌ Failed to send reminder to ${donor.email}:`, err.response?.data || err.message);
                 }
@@ -267,37 +348,36 @@ async function run() {
 
 async function sendAdminSummary(sentList) {
     const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
-    const items = sentList.map(d => `<li><strong>${d.fullName}</strong> (${d.email}) - Blood: ${d.bloodGroup} | Type: <em>${d.donationType}</em> | Eligible: <strong>${d.eligibleDate}</strong></li>`).join('');
+    const items = sentList.map(d => `<li><strong>${d.fullName}</strong> (${d.email}) - Blood: ${d.bloodGroup} | Type: <em>${d.donationType}</em> | Eligible: <strong>${d.eligibleDate}</strong> [via <em>${(d.provider || 'unknown').toUpperCase()}</em>]</li>`).join('');
 
     const html = `
         <div style="font-family:sans-serif;padding:20px;border:1px solid #eee;border-radius:10px;">
-            <h2 style="color:#dc2626;">🩸 Daily Eligibility Reminder Report</h2>
+            <h2 style="color:#dc2626;">🩸 Daily Eligibility Reminder Report (Multi-Provider Rotation)</h2>
             <p>Hello Admin,</p>
-            <p>Today, we successfully sent <strong>${sentList.length}</strong> upcoming 3-day donation eligibility reminder(s) via Resend:</p>
+            <p>Today, we successfully sent <strong>${sentList.length}</strong> upcoming 3-day donation eligibility reminder(s) across our active provider rotation:</p>
             <ul>${items}</ul>
             <p style="color:#777;font-size:12px;margin-top:20px;border-top:1px solid #eee;padding-top:10px;">
-                This is an automated report from LifeSavers United.
+                Automated multi-provider report from LifeSavers United.
             </p>
         </div>
     `;
 
-    try {
-        await axios.post('https://api.resend.com/emails', {
-            from: 'LifeSavers United <noreply@lifesaversunited.org>',
-            to: [ADMIN_EMAIL],
-            subject: `🩸 Eligibility Reminder Report: ${sentList.length} Reminders Sent Today`,
-            html: html
-        }, {
-            timeout: 15000,
-            headers: {
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
+    for (const provider of PROVIDERS) {
+        try {
+            const res = await sendViaProvider(provider, {
+                to: ADMIN_EMAIL,
+                subject: `🩸 Eligibility Reminder Report: ${sentList.length} Reminders Sent Today`,
+                html
+            });
+            if (res.ok) {
+                console.log(`📊 Admin summary sent to ${ADMIN_EMAIL} via ${provider.toUpperCase()}`);
+                return;
             }
-        });
-        console.log('📊 Admin summary sent to lifesaversunited.india@gmail.com');
-    } catch (err) {
-        console.error('❌ Failed to send admin summary:', err.message);
+        } catch (err) {
+            // try next provider
+        }
     }
+    console.error('❌ Failed to send admin summary via all providers.');
 }
 
 run().catch(err => {

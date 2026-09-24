@@ -168,6 +168,10 @@ export function onAuthChange(callback) {
 // ============================================================================
 export function getCurrentUser() {
     if (currentUser) return currentUser;
+    // If Firebase Auth has a signed-in user, do NOT return a fallback donor session while user doc is loading
+    if (auth && auth.currentUser) {
+        return null;
+    }
     try {
         const stored = localStorage.getItem('lsu_donor_session') || sessionStorage.getItem('lsu_donor_session');
         if (stored) {
