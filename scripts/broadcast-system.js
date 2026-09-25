@@ -308,87 +308,128 @@ export function initializeBroadcastSystem() {
                 btnText.textContent = `Sending to ${donorList.length} donors...`;
             }
 
-            // --- STEP 2: Send to Cloudflare ---
-            const response = await fetch('/broadcast-email', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    subject,
-                    message,
-                    adminUid: user.uid,
-                    donorList, // Pass the list directly
-                    isTest
-                }),
-            });
-
-            // Handle potential 500 errors with better messaging
-            if (response.status === 500) {
-                const errData = await response.json();
-                throw new Error(errData.error || 'Server error. Check if RESEND_API_KEY is configured.');
+            // --- STEP 2: Send to Cloudflare in Chunks ---
+            // Chunking into batches of 25 guarantees we stay strictly below Cloudflare's
+            // 50 subrequest limit while providing responsive real-time UI feedback.
+            const CHUNK_SIZE = 25;
+            const chunks = [];
+            for (let i = 0; i < donorList.length; i += CHUNK_SIZE) {
+                chunks.push(donorList.slice(i, i + CHUNK_SIZE));
             }
 
-            const result = await response.json();
+            let resendSent = 0;
+            let brevoSent = 0;
+            let mailjetSent = 0;
+            let failedCount = 0;
+            let processedCount = 0;
 
-            if (result.success) {
-                // Calculate detailed provider stats from waterfall results
-                let resendSent = 0;
-                let brevoSent = 0;
-                let mailjetSent = 0;
-                let failedCount = 0;
+            for (let c = 0; c < chunks.length; c++) {
+                const chunk = chunks[c];
+                const startNum = processedCount + 1;
+                const endNum = processedCount + chunk.length;
 
-                if (result.details && Array.isArray(result.details)) {
-                    result.details.forEach(item => {
-                        const provider = item.provider;
-                        const isOk = item.ok;
-                        const count = typeof item.count === 'number' ? item.count : 1;
-
-                        if (isOk) {
-                            if (provider === 'resend') resendSent += count;
-                            else if (provider === 'brevo') brevoSent += count;
-                            else if (provider === 'mailjet') mailjetSent += count;
-                        } else {
-                            // Skip Resend rate limit attempts that successfully fall back
-                            if (!(provider === 'resend' && item.isRateLimit)) {
-                                failedCount += count;
-                            }
-                        }
-                    });
+                if (chunks.length > 1) {
+                    btnText.textContent = `Sending ${startNum}–${endNum} of ${donorList.length}...`;
+                } else {
+                    btnText.textContent = isTest ? 'Sending Email...' : `Sending to ${donorList.length} donors...`;
                 }
 
-                // Log the broadcast attempt to Firestore
                 try {
-                    const logsRef = collection(db, 'broadcast_logs');
-                    await addDoc(logsRef, {
-                        subject,
-                        message,
-                        senderUid: user.uid,
-                        sentAt: serverTimestamp(),
-                        totalRecipients: donorList.length,
-                        isTest,
-                        stats: {
-                            resend: resendSent,
-                            brevo: brevoSent,
-                            mailjet: mailjetSent,
-                            failed: failedCount
-                        }
+                    const response = await fetch('/broadcast-email', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            subject,
+                            message,
+                            adminUid: user.uid,
+                            donorList: chunk,
+                            isTest,
+                            chunkIndex: c,
+                            totalChunks: chunks.length
+                        }),
                     });
-                    console.log('Broadcast log successfully stored in Firestore.');
-                } catch (logError) {
-                    console.error('Failed to log broadcast to Firestore:', logError);
-                    // Do not block UI success state if only logging fails
+
+                    // Handle potential 500 errors with better messaging
+                    if (response.status === 500) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error || `Server error during batch ${c + 1}. Check if API keys are configured.`);
+                    }
+
+                    const result = await response.json();
+
+                    if (result.details && Array.isArray(result.details)) {
+                        result.details.forEach(item => {
+                            const provider = item.provider;
+                            const isOk = item.ok;
+                            const count = typeof item.count === 'number' ? item.count : 1;
+
+                            if (isOk) {
+                                if (provider === 'resend') resendSent += count;
+                                else if (provider === 'brevo') brevoSent += count;
+                                else if (provider === 'mailjet') mailjetSent += count;
+                            } else {
+                                // Skip Resend rate limit attempts that successfully fall back
+                                if (!(provider === 'resend' && item.isRateLimit)) {
+                                    failedCount += count;
+                                }
+                            }
+                        });
+                    } else if (result.success) {
+                        resendSent += chunk.length;
+                    } else {
+                        failedCount += chunk.length;
+                    }
+                } catch (chunkErr) {
+                    console.error(`Error sending batch ${c + 1}:`, chunkErr);
+                    failedCount += chunk.length;
                 }
 
+                processedCount += chunk.length;
+
+                // 1.5-second cooldown delay between chunks to respect API rate limits (e.g. Resend 2 req/sec burst limit)
+                if (c < chunks.length - 1) {
+                    btnText.textContent = `Pausing (${processedCount}/${donorList.length})...`;
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            }
+
+            const totalDelivered = resendSent + brevoSent + mailjetSent;
+
+            // Log the broadcast attempt to Firestore
+            try {
+                const logsRef = collection(db, 'broadcast_logs');
+                await addDoc(logsRef, {
+                    subject,
+                    message,
+                    senderUid: user.uid,
+                    sentAt: serverTimestamp(),
+                    totalRecipients: donorList.length,
+                    isTest,
+                    stats: {
+                        resend: resendSent,
+                        brevo: brevoSent,
+                        mailjet: mailjetSent,
+                        failed: failedCount
+                    }
+                });
+                console.log('Broadcast log successfully stored in Firestore.');
+            } catch (logError) {
+                console.error('Failed to log broadcast to Firestore:', logError);
+                // Do not block UI success state if only logging fails
+            }
+
+            if (totalDelivered > 0 || failedCount === 0) {
                 // Construct a detailed success message
-                let successMessage = result.message || `Broadcast complete. Sent: ${resendSent + brevoSent + mailjetSent}, Failed: ${failedCount} (of ${donorList.length} total).`;
+                let successMessage = `Broadcast complete. Sent: ${totalDelivered}, Failed: ${failedCount} (of ${donorList.length} total).`;
                 if (!isTest) {
                     successMessage += `<br>Breakdown: Resend (${resendSent}), Brevo (${brevoSent}), Mailjet (${mailjetSent})`;
                 }
-                showToast('Success!', successMessage, 'success');
+                showToast(failedCount === 0 ? 'Success!' : 'Completed with warnings', successMessage, failedCount === 0 ? 'success' : 'error');
                 closeModal();
             } else {
-                showToast('Failed', result.error || 'Something went wrong.', 'error');
+                showToast('Failed', `All ${donorList.length} emails failed to send. Check server logs or API keys.`, 'error');
             }
         } catch (error) {
             console.error('Broadcast Error:', error);

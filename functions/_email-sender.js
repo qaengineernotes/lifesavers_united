@@ -95,6 +95,65 @@ async function trySendResend(apiKey, { to, subject, html, text, replyTo }) {
 }
 
 /**
+ * Attempt to send a batch of emails via Resend Batch API (up to 100 emails/request).
+ * Docs: https://resend.com/docs/api-reference/emails/send-batch-emails
+ */
+async function trySendResendBatch(apiKey, emailList) {
+    if (!apiKey) return { tried: false, provider: 'resend', reason: 'Missing RESEND_API_KEY' };
+
+    try {
+        const payload = emailList.map((email) => {
+            const item = {
+                from: `${FROM_NAME} <${FROM_EMAIL}>`,
+                to: Array.isArray(email.to) ? email.to : [email.to],
+                subject: email.subject,
+                html: email.html,
+            };
+            if (email.text) item.text = email.text;
+            if (email.replyTo) item.reply_to = email.replyTo;
+            return item;
+        });
+
+        const res = await fetch('https://api.resend.com/emails/batch', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+            return { tried: true, provider: 'resend', ok: true, status: res.status, data };
+        }
+
+        const isRateLimit =
+            RATE_LIMIT_STATUSES.has(res.status) ||
+            JSON.stringify(data).toLowerCase().includes('limit') ||
+            JSON.stringify(data).toLowerCase().includes('quota');
+
+        return {
+            tried: true,
+            provider: 'resend',
+            ok: false,
+            status: res.status,
+            data,
+            isRateLimit,
+        };
+    } catch (err) {
+        return {
+            tried: true,
+            provider: 'resend',
+            ok: false,
+            error: err.message,
+            isRateLimit: false,
+        };
+    }
+}
+
+/**
  * Attempt to send via Brevo (300/day free).
  * Docs: https://developers.brevo.com/reference/sendtransacemail
  */
@@ -222,6 +281,72 @@ async function trySendMailjet(apiKey, secretKey, { to, subject, html, text, repl
     }
 }
 
+/**
+ * Attempt to send a batch of emails via Mailjet v3.1 Batch API (up to 50 messages/request).
+ * Docs: https://dev.mailjet.com/email/guides/send-api-v31/
+ */
+async function trySendMailjetBatch(apiKey, secretKey, emailList) {
+    if (!apiKey || !secretKey) {
+        return { tried: false, provider: 'mailjet', reason: 'Missing MAILJET_API_KEY or MAILJET_SECRET_KEY' };
+    }
+
+    try {
+        const messages = emailList.map((email) => {
+            const recipients = (Array.isArray(email.to) ? email.to : [email.to]).map((addr) => {
+                if (typeof addr === 'string') return { Email: addr };
+                return { Email: addr.email, Name: addr.name };
+            });
+            const msg = {
+                From: { Email: FROM_EMAIL, Name: FROM_NAME },
+                To: recipients,
+                Subject: email.subject,
+                HTMLPart: email.html,
+            };
+            if (email.text) msg.TextPart = email.text;
+            if (email.replyTo) msg.ReplyTo = { Email: email.replyTo };
+            return msg;
+        });
+
+        const credentials = btoa(`${apiKey}:${secretKey}`);
+        const res = await fetch('https://api.mailjet.com/v3.1/send', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${credentials}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ Messages: messages }),
+        });
+
+        const data = await res.json().catch(() => ({}));
+
+        if (res.ok) {
+            return { tried: true, provider: 'mailjet', ok: true, status: res.status, data };
+        }
+
+        const isRateLimit =
+            RATE_LIMIT_STATUSES.has(res.status) ||
+            JSON.stringify(data).toLowerCase().includes('limit') ||
+            JSON.stringify(data).toLowerCase().includes('quota');
+
+        return {
+            tried: true,
+            provider: 'mailjet',
+            ok: false,
+            status: res.status,
+            data,
+            isRateLimit,
+        };
+    } catch (err) {
+        return {
+            tried: true,
+            provider: 'mailjet',
+            ok: false,
+            error: err.message,
+            isRateLimit: false,
+        };
+    }
+}
+
 // ── Public API ────────────────────────────────────────────────────────────────
 
 /**
@@ -291,25 +416,80 @@ export async function sendEmail(env, { to, subject, html, text, replyTo, preferr
 }
 
 /**
- * sendBatch — Send a batch of emails rotating round-robin across all 3 providers.
+ * sendBatch — Send a batch of emails utilizing native batch endpoints when possible,
+ * with automatic fallback to secondary batch or individual throttled sends.
  *
- * Each email alternates Resend ──► Brevo ──► Mailjet with circular fallback.
- * Uses a small 150ms delay between sends to respect provider burst rates.
+ * 1. Resend Batch API (/emails/batch) sends all emails in 1 single subrequest.
+ * 2. Mailjet Batch API (/v3.1/send) sends up to 50 emails in 1 single subrequest.
+ * 3. Fallback: Sequential rotation across Brevo/Mailjet with 200ms throttle.
  *
  * @param {object}   env        - Cloudflare Pages `context.env`
  * @param {object[]} emailList  - Array of { to, subject, html, text, replyTo }
  * @returns {{ ok: boolean, sent: number, failed: number, results: object[] }}
  */
 export async function sendBatch(env, emailList) {
+    if (!emailList || emailList.length === 0) {
+        return { ok: true, sent: 0, failed: 0, results: [] };
+    }
+
+    // 1. Try Resend Batch API first (1 HTTP call sends up to 100 emails)
+    if (env.RESEND_API_KEY) {
+        console.log(`[email-batch] 🚀 Attempting Resend Batch API for ${emailList.length} emails...`);
+        const resendBatchRes = await trySendResendBatch(env.RESEND_API_KEY, emailList);
+        if (resendBatchRes.ok) {
+            console.log(`[email-batch] ✅ Resend Batch successful for all ${emailList.length} emails!`);
+            return {
+                ok: true,
+                sent: emailList.length,
+                failed: 0,
+                results: emailList.map((e, idx) => ({
+                    to: e.to,
+                    provider: 'resend',
+                    ok: true,
+                    count: 1,
+                    data: resendBatchRes.data?.data?.[idx] || null,
+                })),
+            };
+        }
+
+        console.warn(`[email-batch] ⚠️ Resend batch failed (${resendBatchRes.reason || resendBatchRes.status}) — checking fallback...`);
+    }
+
+    // 2. Try Mailjet Batch API (1 HTTP call sends up to 50 messages)
+    if (env.MAILJET_API_KEY && env.MAILJET_SECRET_KEY) {
+        console.log(`[email-batch] 🚀 Attempting Mailjet Batch API for ${emailList.length} emails...`);
+        const mailjetBatchRes = await trySendMailjetBatch(env.MAILJET_API_KEY, env.MAILJET_SECRET_KEY, emailList);
+        if (mailjetBatchRes.ok) {
+            console.log(`[email-batch] ✅ Mailjet Batch successful for all ${emailList.length} emails!`);
+            return {
+                ok: true,
+                sent: emailList.length,
+                failed: 0,
+                results: emailList.map((e, idx) => ({
+                    to: e.to,
+                    provider: 'mailjet',
+                    ok: true,
+                    count: 1,
+                    data: mailjetBatchRes.data?.Messages?.[idx] || null,
+                })),
+            };
+        }
+
+        console.warn(`[email-batch] ⚠️ Mailjet batch failed (${mailjetBatchRes.reason || mailjetBatchRes.status}) — falling back to individual send...`);
+    }
+
+    // 3. Fallback: Individual send with Brevo -> Resend -> Mailjet rotation and throttling
+    console.log(`[email-batch] 🔄 Falling back to individual provider sending for ${emailList.length} emails...`);
     const results = [];
-    let sent   = 0;
+    let sent = 0;
     let failed = 0;
 
     for (let i = 0; i < emailList.length; i++) {
         const email = emailList[i];
+        // In fallback mode, prefer Brevo first to conserve quota and avoid repeating the failed batch provider
         const result = await sendEmail(env, {
             ...email,
-            preferredProvider: email.preferredProvider || 'resend'
+            preferredProvider: email.preferredProvider || 'brevo',
         });
 
         if (result.ok) {
@@ -327,9 +507,9 @@ export async function sendBatch(env, emailList) {
             attempts: result.allAttempts,
         });
 
-        // Small 150ms delay between emails to respect provider burst limits
+        // 200ms throttle between individual sends to respect provider burst rates
         if (i < emailList.length - 1) {
-            await new Promise((resolve) => setTimeout(resolve, 150));
+            await new Promise((resolve) => setTimeout(resolve, 200));
         }
     }
 

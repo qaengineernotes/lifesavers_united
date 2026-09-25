@@ -44,10 +44,14 @@ export async function onRequestPost(context) {
             return Response.json({ success: false, error: 'Invalid JSON.' }, { status: 400, headers: CORS });
         }
 
-        const { subject, message, adminUid, donorList, isTest } = data;
+        const { subject, message, adminUid, donorList, isTest, chunkIndex, totalChunks } = data;
 
         if (!subject || !message || !adminUid || !donorList) {
             return Response.json({ success: false, error: 'Missing required fields.' }, { status: 400, headers: CORS });
+        }
+
+        if (chunkIndex !== undefined && totalChunks !== undefined) {
+            console.log(`[broadcast-email] Processing chunk ${chunkIndex + 1}/${totalChunks} (${donorList.length} recipients)`);
         }
 
         // --- STEP 1: Identify Recipients ---
@@ -85,8 +89,10 @@ export async function onRequestPost(context) {
         const batchResult = await sendBatch(context.env, emailList);
 
         return Response.json({
-            success: batchResult.ok,
+            success: batchResult.sent > 0 || batchResult.ok,
             message: `Broadcast complete. Sent: ${batchResult.sent}, Failed: ${batchResult.failed} (of ${emailList.length} total).`,
+            sent: batchResult.sent,
+            failed: batchResult.failed,
             details: batchResult.results,
         }, { headers: CORS });
 

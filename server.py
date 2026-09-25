@@ -198,10 +198,16 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:
+                data = json.loads(post_data.decode('utf-8'))
+                donor_count = len(data.get('donorList', []))
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Broadcast initiated!"}).encode('utf-8'))
+                self.wfile.write(json.dumps({
+                    "success": True, 
+                    "message": f"Local Mock: Batch delivered to {donor_count} donors!",
+                    "details": [{"provider": "resend", "ok": True, "count": donor_count}]
+                }).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
                 self.end_headers()
