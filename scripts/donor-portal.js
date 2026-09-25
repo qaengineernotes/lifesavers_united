@@ -2179,7 +2179,12 @@ function downloadCertificateAsPng() {
     }
 
     const safeName = (currentDonorData?.fullName || 'Donor').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const fileName = `LifeSavers_Certificate_${safeName}.png`;
+    const activeDonation = (donorDonations || []).find(d => String(d.id || '').trim() === String(selectedCertificateDonationId).trim()) || donorDonations?.[0];
+    const certNo = computeCertificateNumber(activeDonation, donorDonations || []);
+    const safeCertNo = (certNo || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const fileName = safeCertNo
+        ? `LifeSavers_Certificate_${safeName}_${safeCertNo}.png`
+        : `LifeSavers_Certificate_${safeName}.png`;
 
     const link = document.createElement('a');
     link.download = fileName;

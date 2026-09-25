@@ -4,6 +4,8 @@
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
 import { db, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, serverTimestamp, arrayUnion, getCountFromServer, initAppCheck } from '/scripts/firebase-config.js';
 import { addHistoryEntry } from '/scripts/firebase-data-service.js';
+import { generateDonorCertificate } from '/scripts/donor-certificate-generator.js';
+import { toDateObj } from '/scripts/donation-interval-validator.js';
 
 /**
  * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
@@ -147,6 +149,10 @@ let currentSort = {
 let currentPage = 1;
 let pageCursors = { 1: null }; // Maps pageNumber -> the last document snapshot of the previous page
 let isFetchingDocs = false;
+
+// --- VIEWING DONOR & DONATIONS (MODAL) ---
+let currentViewingDonor = null;
+let currentViewingDonations = [];
 
 // ============================================================================
 // INITIALIZE PAGE
@@ -549,6 +555,8 @@ window.viewDonor = function (donorId) {
 // POPULATE MODAL
 // ============================================================================
 async function populateModal(donor) {
+    currentViewingDonor = donor;
+
     // Overview Tab
     const overview = document.getElementById('tabOverview');
     overview.innerHTML = createOverviewTab(donor);
@@ -564,6 +572,7 @@ async function populateModal(donor) {
     // Donations Tab
     const donations = document.getElementById('tabDonations');
     const donationHistory = await fetchDonationHistory(donor);
+    currentViewingDonations = donationHistory;
     donations.innerHTML = createDonationsTab(donor, donationHistory);
 }
 
@@ -806,7 +815,18 @@ function createDonationsTab(donor, donations) {
 
             html += `
                 <div class="info-card" id="donation-card-${donation.id}">
-                    <h3>🩸 Donation #${index + 1}</h3>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+                        <h3 style="margin-bottom:0;">🩸 Donation #${index + 1}</h3>
+                        <button type="button" class="view-cert-btn text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 transition-colors cursor-pointer"
+                            onclick="downloadDonationCertificate('${donation.id}')"
+                            id="cert-btn-${donation.id}"
+                            title="Download Certificate for Donation #${index + 1}"
+                            style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;"
+                            onmouseover="this.style.background='#d1fae5';this.style.color='#065f46'"
+                            onmouseout="this.style.background='#ecfdf5';this.style.color='#047857'">
+                            📜 Certificate
+                        </button>
+                    </div>
                     <div class="info-row">
                         <div class="info-label">Patient Name:</div>
                         <div class="info-value"><strong>${escapeHtml(donation.patientName || 'Not specified')}</strong></div>
@@ -894,6 +914,114 @@ async function fetchDonationHistory(donor) {
         return [];
     }
 }
+
+// ============================================================================
+// CERTIFICATE GENERATION & DOWNLOAD
+// ============================================================================
+/**
+ * Compute Dynamic Certificate Number (e.g. LSU-202601)
+ * Matches the logic in the Donor Portal for identical certificate numbering
+ */
+function computeCertificateNumber(donation, allDonations) {
+    let year = new Date().getFullYear();
+    let seq = 1;
+
+    if (donation) {
+        const dDate = toDateObj(donation.donatedAt || donation.timestamp);
+        if (dDate && !isNaN(dDate.getTime())) {
+            year = dDate.getFullYear();
+        }
+
+        // Chronologically sort all donations (oldest to newest) to determine sequence
+        const chronological = [...(allDonations || [])].sort((a, b) => {
+            const timeA = (toDateObj(a.donatedAt || a.timestamp) || new Date(0)).getTime();
+            const timeB = (toDateObj(b.donatedAt || b.timestamp) || new Date(0)).getTime();
+            return timeA - timeB;
+        });
+
+        const sameYearDonations = chronological.filter(d => {
+            const date = toDateObj(d.donatedAt || d.timestamp);
+            return date && date.getFullYear() === year;
+        });
+
+        const matchIdx = sameYearDonations.findIndex(d => String(d.id || '').trim() === String(donation.id || '').trim());
+        if (matchIdx !== -1) {
+            seq = matchIdx + 1;
+        } else {
+            seq = 1;
+        }
+    }
+
+    const seqStr = String(seq).padStart(2, '0');
+    return `LSU-${year}${seqStr}`;
+}
+
+/**
+ * Download Certificate of Appreciation for a specific donation log
+ * Generates official high-resolution Certificate on Canvas and triggers PNG download
+ */
+window.downloadDonationCertificate = async function (donationId) {
+    const btn = document.getElementById(`cert-btn-${donationId}`);
+    const originalText = btn ? btn.innerHTML : '📜 Certificate';
+
+    try {
+        if (!currentViewingDonor) {
+            console.error('No donor currently selected in modal');
+            return;
+        }
+
+        const donation = currentViewingDonations.find(d => String(d.id || '').trim() === String(donationId).trim());
+        if (!donation) {
+            console.error('Donation record not found:', donationId);
+            return;
+        }
+
+        if (btn) {
+            btn.innerHTML = '⏳ Generating...';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.7';
+        }
+
+        const certNo = computeCertificateNumber(donation, currentViewingDonations);
+        const dDate = toDateObj(donation.donatedAt || donation.timestamp) || new Date();
+        const hospitalName = donation.hospital || 'Voluntary Camp / Blood Center';
+        const donorName = currentViewingDonor.fullName || currentViewingDonor.name || 'Valued Donor';
+        const bloodGroup = currentViewingDonor.bloodGroup || donation.bloodGroup || 'O+';
+
+        const blob = await generateDonorCertificate({
+            name: donorName,
+            bloodGroup: bloodGroup,
+            hospital: hospitalName,
+            patientName: donation.patientName || '',
+            donationDate: dDate,
+            certificateNo: certNo
+        });
+
+        const safeName = donorName.replace(/[^a-zA-Z0-9_-]/g, '_');
+        const safeCertNo = (certNo || '').replace(/[^a-zA-Z0-9_-]/g, '_');
+        const fileName = safeCertNo
+            ? `LifeSavers_Certificate_${safeName}_${safeCertNo}.png`
+            : `LifeSavers_Certificate_${safeName}.png`;
+
+        const link = document.createElement('a');
+        const blobUrl = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.href = blobUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+    } catch (err) {
+        console.error('Failed to generate certificate:', err);
+        alert('Could not generate the certificate. Please check console for details.');
+    } finally {
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.style.pointerEvents = '';
+            btn.style.opacity = '';
+        }
+    }
+};
 
 // ============================================================================
 // MODAL CONTROLS
@@ -2340,6 +2468,23 @@ window.saveEditDonationLog = async function () {
             if (rows[5]) rows[5].textContent = updatedDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         }
 
+        if (currentViewingDonations && currentViewingDonations.length > 0) {
+            const dIdx = currentViewingDonations.findIndex(d => String(d.id) === String(logId));
+            if (dIdx !== -1) {
+                currentViewingDonations[dIdx] = {
+                    ...currentViewingDonations[dIdx],
+                    patientName: patientName,
+                    donationType: typeVal,
+                    unitsDonated: units,
+                    unitsGiven: units,
+                    hospital: hospital,
+                    notes: notes,
+                    timestamp: updatedDate,
+                    donatedAt: updatedDate
+                };
+            }
+        }
+
         window.closeEditLogModal();
         showDonorToast('✅ Donation log updated!');
 
@@ -2402,6 +2547,10 @@ window.confirmDeleteDonationLog = async function () {
             card.style.opacity = '0';
             card.style.transform = 'scale(0.95)';
             setTimeout(() => card.remove(), 320);
+        }
+
+        if (currentViewingDonations && currentViewingDonations.length > 0) {
+            currentViewingDonations = currentViewingDonations.filter(d => String(d.id) !== String(logId));
         }
 
         window.closeDeleteLogModal();
