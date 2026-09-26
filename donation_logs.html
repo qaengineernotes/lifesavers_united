@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>All Blood Requests - LifeSavers United</title>
+    <title>Donation Logs - LifeSavers United</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="View all blood requests in the LifeSavers United system. Comprehensive list of blood donation requests with detailed information and status tracking.">
+        content="Official donation logs coordinated by LifeSavers United volunteers and administrators. Track donations, verify records, and download appreciation certificates.">
     <meta name="keywords"
-        content="blood requests, blood donation requests, emergency blood, blood donors, lifesavers united, blood request tracking">
+        content="donation logs, blood donations, lifesavers united, blood donation records, donor certificates, blood coordinators">
     <meta name="author" content="LifeSavers United">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="noindex, nofollow">
 
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="imgs/favicon/favicon.ico">
@@ -30,14 +30,13 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Load combined fonts with display=swap + preload trick -->
+    <!-- Load combined fonts -->
     <link rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Cinzel:wght@700;800&family=Playfair+Display:ital,wght@0,600;1,400&family=Alex+Brush&display=swap"
         as="style" onload="this.onload=null;this.rel='stylesheet'">
-
     <noscript>
         <link
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&family=Cinzel:wght@700;800&family=Playfair+Display:ital,wght@0,600;1,400&family=Alex+Brush&display=swap"
             rel="stylesheet">
     </noscript>
 
@@ -59,12 +58,169 @@
         })(window, document, "clarity", "script", "vv2e6pv1i7");
     </script>
 
-
-
     <script defer src="https://cloud.umami.is/script.js"
         data-website-id="7f971a01-0c53-4b99-87d8-4f507e85b6b7"></script>
-    <!-- LCP Preload for Important Announcement Popup -->
 
+    <style>
+        /* Custom enhancements for Donation Logs */
+        .clickable-link {
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clickable-link:hover {
+            text-decoration: underline;
+            transform: translateY(-1px);
+        }
+
+        .donation-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .type-whole-blood {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+
+        .type-platelets {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .type-plasma {
+            background-color: #e0f2fe;
+            color: #075985;
+            border: 1px solid #bae6fd;
+        }
+
+        .type-default {
+            background-color: #f3f4f6;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+
+        .cert-btn {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .cert-btn:hover {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            box-shadow: 0 4px 8px rgba(5, 150, 105, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .quick-nav-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 9999px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.2s;
+        }
+
+        .quick-nav-pill:hover {
+            background: rgba(255, 255, 255, 0.35);
+            transform: translateY(-1px);
+            color: white;
+        }
+
+        .pagination-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 20px;
+            background: #fff;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
+            border-radius: 8px;
+            border: 1px solid #d1d5db;
+            background: #fff;
+            color: #374151;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
+
+        .page-btn:hover:not(:disabled) {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+
+        .page-btn.active {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        @keyframes pop-in {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .animate-pop-in {
+            animation: pop-in 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
 </head>
 
 <body class="bg-background">
@@ -94,13 +250,13 @@
                     <a href="/events" class="text-text-secondary hover:text-primary transition-smooth">Events</a>
                     <a href="/blood_information_center"
                         class="text-text-secondary hover:text-primary transition-smooth">Learn</a>
-                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About
-                        Us</a>
+                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About Us</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
                 <div class="md:hidden">
-                    <button class="text-text-secondary hover:text-primary">
+                    <button id="mobileMenuBtn" class="text-text-secondary hover:text-primary p-2"
+                        aria-label="Open menu">
                         <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 6h16M4 12h16M4 18h16" />
@@ -116,40 +272,38 @@
         <!-- Page Header -->
         <div class="page-header">
             <div class="flex flex-wrap items-center justify-center gap-3 mb-4">
-                <a href="/donors" class="btn-outline-login-specific text-xs py-1.5 px-3 rounded-lg border inline-flex items-center gap-1.5" style="text-decoration:none; background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);">
+                <a href="/donors" class="quick-nav-pill">
                     👥 All Donors
                 </a>
-                <a href="/donation_logs" class="btn-outline-login-specific text-xs py-1.5 px-3 rounded-lg border inline-flex items-center gap-1.5" style="text-decoration:none; background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);">
-                    🩸 Donation Logs
+                <a href="/all_requests" class="quick-nav-pill">
+                    📋 All Requests
                 </a>
-                <a href="/emergency_request_system" class="btn-outline-login-specific text-xs py-1.5 px-3 rounded-lg border inline-flex items-center gap-1.5" style="text-decoration:none; background: rgba(255,255,255,0.15); color: white; border-color: rgba(255,255,255,0.3);">
+                <a href="/emergency_request_system" class="quick-nav-pill">
                     🚨 Emergency System
                 </a>
             </div>
-            <h1>All Blood Requests</h1>
-            <p>Comprehensive view of all blood requests in the system</p>
 
-            <!-- Statistics -->
+            <div style="font-size: 38px; line-height: 1; margin-bottom: 8px;">🩸</div>
+            <h1>Donation Logs</h1>
+            <p>Official records of blood and platelet donations coordinated by LifeSavers United volunteers</p>
+
+            <!-- Statistics Grid -->
             <div class="stats-grid" id="statsGrid" style="display: none;">
                 <div class="stat-card">
                     <div class="stat-number" id="statTotal">0</div>
-                    <div class="stat-label">Total Requests</div>
+                    <div class="stat-label">Total Coordinated</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="statOpen">0</div>
-                    <div class="stat-label">Open</div>
+                    <div class="stat-number" id="statThisMonth">0</div>
+                    <div class="stat-label">This Month</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="statVerified">0</div>
-                    <div class="stat-label">Verified</div>
+                    <div class="stat-number" id="statWholeBlood">0</div>
+                    <div class="stat-label">Whole Blood</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="statClosed">0</div>
-                    <div class="stat-label">Closed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="statFulfilled">0</div>
-                    <div class="stat-label">Fulfilled</div>
+                    <div class="stat-number" id="statPlatelets">0</div>
+                    <div class="stat-label">Platelets (SDP)</div>
                 </div>
             </div>
 
@@ -163,7 +317,7 @@
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                         <input type="text" id="searchInput" class="search-input text-gray-900 bg-white"
-                            placeholder="Search by patient name, mobile number, or hospital name..."
+                            placeholder="Search by Donor Name, Patient Name, Hospital, or Contact..."
                             autocomplete="off" />
                         <button id="clearSearch" class="clear-search-btn" style="display: none;" title="Clear search">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -183,15 +337,12 @@
             <div class="loader-container">
                 <div class="heartbeat-loader">
                     <div>
-                        <!-- Heartbeat/EKG Line -->
                         <svg class="heartbeat-svg" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
                             <path class="heartbeat-line" d="M0,30 L40,30 L45,10 L50,50 L55,20 L60,30 L200,30"
                                 fill="none" stroke="#dc2626" stroke-width="3" stroke-linecap="round" />
                         </svg>
-
-                        <!-- Loading Text with Animation -->
                         <p class="loading-text text-text-secondary text-lg font-medium">
-                            <span class="loading-message">Loading requests</span>
+                            <span class="loading-message">Loading donation logs</span>
                             <span class="loading-dots">
                                 <span class="dot">.</span>
                                 <span class="dot">.</span>
@@ -207,10 +358,9 @@
         <div id="accessDenied" class="access-denied" style="display: none;">
             <div class="access-denied-icon">🔒</div>
             <h2>Access Denied</h2>
-            <p>
-                You need to be logged in as an approved user to view this page.
-            </p>
-            <button onclick="window.location.href='emergency_request_system'" class="action-btn">
+            <p>You need to be logged in as an approved volunteer or admin to view this page.</p>
+            <button onclick="window.location.href='emergency_request_system'" class="action-btn"
+                style="padding: 12px 28px; font-size: 14px; border-radius: 10px; background: #dc2626; color: #fff; margin-top: 16px;">
                 Go to Emergency System
             </button>
         </div>
@@ -221,60 +371,90 @@
                 <table class="requests-table">
                     <thead>
                         <tr>
-                            <th>Status</th>
-                            <th>Request Date</th>
+                            <th style="width: 50px; text-align: center;">#</th>
+                            <th>Donation Date</th>
+                            <th>Donor Name</th>
                             <th>Patient Name</th>
-                            <th>Blood Group</th>
-                            <th>Units</th>
                             <th>Hospital</th>
-                            <th>City</th>
-                            <th>Contact</th>
-                            <th>Urgency</th>
-                            <th>Created By</th>
-                            <th>Verified By</th>
-                            <th>Actions</th>
+                            <th>Donation Type</th>
+                            <th style="text-align: center;">Certificate</th>
                         </tr>
                     </thead>
-                    <tbody id="requestsTableBody">
-                        <!-- Rows will be inserted here -->
+                    <tbody id="logsTableBody">
+                        <!-- Rows will be inserted here dynamically -->
                     </tbody>
                 </table>
             </div>
 
-            <!-- Pagination -->
-            <div id="pagination" class="mt-8 flex justify-center"></div>
+            <!-- Empty State Notice (if no records match search) -->
+            <div id="emptyNotice" style="display: none; padding: 48px 24px; text-align: center; color: #6b7280;">
+                <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+                <h3 style="font-size: 18px; font-weight: 700; color: #374151; margin-bottom: 6px;">No Donation Logs Found</h3>
+                <p style="font-size: 14px; max-width: 450px; margin: 0 auto;">No matching official donations found. Try clearing your search filter or checking back later.</p>
+            </div>
+
+            <!-- Pagination Bar -->
+            <div id="paginationContainer" class="pagination-container">
+                <div id="paginationInfo" style="font-size: 13px; color: #4b5563; font-weight: 500;">
+                    Showing 0 to 0 of 0 donations
+                </div>
+                <div id="paginationControls" class="pagination-controls">
+                    <!-- Pagination buttons inserted by JS -->
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- View Details Modal -->
-    <div id="viewModal" class="modal-overlay">
-        <div class="modal-content">
+    <!-- ══════════════════════════════════════════════
+         DONOR DETAILS MODAL (4 TABS)
+    ══════════════════════════════════════════════ -->
+    <div id="donorModal" class="modal-overlay">
+        <div class="modal-content animate-pop-in">
             <div class="modal-header">
-                <h2>Request Details</h2>
-                <button class="modal-close" onclick="closeModal()">×</button>
+                <div class="flex items-center gap-2">
+                    <span style="font-size: 22px;">👤</span>
+                    <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #111827;">Donor Details</h2>
+                </div>
+                <button class="modal-close" onclick="closeAllModals()" title="Close">×</button>
             </div>
             <div class="modal-body">
-                <!-- Tabs -->
                 <div class="tabs">
-                    <button class="tab active" onclick="switchTab('overview')">Overview</button>
-                    <button class="tab" onclick="switchTab('details')">Patient & Hospital</button>
-                    <button class="tab" onclick="switchTab('donations')">Donation History</button>
-                    <button class="tab" onclick="switchTab('history')">Request History</button>
+                    <button class="tab active" id="donorTabBtn-overview" onclick="switchDonorTab('overview')">Overview</button>
+                    <button class="tab" id="donorTabBtn-personal" onclick="switchDonorTab('personal')">Personal Details</button>
+                    <button class="tab" id="donorTabBtn-medical" onclick="switchDonorTab('medical')">Medical Info</button>
+                    <button class="tab" id="donorTabBtn-donations" onclick="switchDonorTab('donations')">Donation History</button>
                 </div>
+                <div id="donorTab-overview" class="tab-content active"></div>
+                <div id="donorTab-personal" class="tab-content"></div>
+                <div id="donorTab-medical" class="tab-content"></div>
+                <div id="donorTab-donations" class="tab-content"></div>
+            </div>
+        </div>
+    </div>
 
-                <!-- Tab Contents -->
-                <div id="tabOverview" class="tab-content active">
-                    <!-- Will be populated by JS -->
+    <!-- ══════════════════════════════════════════════
+         REQUEST DETAILS MODAL (4 TABS)
+    ══════════════════════════════════════════════ -->
+    <div id="requestModal" class="modal-overlay">
+        <div class="modal-content animate-pop-in">
+            <div class="modal-header">
+                <div class="flex items-center gap-2">
+                    <span style="font-size: 22px;">📋</span>
+                    <h2 style="margin: 0; font-size: 20px; font-weight: 800; color: #111827;">Request Details</h2>
                 </div>
-                <div id="tabDetails" class="tab-content">
-                    <!-- Will be populated by JS -->
+                <button class="modal-close" onclick="closeAllModals()" title="Close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="tabs">
+                    <button class="tab active" id="reqTabBtn-overview" onclick="switchRequestTab('overview')">Overview</button>
+                    <button class="tab" id="reqTabBtn-details" onclick="switchRequestTab('details')">Patient & Hospital</button>
+                    <button class="tab" id="reqTabBtn-donations" onclick="switchRequestTab('donations')">Donation History</button>
+                    <button class="tab" id="reqTabBtn-history" onclick="switchRequestTab('history')">Request History</button>
                 </div>
-                <div id="tabDonations" class="tab-content">
-                    <!-- Will be populated by JS -->
-                </div>
-                <div id="tabHistory" class="tab-content">
-                    <!-- Will be populated by JS -->
-                </div>
+                <div id="reqTab-overview" class="tab-content active"></div>
+                <div id="reqTab-details" class="tab-content"></div>
+                <div id="reqTab-donations" class="tab-content"></div>
+                <div id="reqTab-history" class="tab-content"></div>
             </div>
         </div>
     </div>
@@ -317,49 +497,27 @@
                     </div>
                 </div>
 
-                <!-- Quick Links -->
                 <div class="text-center md:text-left">
                     <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
                     <ul class="space-y-2">
                         <li><a href="/" class="text-gray-300 hover:text-white transition-smooth">Home</a></li>
-                        <li><a href="/donor_registration"
-                                class="text-gray-300 hover:text-white transition-smooth">Donate</a></li>
-                        <li><a href="/donor_portal"
-                                class="text-gray-300 hover:text-white transition-smooth">Donor Portal</a></li>
-                        <li><a href="/emergency_request_system"
-                                class="text-gray-300 hover:text-white transition-smooth">Emergency</a></li>
-                        <li><a href="/emergency_blood_request"
-                                class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
-                        <li><a href="/events" class="text-gray-300 hover:text-white transition-smooth">Events</a></li>
-                        <li><a href="/volunteers"
-                                class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
-                        <li><a href="/donation_logs"
-                                class="text-gray-300 hover:text-white transition-smooth">Donation Logs</a></li>
-                        <li><a href="/blood_information_center"
-                                class="text-gray-300 hover:text-white transition-smooth">Learn</a></li>
-                        <li><a href="/about_us" class="text-gray-300 hover:text-white transition-smooth">About Us</a>
-                        </li>
+                        <li><a href="/donor_registration" class="text-gray-300 hover:text-white transition-smooth">Donate</a></li>
+                        <li><a href="/donor_portal" class="text-gray-300 hover:text-white transition-smooth">Donor Portal</a></li>
+                        <li><a href="/emergency_request_system" class="text-gray-300 hover:text-white transition-smooth">Emergency</a></li>
+                        <li><a href="/emergency_blood_request" class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
                     </ul>
                 </div>
 
-                <!-- Resources -->
                 <div class="text-center md:text-left">
-                    <h3 class="text-lg font-semibold mb-3">Resources</h3>
+                    <h3 class="text-lg font-semibold mb-3">Admin & Coordinator</h3>
                     <ul class="space-y-2">
-                        <li><a href="/gallery" class="text-gray-300 hover:text-white transition-smooth">Gallery</a></li>
-                        <li><a href="/faq" class="text-gray-300 hover:text-white transition-smooth">FAQs</a></li>
-                        <li><a href="/stories" class="text-gray-300 hover:text-white transition-smooth">Stories</a></li>
-
-                        <li><a href="/blogs" class="text-gray-300 hover:text-white transition-smooth">Blog</a></li>
-                        <li><a href="/health_assessment_tools"
-                                class="text-gray-300 hover:text-white transition-smooth">Health Assessment Tools</a>
-                        </li>
-                        <li><a href="/privacy_policy" class="text-gray-300 hover:text-white transition-smooth">Privacy
-                                Policy</a></li>
+                        <li><a href="/donors" class="text-gray-300 hover:text-white transition-smooth">All Donors</a></li>
+                        <li><a href="/all_requests" class="text-gray-300 hover:text-white transition-smooth">All Requests</a></li>
+                        <li><a href="/donation_logs" class="text-primary font-bold transition-smooth">Donation Logs</a></li>
+                        <li><a href="/volunteers" class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
                     </ul>
                 </div>
 
-                <!-- Contact Info -->
                 <div class="text-center md:text-left">
                     <h3 class="text-lg font-semibold mb-3">Contact</h3>
                     <ul class="space-y-2 text-gray-300">
@@ -383,13 +541,12 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Set current year
             document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
     </script>
 
-    <!-- Firebase and Scripts -->
-    <script type="module" src="scripts/all-requests.js?v=1.0.1"></script>
+    <!-- Main Logic -->
+    <script type="module" src="scripts/donation-logs.js?v=1.0.0"></script>
     <script src="scripts/mobile-menu.js"></script>
     <script id="dhws-dataInjector" src="/public/dhws-data-injector.js"></script>
 </body>

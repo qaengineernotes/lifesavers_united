@@ -109,6 +109,21 @@ function toggleAllRequestsButton(user) {
         }
     }
 
+    // Try to find the Donation Logs button container (in emergency_request_system.html)
+    const donationLogsButtonContainer = document.getElementById('donationLogsButtonContainer');
+
+    if (donationLogsButtonContainer) {
+        if (user && user.status === 'approved' && user.role !== 'donor') {
+            donationLogsButtonContainer.style.display = 'inline-flex';
+            donationLogsButtonContainer.style.visibility = 'visible';
+            donationLogsButtonContainer.style.opacity = '1';
+            donationLogsButtonContainer.classList.remove('hidden');
+        } else {
+            donationLogsButtonContainer.style.display = 'none';
+            donationLogsButtonContainer.classList.add('hidden');
+        }
+    }
+
     // Also handle the old navigation link if it exists (for backward compatibility)
     const allRequestsLink = document.getElementById('allRequestsLink');
     if (allRequestsLink) {
