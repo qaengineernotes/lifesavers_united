@@ -110,11 +110,81 @@ async function sendViaProvider(provider, { to, subject, html, replyTo }) {
     return { ok: false, error: 'Unknown provider' };
 }
 
-async function sendReminderEmail({ email, fullName, bloodGroup, donationType, eligibleDateFormatted }, index = 0) {
-    const typeLabel = donationType === 'platelets_sdp' ? 'Platelets (SDP)' : 
-                      donationType === 'plasma' ? 'Plasma' : 'Whole Blood';
+function getDonationTypeLabel(type) {
+    if (type === 'platelets_sdp') return 'Platelets (SDP)';
+    if (type === 'plasma') return 'Plasma';
+    if (type === 'whole_blood') return 'Whole Blood';
+    return type;
+}
 
-    const subject = `🩸 You will be eligible to donate ${typeLabel} in 3 days! — LifeSavers United`;
+function renderDonationOptions(types) {
+    let cardsHtml = '';
+
+    if (types.includes('platelets_sdp')) {
+        cardsHtml += `
+        <div class="option-card" style="border: 1px solid #fed7aa; border-left: 4px solid #ea580c; background: #fffaf5;">
+          <strong style="color: #9a3412; font-size: 15px;">🧪 Option: Single Donor Platelets (SDP)</strong>
+          <p style="margin: 6px 0 0 0; color: #334155; font-size: 13.5px; line-height: 1.5;">
+            <strong>Who it helps:</strong> Cancer patients undergoing chemotherapy, dengue patients with critically low counts, and major surgical emergencies.<br>
+            <strong>Why it's vital:</strong> Platelets have a short shelf life of only 5 days, making on-demand emergency donors constantly in critical need.
+          </p>
+        </div>`;
+    }
+
+    if (types.includes('plasma')) {
+        cardsHtml += `
+        <div class="option-card" style="border: 1px solid #bfdbfe; border-left: 4px solid #2563eb; background: #f8faff;">
+          <strong style="color: #1e40af; font-size: 15px;">💧 Option: Plasma Donation</strong>
+          <p style="margin: 6px 0 0 0; color: #334155; font-size: 13.5px; line-height: 1.5;">
+            <strong>Who it helps:</strong> Severe burn victims, trauma/accident resuscitation, and patients with critical clotting or liver disorders.<br>
+            <strong>Why it's vital:</strong> Plasma restores blood volume and provides vital proteins and antibodies needed for intensive recovery.
+          </p>
+        </div>`;
+    }
+
+    if (types.includes('whole_blood')) {
+        cardsHtml += `
+        <div class="option-card" style="border: 1px solid #fecaca; border-left: 4px solid #dc2626; background: #fff5f5;">
+          <strong style="color: #991b1b; font-size: 15px;">🩸 Option: Whole Blood Donation</strong>
+          <p style="margin: 6px 0 0 0; color: #334155; font-size: 13.5px; line-height: 1.5;">
+            <strong>Who it helps:</strong> Accident victims, anemia treatments, thalassemia patients, and major surgical operations.<br>
+            <strong>Why it's vital:</strong> One unit of whole blood can be separated into red cells, plasma, and platelets to save up to 3 distinct lives.
+          </p>
+        </div>`;
+    }
+
+    let noteHtml = '';
+    if (types.length > 1) {
+        noteHtml = `
+        <p style="background: #f1f5f9; border-radius: 6px; padding: 10px 14px; font-size: 13px; color: #475569; margin: 16px 0; line-height: 1.5;">
+          💡 <strong>Coordinator Tip:</strong> Because both donation pathways open on the same date, you don't need to choose in advance! When an urgent emergency request arises in Ahmedabad or your area, you can respond to whichever is in greatest need.
+        </p>`;
+    }
+
+    return `
+      <div style="margin: 18px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 600; color: #1e293b;">Your Eligible Donation Options:</p>
+        ${cardsHtml}
+        ${noteHtml}
+      </div>
+    `;
+}
+
+async function sendReminderEmail({ email, fullName, bloodGroup, donationTypes, donationType, eligibleDateFormatted }, index = 0) {
+    const types = Array.isArray(donationTypes) && donationTypes.length > 0
+        ? donationTypes
+        : [donationType || 'whole_blood'];
+
+    let typesLabel = '';
+    if (types.length === 1) {
+        typesLabel = getDonationTypeLabel(types[0]);
+    } else if (types.length === 2) {
+        typesLabel = `${getDonationTypeLabel(types[0])} & ${getDonationTypeLabel(types[1])}`;
+    } else {
+        typesLabel = types.map(t => getDonationTypeLabel(t)).join(', ');
+    }
+
+    const subject = `🩸 You will be eligible to donate ${typesLabel} in 3 days! — LifeSavers United`;
 
     const html = `
 <!DOCTYPE html>
@@ -123,43 +193,56 @@ async function sendReminderEmail({ email, fullName, bloodGroup, donationType, el
   <meta charset="UTF-8">
   <title>${subject}</title>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
-    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; }
+    .container { max-width: 600px; margin: 0 auto; background: #ffffff; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
     .header { background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%); padding: 32px 24px; text-align: center; color: white; }
-    .header h1 { margin: 0 0 8px 0; font-size: 22px; font-weight: 700; }
-    .content { padding: 32px 24px; font-size: 15px; line-height: 1.6; }
-    .highlight-card { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 18px; margin: 20px 0; }
-    .btn { display: inline-block; background-color: #dc2626; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; font-size: 15px; margin-top: 20px; }
-    .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; }
+    .header h1 { margin: 0 0 8px 0; font-size: 22px; font-weight: 700; color: #ffffff; }
+    .header p { margin: 0; font-size: 14px; opacity: 0.92; }
+    .content { padding: 32px 24px; font-size: 15px; line-height: 1.6; color: #334155; }
+    .highlight-card { background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; padding: 18px 20px; margin: 20px 0; }
+    .option-card { background: #ffffff; border-radius: 8px; padding: 14px 16px; margin: 12px 0; }
+    .btn-primary { display: block; background-color: #dc2626; color: #ffffff !important; text-decoration: none; padding: 13px 20px; border-radius: 8px; font-weight: 700; font-size: 14.5px; text-align: center; margin: 10px 0; }
+    .btn-secondary { display: block; background-color: #1e293b; color: #ffffff !important; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; text-align: center; margin: 10px 0; }
+    .btn-whatsapp { display: block; background-color: #059669; color: #ffffff !important; text-decoration: none; padding: 12px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; text-align: center; margin: 10px 0; }
+    .footer { background: #f8fafc; padding: 22px 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; line-height: 1.5; }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>⏳ Get Ready to Save Lives Again!</h1>
-      <p>Your generosity keeps critical patients alive.</p>
+      <p>Your body has replenished its vital cells and will soon be ready to answer the call.</p>
     </div>
     <div class="content">
-      <p>Dear <strong>${fullName}</strong> (${bloodGroup || 'Hero'}),</p>
+      <p>Dear <strong>${fullName}</strong> (Blood Group: <strong>${bloodGroup || 'Hero'}</strong>),</p>
       
+      <p>
+        Thank you for your continued dedication as a registered hero in the <strong>LifeSavers United</strong> emergency blood network. Your selfless contributions bring critical patients back from the brink of danger.
+      </p>
+
       <div class="highlight-card">
-        <strong style="color: #991b1b; font-size: 16px;">🗓️ In Just 3 Days: ${eligibleDateFormatted}</strong>
-        <p style="margin: 6px 0 0 0; color: #334155;">
-          You will complete your mandatory rest interval and become fully eligible to donate <strong>${typeLabel}</strong>!
+        <strong style="color: #991b1b; font-size: 16px;">🗓️ Milestone in 3 Days: ${eligibleDateFormatted}</strong>
+        <p style="margin: 6px 0 0 0; color: #334155; font-size: 14.5px;">
+          You will complete your mandatory rest interval and become <strong>fully eligible to donate ${types.length > 1 ? `both ${typesLabel}` : typesLabel}!</strong>
         </p>
       </div>
 
-      <p>
-        Your body has replenished its vital cells, and hospitals across our emergency network in Ahmedabad and Gujarat are always in urgent need of ready donors like you.
+      ${renderDonationOptions(types)}
+
+      <p style="margin-top: 24px; font-weight: 600; color: #0f172a; text-align: center;">
+        Take Action Before Your Eligibility Date:
       </p>
 
-      <div style="text-align: center;">
-        <a href="https://lifesaversunited.org/donor_portal" class="btn">View Your Donor Portal & Availability</a>
+      <div style="margin: 16px 0;">
+        <a href="https://lifesaversunited.org/emergency_request_system" class="btn-primary">🚨 View Live Emergency Requests</a>
+        <a href="https://lifesaversunited.org/donor_portal" class="btn-secondary">👤 Update Availability on Donor Portal</a>
+        <a href="https://wa.me/919979260393" class="btn-whatsapp">💬 Chat with Emergency Coordinator on WhatsApp</a>
       </div>
     </div>
     <div class="footer">
-      <p>© ${new Date().getFullYear()} LifeSavers United. India's 24/7 Emergency Blood Donation Platform.</p>
-      <p>Emergency Hotline: <a href="https://wa.me/919979260393" style="color: #dc2626; text-decoration: none;">9979260393</a></p>
+      <p style="margin: 0 0 6px 0;"><strong>LifeSavers United</strong> — India's 24/7 Voluntary Blood & Platelet Donor Network</p>
+      <p style="margin: 0 0 6px 0;">24/7 Emergency Helpline: <a href="https://wa.me/919979260393" style="color: #dc2626; text-decoration: none; font-weight: 600;">+91 99792 60393</a> | Official Site: <a href="https://lifesaversunited.org" style="color: #dc2626; text-decoration: none;">lifesaversunited.org</a></p>
+      <p style="margin: 0; font-size: 11px; color: #94a3b8;">© ${new Date().getFullYear()} LifeSavers United. All rights reserved.</p>
     </div>
   </div>
 </body>
@@ -230,13 +313,13 @@ async function run() {
     console.log('🚀 Starting daily eligibility reminder check...');
 
     if (process.env.TEST_EMAIL) {
-        console.log(`🧪 TEST MODE: Sending test reminder to ${process.env.TEST_EMAIL}`);
+        console.log(`🧪 TEST MODE: Sending combined test reminder to ${process.env.TEST_EMAIL}`);
         await sendReminderEmail({
             email: process.env.TEST_EMAIL,
             fullName: 'Test Donor',
             bloodGroup: 'O+',
-            donationType: 'whole_blood',
-            eligibleDateFormatted: '25 Sep 2026'
+            donationTypes: ['platelets_sdp', 'plasma'],
+            eligibleDateFormatted: '5 Oct 2026'
         });
         console.log('✅ Test reminder sent.');
         return;
@@ -288,6 +371,10 @@ async function run() {
         const lastDateKey = lastDateParts.dateStr;
         const lastDateMidnight = toKolkataMidnight(lastDate);
 
+        // Collect all targets for this donor reaching the 3-day reminder threshold today
+        const eligibleDueTargets = [];
+        let eligibleDateFormatted = '';
+
         for (const target of targets) {
             const eligibleMidnight = new Date(lastDateMidnight.getTime() + (target.gapDays * 24 * 60 * 60 * 1000));
 
@@ -297,41 +384,51 @@ async function run() {
             // TRIGGER: Exactly 3 days before eligible date
             if (diffDays === 3) {
                 const reminderKey = `${lastDateKey}_${target.type}_3days`;
-                if (remindersSent[reminderKey]) {
-                    continue; // Already sent for this donation cycle
+                if (!remindersSent[reminderKey]) {
+                    eligibleDueTargets.push(target);
+                    if (!eligibleDateFormatted) {
+                        eligibleDateFormatted = formatKolkataDate(eligibleMidnight);
+                    }
                 }
+            }
+        }
 
-                console.log(`📨 Sending 3-day reminder for ${target.type} to ${donor.fullName} (${donor.email})`);
-                const formattedDate = formatKolkataDate(eligibleMidnight);
+        if (eligibleDueTargets.length > 0) {
+            const types = eligibleDueTargets.map(t => t.type);
+            const typesLabel = types.map(t => getDonationTypeLabel(t)).join(' & ');
 
-                try {
-                    const sendRes = await sendReminderEmail({
-                        email: donor.email,
-                        fullName: donor.fullName || 'Donor',
-                        bloodGroup: donor.bloodGroup || '',
-                        donationType: target.type,
-                        eligibleDateFormatted: formattedDate
-                    }, rotationCounter++);
+            console.log(`📨 Sending 3-day reminder for [${typesLabel}] to ${donor.fullName} (${donor.email})`);
 
-                    // Mark reminder as sent
-                    await donorDoc.ref.update({
-                        [`remindersSent.${reminderKey}`]: admin.firestore.FieldValue.serverTimestamp()
-                    });
+            try {
+                const sendRes = await sendReminderEmail({
+                    email: donor.email,
+                    fullName: donor.fullName || 'Donor',
+                    bloodGroup: donor.bloodGroup || '',
+                    donationTypes: types,
+                    eligibleDateFormatted
+                }, rotationCounter++);
 
-                    sentList.push({
-                        fullName: donor.fullName || 'Donor',
-                        email: donor.email,
-                        bloodGroup: donor.bloodGroup || 'N/A',
-                        donationType: target.type,
-                        eligibleDate: formattedDate,
-                        provider: sendRes?.provider || 'unknown'
-                    });
-
-                    // Wait 1.2 seconds to respect provider burst limits
-                    await delay(1200);
-                } catch (err) {
-                    console.error(`❌ Failed to send reminder to ${donor.email}:`, err.response?.data || err.message);
+                // Mark reminder keys as sent for all bundled types in Firestore
+                const updateFields = {};
+                for (const t of eligibleDueTargets) {
+                    const reminderKey = `${lastDateKey}_${t.type}_3days`;
+                    updateFields[`remindersSent.${reminderKey}`] = admin.firestore.FieldValue.serverTimestamp();
                 }
+                await donorDoc.ref.update(updateFields);
+
+                sentList.push({
+                    fullName: donor.fullName || 'Donor',
+                    email: donor.email,
+                    bloodGroup: donor.bloodGroup || 'N/A',
+                    donationTypeLabel: typesLabel,
+                    eligibleDate: eligibleDateFormatted,
+                    provider: sendRes?.provider || 'unknown'
+                });
+
+                // Wait 1.2 seconds to respect provider burst limits
+                await delay(1200);
+            } catch (err) {
+                console.error(`❌ Failed to send reminder to ${donor.email}:`, err.response?.data || err.message);
             }
         }
     }
@@ -346,7 +443,7 @@ async function run() {
 
 async function sendAdminSummary(sentList) {
     const ADMIN_EMAIL = 'lifesaversunited.india@gmail.com';
-    const items = sentList.map(d => `<li><strong>${d.fullName}</strong> (${d.email}) - Blood: ${d.bloodGroup} | Type: <em>${d.donationType}</em> | Eligible: <strong>${d.eligibleDate}</strong> [via <em>${(d.provider || 'unknown').toUpperCase()}</em>]</li>`).join('');
+    const items = sentList.map(d => `<li><strong>${d.fullName}</strong> (${d.email}) - Blood: ${d.bloodGroup} | Eligible For: <strong>${d.donationTypeLabel || d.donationType}</strong> on <strong>${d.eligibleDate}</strong> [via <em>${(d.provider || 'unknown').toUpperCase()}</em>]</li>`).join('');
 
     const html = `
         <div style="font-family:sans-serif;padding:20px;border:1px solid #eee;border-radius:10px;">
