@@ -101,8 +101,70 @@
         <link rel="stylesheet" href="css/main.css?v=2">
     </noscript>
 
-    <!-- Mobile Controls Responsive Fix -->
+    <!-- Controls Responsive Styling (Mobile & Web View) -->
     <style>
+        /* Web View (Desktop & Tablet) Controls Styling */
+        @media (min-width: 640px) {
+            .mobile-header-section {
+                flex-wrap: wrap !important;
+                gap: 16px !important;
+            }
+
+            #emergencyControlsRow {
+                display: flex !important;
+                align-items: center !important;
+                flex-wrap: nowrap !important;
+                gap: 8px !important;
+                flex-shrink: 0 !important;
+            }
+
+            #emergencyControlsRow a.mobile-refresh-btn:not(.hidden),
+            #emergencyControlsRow button.mobile-refresh-btn:not(.hidden) {
+                display: inline-flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                white-space: nowrap !important;
+                padding: 7px 12px !important;
+                font-size: 0.8125rem !important;
+                line-height: 1.25rem !important;
+                font-weight: 600 !important;
+                border-width: 1.5px !important;
+                border-radius: 8px !important;
+                box-sizing: border-box !important;
+                flex-shrink: 0 !important;
+                height: 38px !important;
+                text-decoration: none !important;
+                cursor: pointer;
+                transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+            }
+
+            #emergencyControlsRow a.mobile-refresh-btn:hover,
+            #emergencyControlsRow button.mobile-refresh-btn:hover {
+                background-color: #fef2f2 !important;
+                border-color: #b91c1c !important;
+                color: #b91c1c !important;
+            }
+
+            #emergencyControlsRow a.mobile-refresh-btn svg,
+            #emergencyControlsRow button.mobile-refresh-btn svg {
+                width: 15px !important;
+                height: 15px !important;
+                margin-right: 5px !important;
+                flex-shrink: 0 !important;
+                display: inline-block !important;
+                vertical-align: middle !important;
+            }
+
+            #emergencyControlsRow .mobile-live-indicator {
+                display: inline-flex !important;
+                align-items: center !important;
+                white-space: nowrap !important;
+                padding: 0 4px !important;
+                flex-shrink: 0 !important;
+            }
+        }
+
+        /* Mobile Controls Responsive Fix */
         @media (max-width: 639px) {
 
             /* Stack title + controls vertically */
@@ -380,7 +442,7 @@
                     <p class="text-text-secondary mobile-subtitle">Real-time critical blood needs across Ahmedabad,
                         Gujarat, Mumbai and India — respond now</p>
                 </div>
-                <div id="emergencyControlsRow" class="flex items-center mobile-controls" style="gap: 12px;">
+                <div id="emergencyControlsRow" class="flex items-center mobile-controls" style="gap: 8px;">
                     <!-- View All Requests Button (for approved users) -->
                     <a href="/all_requests" id="allRequestsButtonContainer"
                         class="btn-outline-login-specific text-sm mobile-refresh-btn hidden"
