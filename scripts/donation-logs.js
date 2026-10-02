@@ -5,6 +5,7 @@
 import { getCurrentUser, onAuthChange } from '/scripts/firebase-auth-service.js';
 import { generateDonorCertificate } from '/scripts/donor-certificate-generator.js';
 import { toDateObj } from '/scripts/donation-interval-validator.js';
+import { normalizePhoneNumber } from '/scripts/phone-normalizer.js';
 import {
     db,
     collection,
@@ -30,6 +31,8 @@ let searchQuery = '';
 
 // Local caches to prevent redundant Firestore reads
 const donorCache = new Map();
+const donorByPhone = new Map();
+const donorByName = new Map();
 const requestCache = new Map();
 
 let currentViewingDonor = null;
@@ -94,9 +97,38 @@ async function loadDonationLogs() {
         document.getElementById('accessDenied').style.display = 'none';
         document.getElementById('tableContainer').style.display = 'none';
 
-        // Query donation_logs collection
+        // Query donation_logs and donors collections in parallel
         const logsRef = collection(db, 'donation_logs');
-        const snapshot = await getDocs(logsRef);
+        const donorsRef = collection(db, 'donors');
+
+        const [snapshot, donorsSnapshot] = await Promise.all([
+            getDocs(logsRef),
+            getDocs(donorsRef)
+        ]);
+
+        // Build donor lookup maps to resolve registered blood group
+        donorCache.clear();
+        donorByPhone.clear();
+        donorByName.clear();
+
+        donorsSnapshot.forEach((docSnap) => {
+            const dData = docSnap.data();
+            const donorObj = { id: docSnap.id, ...dData };
+            donorCache.set(docSnap.id, donorObj);
+
+            if (dData.contactNumber) {
+                const norm = normalizePhoneNumber(dData.contactNumber);
+                if (norm) {
+                    donorByPhone.set(norm, donorObj);
+                }
+            }
+            if (dData.fullName) {
+                const cleanName = dData.fullName.trim().toLowerCase();
+                if (cleanName && !donorByName.has(cleanName)) {
+                    donorByName.set(cleanName, donorObj);
+                }
+            }
+        });
 
         const logs = [];
         snapshot.forEach((docSnap) => {
@@ -105,9 +137,34 @@ async function loadDonationLogs() {
             if (data.source === 'donor_self_reported' || data.status === 'self_reported') {
                 return;
             }
+
+            // Find matching registered donor
+            let matchedDonor = null;
+            if (data.donorId && data.donorId !== 'none' && donorCache.has(data.donorId)) {
+                matchedDonor = donorCache.get(data.donorId);
+            } else if (data.donorContact) {
+                const norm = normalizePhoneNumber(data.donorContact);
+                if (norm && donorByPhone.has(norm)) {
+                    matchedDonor = donorByPhone.get(norm);
+                }
+            }
+            if (!matchedDonor && data.donorName) {
+                const cleanName = data.donorName.trim().toLowerCase();
+                if (cleanName && donorByName.has(cleanName)) {
+                    matchedDonor = donorByName.get(cleanName);
+                }
+            }
+
+            // Donor's registered blood group (from registration)
+            const registeredBlood = (matchedDonor && matchedDonor.bloodGroup) 
+                ? matchedDonor.bloodGroup 
+                : (data.donorBloodGroup || '');
+
             logs.push({
                 id: docSnap.id,
-                ...data
+                ...data,
+                donorRegisteredBloodGroup: registeredBlood || data.bloodGroup || '',
+                matchedDonorId: matchedDonor?.id || data.donorId || ''
             });
         });
 
@@ -202,7 +259,7 @@ function initializeSearch() {
                 const patientName = (log.patientName || '').toLowerCase();
                 const hospital = (log.hospital || log.hospitalName || '').toLowerCase();
                 const contact = String(log.donorContact || '').toLowerCase();
-                const bloodGroup = (log.bloodGroup || '').toLowerCase();
+                const bloodGroup = (log.donorRegisteredBloodGroup || log.donorBloodGroup || log.bloodGroup || '').toLowerCase();
                 return donorName.includes(searchQuery) ||
                        patientName.includes(searchQuery) ||
                        hospital.includes(searchQuery) ||
@@ -262,9 +319,10 @@ function renderTable() {
         const dDate = toDateObj(log.donatedAt || log.timestamp || log.createdAt);
         const formattedDate = dDate ? formatDate(dDate) : 'N/A';
 
-        // Donor Name
+        // Donor Name & Donor Registered Blood Group
         const donorName = escapeHtml(log.donorName || 'Donor');
-        const donorBlood = log.bloodGroup ? `<span style="background: #fee2e2; color: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 9999px; font-weight: 700; margin-left: 6px;">🩸 ${escapeHtml(log.bloodGroup)}</span>` : '';
+        const displayBlood = log.donorRegisteredBloodGroup || log.donorBloodGroup || log.bloodGroup || '';
+        const donorBlood = displayBlood ? `<span style="background: #fee2e2; color: #dc2626; font-size: 11px; padding: 2px 6px; border-radius: 9999px; font-weight: 700; margin-left: 6px;">🩸 ${escapeHtml(displayBlood)}</span>` : '';
 
         // Patient Name
         const patientName = escapeHtml(log.patientName || 'Direct / Voluntary Camp');
@@ -484,7 +542,7 @@ window.downloadCertificate = async function (donationId) {
         const dDate = toDateObj(donation.donatedAt || donation.timestamp || donation.createdAt) || new Date();
         const hospitalName = donation.hospital || donation.hospitalName || 'Voluntary Camp / Blood Center';
         const donorName = donation.donorName || 'Valued Donor';
-        const bloodGroup = donation.bloodGroup || 'O+';
+        const bloodGroup = donation.donorRegisteredBloodGroup || donation.donorBloodGroup || donation.bloodGroup || 'O+';
 
         const blob = await generateDonorCertificate({
             name: donorName,
@@ -529,15 +587,23 @@ window.openDonorModal = async function (logId, donorId) {
     let donor = null;
 
     try {
-        if (donorId && donorId !== 'none') {
-            if (donorCache.has(donorId)) {
-                donor = donorCache.get(donorId);
+        const targetId = (donorId && donorId !== 'none') ? donorId : donation?.matchedDonorId;
+        if (targetId && targetId !== 'none') {
+            if (donorCache.has(targetId)) {
+                donor = donorCache.get(targetId);
             } else {
-                const donorSnap = await getDoc(doc(db, 'donors', donorId));
+                const donorSnap = await getDoc(doc(db, 'donors', targetId));
                 if (donorSnap.exists()) {
                     donor = { id: donorSnap.id, ...donorSnap.data() };
-                    donorCache.set(donorId, donor);
+                    donorCache.set(targetId, donor);
                 }
+            }
+        }
+
+        if (!donor && donation?.donorContact) {
+            const normContact = normalizePhoneNumber(donation.donorContact);
+            if (normContact && donorByPhone.has(normContact)) {
+                donor = donorByPhone.get(normContact);
             }
         }
 
@@ -547,7 +613,7 @@ window.openDonorModal = async function (logId, donorId) {
                 id: donorId || 'temp_donor_' + logId,
                 fullName: donation?.donorName || 'Anonymous Donor',
                 contactNumber: donation?.donorContact || '',
-                bloodGroup: donation?.bloodGroup || 'N/A',
+                bloodGroup: donation?.donorRegisteredBloodGroup || donation?.donorBloodGroup || donation?.bloodGroup || 'N/A',
                 city: 'N/A',
                 isEmergencyAvailable: 'Yes',
                 registeredAt: donation?.donatedAt || donation?.createdAt || new Date()

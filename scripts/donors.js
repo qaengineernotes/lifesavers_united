@@ -1884,6 +1884,7 @@ window.saveLogDonation = async function () {
         donorName: donor?.fullName || '',
         donorContact: donor?.contactNumber || '',
         bloodGroup: donor?.bloodGroup || '',
+        donorBloodGroup: donor?.bloodGroup || '',
         // Patient / request link
         patientName: patientName || '',
         requestId: linkedReqId || '',
