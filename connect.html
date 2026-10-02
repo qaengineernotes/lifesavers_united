@@ -109,6 +109,20 @@
             href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" />
     </noscript>
 
+    <!-- Specific styles for Donor Portal card -->
+    <style>
+        .link-card--portal {
+            border-color: rgba(124, 58, 237, 0.18);
+        }
+        .link-card--portal .link-icon-wrap {
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+        }
+        .link-card--portal:hover {
+            border-color: rgba(124, 58, 237, 0.35);
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.18);
+        }
+    </style>
+
     <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
     {
@@ -238,6 +252,27 @@
                 <div class="link-text">
                     <div class="link-title">Register as Donor</div>
                     <div class="link-subtitle">Become a life-saving blood donor</div>
+                </div>
+                <svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                    stroke-width="2.5">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                </svg>
+            </a>
+
+            <!-- Donor Portal -->
+            <a id="link-donor-portal" href="https://lifesaversunited.org/donor_portal"
+                class="link-card link-card--portal" target="_blank" rel="noopener noreferrer"
+                aria-label="Access Donor Portal">
+                <div class="link-icon-wrap">
+                    <!-- User / Badge icon -->
+                    <svg fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                </div>
+                <div class="link-text">
+                    <div class="link-title">Donor Portal</div>
+                    <div class="link-subtitle">Manage profile, donations & certificates</div>
                 </div>
                 <svg class="link-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                     stroke-width="2.5">
