@@ -816,16 +816,24 @@ function createDonationsTab(donor, donations) {
             html += `
                 <div class="info-card" id="donation-card-${donation.id}">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
-                        <h3 style="margin-bottom:0;">🩸 Donation #${index + 1}</h3>
-                        <button type="button" class="view-cert-btn text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 transition-colors cursor-pointer"
-                            onclick="downloadDonationCertificate('${donation.id}')"
-                            id="cert-btn-${donation.id}"
-                            title="Download Certificate for Donation #${index + 1}"
-                            style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;"
-                            onmouseover="this.style.background='#d1fae5';this.style.color='#065f46'"
-                            onmouseout="this.style.background='#ecfdf5';this.style.color='#047857'">
-                            📜 Certificate
-                        </button>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <button type="button" class="view-cert-btn text-xs font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 transition-colors cursor-pointer"
+                                onclick="downloadDonationCertificate('${donation.id}')"
+                                id="cert-btn-${donation.id}"
+                                title="Download Certificate for Donation #${index + 1}"
+                                style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:6px; border:1px solid #a7f3d0; background:#ecfdf5; color:#047857; font-size:12px; font-weight:700; cursor:pointer; transition:all 0.2s;"
+                                onmouseover="this.style.background='#d1fae5';this.style.color='#065f46'"
+                                onmouseout="this.style.background='#ecfdf5';this.style.color='#047857'">
+                                📜 Certificate
+                            </button>
+                            <a href="/donor_card?donorName=${encodeURIComponent(currentViewingDonor.fullName || currentViewingDonor.name || '')}&date=${encodeURIComponent(formatDateTime(donation.timestamp || donation.donatedAt))}&hospital=${encodeURIComponent(donation.hospital || '')}&patientName=${encodeURIComponent((donation.patientName && donation.patientName !== 'Not specified' && donation.patientName !== 'Direct / Voluntary Camp') ? donation.patientName : '')}&milestone=${index + 1}&logId=${encodeURIComponent(donation.id)}" target="_blank"
+                                style="display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:6px; border:1px solid #fecaca; background:#fef2f2; color:#b91c1c; font-size:12px; font-weight:700; text-decoration:none; cursor:pointer; transition:all 0.2s;"
+                                onmouseover="this.style.background='#fee2e2';this.style.color='#991b1b'"
+                                onmouseout="this.style.background='#fef2f2';this.style.color='#b91c1c'"
+                                title="Create Studio Hero Appreciation Card">
+                                🎖️ Hero Card
+                            </a>
+                        </div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Patient Name:</div>

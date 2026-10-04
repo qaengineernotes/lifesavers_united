@@ -640,6 +640,9 @@ function renderDonationHistory() {
                         <button type="button" class="text-xs font-bold text-emerald-700 hover:text-emerald-900 view-cert-btn flex items-center gap-1 bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-md border border-emerald-200 transition-colors cursor-pointer" data-id="${safeId}">
                             📜 Certificate
                         </button>
+                        <a href="/donor_card?donorName=${encodeURIComponent(currentDonorData?.fullName || '')}&date=${encodeURIComponent(formattedDate)}&hospital=${encodeURIComponent(d.hospital || '')}&patientName=${encodeURIComponent((d.patientName && d.patientName !== 'Direct / Voluntary Camp') ? d.patientName : '')}&logId=${encodeURIComponent(safeId)}" target="_blank" class="text-xs font-bold text-red-700 hover:text-red-900 flex items-center gap-1 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md border border-red-200 transition-colors" title="Create Studio Hero Appreciation Card">
+                            🎖️ Hero Card
+                        </a>
                     </div>
                     
                     ${!isOfficial ? `

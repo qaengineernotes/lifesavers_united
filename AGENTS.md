@@ -78,6 +78,11 @@ NOT bare `npx tailwindcss` which would miss the component tagging.
 **CRITICAL RULE FOR RUNNING `npm run build:css`:**
 Before running `npm run build:css`, you MUST check if any custom, plain CSS rules are getting deleted from `css/main.css` (e.g. by comparing the differences). Check if the deleted CSS classes/selectors are used anywhere in the project. If they are used anywhere, do NOT run the build command. Instead, ask the user to manually add the custom CSS rules to `css/tailwind.css` first.
 
+### No CSS Writing in HTML Pages (Strict Global Rule)
+- **NEVER** write CSS inside `<style>` tags or inline `style="..."` attributes within `.html` files.
+- All styles must strictly reside in external `.css` files (e.g., `css/donor-portal.css`, `css/main.css`, etc.) without modifying or breaking existing CSS rules.
+- HTML files must only link to external `.css` stylesheets via `<link rel="stylesheet">`.
+
 ### Local Development
 - Use `server.py` for local dev - it handles CORS and proxies to Google Apps Script
 - Direct file:// won't work due to CORS restrictions

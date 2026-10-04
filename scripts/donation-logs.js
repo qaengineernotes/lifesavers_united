@@ -363,10 +363,13 @@ function renderTable() {
             <td>
                 ${typeBadge}
             </td>
-            <td style="text-align: center;">
+            <td style="text-align: center; white-space: nowrap;">
                 <button id="cert-btn-${log.id}" class="cert-btn" onclick="downloadCertificate('${log.id}')" title="Download Certificate of Appreciation">
                     📜 Certificate
                 </button>
+                <a href="/donor_card?donorName=${encodeURIComponent(log.donorName || '')}&date=${encodeURIComponent(formattedDate !== 'N/A' ? formattedDate : '')}&hospital=${encodeURIComponent(log.hospital || log.hospitalName || '')}&patientName=${encodeURIComponent((log.patientName && log.patientName !== 'Direct / Voluntary Camp') ? log.patientName : '')}&logId=${encodeURIComponent(log.id || '')}" target="_blank" class="cert-btn" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); margin-left: 6px;" title="Generate Studio Hero Appreciation Card">
+                    🎖️ Hero Card
+                </a>
             </td>
         `;
 
