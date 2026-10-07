@@ -1,0 +1,1700 @@
+/**
+ * LifeSavers United - Donor Registration Redesign Stylesheet
+ * File: css/donor-registration.css
+ * Follows strict design system: crimson accents, clean whitespace, accessible UX, zero inline styles.
+ */
+
+:root {
+  --lsu-crimson: #dc2626;
+  --lsu-crimson-dark: #b91c1c;
+  --lsu-crimson-deep: #991b1b;
+  --lsu-crimson-light: #fee2e2;
+  --lsu-crimson-subtle: #fef2f2;
+  --lsu-cream: #faf7f2;
+  --lsu-cream-light: #fdfbf7;
+  --lsu-charcoal: #0f172a;
+  --lsu-charcoal-muted: #334155;
+  --lsu-charcoal-subtle: #64748b;
+  --lsu-border: #e2e8f0;
+  --lsu-border-crimson: #fecaca;
+  --lsu-card-bg: #ffffff;
+  --lsu-radius-lg: 1.25rem;
+  --lsu-radius-xl: 1.5rem;
+  --lsu-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --lsu-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  --lsu-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.04);
+  --lsu-shadow-glow: 0 8px 25px -4px rgba(220, 38, 38, 0.25);
+}
+
+/* Base resets & typography for donor registration */
+.donor-form-page {
+  background-color: #fcfbf9;
+  color: var(--lsu-charcoal);
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Section Rhythm Backgrounds */
+.section-white {
+  background-color: #ffffff;
+}
+
+.section-cream {
+  background-color: var(--lsu-cream);
+}
+
+.section-cream-light {
+  background-color: var(--lsu-cream-light);
+}
+
+.section-tint-subtle {
+  background-color: #fef8f8;
+}
+
+/* Badge & Section Labels */
+.section-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.875rem;
+  border-radius: 9999px;
+  background-color: var(--lsu-crimson-subtle);
+  border: 1px solid var(--lsu-border-crimson);
+  color: var(--lsu-crimson-dark);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 0.875rem;
+}
+
+.section-badge-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background-color: var(--lsu-crimson);
+  animation: pulseDot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.3); }
+}
+
+.section-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  font-weight: 800;
+  color: var(--lsu-charcoal);
+  letter-spacing: -0.02em;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .section-title {
+    font-size: 2.5rem;
+  }
+}
+
+.section-subtitle {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--lsu-charcoal-subtle);
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ==========================================================================
+   1. HERO SECTION
+   ========================================================================== */
+.hero-registration {
+  position: relative;
+  background: radial-gradient(circle at 50% 0%, #fff1f1 0%, #fcfbf9 70%);
+  border-bottom: 1px solid rgba(220, 38, 38, 0.1);
+  padding: 4rem 1rem 4.5rem;
+  text-align: center;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .hero-registration {
+    padding: 5.5rem 1.5rem 5.5rem;
+  }
+}
+
+.hero-drop-bg {
+  position: absolute;
+  top: -60px;
+  right: -60px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.07) 0%, rgba(220, 38, 38, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-drop-bg-left {
+  position: absolute;
+  bottom: -40px;
+  left: -40px;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.06) 0%, rgba(220, 38, 38, 0) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.hero-content {
+  position: relative;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.hero-headline {
+  font-size: 2.25rem;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--lsu-charcoal);
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .hero-headline {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .hero-headline {
+    font-size: 3.5rem;
+  }
+}
+
+.hero-headline-accent {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.hero-desc {
+  font-size: 1.125rem;
+  line-height: 1.65;
+  color: var(--lsu-charcoal-muted);
+  max-width: 44rem;
+  margin: 0 auto 2rem;
+}
+
+@media (min-width: 768px) {
+  .hero-desc {
+    font-size: 1.25rem;
+  }
+}
+
+.hero-cta-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 2.5rem;
+}
+
+.btn-hero-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  padding: 1rem 2.25rem;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  transition: all 0.25s ease;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-hero-primary:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+  color: #ffffff;
+}
+
+.btn-hero-primary:active {
+  transform: translateY(0);
+}
+
+/* Trust Indicators */
+.trust-indicators-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  padding-top: 0.5rem;
+}
+
+.trust-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--lsu-charcoal-muted);
+}
+
+.trust-item-icon {
+  color: #059669;
+  font-size: 1rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ==========================================================================
+   2. WHY JOIN LIFESAVERS UNITED?
+   ========================================================================== */
+.features-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 640px) {
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .features-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.feature-card {
+  background: var(--lsu-card-bg);
+  border: 1px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-lg);
+  padding: 2rem 1.75rem;
+  box-shadow: var(--lsu-shadow-sm);
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--lsu-border-crimson);
+  box-shadow: var(--lsu-shadow-lg);
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.25s ease;
+}
+
+.feature-card:hover::before {
+  background: linear-gradient(90deg, #dc2626, #f87171);
+}
+
+.feature-icon-badge {
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 1rem;
+  background: var(--lsu-crimson-subtle);
+  border: 1px solid var(--lsu-border-crimson);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1.25rem;
+  flex-shrink: 0;
+}
+
+.feature-title {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.5rem;
+}
+
+.feature-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--lsu-charcoal-subtle);
+}
+
+/* ==========================================================================
+   3. HOW IT WORKS (Timeline Section)
+   ========================================================================== */
+.how-it-works-wrap {
+  margin-top: 3.5rem;
+}
+
+/* Desktop Horizontal Timeline */
+.timeline-desktop {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .timeline-desktop {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+    position: relative;
+  }
+
+  .timeline-desktop-track {
+    position: absolute;
+    top: 2rem;
+    left: 8%;
+    right: 8%;
+    height: 2px;
+    background: #e2e8f0;
+    z-index: 0;
+  }
+}
+
+.timeline-step {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.timeline-step-badge {
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #e2e8f0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1rem;
+  color: var(--lsu-crimson);
+  margin-bottom: 1.25rem;
+  transition: all 0.25s ease;
+}
+
+.timeline-step:hover .timeline-step-badge {
+  border-color: var(--lsu-crimson);
+  background: var(--lsu-crimson-subtle);
+  transform: scale(1.08);
+}
+
+.timeline-step-title {
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.375rem;
+}
+
+.timeline-step-desc {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  color: var(--lsu-charcoal-subtle);
+  max-width: 11rem;
+}
+
+/* Mobile Vertical Timeline */
+.timeline-mobile {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  padding-left: 1.5rem;
+  border-left: 2px solid #fed7d7;
+  margin-left: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .timeline-mobile {
+    display: none;
+  }
+}
+
+.timeline-mobile-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-mobile-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-mobile-dot {
+  position: absolute;
+  left: -2.35rem;
+  top: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 50%;
+  background: var(--lsu-crimson);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.6875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 0 4px #ffffff, 0 2px 4px rgba(220, 38, 38, 0.3);
+}
+
+.timeline-mobile-card {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  box-shadow: var(--lsu-shadow-sm);
+}
+
+.timeline-mobile-title {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.timeline-mobile-desc {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--lsu-charcoal-subtle);
+}
+
+/* ==========================================================================
+   4. DONOR REGISTRATION FORM CONTAINER & VISUAL GROUPS
+   ========================================================================== */
+.registration-section-wrap {
+  position: relative;
+  padding: 4.5rem 1rem;
+  background-color: var(--lsu-cream-light);
+}
+
+@media (min-width: 768px) {
+  .registration-section-wrap {
+    padding: 5.5rem 1.5rem;
+  }
+}
+
+.form-shell {
+  max-width: 54rem;
+  margin: 0 auto;
+}
+
+.form-main-card {
+  background: #ffffff;
+  border-radius: var(--lsu-radius-xl);
+  border: 1px solid #fed7d7;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  padding: 2rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .form-main-card {
+    padding: 3rem 2.5rem;
+  }
+}
+
+/* Donor Portal Callout Banner in Form */
+.portal-reminder-banner {
+  background: #fff5f5;
+  border: 1px solid #fecaca;
+  border-radius: 0.875rem;
+  padding: 0.875rem 1.25rem;
+  font-size: 0.875rem;
+  color: #7f1d1d;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+@media (min-width: 640px) {
+  .portal-reminder-banner {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.portal-reminder-link {
+  font-weight: 700;
+  color: var(--lsu-crimson-dark);
+  text-decoration: underline;
+  transition: color 0.15s ease;
+}
+
+.portal-reminder-link:hover {
+  color: var(--lsu-crimson);
+}
+
+/* Visual Groups inside Form */
+.form-step-group {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.form-step-group:last-of-type {
+  border-bottom: none;
+  margin-bottom: 1rem;
+  padding-bottom: 0;
+}
+
+.form-step-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-step-num {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: var(--lsu-crimson-subtle);
+  border: 1px solid var(--lsu-border-crimson);
+  color: var(--lsu-crimson);
+  font-weight: 800;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.form-step-title-box {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-step-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  color: var(--lsu-charcoal);
+  line-height: 1.2;
+}
+
+.form-step-desc {
+  font-size: 0.8125rem;
+  color: var(--lsu-charcoal-subtle);
+}
+
+/* Form Inputs & Elements Refinements */
+.donor-form-page .form-row {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.donor-form-page .form-row .form-group {
+  flex: 1;
+  min-width: 240px;
+  margin-bottom: 0;
+}
+
+.donor-form-page .form-group {
+  margin-bottom: 1.25rem;
+}
+
+.donor-form-page label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #334155;
+  margin-bottom: 0.375rem;
+}
+
+.donor-form-page input[type="text"],
+.donor-form-page input[type="date"],
+.donor-form-page input[type="tel"],
+.donor-form-page input[type="email"],
+.donor-form-page select,
+.donor-form-page textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 0.625rem;
+  border: 1.5px solid #e2e8f0;
+  background-color: #ffffff;
+  font-size: 0.9375rem;
+  color: var(--lsu-charcoal);
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.donor-form-page input[type="text"]:focus,
+.donor-form-page input[type="date"]:focus,
+.donor-form-page input[type="tel"]:focus,
+.donor-form-page input[type="email"]:focus,
+.donor-form-page select:focus,
+.donor-form-page textarea:focus {
+  outline: none;
+  border-color: var(--lsu-crimson);
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.12);
+}
+
+.donor-form-page textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+/* Blood Type Grid Modernization */
+.donor-form-page .blood-type-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .donor-form-page .blood-type-grid {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+.donor-form-page .blood-type-option {
+  position: relative;
+  background: transparent !important;
+  border-radius: 0.625rem;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.donor-form-page .blood-type-option.ring-2,
+.donor-form-page .blood-type-option.ring-primary,
+.donor-form-page .blood-type-option.bg-accent-100 {
+  background-color: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  --tw-ring-shadow: 0 0 #0000 !important;
+  --tw-ring-offset-shadow: 0 0 #0000 !important;
+  --tw-ring-color: transparent !important;
+  outline: none !important;
+  border: none !important;
+}
+
+.donor-form-page .blood-type-option label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 3rem;
+  padding: 0;
+  background: #f8fafc;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 0.625rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #1e293b;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  outline: none;
+}
+
+.donor-form-page .blood-type-option label:hover {
+  border-color: var(--lsu-crimson);
+  background: #fef2f2;
+}
+
+.donor-form-page .blood-type-option input[type="radio"]:checked + label {
+  background: var(--lsu-crimson);
+  color: #ffffff;
+  border-color: var(--lsu-crimson-dark);
+  box-shadow: 0 4px 10px rgba(220, 38, 38, 0.35);
+  transform: translateY(-2px);
+}
+
+/* Captcha Box */
+.donor-form-page .captcha-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1rem 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .donor-form-page .captcha-container {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+.donor-form-page .captcha-question {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 0.9375rem;
+  min-width: 160px;
+}
+
+.donor-form-page .captcha-refresh-btn {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.375rem;
+  padding: 0.375rem;
+  cursor: pointer;
+  color: #64748b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.donor-form-page .captcha-refresh-btn:hover {
+  color: var(--lsu-crimson);
+  border-color: var(--lsu-border-crimson);
+  background: #fef2f2;
+}
+
+.donor-form-page .captcha-container input[type="text"] {
+  max-width: 180px;
+  background: #ffffff;
+}
+
+/* Consent checkboxes */
+.donor-form-page .consent-section {
+  background: #fafafa;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin-top: 1rem;
+}
+
+.donor-form-page .consent-checkbox input[type="checkbox"] {
+  accent-color: var(--lsu-crimson);
+  width: 1.15rem;
+  height: 1.15rem;
+  margin-top: 0.15rem;
+  flex-shrink: 0;
+}
+
+/* Primary Register Button */
+.donor-form-page .btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-size: 1.125rem;
+  font-weight: 800;
+  padding: 1.125rem 2rem;
+  border-radius: 0.75rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.3);
+  transition: all 0.2s ease;
+  letter-spacing: 0.01em;
+  margin-top: 1.5rem;
+}
+
+.donor-form-page .btn:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.4);
+  transform: translateY(-2px);
+}
+
+.donor-form-page .btn:active {
+  transform: translateY(0);
+}
+
+/* City Autocomplete Dropdown */
+.city-autocomplete-container {
+  position: relative;
+}
+
+.city-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  box-shadow: var(--lsu-shadow-lg);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 50;
+  margin-top: 0.25rem;
+}
+
+.city-suggestion {
+  padding: 0.625rem 1rem;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  color: #1e293b;
+  transition: background 0.15s ease;
+}
+
+.city-suggestion:hover {
+  background-color: #fef2f2;
+  color: var(--lsu-crimson);
+}
+
+/* Error Messages */
+.error-message {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: #ef4444;
+  margin-top: 0.375rem;
+}
+
+.border-error {
+  border-color: #ef4444 !important;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.15) !important;
+}
+
+/* ==========================================================================
+   5. YOUR INFORMATION. YOUR CONTROL.
+   ========================================================================== */
+.control-section-card {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-xl);
+  padding: 2.5rem 1.75rem;
+  box-shadow: var(--lsu-shadow-md);
+  max-width: 58rem;
+  margin: 3rem auto 0;
+}
+
+@media (min-width: 768px) {
+  .control-section-card {
+    padding: 3.5rem 3rem;
+  }
+}
+
+.control-points-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  margin: 2rem 0 2.5rem;
+}
+
+@media (min-width: 640px) {
+  .control-points-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.control-point-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  background: #f8fafc;
+  border: 1px solid #f1f5f9;
+  border-radius: 0.875rem;
+  padding: 1.125rem;
+}
+
+.control-check-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: #dcfce7;
+  color: #15803d;
+  font-weight: 800;
+  font-size: 0.875rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.control-point-text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.btn-secondary-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: var(--lsu-crimson-dark);
+  border: 1.5px solid var(--lsu-crimson);
+  font-weight: 700;
+  font-size: 0.9375rem;
+  padding: 0.875rem 1.75rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary-outline:hover {
+  background: #fef2f2;
+  color: var(--lsu-crimson);
+  transform: translateY(-1px);
+}
+
+/* ==========================================================================
+   6. WHAT HAPPENS WHEN SOMEONE NEEDS YOUR BLOOD?
+   ========================================================================== */
+.flow-journey-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 58rem;
+  margin: 3.5rem auto 0;
+}
+
+@media (min-width: 640px) {
+  .flow-journey-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .flow-journey-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.flow-step-card {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--lsu-shadow-sm);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.flow-step-card:hover {
+  border-color: var(--lsu-border-crimson);
+  box-shadow: var(--lsu-shadow-md);
+  transform: translateY(-2px);
+}
+
+.flow-step-index {
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lsu-crimson);
+  margin-bottom: 0.375rem;
+  text-align: center;
+}
+
+.flow-step-name {
+  font-size: 1.0625rem;
+  font-weight: 800;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.flow-step-desc {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--lsu-charcoal-subtle);
+}
+
+.flow-disclaimer-card {
+  background: #fff8f8;
+  border: 1px solid #fee2e2;
+  border-radius: 1rem;
+  padding: 1.25rem 1.5rem;
+  margin-top: 2rem;
+  max-width: 58rem;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.flow-disclaimer-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #7f1d1d;
+}
+
+/* ==========================================================================
+   7. YOUR DONOR PORTAL & MOCKUP
+   ========================================================================== */
+.portal-section-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2.5rem;
+  align-items: center;
+  max-width: 68rem;
+  margin: 3.5rem auto 0;
+}
+
+@media (min-width: 1024px) {
+  .portal-section-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+.portal-feature-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.portal-feature-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.portal-feature-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+}
+
+.portal-feature-row h4 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.125rem;
+}
+
+.portal-feature-row p {
+  font-size: 0.875rem;
+  color: var(--lsu-charcoal-subtle);
+  line-height: 1.5;
+}
+
+/* Realistic Donor Portal Mockup */
+.portal-mockup-frame {
+  background: linear-gradient(145deg, #1e293b 0%, #0f172a 100%);
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35);
+  border: 1px solid #334155;
+  color: #ffffff;
+  position: relative;
+}
+
+.portal-mockup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.portal-mockup-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #fca5a5;
+}
+
+.portal-mockup-badge {
+  background: rgba(34, 197, 94, 0.2);
+  color: #4ade80;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(34, 197, 94, 0.4);
+}
+
+/* The actual Digital Donor Card inside Mockup */
+.mockup-donor-card {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  color: #ffffff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.mockup-donor-card-watermark {
+  position: absolute;
+  right: -15px;
+  bottom: -20px;
+  font-size: 6rem;
+  opacity: 0.15;
+  user-select: none;
+  pointer-events: none;
+}
+
+.mockup-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.mockup-card-sub {
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.mockup-card-blood {
+  font-size: 1.75rem;
+  font-weight: 900;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mockup-card-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 0.25rem;
+}
+
+.mockup-card-id {
+  font-size: 0.75rem;
+  opacity: 0.85;
+  font-family: monospace;
+  margin-bottom: 1rem;
+}
+
+.mockup-card-stats {
+  display: flex;
+  gap: 1.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.75rem;
+}
+
+.mockup-card-stat strong {
+  display: block;
+  font-size: 0.9375rem;
+  font-weight: 800;
+}
+
+/* Quick mini bar in Mockup */
+.mockup-tabs-bar {
+  display: flex;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.375rem;
+  border-radius: 0.625rem;
+}
+
+.mockup-tab-pill {
+  flex: 1;
+  text-align: center;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  color: #94a3b8;
+}
+
+.mockup-tab-pill.active {
+  background: #ffffff;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+/* ==========================================================================
+   8. WHO MAY NEED YOUR DONATION?
+   ========================================================================== */
+.who-needs-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 68rem;
+  margin: 3rem auto 0;
+}
+
+@media (min-width: 640px) {
+  .who-needs-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .who-needs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.who-needs-card {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--lsu-shadow-sm);
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: flex-start;
+  gap: 1.125rem;
+}
+
+.who-needs-card:hover {
+  border-color: var(--lsu-border-crimson);
+  box-shadow: var(--lsu-shadow-md);
+  transform: translateY(-2px);
+}
+
+.who-needs-drop {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 0.75rem;
+  background: var(--lsu-crimson-subtle);
+  border: 1px solid var(--lsu-border-crimson);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.who-needs-title {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.375rem;
+  letter-spacing: -0.01em;
+}
+
+.who-needs-desc {
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: var(--lsu-charcoal-subtle);
+}
+
+/* ==========================================================================
+   9. REAL PEOPLE. REAL STORIES.
+   ========================================================================== */
+.stories-grid-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.75rem;
+  max-width: 68rem;
+  margin: 3.5rem auto 0;
+}
+
+@media (min-width: 768px) {
+  .stories-grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.story-card-item {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-lg);
+  overflow: hidden;
+  box-shadow: var(--lsu-shadow-sm);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.25s ease;
+}
+
+.story-card-item:hover {
+  box-shadow: var(--lsu-shadow-lg);
+  border-color: var(--lsu-border-crimson);
+  transform: translateY(-4px);
+}
+
+.story-card-image-wrap {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  background-color: #f1f5f9;
+  overflow: hidden;
+}
+
+.story-card-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 15%;
+  transition: transform 0.35s ease;
+}
+
+.story-card-item:hover .story-card-img {
+  transform: scale(1.04);
+}
+
+.story-category-pill {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(4px);
+  color: #ffffff;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+}
+
+.story-card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.story-person-name {
+  font-size: 1.1875rem;
+  font-weight: 800;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.25rem;
+}
+
+.story-person-role {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--lsu-crimson);
+  margin-bottom: 0.75rem;
+}
+
+.story-excerpt-text {
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--lsu-charcoal-subtle);
+  margin-bottom: 1.25rem;
+  flex: 1;
+}
+
+.story-read-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--lsu-crimson-dark);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.story-read-link:hover {
+  color: var(--lsu-crimson);
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   10. BUILD THE NETWORK
+   ========================================================================== */
+.share-network-card {
+  background: linear-gradient(135deg, #fff5f5 0%, #ffffff 100%);
+  border: 1.5px solid var(--lsu-border-crimson);
+  border-radius: var(--lsu-radius-xl);
+  padding: 3rem 1.5rem;
+  text-align: center;
+  max-width: 50rem;
+  margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(220, 38, 38, 0.06);
+}
+
+@media (min-width: 640px) {
+  .share-network-card {
+    padding: 3.5rem 3rem;
+  }
+}
+
+.share-network-title {
+  font-size: 1.875rem;
+  font-weight: 900;
+  line-height: 1.2;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .share-network-title {
+    font-size: 2.25rem;
+  }
+}
+
+.share-network-desc {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--lsu-charcoal-muted);
+  max-width: 36rem;
+  margin: 0 auto 2rem;
+}
+
+.btn-whatsapp-share {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background: #25d366;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.0625rem;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+  transition: all 0.2s ease;
+}
+
+.btn-whatsapp-share:hover {
+  background: #20ba59;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 211, 102, 0.45);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   11. NEED HELP?
+   ========================================================================== */
+.help-options-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+  max-width: 58rem;
+  margin: 3rem auto 0;
+}
+
+@media (min-width: 768px) {
+  .help-options-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.help-option-card {
+  background: #ffffff;
+  border: 1.5px solid var(--lsu-border);
+  border-radius: var(--lsu-radius-lg);
+  padding: 1.75rem 1.5rem;
+  text-align: center;
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.2s ease;
+  box-shadow: var(--lsu-shadow-sm);
+}
+
+.help-option-card:hover {
+  border-color: var(--lsu-crimson);
+  box-shadow: var(--lsu-shadow-md);
+  transform: translateY(-3px);
+}
+
+.help-option-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: var(--lsu-crimson-subtle);
+  border: 1px solid var(--lsu-border-crimson);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.help-option-label {
+  font-size: 1.125rem;
+  font-weight: 800;
+  color: var(--lsu-charcoal);
+  margin-bottom: 0.375rem;
+}
+
+.help-option-sub {
+  font-size: 0.875rem;
+  color: var(--lsu-charcoal-subtle);
+  margin-bottom: 0.75rem;
+}
+
+.help-option-contact {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--lsu-crimson-dark);
+}
+
+/* ==========================================================================
+   12. FAQ (Accordion)
+   ========================================================================== */
+.faq-accordion-wrap {
+  max-width: 52rem;
+  margin: 3rem auto 0;
+}
+
+.faq-category-header {
+  font-size: 0.875rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lsu-crimson-dark);
+  margin: 2rem 0 1rem;
+  padding-left: 0.5rem;
+  border-left: 3px solid var(--lsu-crimson);
+}
+
+.faq-category-header:first-of-type {
+  margin-top: 0;
+}
+
+.faq-accordion-item {
+  background: #ffffff;
+  border: 1px solid var(--lsu-border);
+  border-radius: 0.875rem;
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.faq-accordion-item:hover {
+  border-color: #cbd5e1;
+}
+
+.faq-accordion-item.active {
+  border-color: var(--lsu-border-crimson);
+  box-shadow: var(--lsu-shadow-sm);
+}
+
+.faq-accordion-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.125rem 1.25rem;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--lsu-charcoal);
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.faq-accordion-trigger:hover {
+  color: var(--lsu-crimson-dark);
+}
+
+.faq-accordion-icon {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #94a3b8;
+  transition: transform 0.25s ease;
+  flex-shrink: 0;
+}
+
+.faq-accordion-item.active .faq-accordion-icon {
+  transform: rotate(45deg);
+  color: var(--lsu-crimson);
+}
+
+.faq-accordion-content {
+  display: none;
+  padding: 0 1.25rem 1.25rem;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--lsu-charcoal-muted);
+}
+
+.faq-accordion-item.active .faq-accordion-content {
+  display: block;
+}
+
+/* ==========================================================================
+   13. MOBILE STICKY BUTTON
+   ========================================================================== */
+.mobile-sticky-cta {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 40;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+@media (min-width: 768px) {
+  .mobile-sticky-cta {
+    display: none;
+  }
+}
+
+.mobile-sticky-cta-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  max-width: 22rem;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1rem;
+  padding: 0.875rem 1.5rem;
+  border-radius: 9999px;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.45);
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-sticky-cta.hidden-by-form {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+
+/* Footer logo class (replaces inline style height: 65px) */
+.footer-brand-logo {
+  height: 65px;
+  width: auto;
+}

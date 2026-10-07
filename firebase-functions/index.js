@@ -10,14 +10,16 @@ const db = admin.firestore();
 // Initialize Bot and Twitter Client (lazily or global if config available)
 // We rely on functions.config() for secrets
 // Run: firebase functions:config:set telegram.token="YOUR_TOKEN" twitter.api_key="KEY" ...
-const bot = new Telegraf(functions.config().telegram.token);
+const telegramConfig = (functions.config && functions.config().telegram) || {};
+const bot = new Telegraf(telegramConfig.token || "");
 
 // Twitter Client Setup
+const twitterConfig = (functions.config && functions.config().twitter) || {};
 const twitterClient = new TwitterApi({
-    appKey: functions.config().twitter.api_key,
-    appSecret: functions.config().twitter.api_secret,
-    accessToken: functions.config().twitter.access_token,
-    accessSecret: functions.config().twitter.access_secret,
+    appKey: twitterConfig.api_key || "",
+    appSecret: twitterConfig.api_secret || "",
+    accessToken: twitterConfig.access_token || "",
+    accessSecret: twitterConfig.access_secret || "",
 });
 
 // --- SHARED TWITTER POSTING FUNCTION ---
@@ -759,18 +761,9 @@ exports.submitDonorRegistration = functions.https.onCall(async (data, context) =
         const searchName = (donorData.fullName || '').trim();
         const searchContact = normalizePhoneNumber(donorData.contactNumber);
 
-        // 1. Search by Contact Number
+        // 1. Search by Contact Number (Phone number is the unique donor identifier)
         if (searchContact) {
             const snapshot = await donorsRef.where('contactNumber', '==', searchContact).get();
-            if (!snapshot.empty) {
-                existingDonor = snapshot.docs[0];
-                donorId = existingDonor.id;
-            }
-        }
-
-        // 2. Search by Name
-        if (!existingDonor && searchName) {
-            const snapshot = await donorsRef.where('fullName', '==', searchName).get();
             if (!snapshot.empty) {
                 existingDonor = snapshot.docs[0];
                 donorId = existingDonor.id;

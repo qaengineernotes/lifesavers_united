@@ -4,20 +4,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Register as a Blood Donor | LifeSavers United - Save Lives Today</title>
+    <title>Become a Blood Donor | LifeSavers United - Save Lives Today</title>
 
     <!-- SEO Meta Tags -->
     <meta name="description"
-        content="Register as a blood donor with LifeSavers United. Join our community of heroes saving lives through blood donation. Easy registration process, health screening, and ongoing support for donors.">
+        content="Register as a blood donor with LifeSavers United. Join our emergency donor network and help save lives across Gujarat. Free registration, zero obligation, and full privacy control.">
     <meta name="keywords"
-        content="blood donor registration, become a blood donor, donor signup, blood donation registration, donor application, blood donor form, join blood donors, register to donate blood">
+        content="blood donor registration, become a blood donor, donor signup, blood donation registration, donor application, blood donor form, join blood donors, register to donate blood, LifeSavers United">
     <meta name="author" content="LifeSavers United">
     <meta name="robots" content="index, follow">
 
     <!-- Open Graph Meta Tags (WhatsApp, Facebook, LinkedIn) -->
-    <meta property="og:title" content="Become a Blood Donor - Save Lives Today!">
+    <meta property="og:title" content="Become a Blood Donor - Save Lives Today | LifeSavers United">
     <meta property="og:description"
-        content="Join LifeSavers United and become a hero! Register as a blood donor in just 2 minutes. Your donation can save up to 3 lives. Easy registration, ongoing support, and a community of lifesavers waiting for you.">
+        content="Join LifeSavers United and become a hero! Register as a blood donor in just 2 minutes. Your blood could be the reason someone gets another tomorrow.">
     <meta property="og:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
     <meta property="og:image:secure_url" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
     <meta property="og:image:width" content="1200">
@@ -27,11 +27,11 @@
     <meta property="og:url" content="https://lifesaversunited.org/donor_registration">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="LifeSavers United">
-    <meta property="og:locale" content="en_US">
+    <meta property="og:locale" content="en_IN">
 
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Become a Blood Donor - Save Lives Today!">
+    <meta name="twitter:title" content="Become a Blood Donor - Save Lives Today | LifeSavers United">
     <meta name="twitter:description"
         content="Join LifeSavers United and become a hero! Register as a blood donor in just 2 minutes. Your donation can save up to 3 lives.">
     <meta name="twitter:image" content="https://lifesaversunited.org/imgs/lifesavers-United.jpg">
@@ -82,25 +82,25 @@
     <!-- Web App Manifest -->
     <link rel="manifest" href="imgs/favicon/manifest.json">
 
-    <!-- Optimized CSS and Fonts Loading -->
+    <!-- Stylesheets: External main + Redesign stylesheet -->
     <link rel="preload" as="style" href="css/main.css">
     <link rel="stylesheet" href="css/main.css">
-
+    <link rel="stylesheet" href="css/donor-registration.css">
 
     <!-- Preconnect for Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- Load combined fonts with display=swap + preload trick to prevent render blocking -->
+    <!-- Load fonts -->
     <link rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Crimson+Text:wght@400;600&display=swap"
         as="style" />
     <link rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Crimson+Text:wght@400;600&display=swap"
         media="print" onload="this.media='all'" />
     <noscript>
         <link rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Crimson+Text:wght@400;600&display=swap" />
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Crimson+Text:wght@400;600&display=swap" />
     </noscript>
 
     <!-- Structured Data (JSON-LD) -->
@@ -108,8 +108,8 @@
     {
         "@context": "https://schema.org",
         "@type": "WebPage",
-        "name": "Blood Donor Registration - Join LifeSavers United",
-        "description": "Register as a blood donor with LifeSavers United. Join our community of heroes saving lives through blood donation. Easy registration process and ongoing support.",
+        "name": "Blood Donor Registration - LifeSavers United",
+        "description": "Register as a blood donor with LifeSavers United. Join Gujarat's largest emergency blood donation network.",
         "url": "https://lifesaversunited.org/donor_registration",
         "potentialAction": {
             "@type": "RegisterAction",
@@ -119,13 +119,29 @@
         "mainEntity": {
             "@type": "Service",
             "name": "Blood Donor Registration Service",
-            "description": "Registration service for new blood donors to join the LifeSavers United community",
+            "description": "Free voluntary blood donor registration service connecting verified donors with emergency patient requirements across Gujarat and India.",
             "provider": {
-                "@type": "Organization",
+                "@type": "NonprofitOrganization",
                 "name": "LifeSavers United",
-                "url": "https://lifesaversunited.org"
+                "url": "https://lifesaversunited.org",
+                "logo": "https://lifesaversunited.org/imgs/Life-saver-united-logo.png",
+                "address": {
+                    "@type": "PostalAddress",
+                    "addressLocality": "Ahmedabad",
+                    "addressRegion": "Gujarat",
+                    "addressCountry": "IN"
+                }
             },
-            "areaServed": "India",
+            "areaServed": [
+                {
+                    "@type": "AdministrativeArea",
+                    "name": "Gujarat"
+                },
+                {
+                    "@type": "Country",
+                    "name": "India"
+                }
+            ],
             "serviceType": "Blood Donor Registration"
         }
     }
@@ -150,6 +166,70 @@
         ]
     }
     </script>
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Who can register as a donor?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Any healthy adult between 18 and 65 years of age weighing at least 45 kg (or 50 kg for Single Donor Platelet donations) can register. You should not have any active serious medical conditions or recent major surgery."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How long does registration take?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Registration takes less than 2 minutes. Simply fill in your basic personal details, blood group, and location in the form."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Does registering mean I must donate whenever contacted?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Registering is completely voluntary. When an emergency requirement matches your blood group and location, you always decide whether you are available and fit to donate."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How often can I donate blood or platelets?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "For Whole Blood, male donors can donate every 90 days (3 months) and female donors every 120 days (4 months). For Single Donor Platelets (SDP), donors can safely donate every 14 days, up to a maximum of 24 times a year."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does emergency donor matching work?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "When an urgent blood requirement arises in your vicinity, an authorized LifeSavers United coordinator reaches out via your preferred contact channel (WhatsApp, phone call, or SMS). If you agree, you visit the certified hospital blood bank or donation center."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is my personal information publicly visible?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. Your personal contact number and medical history are never published publicly on the internet. Only verified emergency coordinators handle match outreach in accordance with our strict privacy policy."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Where can I track my donation history and digital donor card?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "You can view your complete donation logs, calculate your next eligible donation date, and download your verified Digital Donor Card anytime by logging into the LifeSavers United Donor Portal with your registered phone number."
+                }
+            }
+        ]
+    }
+    </script>
 
     <!-- User Profile UI -->
     <script type="module">
@@ -160,11 +240,8 @@
         });
     </script>
 
-
     <script defer src="https://cloud.umami.is/script.js"
         data-website-id="7f971a01-0c53-4b99-87d8-4f507e85b6b7"></script>
-    <!-- LCP Preload for Important Announcement Popup -->
-
 </head>
 
 <body class="donor-form-page">
@@ -177,7 +254,6 @@
                         <img src="imgs/Life-saver-united-logo.png" alt="LifeSavers United Logo"
                             class="h-10 w-auto mr-3">
                     </a>
-
                 </div>
                 <div class="hidden md:flex items-center space-x-8">
                     <a href="/" class="text-text-secondary hover:text-primary transition-smooth">Home</a>
@@ -190,8 +266,7 @@
                     <a href="/events" class="text-text-secondary hover:text-primary transition-smooth">Events</a>
                     <a href="/blood_information_center"
                         class="text-text-secondary hover:text-primary transition-smooth">Learn</a>
-                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About
-                        Us</a>
+                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About Us</a>
                 </div>
                 <div class="md:hidden">
                     <button class="text-text-secondary hover:text-primary" aria-label="Open navigation menu">
@@ -205,399 +280,1180 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="relative bg-gradient-hero text-white py-16">
-        <div class="absolute inset-0 bg-black opacity-20"></div>
-        <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center">
-                <h1 class="text-hero mb-6">
-                    Register as a Blood Donor | LifeSavers United
-                </h1>
-                <p class="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
-                    Join our community of lifesavers. Register as a blood donor and help save lives in your area.
-                </p>
+    <!-- ==================================================================== -->
+    <!-- 1. HERO / INTRODUCTION SECTION                                       -->
+    <!-- ==================================================================== -->
+    <header class="hero-registration">
+        <div class="hero-drop-bg" aria-hidden="true"></div>
+        <div class="hero-drop-bg-left" aria-hidden="true"></div>
+        <div class="hero-content">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>🩸 BECOME A LIFESAVER</span>
+            </div>
+            <h1 class="hero-headline">
+                Your blood could be the reason <br class="hidden sm:inline">
+                <span class="hero-headline-accent">someone gets another tomorrow.</span>
+            </h1>
+            <p class="hero-desc">
+                By registering, you join the LifeSavers United donor network and may be contacted when a suitable emergency blood requirement arises in your area. Step forward today and stand ready for those fighting for life.
+            </p>
+            <div class="hero-cta-wrap">
+                <a href="#donor-registration-section" class="btn-hero-primary" id="heroRegisterBtn">
+                    <span>REGISTER AS A DONOR</span>
+                    <span aria-hidden="true">↓</span>
+                </a>
+                <div class="trust-indicators-grid">
+                    <span class="trust-item">
+                        <span class="trust-item-icon">✓</span>
+                        <span>Free registration</span>
+                    </span>
+                    <span class="trust-item">
+                        <span class="trust-item-icon">✓</span>
+                        <span>No obligation to donate</span>
+                    </span>
+                    <span class="trust-item">
+                        <span class="trust-item-icon">✓</span>
+                        <span>Your information is private</span>
+                    </span>
+                    <span class="trust-item">
+                        <span class="trust-item-icon">✓</span>
+                        <span>You control your availability</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ==================================================================== -->
+    <!-- 2. WHY JOIN LIFESAVERS UNITED?                                       -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-cream" id="why-join">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>COMMUNITY ADVANTAGE</span>
+            </div>
+            <h2 class="section-title">WHY JOIN LIFESAVERS UNITED?</h2>
+            <p class="section-subtitle">
+                We bridge the critical gap between emergency patients and selfless blood donors with modern technology, total transparency, and human care.
+            </p>
+
+            <div class="features-grid">
+                <!-- Feature 1 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">🩸</div>
+                    <h3 class="feature-title">Emergency Matching</h3>
+                    <p class="feature-desc">
+                        Help connect suitable donors with emergency blood requirements when there is a relevant match.
+                    </p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">📱</div>
+                    <h3 class="feature-title">Donor Portal</h3>
+                    <p class="feature-desc">
+                        Manage your donor profile and access your LifeSavers United donor features.
+                    </p>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">📋</div>
+                    <h3 class="feature-title">Donation History</h3>
+                    <p class="feature-desc">
+                        Keep a record of your previous blood donations.
+                    </p>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">⏰</div>
+                    <h3 class="feature-title">Next Donation Reminder</h3>
+                    <p class="feature-desc">
+                        Keep track of when you may next be eligible to donate.
+                    </p>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">🪪</div>
+                    <h3 class="feature-title">Digital Donor Card</h3>
+                    <p class="feature-desc">
+                        Access your digital donor identity through the Donor Portal.
+                    </p>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="feature-card">
+                    <div class="feature-icon-badge" aria-hidden="true">🏆</div>
+                    <h3 class="feature-title">Certificates & Recognition</h3>
+                    <p class="feature-desc">
+                        View available donor recognition, milestones and appreciation certificates.
+                    </p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Registration Form Section -->
-    <section class="py-12 min-h-[80vh]">
-        <div class="form-outer">
-            <div class="form-card">
-                <div class="mb-4 text-sm text-gray-700 bg-red-50 border border-red-200 rounded-xl p-3 text-center">
-                    Already registered with us? 
-                    <a href="/donor_portal" class="font-bold text-red-600 hover:underline ml-1">
+    <!-- ==================================================================== -->
+    <!-- 3. HOW IT WORKS                                                      -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-white" id="how-it-works">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>STEP-BY-STEP PROCESS</span>
+            </div>
+            <h2 class="section-title">HOW IT WORKS</h2>
+            <p class="section-subtitle">
+                From registration to your next lifesaving donation.
+            </p>
+
+            <div class="how-it-works-wrap">
+                <!-- Desktop Horizontal Timeline -->
+                <div class="timeline-desktop">
+                    <div class="timeline-desktop-track" aria-hidden="true"></div>
+
+                    <!-- Step 1 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">01</div>
+                        <h3 class="timeline-step-title">JOIN</h3>
+                        <p class="timeline-step-desc">Register as a LifeSavers United donor.</p>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">02</div>
+                        <h3 class="timeline-step-title">GET MATCHED</h3>
+                        <p class="timeline-step-desc">When a suitable emergency requirement is identified, relevant donors may be contacted.</p>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">03</div>
+                        <h3 class="timeline-step-title">YOU DECIDE</h3>
+                        <p class="timeline-step-desc">You decide whether you are available and able to help.</p>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">04</div>
+                        <h3 class="timeline-step-title">DONATE</h3>
+                        <p class="timeline-step-desc">Donate through an appropriate blood bank, hospital or authorized donation facility.</p>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">05</div>
+                        <h3 class="timeline-step-title">LOG IT</h3>
+                        <p class="timeline-step-desc">Record your donation through your Donor Portal.</p>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="timeline-step">
+                        <div class="timeline-step-badge">06</div>
+                        <h3 class="timeline-step-title">KEEP SAVING</h3>
+                        <p class="timeline-step-desc">Stay connected and help again when you are eligible and available.</p>
+                    </div>
+                </div>
+
+                <!-- Mobile Vertical Timeline -->
+                <div class="timeline-mobile text-left">
+                    <!-- Step 1 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">01</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">JOIN</h3>
+                            <p class="timeline-mobile-desc">Register as a LifeSavers United donor.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">02</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">GET MATCHED</h3>
+                            <p class="timeline-mobile-desc">When a suitable emergency requirement is identified, relevant donors may be contacted.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">03</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">YOU DECIDE</h3>
+                            <p class="timeline-mobile-desc">You decide whether you are available and able to help.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">04</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">DONATE</h3>
+                            <p class="timeline-mobile-desc">Donate through an appropriate blood bank, hospital or authorized donation facility.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">05</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">LOG IT</h3>
+                            <p class="timeline-mobile-desc">Record your donation through your Donor Portal.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="timeline-mobile-item">
+                        <div class="timeline-mobile-dot">06</div>
+                        <div class="timeline-mobile-card">
+                            <h3 class="timeline-mobile-title">KEEP SAVING</h3>
+                            <p class="timeline-mobile-desc">Stay connected and help again when you are eligible and available.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 4. DONOR REGISTRATION FORM SECTION                                   -->
+    <!-- EXACT SAME FORM FIELDS, ORDER, IDs, VALIDATION & BACKEND SUBMISSION  -->
+    <!-- ==================================================================== -->
+    <section class="registration-section-wrap" id="donor-registration-section">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center mb-8">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>VOLUNTARY SIGNUP</span>
+            </div>
+            <h2 class="section-title">DONOR REGISTRATION</h2>
+            <p class="section-subtitle">
+                Join the LifeSavers United donor network. Complete the form below to become an active lifesaver.
+            </p>
+        </div>
+
+        <div class="form-shell">
+            <div class="form-main-card">
+                <!-- Already Registered Reminder Banner -->
+                <div class="portal-reminder-banner">
+                    <span>Already registered with us?</span>
+                    <a href="/donor_portal" class="portal-reminder-link">
                         Login to your Donor Portal & View Donations →
                     </a>
                 </div>
-                <div class="mb-8 pb-4 border-b border-gray-200">
-                    <h2 class="text-xl sm:text-2xl font-bold text-primary">Donor Registration</h2>
-                </div>
+
+                <!-- Existing Form Structure Preserved in Exact Order -->
                 <form id="donorRegistrationForm">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="fullName">Full Name *</label>
-                            <input type="text" id="fullName" name="fullName" required placeholder="e.g., John Doe">
-                            <div id="fullNameError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="dateOfBirth">Date of Birth</label>
-                            <input type="date" id="dateOfBirth" name="dateOfBirth" required>
-                            <div id="dateOfBirthError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="contactNumber">Contact Number *</label>
-                            <input type="text" id="contactNumber" name="contactNumber" required
-                                placeholder="e.g., 9876543210" pattern="[0-9]*" inputmode="numeric" minlength="10"
-                                maxlength="15">
-                            <div id="contactNumberError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="email">Email Address</label>
-                            <input type="email" id="email" name="email" placeholder="e.g., john@example.com">
-                            <div id="emailError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Blood Group *</label>
-                        <div class="blood-type-grid">
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-A+" name="bloodGroup" value="A+">
-                                <label for="bloodType-A+">A+</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-A-" name="bloodGroup" value="A-">
-                                <label for="bloodType-A-">A-</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-B+" name="bloodGroup" value="B+">
-                                <label for="bloodType-B+">B+</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-B-" name="bloodGroup" value="B-">
-                                <label for="bloodType-B-">B-</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-AB+" name="bloodGroup" value="AB+">
-                                <label for="bloodType-AB+">AB+</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-AB-" name="bloodGroup" value="AB-">
-                                <label for="bloodType-AB-">AB-</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-O+" name="bloodGroup" value="O+">
-                                <label for="bloodType-O+">O+</label>
-                            </div>
-                            <div class="blood-type-option">
-                                <input type="radio" id="bloodType-O-" name="bloodGroup" value="O-">
-                                <label for="bloodType-O-">O-</label>
+
+                    <!-- VISUAL GROUP 1: ABOUT YOU (Personal Information) -->
+                    <div class="form-step-group">
+                        <div class="form-step-header">
+                            <div class="form-step-num">1</div>
+                            <div class="form-step-title-box">
+                                <h3 class="form-step-title">ABOUT YOU</h3>
+                                <span class="form-step-desc">Personal information and contact details</span>
                             </div>
                         </div>
-                        <div id="bloodGroupError" class="error-message hidden" aria-live="polite"></div>
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="weight">Weight (kg)</label>
-                            <input type="text" id="weight" name="weight" placeholder="e.g., 65" pattern="[0-9]*"
-                                inputmode="numeric">
-                            <div id="weightError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="gender">Gender</label>
-                            <select id="gender" name="gender">
-                                <option value="">Select gender...</option>
-                                <option value="Male">Male</option>
-                                <option value="Female">Female</option>
-                                <option value="Other">Other</option>
-                            </select>
-                            <div id="genderError" class="error-message hidden" aria-live="polite"></div>
-                        </div>
-                        <div class="form-group">
-                            <label for="city">City</label>
-                            <div class="city-autocomplete-container">
-                                <input type="text" id="city" name="city" placeholder="Type to search cities..."
-                                    autocomplete="off">
-                                <div id="citySuggestions" class="city-suggestions hidden"></div>
+
+                        <!-- 1. Full Name & 2. Date of Birth -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fullName">Full Name *</label>
+                                <input type="text" id="fullName" name="fullName" required placeholder="e.g., John Doe">
+                                <div id="fullNameError" class="error-message hidden" aria-live="polite"></div>
                             </div>
-                            <div id="cityError" class="error-message hidden" aria-live="polite"></div>
+                            <div class="form-group">
+                                <label for="dateOfBirth">Date of Birth *</label>
+                                <input type="date" id="dateOfBirth" name="dateOfBirth" required>
+                                <div id="dateOfBirthError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                        </div>
+
+                        <!-- 3. Contact Number & 4. Email Address -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="contactNumber">Contact Number *</label>
+                                <input type="text" id="contactNumber" name="contactNumber" required
+                                    placeholder="e.g., 9876543210" pattern="[0-9]*" inputmode="numeric" minlength="10"
+                                    maxlength="15">
+                                <div id="contactNumberError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email Address</label>
+                                <input type="email" id="email" name="email" placeholder="e.g., john@example.com">
+                                <div id="emailError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="form-row">
+
+                    <!-- VISUAL GROUP 2: DONATION PROFILE (Blood Group & Health Profile) -->
+                    <div class="form-step-group">
+                        <div class="form-step-header">
+                            <div class="form-step-num">2</div>
+                            <div class="form-step-title-box">
+                                <h3 class="form-step-title">DONATION PROFILE</h3>
+                                <span class="form-step-desc">Blood group, physical details, and geographical location</span>
+                            </div>
+                        </div>
+
+                        <!-- 5. Blood Group Grid -->
+                        <div class="form-group">
+                            <label>Blood Group *</label>
+                            <div class="blood-type-grid">
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-A+" name="bloodGroup" value="A+">
+                                    <label for="bloodType-A+">A+</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-A-" name="bloodGroup" value="A-">
+                                    <label for="bloodType-A-">A-</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-B+" name="bloodGroup" value="B+">
+                                    <label for="bloodType-B+">B+</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-B-" name="bloodGroup" value="B-">
+                                    <label for="bloodType-B-">B-</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-AB+" name="bloodGroup" value="AB+">
+                                    <label for="bloodType-AB+">AB+</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-AB-" name="bloodGroup" value="AB-">
+                                    <label for="bloodType-AB-">AB-</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-O+" name="bloodGroup" value="O+">
+                                    <label for="bloodType-O+">O+</label>
+                                </div>
+                                <div class="blood-type-option">
+                                    <input type="radio" id="bloodType-O-" name="bloodGroup" value="O-">
+                                    <label for="bloodType-O-">O-</label>
+                                </div>
+                            </div>
+                            <div id="bloodGroupError" class="error-message hidden" aria-live="polite"></div>
+                        </div>
+
+                        <!-- 6. Weight, 7. Gender & 8. City -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="weight">Weight (kg)</label>
+                                <input type="text" id="weight" name="weight" placeholder="e.g., 65" pattern="[0-9]*"
+                                    inputmode="numeric">
+                                <div id="weightError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="gender">Gender</label>
+                                <select id="gender" name="gender">
+                                    <option value="">Select gender...</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                <div id="genderError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="city">City</label>
+                                <div class="city-autocomplete-container">
+                                    <input type="text" id="city" name="city" placeholder="Type to search cities..."
+                                        autocomplete="off">
+                                    <div id="citySuggestions" class="city-suggestions hidden"></div>
+                                </div>
+                                <div id="cityError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                        </div>
+
+                        <!-- 9. Area / Locality -->
                         <div class="form-group">
                             <label for="area">Area/Locality</label>
                             <input type="text" id="area" name="area" placeholder="e.g., Vastrapur, Asarva">
                             <div id="areaError" class="error-message hidden" aria-live="polite"></div>
                         </div>
+                    </div>
+
+                    <!-- VISUAL GROUP 3: AVAILABILITY & PREFERENCES -->
+                    <div class="form-step-group">
+                        <div class="form-step-header">
+                            <div class="form-step-num">3</div>
+                            <div class="form-step-title-box">
+                                <h3 class="form-step-title">AVAILABILITY & PREFERENCES</h3>
+                                <span class="form-step-desc">Emergency availability, history, and communication options</span>
+                            </div>
+                        </div>
+
+                        <!-- 10. Emergency Available & 11. Preferred Contact -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="emergencyAvailable">Available for Emergency</label>
+                                <select id="emergencyAvailable" name="emergencyAvailable">
+                                    <option value="">Select availability...</option>
+                                    <option value="Yes">Yes</option>
+                                    <option value="No">No</option>
+                                </select>
+                                <div id="emergencyAvailableError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                            <div class="form-group">
+                                <label for="preferredContact">Preferred Contact Method</label>
+                                <select id="preferredContact" name="preferredContact">
+                                    <option value="">Select method...</option>
+                                    <option value="Phone">Phone Call</option>
+                                    <option value="Email">Email</option>
+                                    <option value="WhatsApp">WhatsApp</option>
+                                    <option value="SMS">SMS</option>
+                                </select>
+                                <div id="preferredContactError" class="error-message hidden" aria-live="polite"></div>
+                            </div>
+                        </div>
+
+                        <!-- 12. Last Donation Date -->
                         <div class="form-group">
-                            <label for="emergencyAvailable">Available for Emergency</label>
-                            <select id="emergencyAvailable" name="emergencyAvailable">
-                                <option value="">Select availability...</option>
-                                <option value="Yes">Yes</option>
-                                <option value="No">No</option>
-                            </select>
-                            <div id="emergencyAvailableError" class="error-message hidden" aria-live="polite"></div>
+                            <label for="lastDonation">Last Blood Donation Date</label>
+                            <input type="date" id="lastDonation" name="lastDonation">
                         </div>
+
+                        <!-- 13. Medical History -->
                         <div class="form-group">
-                            <label for="preferredContact">Preferred Contact Method</label>
-                            <select id="preferredContact" name="preferredContact">
-                                <option value="">Select method...</option>
-                                <option value="Phone">Phone Call</option>
-                                <option value="Email">Email</option>
-                                <option value="WhatsApp">WhatsApp</option>
-                                <option value="SMS">SMS</option>
-                            </select>
-                            <div id="preferredContactError" class="error-message hidden" aria-live="polite"></div>
+                            <label for="medicalHistory">Medical History</label>
+                            <textarea id="medicalHistory" name="medicalHistory"
+                                placeholder="Any relevant medical conditions, medications, or allergies..."></textarea>
                         </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastDonation">Last Blood Donation Date</label>
-                        <input type="date" id="lastDonation" name="lastDonation">
-                    </div>
-                    <div class="form-group">
-                        <label for="medicalHistory">Medical History</label>
-                        <textarea id="medicalHistory" name="medicalHistory"
-                            placeholder="Any relevant medical conditions, medications, or allergies..."></textarea>
-                    </div>
 
-                    <!-- Captcha Section -->
-                    <div class="form-group">
-                        <label for="captchaAnswer">Security Verification *</label>
-                        <div class="captcha-container">
-                            <div class="captcha-question">
-                                <span id="captchaQuestion"></span>
-                                <button type="button" id="refreshCaptcha" class="captcha-refresh-btn"
-                                    title="Refresh Captcha" aria-label="Refresh captcha">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2">
-                                        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
-                                        <path d="M21 3v5h-5"></path>
-                                        <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
-                                        <path d="M3 21v-5h5"></path>
-                                    </svg>
-                                </button>
+                        <!-- 14. Captcha Section -->
+                        <div class="form-group">
+                            <label for="captchaAnswer">Security Verification *</label>
+                            <div class="captcha-container">
+                                <div class="captcha-question">
+                                    <span id="captchaQuestion"></span>
+                                    <button type="button" id="refreshCaptcha" class="captcha-refresh-btn"
+                                        title="Refresh Captcha" aria-label="Refresh captcha">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                            stroke-width="2">
+                                            <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path>
+                                            <path d="M21 3v5h-5"></path>
+                                            <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path>
+                                            <path d="M3 21v-5h5"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                                <input type="text" id="captchaAnswer" name="captchaAnswer" required
+                                    placeholder="Enter your answer" pattern="[0-9]*" inputmode="numeric">
+                                <div id="captchaError" class="error-message hidden" aria-live="polite"></div>
                             </div>
-                            <input type="text" id="captchaAnswer" name="captchaAnswer" required
-                                placeholder="Enter your answer" pattern="[0-9]*" inputmode="numeric">
-                            <div id="captchaError" class="error-message hidden" aria-live="polite"></div>
                         </div>
-                    </div>
 
-                    <!-- Consent & Declaration Checkboxes -->
-                    <div class="consent-section mb-6">
-                        <h3 class="text-lg font-semibold text-primary mb-4">Consent & Declaration</h3>
+                        <!-- 15. Consent & Declaration Checkboxes -->
+                        <div class="consent-section">
+                            <h4 class="text-base font-bold text-gray-900 mb-3">Consent & Declaration</h4>
+                            <div class="space-y-4">
+                                <!-- Declaration & Health Checkbox -->
+                                <div class="consent-checkbox">
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="declaration" name="declaration" required class="mt-1">
+                                        <span class="text-sm text-gray-700 leading-relaxed">
+                                            <strong>Declaration & Health:</strong> I hereby declare that all the information
+                                            provided above is true to the best of my knowledge. I confirm that I have disclosed all
+                                            relevant medical history and that I am currently in good health. I understand that my personal
+                                            information and medical history will be used by LifeSavers United for the purpose of matching me
+                                            with a blood recipient in a time of need. I understand that my donation eligibility is dependent
+                                            on this information being accurate and that a change in my medical status may affect my eligibility.
+                                            I give my consent to be contacted by LifeSavers United.
+                                        </span>
+                                    </label>
+                                    <div id="declarationError" class="error-message hidden" aria-live="polite"></div>
+                                </div>
 
-                        <div class="space-y-4">
-                            <!-- Declaration & Health Checkbox -->
-                            <div class="consent-checkbox">
-                                <label class="flex items-start space-x-3 cursor-pointer">
-                                    <input type="checkbox" id="declaration" name="declaration" required class="mt-1">
-                                    <span class="text-sm text-gray-700">
-                                        <strong>Declaration & Health:</strong> I hereby declare that all the information
-                                        provided
-                                        above is true to the best of my knowledge. I confirm that I have disclosed all
-                                        relevant medical
-                                        history and that I am currently in good health. I understand that my personal
-                                        information and medical history will be used by Lifesavers United for the
-                                        purpose of matching me with a blood recipient in a time of need. I understand
-                                        that my donation
-                                        eligibility is dependent on this information being accurate and that a change in
-                                        my medical status may affect my eligibility. I give my
-                                        consent to be contacted by Lifesavers United.
-                                    </span>
-                                </label>
-                                <div id="declarationError" class="error-message hidden" aria-live="polite"></div>
-                            </div>
-
-                            <!-- Privacy & Consent Checkbox -->
-                            <div class="consent-checkbox">
-                                <label class="flex items-start space-x-3 cursor-pointer">
-                                    <input type="checkbox" id="privacy" name="privacy" required class="mt-1">
-                                    <span class="text-sm text-gray-700">
-                                        <strong>Privacy & Consent:</strong> I have read and agree to the Lifesavers
-                                        United Privacy
-                                        Policy. I would like to receive updates on blood donation
-                                        camps, awareness campaigns, and other activities from Lifesavers United.
-                                    </span>
-                                </label>
-                                <div id="privacyError" class="error-message hidden" aria-live="polite"></div>
+                                <!-- Privacy & Consent Checkbox -->
+                                <div class="consent-checkbox">
+                                    <label class="flex items-start space-x-3 cursor-pointer">
+                                        <input type="checkbox" id="privacy" name="privacy" required class="mt-1">
+                                        <span class="text-sm text-gray-700 leading-relaxed">
+                                            <strong>Privacy & Consent:</strong> I have read and agree to the LifeSavers
+                                            United Privacy Policy. I would like to receive updates on blood donation camps, awareness
+                                            campaigns, and emergency alerts from LifeSavers United.
+                                        </span>
+                                    </label>
+                                    <div id="privacyError" class="error-message hidden" aria-live="polite"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- 16. Submit Button -->
                     <button type="submit" class="btn">Register as Donor</button>
                 </form>
             </div>
         </div>
     </section>
 
-    <!-- Additional Information Sections -->
-    <section class="py-16 bg-gradient-to-b from-accent-50 to-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center mb-12">
-                <h2 class="text-section mb-4">Why Donate? Who Can? How It Works.</h2>
-                <p class="text-text-secondary max-w-2xl mx-auto">
-                    Everything you need to know before you become a hero.
-                </p>
+    <!-- ==================================================================== -->
+    <!-- 5. YOUR INFORMATION. YOUR CONTROL.                                   -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-white" id="your-control">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>TRUST & TRANSPARENCY</span>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 information-cards-grid">
-                <!-- Why Become a Donor -->
-                <div
-                    class="card bg-white rounded-2xl shadow-card p-8 hover:shadow-lg transition-smooth flex flex-col items-center text-center">
-                    <div class="bg-accent-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-accent" fill="currentColor" viewBox="0 0 20 20">
-                            <path
-                                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary mb-2">Why Become a Donor?</h3>
-                    <p class="text-gray-700 mb-4">
-                        Every blood donation can save up to three lives. Join our community of lifesavers and make a
-                        real difference in your area.
-                    </p>
-                    <ul class="list-disc list-inside text-gray-600 text-left mx-auto max-w-xs mb-4">
-                        <li>Someone needs blood every 2 seconds.</li>
-                        <li>1 in 7 people entering a hospital needs blood.</li>
-                        <li>There is no substitute for human blood.</li>
-                    </ul>
-                    <a href="/stories" class="btn-outline mt-2">See Real Stories</a>
-                </div>
-                <!-- Who Can Donate -->
-                <div
-                    class="card bg-white rounded-2xl shadow-card p-8 hover:shadow-lg transition-smooth flex flex-col items-center text-center">
-                    <div class="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-primary" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary mb-2">Who Can Donate?</h3>
-                    <ul class="list-disc list-inside text-gray-600 text-left mx-auto max-w-xs mb-2">
-                        <li>Age between 18 and 70 years</li>
-                        <li>Minimum weight 45 kgs</li>
-                        <li>Good general health</li>
-                        <li>No recent major illness or surgery</li>
-                    </ul>
-                    <a href="/health_assessment_tools" class="btn-outline mt-2">Check Eligibility</a>
-                </div>
-                <!-- How It Works -->
-                <div
-                    class="card bg-white rounded-2xl shadow-card p-8 hover:shadow-lg transition-smooth flex flex-col items-center text-center">
-                    <div class="bg-secondary-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-secondary" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <h3 class="text-xl font-bold text-primary mb-4">How It Works</h3>
-                    <div class="w-full mb-4">
-                        <!-- Mobile Layout (Vertical Stack) -->
-                        <div class="flex flex-col items-center gap-4 md:hidden">
-                            <!-- Step 1 -->
-                            <div class="flex flex-col items-center">
-                                <span class="text-3xl mb-2">📝</span>
-                                <span class="font-semibold text-primary text-sm">Register Online</span>
-                            </div>
-                            <span class="text-2xl text-gray-400">↓</span>
-                            <!-- Step 2 -->
-                            <div class="flex flex-col items-center">
-                                <span class="text-3xl mb-2">📞</span>
-                                <span class="font-semibold text-primary text-sm">Get Contacted</span>
-                            </div>
-                            <span class="text-2xl text-gray-400">↓</span>
-                            <!-- Step 3 -->
-                            <div class="flex flex-col items-center">
-                                <span class="text-3xl mb-2">💉</span>
-                                <span class="font-semibold text-primary text-sm">Donate Blood</span>
-                            </div>
-                            <span class="text-2xl text-gray-400">↓</span>
-                            <!-- Step 4 -->
-                            <div class="flex flex-col items-center">
-                                <span class="text-3xl mb-2">❤️</span>
-                                <span class="font-semibold text-primary text-sm">Save Lives</span>
-                            </div>
-                        </div>
+            <h2 class="section-title">YOUR INFORMATION. YOUR CONTROL.</h2>
+            <p class="section-subtitle">
+                <strong>You decide when you're available.</strong> Registering as a donor connects you to potential lifelines, but you always have the final say.
+            </p>
 
-                        <!-- Desktop Layout (Horizontal) -->
-                        <div
-                            class="hidden md:flex flex-row items-center justify-center gap-4 lg:gap-8 py-2 overflow-x-auto">
-                            <!-- Step 1 -->
-                            <div class="flex flex-col items-center min-w-[100px]">
-                                <span class="text-3xl mb-2">📝</span>
-                                <span class="font-semibold text-primary">Register Online</span>
-                            </div>
-                            <span class="text-3xl text-gray-400">→</span>
-                            <!-- Step 2 -->
-                            <div class="flex flex-col items-center min-w-[100px]">
-                                <span class="text-3xl mb-2">📞</span>
-                                <span class="font-semibold text-primary">Get Contacted</span>
-                            </div>
-                            <span class="text-3xl text-gray-400">→</span>
-                            <!-- Step 3 -->
-                            <div class="flex flex-col items-center min-w-[100px]">
-                                <span class="text-3xl mb-2">💉</span>
-                                <span class="font-semibold text-primary">Donate Blood</span>
-                            </div>
-                            <span class="text-3xl text-gray-400">→</span>
-                            <!-- Step 4 -->
-                            <div class="flex flex-col items-center min-w-[100px]">
-                                <span class="text-3xl mb-2">❤️</span>
-                                <span class="font-semibold text-primary">Save Lives</span>
-                            </div>
-                        </div>
+            <div class="control-section-card">
+                <div class="control-points-grid">
+                    <div class="control-point-item">
+                        <div class="control-check-icon">✓</div>
+                        <span class="control-point-text">You can decide whether you can respond to a request.</span>
                     </div>
-                    <a href="/blood_information_center#donation-process" class="btn-outline mt-4">Donation
-                        Journey</a>
+                    <div class="control-point-item">
+                        <div class="control-check-icon">✓</div>
+                        <span class="control-point-text">You can manage your donor information.</span>
+                    </div>
+                    <div class="control-point-item">
+                        <div class="control-check-icon">✓</div>
+                        <span class="control-point-text">You can manage your availability where supported.</span>
+                    </div>
+                    <div class="control-point-item">
+                        <div class="control-check-icon">✓</div>
+                        <span class="control-point-text">You can keep your donation information updated.</span>
+                    </div>
+                    <div class="control-point-item">
+                        <div class="control-check-icon">✓</div>
+                        <span class="control-point-text">You can use your Donor Portal to manage your donor journey.</span>
+                    </div>
                 </div>
-                <!-- Testimonial -->
-                <div
-                    class="card bg-white rounded-2xl shadow-card p-8 hover:shadow-lg transition-smooth flex flex-col items-center text-center">
-                    <div class="bg-warning-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                        <svg class="w-8 h-8 text-warning" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <blockquote class="italic text-gray-600 mb-2">
-                        "Donating blood was quick and easy, and I felt proud knowing I helped someone in need."
-                    </blockquote>
-                    <span class="block mt-2 font-bold text-primary">– Moxesh Shah, Regular Donor</span>
+
+                <div class="text-center pt-2">
+                    <a href="/privacy_policy" class="btn-secondary-outline">
+                        <span>LEARN HOW YOUR INFORMATION IS USED</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
                 </div>
             </div>
-            <!-- Contact/Help Full Width -->
-            <div class="bg-accent-100 rounded-2xl shadow-card p-8 mt-12 text-center">
-                <h3 class="text-lg font-semibold text-primary mb-2">Need Help?</h3>
-                <p class="text-gray-700">Send us a message on our 24/7 helpline: <span class="font-bold"><a
-                            href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
-                            target="_blank" rel="noopener noreferrer"
-                            class="hover:text-primary-700 transition-smooth">9979260393</a></span> or
-                    email
-                    <a href="mailto:lifesaversunited.india@gmail.com"
-                        class="text-primary underline">lifesaversunited.india@gmail.com</a>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 6. WHAT HAPPENS WHEN SOMEONE NEEDS YOUR BLOOD?                       -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-cream-light" id="emergency-flow">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>EMERGENCY PROTOCOL</span>
+            </div>
+            <h2 class="section-title">WHAT HAPPENS WHEN SOMEONE NEEDS YOUR BLOOD?</h2>
+            <p class="section-subtitle">
+                A simple, reassuring look at how emergency coordination works when a critical requirement arises.
+            </p>
+
+            <div class="flow-journey-container">
+                <!-- Step 1 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 1</span>
+                    <h3 class="flow-step-name">🚨 EMERGENCY REQUEST</h3>
+                    <p class="flow-step-desc">
+                        A hospital, patient relative, or doctor submits a verified urgent blood requirement to LifeSavers United.
+                    </p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 2</span>
+                    <h3 class="flow-step-name">🩸 BLOOD GROUP MATCH</h3>
+                    <p class="flow-step-desc">
+                        Our platform identifies compatible donor blood groups suitable for the requested component.
+                    </p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 3</span>
+                    <h3 class="flow-step-name">📍 LOCATION MATCH</h3>
+                    <p class="flow-step-desc">
+                        Donors located within reasonable proximity to the hospital or blood bank are matched.
+                    </p>
+                </div>
+
+                <!-- Step 4 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 4</span>
+                    <h3 class="flow-step-name">📲 AVAILABLE DONORS CONTACTED</h3>
+                    <p class="flow-step-desc">
+                        Matched, eligible donors receive an emergency request notification with patient and hospital details.
+                    </p>
+                </div>
+
+                <!-- Step 5 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 5</span>
+                    <h3 class="flow-step-name">🤝 YOU DECIDE</h3>
+                    <p class="flow-step-desc">
+                        You review your personal availability and schedule, and freely choose whether you can respond.
+                    </p>
+                </div>
+
+                <!-- Step 6 -->
+                <div class="flow-step-card">
+                    <span class="flow-step-index">STEP 6</span>
+                    <h3 class="flow-step-name">💉 DONATION</h3>
+                    <p class="flow-step-desc">
+                        You donate safely at the accredited hospital, authorized blood bank, or licensed collection facility.
+                    </p>
+                </div>
+            </div>
+
+            <div class="flow-disclaimer-card">
+                <p class="flow-disclaimer-text">
+                    <strong>Medical Note:</strong> LifeSavers United operates as an emergency matching and coordination network. All medical screenings, testing, blood collection, and transfusions are conducted exclusively by licensed medical practitioners at certified blood banks and authorized healthcare facilities.
                 </p>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <!-- ==================================================================== -->
+    <!-- 7. YOUR DONOR PORTAL                                                 -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-white" id="donor-portal-promo">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="portal-section-grid">
+                <div>
+                    <div class="section-badge">
+                        <span class="section-badge-dot"></span>
+                        <span>DONOR DASHBOARD</span>
+                    </div>
+                    <h2 class="section-title text-left">YOUR DONOR PORTAL</h2>
+                    <p class="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed">
+                        Your donor journey doesn't end after registration. Access your personalized LifeSavers United profile anytime to track milestones and manage your impact.
+                    </p>
+
+                    <div class="portal-feature-list">
+                        <div class="portal-feature-row">
+                            <span class="portal-feature-icon">📋</span>
+                            <div>
+                                <h4>Track Donations</h4>
+                                <p>See your previous donation records.</p>
+                            </div>
+                        </div>
+                        <div class="portal-feature-row">
+                            <span class="portal-feature-icon">⏰</span>
+                            <div>
+                                <h4>Next Eligible Date</h4>
+                                <p>Keep track of your next possible donation date.</p>
+                            </div>
+                        </div>
+                        <div class="portal-feature-row">
+                            <span class="portal-feature-icon">🪪</span>
+                            <div>
+                                <h4>Digital Donor Card</h4>
+                                <p>Access your digital donor identity.</p>
+                            </div>
+                        </div>
+                        <div class="portal-feature-row">
+                            <span class="portal-feature-icon">🏆</span>
+                            <div>
+                                <h4>Certificates</h4>
+                                <p>Access available donor appreciation certificates and milestones.</p>
+                            </div>
+                        </div>
+                        <div class="portal-feature-row">
+                            <span class="portal-feature-icon">🔔</span>
+                            <div>
+                                <h4>Emergency Availability</h4>
+                                <p>Manage your availability where supported.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="/donor_portal" class="btn-hero-primary">
+                        <span>OPEN DONOR PORTAL</span>
+                        <span aria-hidden="true">→</span>
+                    </a>
+                </div>
+
+                <!-- Realistic Mockup of the Official LSU Donor Portal Card -->
+                <div>
+                    <div class="portal-mockup-frame">
+                        <div class="portal-mockup-header">
+                            <div class="portal-mockup-brand">
+                                <span>🩸</span>
+                                <span>LIFESAVERS UNITED PORTAL</span>
+                            </div>
+                            <span class="portal-mockup-badge">✓ ACTIVE PROFILE</span>
+                        </div>
+
+                        <!-- Rendered Donor Card Simulation -->
+                        <div class="mockup-donor-card">
+                            <div class="mockup-donor-card-watermark">🩸</div>
+                            <div class="mockup-card-top">
+                                <div>
+                                    <span class="mockup-card-sub">OFFICIAL DONOR CARD</span>
+                                    <div class="mockup-card-name">Moxesh Shah</div>
+                                    <div class="mockup-card-id">ID: LSU-AHM-00100</div>
+                                </div>
+                                <div class="mockup-card-blood">O+</div>
+                            </div>
+                            <div class="mockup-card-stats">
+                                <div class="mockup-card-stat">
+                                    <span>DONATIONS</span>
+                                    <strong>100+</strong>
+                                </div>
+                                <div class="mockup-card-stat">
+                                    <span>TYPE</span>
+                                    <strong>Blood & SDP</strong>
+                                </div>
+                                <div class="mockup-card-stat">
+                                    <span>TIER</span>
+                                    <strong>Platinum Lifesaver</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Portal Feature Tabs Preview -->
+                        <div class="mockup-tabs-bar">
+                            <span class="mockup-tab-pill active">📋 History</span>
+                            <span class="mockup-tab-pill">🪪 Digital Card</span>
+                            <span class="mockup-tab-pill">🏆 Certificates</span>
+                            <span class="mockup-tab-pill">⏰ Eligibility</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 8. WHO MAY NEED YOUR DONATION?                                       -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-cream" id="who-needs-blood">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>DIRECT IMPACT</span>
+            </div>
+            <h2 class="section-title">WHO MAY NEED YOUR DONATION?</h2>
+            <p class="section-subtitle">
+                Blood cannot be manufactured in a laboratory. It can only come from one generous person to another in moments of critical medical need.
+            </p>
+
+            <div class="who-needs-grid text-left">
+                <!-- Cancer -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">CANCER</h3>
+                        <p class="who-needs-desc">Patients who may require transfusion support during treatment.</p>
+                    </div>
+                </div>
+
+                <!-- Thalassemia -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">THALASSEMIA</h3>
+                        <p class="who-needs-desc">Patients who depend on regular transfusion support.</p>
+                    </div>
+                </div>
+
+                <!-- Surgery -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">SURGERY</h3>
+                        <p class="who-needs-desc">Patients requiring blood during or around medical procedures.</p>
+                    </div>
+                </div>
+
+                <!-- Accidents -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">ACCIDENTS</h3>
+                        <p class="who-needs-desc">People requiring urgent transfusion support after serious injuries.</p>
+                    </div>
+                </div>
+
+                <!-- Trauma -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">TRAUMA</h3>
+                        <p class="who-needs-desc">Patients experiencing major blood loss.</p>
+                    </div>
+                </div>
+
+                <!-- Other Emergencies -->
+                <div class="who-needs-card">
+                    <div class="who-needs-drop" aria-hidden="true">🩸</div>
+                    <div>
+                        <h3 class="who-needs-title">OTHER EMERGENCIES</h3>
+                        <p class="who-needs-desc">Other situations where compatible blood may be urgently required.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 9. REAL PEOPLE. REAL STORIES.                                        -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-white" id="real-stories">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>GENUINE EXPERIENCES</span>
+            </div>
+            <h2 class="section-title">REAL PEOPLE. REAL STORIES.</h2>
+            <p class="section-subtitle">
+                Hear directly from active donors, grateful recipient families, and passionate volunteers across the LifeSavers United community.
+            </p>
+
+            <div class="stories-grid-container text-left">
+                <!-- Donor Story -->
+                <div class="story-card-item">
+                    <div class="story-card-image-wrap">
+                        <img src="imgs/Moxesh-Shah.webp" alt="Moxesh Shah - Regular Blood Donor" class="story-card-img"
+                            loading="lazy">
+                        <span class="story-category-pill">DONOR STORY</span>
+                    </div>
+                    <div class="story-card-body">
+                        <h3 class="story-person-name">Moxesh Shah</h3>
+                        <span class="story-person-role">100+ Donations Strong • Ahmedabad</span>
+                        <p class="story-excerpt-text">
+                            "My journey began during the 2008 Ahmedabad Serial Bomb Blasts. Witnessing the urgent need inspired me to step forward. Donating blood costs nothing, but it saves everything."
+                        </p>
+                        <a href="/stories" class="story-read-link">
+                            <span>READ STORY</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Recipient / Family Story -->
+                <div class="story-card-item">
+                    <div class="story-card-image-wrap">
+                        <img src="imgs/parshwa-birenkumar-shah.webp" alt="Parshwa Shah - Patient Family" class="story-card-img"
+                            loading="lazy">
+                        <span class="story-category-pill">RECIPIENT / FAMILY STORY</span>
+                    </div>
+                    <div class="story-card-body">
+                        <h3 class="story-person-name">Parshwa Birenkumar Shah</h3>
+                        <span class="story-person-role">Leukemia Recovery Support • GCRI Asarwa</span>
+                        <p class="story-excerpt-text">
+                            "During my mother's battle against Acute Myeloid Leukemia, LifeSavers United arranged prompt whole blood donors. A single drop created an ocean of hope for our family."
+                        </p>
+                        <a href="/stories" class="story-read-link">
+                            <span>READ STORY</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Volunteer Story -->
+                <div class="story-card-item">
+                    <div class="story-card-image-wrap">
+                        <img src="imgs/volunteer-nikunj-mistri-blood-donation.webp" alt="Nikunj Mistri - Volunteer"
+                            class="story-card-img" loading="lazy">
+                        <span class="story-category-pill">VOLUNTEER STORY</span>
+                    </div>
+                    <div class="story-card-body">
+                        <h3 class="story-person-name">Nikunj Mistri</h3>
+                        <span class="story-person-role">From Silent Observer to Active Lifesaver</span>
+                        <p class="story-excerpt-text">
+                            "I watched lives being saved for 18 months before I found the courage to donate. When I finally took that step, I realized the joy of giving is far greater than any fear."
+                        </p>
+                        <a href="/stories" class="story-read-link">
+                            <span>READ STORY</span>
+                            <span aria-hidden="true">→</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 10. BUILD THE NETWORK                                                -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-tint-subtle" id="build-network">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="share-network-card">
+                <div class="section-badge">
+                    <span class="section-badge-dot"></span>
+                    <span>COMMUNITY MULTIPLIER</span>
+                </div>
+                <h2 class="share-network-title">
+                    YOU JOINED. <br>
+                    NOW HELP US GROW THE NETWORK.
+                </h2>
+                <p class="share-network-desc">
+                    One donor can become two. Two can become many. Encourage a friend, family member, or colleague to register and help us build a reliable safety net for everyone.
+                </p>
+                <div>
+                    <a href="https://api.whatsapp.com/send?text=I've%20joined%20LifeSavers%20United%20as%20a%20blood%20donor.%20You%20can%20join%20the%20donor%20network%20too%20and%20be%20there%20when%20someone%20needs%20your%20blood%20group.%20Register%20here%3A%20https%3A%2F%2Flifesaversunited.org%2Fdonor_registration"
+                        target="_blank" rel="noopener noreferrer" class="btn-whatsapp-share" id="inviteFriendBtn">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path
+                                d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+                        </svg>
+                        <span>INVITE A FRIEND ON WHATSAPP</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 11. NEED HELP?                                                       -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-white" id="need-help">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>24/7 SUPPORT</span>
+            </div>
+            <h2 class="section-title">NEED HELP?</h2>
+            <p class="section-subtitle">
+                Have questions about registering or need urgent blood coordination? Our volunteer team is available 24/7.
+            </p>
+
+            <div class="help-options-grid">
+                <!-- WhatsApp -->
+                <a href="https://wa.me/919979260393?text=Hi%20LifeSavers%20United%20Team%2C%20I%20need%20assistance%20regarding%20donor%20registration."
+                    target="_blank" rel="noopener noreferrer" class="help-option-card">
+                    <div class="help-option-icon" aria-hidden="true">💬</div>
+                    <h3 class="help-option-label">WHATSAPP</h3>
+                    <p class="help-option-sub">Get assistance through WhatsApp.</p>
+                    <span class="help-option-contact">+91 99792 60393</span>
+                </a>
+
+                <!-- Phone Call -->
+                <a href="tel:+919979260393" class="help-option-card">
+                    <div class="help-option-icon" aria-hidden="true">📞</div>
+                    <h3 class="help-option-label">CALL</h3>
+                    <p class="help-option-sub">Contact the LifeSavers United team.</p>
+                    <span class="help-option-contact">+91 99792 60393</span>
+                </a>
+
+                <!-- Email -->
+                <a href="mailto:lifesaversunited.india@gmail.com" class="help-option-card">
+                    <div class="help-option-icon" aria-hidden="true">✉️</div>
+                    <h3 class="help-option-label">EMAIL</h3>
+                    <p class="help-option-sub">Send us an email.</p>
+                    <span class="help-option-contact">lifesaversunited.india@gmail.com</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================== -->
+    <!-- 12. FREQUENTLY ASKED QUESTIONS (Accordion)                           -->
+    <!-- ==================================================================== -->
+    <section class="py-16 sm:py-24 section-cream" id="faq">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="section-badge">
+                <span class="section-badge-dot"></span>
+                <span>COMMON QUESTIONS</span>
+            </div>
+            <h2 class="section-title">FREQUENTLY ASKED QUESTIONS</h2>
+            <p class="section-subtitle">
+                Clear, straightforward answers about registration, donation eligibility, emergency coordination, and your privacy.
+            </p>
+
+            <div class="faq-accordion-wrap text-left">
+                <!-- CATEGORY: REGISTRATION -->
+                <div class="faq-category-header">REGISTRATION</div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Who can register as a donor?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Any healthy adult between 18 and 65 years of age weighing at least 45 kg (or 50 kg for Single Donor Platelet donations) can register. You should not have any active serious medical conditions or recent major surgery.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How long does registration take?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Registration takes less than 2 minutes. Simply fill in your basic personal details, blood group, and location in the form above.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Does registering mean I must donate?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        No. Blood donation is 100% voluntary. You always have full freedom to assess your physical readiness and availability whenever a coordinator contacts you.
+                    </div>
+                </div>
+
+                <!-- CATEGORY: DONATION -->
+                <div class="faq-category-header">DONATION</div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How does the donation process work?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        When a patient needs blood in your vicinity, a coordinator reaches out. If you agree, you visit the certified hospital blood bank or donation center, undergo a quick free health check (hemoglobin, blood pressure, weight), and complete your donation in about 10–15 minutes under licensed medical supervision.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How often can I donate?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        For Whole Blood, male donors can donate every 90 days (3 months) and female donors every 120 days (4 months). For Single Donor Platelets (SDP), donors can safely donate every 14 days, up to a maximum of 24 times a year.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>What happens after I donate?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        You rest for 10–15 minutes and enjoy fluids or light refreshments provided by the blood center. You can log your donation in your LifeSavers United Donor Portal to update your records, receive milestone certificates, and track your next eligible date.
+                    </div>
+                </div>
+
+                <!-- CATEGORY: EMERGENCY REQUESTS -->
+                <div class="faq-category-header">EMERGENCY REQUESTS</div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How will I be contacted?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        You will be contacted via your chosen preferred contact method (WhatsApp, phone call, or SMS) by an authorized LifeSavers United coordinator when an emergency requires your blood group in your area.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Can I decline an emergency request?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Yes, absolutely. If you are unwell, traveling, busy, or otherwise unavailable, you can simply decline without any hesitation or penalty.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Can I change my availability?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Yes. You can manage your availability, contact preferences, or activate rest mode through your Donor Portal or by reaching out to our helpline.
+                    </div>
+                </div>
+
+                <!-- CATEGORY: DONOR PORTAL -->
+                <div class="faq-category-header">DONOR PORTAL</div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How do I see my donation history?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Visit the <a href="/donor_portal" class="text-primary font-bold hover:underline">Donor Portal</a> and enter your registered mobile number. Your complete history of past donations and dates will be displayed.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Where can I find my donor card?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Your official Digital Donor Card is available under the "Digital Donor Card" tab in the Donor Portal. You can download it as a high-resolution PNG image or share it directly on WhatsApp.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How can I see my next eligible donation date?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        The Donor Portal automatically calculates your mandatory medical interval based on DGHS guidelines and displays a clear countdown to your next eligible donation date.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Where can I access certificates?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Under the "Appreciation Certificate" tab in the Donor Portal, you can generate and download official verified LifeSavers United appreciation certificates recognizing your lifesaving contributions.
+                    </div>
+                </div>
+
+                <!-- CATEGORY: PRIVACY -->
+                <div class="faq-category-header">PRIVACY</div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>How is my information used?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        Your information is strictly used to match you with patients requiring your specific blood type during medical emergencies and to provide you with your digital donor card and records.
+                    </div>
+                </div>
+
+                <div class="faq-accordion-item">
+                    <button type="button" class="faq-accordion-trigger" aria-expanded="false">
+                        <span>Is my personal information publicly visible?</span>
+                        <span class="faq-accordion-icon">+</span>
+                    </button>
+                    <div class="faq-accordion-content">
+                        No. Your personal contact number and medical history are never published publicly on the internet. Only verified emergency coordinators handle match outreach in accordance with our strict privacy policy.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mobile Sticky Floating Action Button (Auto-hides when form is visible) -->
+    <div class="mobile-sticky-cta" id="mobileStickyCta">
+        <a href="#donor-registration-section" class="mobile-sticky-cta-btn">
+            <span>🩸 REGISTER AS A DONOR</span>
+        </a>
+    </div>
+
+    <!-- ==================================================================== -->
+    <!-- FOOTER                                                               -->
+    <!-- ==================================================================== -->
     <footer class="bg-text-primary text-white py-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
                 <!-- Logo and Mission -->
                 <div>
                     <div class="flex items-center mb-3">
-                        <img src="imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" class="w-auto mr-3"
-                            style="height: 65px;">
-
+                        <img src="imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" class="footer-brand-logo mr-3">
                     </div>
                     <p class="text-gray-300 mb-4">
-                        Connecting donors, recipients, and hospitals to save lives through the power of community-driven
-                        blood donation.
+                        Connecting donors, recipients, and hospitals to save lives through the power of community-driven blood donation.
                     </p>
                     <div class="flex space-x-4">
                         <a href="https://www.instagram.com/lifesaversunited_blooddonors/" target="_blank"
@@ -648,6 +1504,7 @@
                         </li>
                     </ul>
                 </div>
+
                 <!-- Resources -->
                 <div class="text-center md:text-left">
                     <h3 class="text-lg font-semibold mb-3">Resources</h3>
@@ -655,7 +1512,6 @@
                         <li><a href="/gallery" class="text-gray-300 hover:text-white transition-smooth">Gallery</a></li>
                         <li><a href="/faq" class="text-gray-300 hover:text-white transition-smooth">FAQs</a></li>
                         <li><a href="/stories" class="text-gray-300 hover:text-white transition-smooth">Stories</a></li>
-
                         <li><a href="/blogs" class="text-gray-300 hover:text-white transition-smooth">Blog</a></li>
                         <li><a href="/health_assessment_tools"
                                 class="text-gray-300 hover:text-white transition-smooth">Health Assessment Tools</a>
@@ -670,13 +1526,11 @@
                     <h3 class="text-lg font-semibold mb-3">Contact</h3>
                     <ul class="space-y-2 text-gray-300">
                         <li class="font-bold text-primary"><a
-                                href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
+                                href="https://wa.me/919979260393?text=Hi%20LifeSavers%20United%20Team%2C%20I%20need%20assistance."
                                 target="_blank" rel="noopener noreferrer"
-                                class="hover:text-primary-700 transition-smooth">24/7 Emergency:
-                                9979260393</a></li>
+                                class="hover:text-primary-700 transition-smooth">24/7 Helpline: 9979260393</a></li>
                         <li>Support: <a href="mailto:lifesaversunited.india@gmail.com"
-                                class="hover:text-white transition-smooth">
-                                lifesaversunited.india@gmail.com</a>
+                                class="hover:text-white transition-smooth">lifesaversunited.india@gmail.com</a>
                         </li>
                     </ul>
                 </div>
@@ -693,7 +1547,8 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Set current year
-            document.getElementById('currentYear').textContent = new Date().getFullYear();
+            const yearEl = document.getElementById('currentYear');
+            if (yearEl) yearEl.textContent = new Date().getFullYear();
         });
     </script>
     <script type="module">
@@ -701,6 +1556,7 @@
         import './scripts/firebase-config.js';
     </script>
     <script type="module" src="scripts/donor_registration.js"></script>
+    <script src="scripts/donor-registration-enhancements.js"></script>
     <script src="scripts/mobile-menu.js"></script>
 
     <!-- Microsoft Clarity -->

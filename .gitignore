@@ -8,3 +8,5 @@ package-lock.json
 __pycache__/
 scratch/
 *.pyc
+.runtimeconfig.json
+firebase-functions/.runtimeconfig.json
