@@ -181,7 +181,7 @@ const sampleEventsData = [
 const milestoneData = [
     { year: "2023", title: "Organization Started", detail: "LifeSavers United founded with a core mission to connect emergency blood donors with patients 24/7 across Gujarat." },
     { year: "2023", title: "First Blood Donation Drive", detail: "Successfully conducted inaugural blood donation drive in Nadiad, collecting 95 units for critical care units." },
-    { year: "2024", title: "Volunteer Network Expansion", detail: "Expanded dedicated volunteer team to 150+ members across Ahmedabad, Vadodara, Surat, and Rajkot." },
+    { year: "2024", title: "Volunteer Network Expansion", detail: "Expanded dedicated volunteer team to 50+ members across Ahmedabad, Vadodara, Surat, and Rajkot." },
     { year: "2025", title: "Major Community Outreach", detail: "Hosted over 40 corporate and college awareness seminars, reaching 5,000+ prospective young blood donors." },
     { year: "2026", title: "1000+ Blood Units Facilitated", detail: "Crossed major milestone of facilitating 1,000+ verified blood units for emergency surgeries and thalassemia children." }
 ];
@@ -495,7 +495,7 @@ function updateAndAnimateStats() {
     const totalVolunteersEl = document.getElementById('statTotalVolunteers');
     const totalLivesEl = document.getElementById('statTotalLives');
 
-    const totalEventsCount = Math.max(75, eventsData.length);
+    const totalEventsCount = eventsData.length;
 
     let unitsSum = 0;
     eventsData.forEach(e => {
@@ -504,12 +504,14 @@ function updateAndAnimateStats() {
             if (!isNaN(num)) unitsSum += num;
         }
     });
-    const bloodUnitsCount = Math.max(1250, unitsSum);
+    const bloodUnitsCount = unitsSum;
+    const volunteersCount = 50;
+    const livesSavedCount = 700;
 
     if (totalEventsEl) totalEventsEl.setAttribute('data-count', totalEventsCount);
     if (totalUnitsEl) totalUnitsEl.setAttribute('data-count', bloodUnitsCount);
-    if (totalVolunteersEl) totalVolunteersEl.setAttribute('data-count', 350);
-    if (totalLivesEl) totalLivesEl.setAttribute('data-count', Math.max(bloodUnitsCount * 3, 3750));
+    if (totalVolunteersEl) totalVolunteersEl.setAttribute('data-count', volunteersCount);
+    if (totalLivesEl) totalLivesEl.setAttribute('data-count', livesSavedCount);
 
     initCounterAnimations();
 }
@@ -637,17 +639,26 @@ function initCounterAnimations() {
     const counters = document.querySelectorAll('.event-counter');
     if (counters.length === 0) return;
 
+    if (!('IntersectionObserver' in window)) {
+        counters.forEach(target => {
+            const endVal = parseInt(target.getAttribute('data-count'), 10);
+            const suffix = target.getAttribute('data-suffix') || '';
+            target.textContent = endVal.toLocaleString() + suffix;
+        });
+        return;
+    }
+
     const observer = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const target = entry.target;
                 const endVal = parseInt(target.getAttribute('data-count'), 10);
                 const suffix = target.getAttribute('data-suffix') || '';
-                animateValue(target, 0, endVal, 1500, suffix);
+                animateValue(target, 0, endVal, 1200, suffix);
                 obs.unobserve(target);
             }
         });
-    }, { threshold: 0.4 });
+    }, { threshold: 0.15 });
 
     counters.forEach(c => observer.observe(c));
 }

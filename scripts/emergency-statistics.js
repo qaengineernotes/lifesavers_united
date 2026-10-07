@@ -76,7 +76,8 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
         const closedRequests = statistics.closed;
 
         successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = closedRequests; // Show only the closed requests count
+        const closedCount = Number(closedRequests) || 0;
+        livesSaved = closedCount >= 700 ? `${closedCount}+` : '700+'; // Organization baseline is 700+ lives saved
     } else {
         // Fallback to local calculation (for backward compatibility)
         openRequests = requests.filter(request => {
@@ -99,7 +100,8 @@ function updateStatistics(requests = [], statistics = null, buttonStates = new M
         }).length;
 
         successRate = totalRequests > 0 ? Math.round((closedRequests / totalRequests) * 100) : 94;
-        livesSaved = closedRequests; // Show only the closed requests count
+        const fallbackClosedCount = Number(closedRequests) || 0;
+        livesSaved = fallbackClosedCount >= 700 ? `${fallbackClosedCount}+` : '700+'; // Organization baseline is 700+ lives saved
     }
 
     // Update the DOM elements
