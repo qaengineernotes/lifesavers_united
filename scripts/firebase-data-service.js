@@ -507,151 +507,118 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
             const newUnitsFulfilled = (currentData.unitsFulfilled || 0) + parseInt(donationInfo.units);
             const willClose = newUnitsFulfilled >= totalUnitsRequired;
 
-            // Update request with donation
-            const updateData = {
-                unitsFulfilled: newUnitsFulfilled,
-                updatedBy: currentUser?.displayName || 'System',
-                updatedByUid: currentUser?.uid || 'legacy',
-                updatedAt: serverTimestamp(),
-                lastUpdatedByName: currentUser?.displayName || 'System',
-                lastUpdatedByUid: currentUser?.uid || 'legacy',
-                lastUpdatedAt: serverTimestamp()
-            };
+            // Resolve donor identity and blood group (properly scoped)
+            let donorId = donationInfo.donorId || null;
+            let existingDonor = null;
+            let existingDonorData = null;
+            let bloodGroupToStore = '';
 
-            // Close if fulfilled
-            if (willClose) {
-                updateData.status = 'Closed';
-                updateData.closedBy = currentUser?.displayName || 'System';
-                updateData.closedByUid = currentUser?.uid || 'legacy';
-                updateData.closedAt = serverTimestamp();
-                updateData.closureReason = 'Blood fulfilled by our donors';
-                updateData.closureType = 'fulfilled';
-                updateData.fulfilledAt = new Date().toISOString();
+            const donorsRef = collection(db, 'donors');
+            const searchName = (donationInfo.donorName || '').trim().toLowerCase();
+            const searchContact = (donationInfo.donorContact || '').toString().trim();
+
+            // 0. Fetch linked donor directly if donorId provided from popup autocomplete
+            if (donorId) {
+                try {
+                    const linkedDocSnap = await getDoc(doc(db, 'donors', donorId));
+                    if (linkedDocSnap.exists()) {
+                        existingDonor = linkedDocSnap;
+                        existingDonorData = linkedDocSnap.data();
+                    }
+                } catch (e) {
+                    console.warn('Could not fetch donor by donorId:', e);
+                }
             }
 
-            await updateDoc(doc(db, 'emergency_requests', requestId), updateData);
-
-            // Generate donor ID for linking with duplicate detection
-            let donorId = null;
-            let existingDonor = null;
-            if (donationInfo.donorName && donationInfo.donorContact) {
-                // --- DUPLICATE DETECTION: Search by Name OR Contact Number ---
-                const donorsRef = collection(db, 'donors');
-
-                const searchName = (donationInfo.donorName || '').trim().toLowerCase();
-                const searchContact = (donationInfo.donorContact || '').toString().trim();
-
-                // 1. Search by Contact Number (most reliable)
-                if (searchContact) {
+            // 1. Search by Contact Number (most reliable fallback)
+            if (!existingDonor && searchContact) {
+                try {
                     const q = query(donorsRef, where('contactNumber', '==', searchContact));
                     const snapshot = await getDocs(q);
                     if (!snapshot.empty) {
                         existingDonor = snapshot.docs[0];
                         donorId = existingDonor.id;
+                        existingDonorData = existingDonor.data();
                     }
+                } catch (e) {
+                    console.warn('Could not query donor by contact number:', e);
                 }
+            }
 
-                // 2. Search by Name (if not found by contact)
-                if (!existingDonor && searchName) {
-                    // Query all donors and filter by case-insensitive name match
+            // 2. Search by Name (if not found by contact)
+            if (!existingDonor && searchName) {
+                try {
                     const allDonorsSnapshot = await getDocs(donorsRef);
-                    allDonorsSnapshot.forEach((doc) => {
-                        const data = doc.data();
-                        const existingName = (data.fullName || '').trim().toLowerCase();
-                        if (existingName === searchName) {
-                            existingDonor = doc;
-                            donorId = doc.id;
+                    allDonorsSnapshot.forEach((docSnap) => {
+                        if (!existingDonor) {
+                            const data = docSnap.data();
+                            const existingName = (data.fullName || data.displayName || '').trim().toLowerCase();
+                            if (existingName === searchName) {
+                                existingDonor = docSnap;
+                                donorId = docSnap.id;
+                                existingDonorData = data;
+                            }
                         }
                     });
+                } catch (e) {
+                    console.warn('Could not query donor by name:', e);
                 }
+            }
 
-                // Generate ID if new donor
-                if (!donorId) {
-                    donorId = generateDonorId(donationInfo.donorName, donationInfo.donorContact);
-                }
+            // Generate ID if new donor
+            if (!donorId && donationInfo.donorName && donationInfo.donorContact) {
+                donorId = generateDonorId(donationInfo.donorName, donationInfo.donorContact);
+            }
 
-                // Update donor master record
+            // Determine blood group to store: prefer registered donor's blood group, otherwise patient's
+            const donorExists = !!existingDonor;
+            if (donorExists && existingDonorData && existingDonorData.bloodGroup) {
+                bloodGroupToStore = existingDonorData.bloodGroup;
+            } else if (requestData.bloodType && requestData.bloodType !== 'Any') {
+                bloodGroupToStore = requestData.bloodType;
+            } else {
+                bloodGroupToStore = '';
+            }
+
+            // Update donor master record if donorId resolved
+            if (donorId) {
                 try {
                     const donorRef = doc(db, 'donors', donorId);
-
-                    // Check if donor already exists (for blood group logic)
-                    const existingDonorDoc = await getDoc(donorRef);
-                    const donorExists = existingDonorDoc.exists();
-                    const existingDonorData = donorExists ? existingDonorDoc.data() : null;
-
-                    // Determine blood group to store
-                    let bloodGroupToStore = '';
-
-                    if (requestData.bloodType === 'Any') {
-                        // Patient required blood group is "Any"
-                        if (donorExists && existingDonorData.bloodGroup) {
-                            // Existing donor - keep their existing blood group
-                            bloodGroupToStore = existingDonorData.bloodGroup;
-                        } else {
-                            // New donor - keep empty (don't set to "Any")
-                            bloodGroupToStore = '';
-                        }
-                    } else {
-                        // Patient required specific blood group
-                        if (donorExists && existingDonorData.bloodGroup) {
-                            // Existing donor - keep their existing blood group
-                            bloodGroupToStore = existingDonorData.bloodGroup;
-                        } else {
-                            // New donor - set to the specific blood group
-                            bloodGroupToStore = requestData.bloodType;
-                        }
-                    }
-
                     const donorData = {
-                        // Core identity fields
-                        fullName: donationInfo.donorName,
-                        contactNumber: donationInfo.donorContact,
-                        bloodGroup: bloodGroupToStore,
-
-                        // Donation tracking
+                        fullName: donationInfo.donorName || (existingDonorData?.fullName || ''),
+                        contactNumber: donationInfo.donorContact || (existingDonorData?.contactNumber || ''),
+                        bloodGroup: bloodGroupToStore || (existingDonorData?.bloodGroup || ''),
                         lastDonatedAt: serverTimestamp(),
-
-                        // Update tracking
                         updatedAt: serverTimestamp(),
                         updatedBy: currentUser?.displayName || 'System'
                     };
 
-                    // Add ALL fields for new donors (standardized structure)
                     if (!donorExists) {
-                        // Creation tracking
                         donorData.createdAt = serverTimestamp();
                         donorData.registeredAt = serverTimestamp();
                         donorData.createdBy = currentUser?.displayName || 'System';
                         donorData.createdByUid = currentUser?.uid || null;
                         donorData.source = 'donation_logging';
                         donorData.registrationDate = new Date().toISOString();
-
-                        // Personal details (empty defaults)
                         donorData.dateOfBirth = '';
                         donorData.age = 0;
                         donorData.gender = '';
                         donorData.weight = '';
-                        donorData.email = '';
-
-                        // Location (empty defaults)
+                        donorData.email = donationInfo.donorEmail || '';
                         donorData.city = '';
                         donorData.area = '';
-
-                        // Preferences (empty defaults)
                         donorData.isEmergencyAvailable = '';
                         donorData.preferredContact = '';
-
-                        // Medical history (empty default)
                         donorData.medicalHistory = '';
                     }
 
                     await setDoc(donorRef, donorData, { merge: true });
-
                 } catch (donorErr) {
+                    console.error('❌ Failed to sync donor to master list:', donorErr);
                 }
             }
 
-            // Create donation log entry
+            // Create donation log entry FIRST before mutating emergency request
             const donationLogRef = await addDoc(collection(db, 'donation_logs'), {
                 requestId: requestId,
                 donorId: donorId || 'none',
@@ -677,21 +644,36 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 
             const donationLogId = donationLogRef.id;
 
-            // Update donorSummary
+            // Prepare unified request update data
             const currentSummary = currentData.donorSummary || '';
             const donorEntry = `${donationInfo.donorName || 'Anonymous'} (${donationInfo.units} unit${parseInt(donationInfo.units) > 1 ? 's' : ''})`;
             const newSummary = currentSummary ? `${currentSummary}, ${donorEntry}` : donorEntry;
 
-            // Add donation ID to tracking arrays
-            await updateDoc(doc(db, 'emergency_requests', requestId), {
+            const updateData = {
+                unitsFulfilled: newUnitsFulfilled,
+                updatedBy: currentUser?.displayName || 'System',
+                updatedByUid: currentUser?.uid || 'legacy',
+                updatedAt: serverTimestamp(),
+                lastUpdatedByName: currentUser?.displayName || 'System',
+                lastUpdatedByUid: currentUser?.uid || 'legacy',
+                lastUpdatedAt: serverTimestamp(),
                 donorSummary: newSummary,
                 donationLogIds: arrayUnion(donationLogId),
                 allDonationLogIds: arrayUnion(donationLogId),
                 lastDonationAt: serverTimestamp()
-            });
+            };
 
-            // Add to closure history if closing
+            // Close if fulfilled
             if (willClose) {
+                updateData.status = 'Closed';
+                updateData.closedBy = currentUser?.displayName || 'System';
+                updateData.closedByUid = currentUser?.uid || 'legacy';
+                updateData.closedAt = serverTimestamp();
+                updateData.closureReason = 'Blood fulfilled by our donors';
+                updateData.closureType = 'fulfilled';
+                updateData.fulfilledAt = new Date().toISOString();
+                updateData.totalClosures = (currentData.totalClosures || 0) + 1;
+
                 const closureEntry = {
                     closedBy: currentUser?.displayName || 'System',
                     closedByUid: currentUser?.uid || 'legacy',
@@ -702,12 +684,11 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                     unitsFulfilled: newUnitsFulfilled,
                     donationLogIds: [donationLogId]
                 };
-
-                await updateDoc(doc(db, 'emergency_requests', requestId), {
-                    closureHistory: arrayUnion(closureEntry),
-                    totalClosures: (currentData.totalClosures || 0) + 1
-                });
+                updateData.closureHistory = arrayUnion(closureEntry);
             }
+
+            // Single atomic update call on emergency_requests
+            await updateDoc(doc(db, 'emergency_requests', requestId), updateData);
 
             // Add history entry
             try {
@@ -719,6 +700,7 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                     note: `${donationInfo.units} unit(s) donated by ${donationInfo.donorName || 'Unknown'}`
                 });
             } catch (historyError) {
+                console.warn('Could not add history entry:', historyError);
             }
 
             return {
@@ -726,7 +708,7 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                 autoClosed: willClose,
                 unitsRemaining: totalUnitsRequired - newUnitsFulfilled,
                 closureType: 'fulfilled',
-                donorEmail: existingDonor ? (existingDonor.data().email || '') : ''
+                donorEmail: existingDonorData?.email || donationInfo.donorEmail || ''
             };
         }
 

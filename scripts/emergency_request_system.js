@@ -1042,7 +1042,8 @@ async function logDonation(requestData, button) {
             donorType: donationInfo.donorType,
             donorName: donationInfo.donorName || '',
             donorContact: donationInfo.donorContact || '',
-            closureReason: donationInfo.closureReason || ''
+            closureReason: donationInfo.closureReason || '',
+            donorId: donationInfo.donorId || ''
         };
 
         let result = { success: false };
@@ -2205,12 +2206,14 @@ function showDonationPopup(requestData) {
             }
 
             const donorEmail = document.getElementById('donorLinkedEmail')?.value || '';
+            const donorLinkedId = document.getElementById('donorLinkedId')?.value || '';
             document.body.removeChild(modal);
             resolve({
                 units: selectedUnits,
                 donorType: donorType,
                 donorName: toTitleCase(donorName),
                 donorContact: donorContact,
+                donorId: donorLinkedId,
                 closureReason: closureReason,
                 donorEmail: donorEmail
             });
