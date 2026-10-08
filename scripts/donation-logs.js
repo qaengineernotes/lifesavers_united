@@ -175,6 +175,20 @@ async function loadDonationLogs() {
             return dateB.getTime() - dateA.getTime();
         });
 
+        // Calculate each donor's chronological milestone count (1st, 2nd, 3rd...)
+        const donorChronologicalCounts = new Map();
+        const chronological = [...logs].reverse();
+        chronological.forEach((log) => {
+            const donorKey = log.matchedDonorId || (log.donorContact ? normalizePhoneNumber(log.donorContact) : null) || (log.donorName ? log.donorName.trim().toLowerCase() : null);
+            if (donorKey) {
+                const count = (donorChronologicalCounts.get(donorKey) || 0) + 1;
+                donorChronologicalCounts.set(donorKey, count);
+                log.milestoneNumber = count;
+            } else {
+                log.milestoneNumber = 1;
+            }
+        });
+
         allDonationLogs = logs;
         filteredDonationLogs = [...allDonationLogs];
 
@@ -367,7 +381,7 @@ function renderTable() {
                 <button id="cert-btn-${log.id}" class="cert-btn" onclick="downloadCertificate('${log.id}')" title="Download Certificate of Appreciation">
                     📜 Certificate
                 </button>
-                <a href="/donor_card?donorName=${encodeURIComponent(log.donorName || '')}&date=${encodeURIComponent(formattedDate !== 'N/A' ? formattedDate : '')}&hospital=${encodeURIComponent(log.hospital || log.hospitalName || '')}&patientName=${encodeURIComponent((log.patientName && log.patientName !== 'Direct / Voluntary Camp') ? log.patientName : '')}&logId=${encodeURIComponent(log.id || '')}" target="_blank" class="cert-btn" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); margin-left: 6px;" title="Generate Studio Hero Appreciation Card">
+                <a href="/donor_card?donorName=${encodeURIComponent(log.donorName || '')}&date=${encodeURIComponent(formattedDate !== 'N/A' ? formattedDate : '')}&hospital=${encodeURIComponent(log.hospital || log.hospitalName || '')}&patientName=${encodeURIComponent((log.patientName && log.patientName !== 'Direct / Voluntary Camp') ? log.patientName : '')}&milestone=${log.milestoneNumber || 1}&logId=${encodeURIComponent(log.id || '')}${log.matchedDonorId ? `&donorId=${encodeURIComponent(log.matchedDonorId)}` : ''}" target="_blank" class="cert-btn" style="background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); margin-left: 6px;" title="Generate Studio Hero Appreciation Card">
                     🎖️ Hero Card
                 </a>
             </td>

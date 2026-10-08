@@ -574,11 +574,11 @@
                                 🏆 Lifetime Blood Donation Milestone Number
                             </label>
                             <span id="milestoneBadgePreview" class="gold-badge-chip shadow-sm">
-                                103rd Donation
+                                1st Donation
                             </span>
                         </div>
-                        <p class="text-xs text-amber-700/80 mb-2">Enter your true lifetime donation count (e.g. 103, 25, 5, 1). Rendered in 3D gold on the plaque and medal.</p>
-                        <input type="number" id="inputMilestone" min="1" max="999" value="103"
+                        <p class="text-xs text-amber-700/80 mb-2">Pre-filled from verified donation history. You can edit this anytime to reflect your true lifetime donations (e.g. 25, 5, 1). Rendered in 3D gold on the plaque and medal.</p>
+                        <input type="number" id="inputMilestone" min="1" max="999" value="1"
                             class="portal-form-input studio-form-input font-extrabold text-gray-900" />
                     </div>
 
@@ -944,7 +944,7 @@
 
             if (!isStudioReady) {
                 isStudioReady = true;
-                await initStudioEngine();
+                await initStudioEngine(profile);
             } else {
                 scheduleRender();
             }
@@ -1025,7 +1025,7 @@
         });
 
         // Studio Engine Setup
-        async function initStudioEngine() {
+        async function initStudioEngine(profile) {
             try {
                 canvasRenderStatus.textContent = 'Loading template...';
                 await loadCardTemplate();
@@ -1052,7 +1052,13 @@
 
             if (pDonorName) inputDonorName.value = pDonorName;
             if (pHospital) inputHospital.value = pHospital;
-            if (pMilestone) inputMilestone.value = pMilestone;
+
+            if (pMilestone) {
+                inputMilestone.value = pMilestone;
+            } else {
+                // Pre-fill milestone from database donation logs, default to 1
+                await resolveMilestoneFromDatabase(urlParams, profile);
+            }
 
             if (pPatient) {
                 inputPatientName.value = pPatient;
@@ -1081,6 +1087,102 @@
             scheduleRender();
         }
 
+        // Auto-resolve milestone count based on donor's logs in Firestore
+        async function resolveMilestoneFromDatabase(urlParams, profile) {
+            try {
+                const targetLogId = urlParams.get('logId');
+                const targetDonorId = urlParams.get('donorId') || profile?.id;
+                const targetPhone = urlParams.get('contact') || urlParams.get('phone') || profile?.contactNumber;
+                const targetName = (urlParams.get('donorName') || urlParams.get('name') || profile?.fullName || '').trim().toLowerCase();
+
+                const { getFirestore, collection, query, where, getDocs, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js');
+                const { db } = await import('./scripts/firebase-config.js');
+
+                const logsRef = collection(db, 'donation_logs');
+                let foundLogs = [];
+
+                let specificLogDoc = null;
+                if (targetLogId) {
+                    try {
+                        const snap = await getDoc(doc(db, 'donation_logs', targetLogId));
+                        if (snap.exists()) {
+                            specificLogDoc = { id: snap.id, ...snap.data() };
+                        }
+                    } catch (e) {}
+                }
+
+                const resolvedDonorId = targetDonorId || specificLogDoc?.donorId;
+                const resolvedPhone = targetPhone || specificLogDoc?.donorContact;
+                const resolvedName = targetName || (specificLogDoc?.donorName || '').trim().toLowerCase();
+
+                // 1. Query by donorId
+                if (resolvedDonorId && resolvedDonorId !== 'none') {
+                    try {
+                        const q1 = query(logsRef, where('donorId', '==', resolvedDonorId));
+                        const snap1 = await getDocs(q1);
+                        snap1.forEach(d => foundLogs.push({ id: d.id, ...d.data() }));
+                    } catch (e) {}
+                }
+
+                // 2. Query by phone if not found
+                if (foundLogs.length === 0 && resolvedPhone) {
+                    const cleanPhone = normalizePhoneNumber(resolvedPhone);
+                    const phoneVariations = [resolvedPhone, cleanPhone, '+91' + cleanPhone].filter(Boolean);
+                    for (const p of phoneVariations) {
+                        try {
+                            const q2 = query(logsRef, where('donorContact', '==', p));
+                            const snap2 = await getDocs(q2);
+                            snap2.forEach(d => {
+                                if (!foundLogs.some(x => x.id === d.id)) foundLogs.push({ id: d.id, ...d.data() });
+                            });
+                        } catch (e) {}
+                        if (foundLogs.length > 0) break;
+                    }
+                }
+
+                // 3. Fallback to name match if not found
+                if (foundLogs.length === 0 && resolvedName) {
+                    try {
+                        const allSnap = await getDocs(logsRef);
+                        allSnap.forEach(d => {
+                            const data = d.data();
+                            if ((data.donorName || '').trim().toLowerCase() === resolvedName) {
+                                if (!foundLogs.some(x => x.id === d.id)) foundLogs.push({ id: d.id, ...data });
+                            }
+                        });
+                    } catch (e) {}
+                }
+
+                // Exclude manual unverified self-reported if filtering official
+                const validLogs = foundLogs.filter(d => d.source !== 'donor_self_reported' || d.status !== 'self_reported');
+                const logsToUse = validLogs.length > 0 ? validLogs : foundLogs;
+
+                if (logsToUse.length > 0) {
+                    // Sort chronologically (oldest to newest)
+                    logsToUse.sort((a, b) => {
+                        const tA = (a.donatedAt?.seconds || a.timestamp?.seconds || a.createdAt?.seconds || 0);
+                        const tB = (b.donatedAt?.seconds || b.timestamp?.seconds || b.createdAt?.seconds || 0);
+                        return tA - tB;
+                    });
+
+                    let milestone = logsToUse.length;
+                    if (targetLogId) {
+                        const idx = logsToUse.findIndex(x => x.id === targetLogId);
+                        if (idx !== -1) {
+                            milestone = idx + 1;
+                        }
+                    }
+
+                    inputMilestone.value = Math.max(1, milestone);
+                } else {
+                    inputMilestone.value = 1;
+                }
+            } catch (err) {
+                console.warn('Could not auto-resolve donor milestone from database:', err);
+                inputMilestone.value = 1;
+            }
+        }
+
         // Live Render Debouncing
         function scheduleRender() {
             if (isRendering) return;
@@ -1099,7 +1201,7 @@
             const params = {
                 honorific: inputHonorific.value,
                 donorName: inputDonorName.value.trim() || 'Hero Donor',
-                milestoneNumber: parseInt(inputMilestone.value, 10) || 103,
+                milestoneNumber: parseInt(inputMilestone.value, 10) || 1,
                 donationDate: inputDonationDate.value,
                 patientName: patientName,
                 hospitalName: inputHospital.value.trim() || 'Ahmedabad Blood Bank'
@@ -1187,13 +1289,13 @@
         // Export Actions
         downloadBtn.addEventListener('click', () => {
             const name = (inputDonorName.value.trim() || 'Donor').replace(/\s+/g, '_');
-            const milestone = inputMilestone.value || '103';
+            const milestone = inputMilestone.value || '1';
             downloadHeroCard(canvas, `LifeSavers_United_Hero_Card_${name}_${milestone}th.png`);
         });
 
         shareBtn.addEventListener('click', async () => {
             const name = inputDonorName.value.trim() || 'Hero Donor';
-            const milestone = inputMilestone.value || '103';
+            const milestone = inputMilestone.value || '1';
             const shareText = `Honoring ${name} for completing their ${milestone}${getOrdinalSuffix(milestone)} blood donation milestone with LifeSavers United! ❤️🩸 Every blood donation saves up to 3 precious lives. Join our community at https://lifesaversunited.org`;
 
             shareBtn.disabled = true;
