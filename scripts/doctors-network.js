@@ -250,7 +250,7 @@ function initFormHandler() {
       if (btnText) btnText.textContent = 'Submitting Details…';
       if (btnSpinner) btnSpinner.classList.remove('dn-hidden');
     } else {
-      if (btnText) btnText.textContent = 'Submit Details for Verification';
+      if (btnText) btnText.textContent = 'Submit Details & Join Network';
       if (btnSpinner) btnSpinner.classList.add('dn-hidden');
     }
   }
@@ -277,7 +277,7 @@ function initFormHandler() {
 
       if (whatsappNoteEl) {
         if (optedWhatsApp) {
-          whatsappNoteEl.textContent = `Upon successful credential verification by our medical liaison team, you will receive your personal WhatsApp invitation link at +91 ${phone}.`;
+          whatsappNoteEl.textContent = `You are now connected with our coordination team at +91 ${phone}. You can also reach our 24/7 helpline anytime for critical case collaboration.`;
         } else {
           whatsappNoteEl.textContent = `Your details have been recorded for voluntary medical advisory consultations. Our team will contact you at +91 ${phone} when relevant cases arise.`;
         }

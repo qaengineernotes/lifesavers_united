@@ -374,12 +374,13 @@ export async function sendEmail(env, { to, subject, html, text, replyTo, preferr
     // - Welcome, Thank you, Birthday -> Brevo (fallback: Resend)
     // - Other emails (Eligibility reminders, Broadcasts, Admin notifications) -> Resend (fallback: Brevo)
     const pref = (preferredProvider || '').toLowerCase();
-    const chain = pref === 'brevo'
-        ? ['brevo', 'resend']
-        : ['resend', 'brevo'];
-
-    if (env.MAILJET_API_KEY && env.MAILJET_SECRET_KEY) {
-        chain.push('mailjet');
+    let chain;
+    if (pref === 'mailjet') {
+        chain = ['mailjet', 'brevo', 'resend'];
+    } else if (pref === 'brevo') {
+        chain = ['brevo', 'resend', 'mailjet'];
+    } else {
+        chain = ['resend', 'brevo', 'mailjet'];
     }
 
     for (const provider of chain) {
