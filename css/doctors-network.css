@@ -1,0 +1,356 @@
+/**
+ * LifeSavers United - Doctors Network Companion Stylesheet
+ * File: css/doctors-network.css
+ * Works in tandem with css/donor-registration.css to ensure identical look and feel.
+ * Strict rule compliance: Zero inline styles in HTML.
+ */
+
+/* Hero Tagline */
+.hero-tagline {
+  font-family: 'Crimson Text', serif;
+  font-size: 1.5rem;
+  font-style: italic;
+  font-weight: 600;
+  color: var(--lsu-crimson-dark, #991b1b);
+  margin-top: -0.5rem;
+  margin-bottom: 1.25rem;
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 640px) {
+  .hero-tagline {
+    font-size: 1.75rem;
+  }
+}
+
+/* 3-Step Horizontal Timeline override for desktop */
+@media (min-width: 1024px) {
+  .timeline-desktop.timeline-3-steps {
+    grid-template-columns: repeat(3, 1fr);
+    max-width: 60rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .timeline-desktop.timeline-3-steps .timeline-desktop-track {
+    left: 15%;
+    right: 15%;
+  }
+}
+
+/* Specialty Other row conditional toggle */
+.other-specialty-row {
+  display: none;
+  margin-top: 0.75rem;
+}
+
+.other-specialty-row.active {
+  display: block;
+}
+
+/* Prefix select combined with text input */
+.input-with-prefix {
+  display: flex;
+  align-items: stretch;
+  border-radius: 0.625rem;
+  border: 1.5px solid #e2e8f0;
+  background-color: #ffffff;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.input-with-prefix:focus-within {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.donor-form-page .input-with-prefix select.input-prefix-select,
+.input-prefix-select {
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 120px;
+  max-width: 160px;
+  background-color: #f8fafc;
+  border: none !important;
+  border-right: 1.5px solid #e2e8f0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0.75rem 2rem 0.75rem 0.875rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.65rem center;
+  background-size: 1rem;
+}
+
+.donor-form-page .input-with-prefix select.input-prefix-select:focus,
+.input-prefix-select:focus {
+  outline: none !important;
+  border-color: transparent !important;
+  border-right: 1.5px solid #e2e8f0 !important;
+  box-shadow: none !important;
+}
+
+.donor-form-page .input-with-prefix input.input-nested-field,
+.input-nested-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 100%;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  outline: none !important;
+  padding: 0.75rem 1rem;
+  background-color: transparent;
+}
+
+.donor-form-page .input-with-prefix input.input-nested-field:focus,
+.input-nested-field:focus {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Custom Checkbox Group in Form */
+.checkbox-card-group {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.875rem;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.checkbox-item-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-size: 0.925rem;
+  color: #334155;
+  line-height: 1.5;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-input-custom {
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.2rem;
+  border-radius: 0.25rem;
+  border: 1.5px solid #cbd5e1;
+  accent-color: #dc2626;
+  cursor: pointer;
+}
+
+/* Submit Button & Spinner */
+.btn-submit-primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 1.125rem;
+  padding: 1.125rem 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 14px rgba(220, 38, 38, 0.35);
+  transition: all 0.25s ease;
+  border: none;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+
+.btn-submit-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.45);
+}
+
+.donor-form-page .btn {
+  gap: 0.625rem;
+}
+
+.donor-form-page .btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-spinner {
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: dnSpinnerRotate 0.8s linear infinite;
+}
+
+@keyframes dnSpinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+/* Success Card */
+.form-success-container {
+  display: none;
+  text-align: center;
+  padding: 2.5rem 1rem;
+}
+
+.form-success-container.visible {
+  display: block;
+}
+
+.success-badge-circle {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background-color: #d1fae5;
+  border: 2px solid #a7f3d0;
+  color: #059669;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Utilities without inline styles */
+.dn-hidden {
+  display: none !important;
+}
+
+.dn-block {
+  display: block !important;
+}
+
+/* Call to action banner */
+.doctors-cta-card {
+  background: radial-gradient(circle at 50% 0%, #fff1f1 0%, #ffffff 80%);
+  border: 1.5px solid #fecaca;
+  border-radius: var(--lsu-radius-xl);
+  padding: 3.5rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--lsu-shadow-md);
+}
+
+@media (min-width: 640px) {
+  .doctors-cta-card {
+    padding: 4.5rem 3rem;
+  }
+}
+
+/* Contact Banner Section 8 */
+.contact-inquiry-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e2e8f0;
+  padding: 1.75rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@media (min-width: 1024px) {
+  .contact-inquiry-card {
+    flex-direction: row;
+  }
+}
+
+.contact-inquiry-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+@media (min-width: 640px) {
+  .contact-inquiry-actions {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+}
+
+.contact-inquiry-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #334155;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: color 0.2s ease;
+  text-decoration: none;
+}
+
+.contact-inquiry-email:hover {
+  color: #dc2626;
+}
+
+.contact-inquiry-helpline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #ffffff;
+  background-color: #059669;
+  padding: 0.65rem 1.25rem;
+  border-radius: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, transform 0.15s ease;
+  text-decoration: none;
+}
+
+.contact-inquiry-helpline:hover {
+  background-color: #047857;
+  transform: translateY(-1px);
+}
+
+.contact-inquiry-icon {
+  width: 1.125rem;
+  height: 1.125rem;
+  flex-shrink: 0;
+}
+
+/* Email field helper label */
+.dn-field-helper {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: #059669;
+  margin-left: 0.25rem;
+}
+
+/* Success Card Email Banner */
+.dn-email-success-card {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 0.625rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.dn-email-badge {
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  line-height: 1;
+  margin-top: 0.125rem;
+}
+

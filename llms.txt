@@ -11,9 +11,10 @@ Location: India (Nationwide coverage)
 ## Core Services
 1. Blood Donor Registration - Register as a blood donor to help save lives
 2. Emergency Blood Request System - Submit urgent blood requests for medical emergencies
-3. Health Assessment Tools - Check blood donation eligibility and health screening
-4. Blood Information Center - Educational resources about blood types and compatibility
-5. 24/7 Emergency Support - Round-the-clock assistance for critical situations
+3. Doctors Network - Exclusive verified network of medical doctors providing voluntary emergency guidance and case consultation (https://lifesaversunited.org/doctors-network)
+4. Health Assessment Tools - Check blood donation eligibility and health screening
+5. Blood Information Center - Educational resources about blood types and compatibility
+6. 24/7 Emergency Support - Round-the-clock assistance for critical situations
 
 ## Contact Information
 - Emergency Hotline: +91-9979260393

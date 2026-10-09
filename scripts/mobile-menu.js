@@ -74,20 +74,62 @@ class MobileMenu {
 
         // Remove the hidden class and adjust styling
         navLinks.classList.remove('hidden', 'md:flex');
-        navLinks.classList.add('flex', 'flex-col', 'space-y-4');
+        navLinks.classList.add('flex', 'flex-col', 'space-y-1');
 
-        // Update link styling for mobile and add active page detection
-        const links = navLinks.querySelectorAll('a');
+        // Update link styling for mobile, structure dropdown accordions, and add active page detection
         const currentPage = this.getCurrentPage();
 
-        links.forEach(link => {
-            const href = link.getAttribute('href');
-            const isActive = this.isActivePage(href, currentPage);
+        Array.from(navLinks.children).forEach(child => {
+            // Dropdown component (Donate, Network, Learn)
+            if (child.classList.contains('nav-dropdown')) {
+                const trigger = child.querySelector('.nav-dropdown-trigger');
+                const menu = child.querySelector('.nav-dropdown-menu');
+                const subItems = menu ? menu.querySelectorAll('.nav-dropdown-item, a') : [];
+                let hasActiveChild = false;
 
-            if (isActive) {
-                link.className = 'mobile-nav-link active text-primary font-semibold bg-primary-50 border-l-4 border-primary py-3 px-4 text-lg transition-smooth';
-            } else {
-                link.className = 'mobile-nav-link text-text-secondary hover:text-primary hover:bg-gray-50 transition-smooth py-3 px-4 text-lg';
+                subItems.forEach(subItem => {
+                    const href = subItem.getAttribute('href');
+                    const isActive = this.isActivePage(href, currentPage);
+                    if (isActive) {
+                        hasActiveChild = true;
+                        subItem.classList.add('active-dropdown-item');
+                    }
+                });
+
+                if (trigger) {
+                    if (hasActiveChild) {
+                        child.classList.add('mobile-dropdown-open');
+                        trigger.setAttribute('aria-expanded', 'true');
+                    }
+                    trigger.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        const isOpen = child.classList.contains('mobile-dropdown-open');
+
+                        // Close all other dropdowns in mobile menu (exclusive accordion)
+                        navLinks.querySelectorAll('.nav-dropdown').forEach(otherDropdown => {
+                            if (otherDropdown !== child) {
+                                otherDropdown.classList.remove('mobile-dropdown-open');
+                                const otherTrigger = otherDropdown.querySelector('.nav-dropdown-trigger');
+                                if (otherTrigger) otherTrigger.setAttribute('aria-expanded', 'false');
+                            }
+                        });
+
+                        child.classList.toggle('mobile-dropdown-open', !isOpen);
+                        trigger.setAttribute('aria-expanded', !isOpen ? 'true' : 'false');
+                    });
+                }
+            } 
+            // Direct top-level links (Home, Emergency, Submit Request, About Us)
+            else if (child.tagName === 'A') {
+                const href = child.getAttribute('href');
+                const isActive = this.isActivePage(href, currentPage);
+
+                if (isActive) {
+                    child.className = 'mobile-nav-link active text-primary font-semibold bg-primary-50 border-l-4 border-primary py-3 px-4 text-lg transition-smooth';
+                } else {
+                    child.className = 'mobile-nav-link text-text-secondary hover:text-primary hover:bg-gray-50 transition-smooth py-3 px-4 text-lg';
+                }
             }
         });
 
@@ -175,7 +217,7 @@ class MobileMenu {
 
         // Close menu when clicking on mobile menu links
         if (this.mobileMenu) {
-            const mobileLinks = this.mobileMenu.querySelectorAll('.mobile-nav-link');
+            const mobileLinks = this.mobileMenu.querySelectorAll('.mobile-nav-link, .nav-dropdown-item');
             mobileLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -291,7 +333,7 @@ class MobileMenu {
                 bottom: 0;
                 background: rgba(0, 0, 0, 0.6);
                 backdrop-filter: blur(4px);
-                z-index: 9999;
+                z-index: 100001;
                 opacity: 0;
                 visibility: hidden;
                 transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -317,6 +359,7 @@ class MobileMenu {
                 border-left: 1px solid rgba(239, 68, 68, 0.1);
                 display: flex;
                 flex-direction: column;
+                z-index: 100002;
             }
 
             .mobile-menu.mobile-menu-open .mobile-menu-content {
@@ -339,6 +382,7 @@ class MobileMenu {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                z-index: 10;
             }
 
             .mobile-menu-close:hover {
@@ -349,7 +393,7 @@ class MobileMenu {
             .mobile-menu-header {
                 padding: 1rem 1.5rem;
                 border-bottom: 1px solid rgba(239, 68, 68, 0.1);
-                margin-bottom: 1rem;
+                margin-bottom: 0.5rem;
             }
 
             .mobile-menu-logo {
@@ -382,13 +426,14 @@ class MobileMenu {
 
             .mobile-nav-link {
                 display: block;
-                padding: 1rem 1.5rem;
-                margin: 0.25rem 1rem;
+                padding: 0.85rem 1.25rem;
+                margin: 0.15rem 1rem;
                 border-radius: 0.75rem;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                transition: all 0.2s ease;
                 position: relative;
+                font-size: 1.05rem;
                 font-weight: 500;
-                letter-spacing: 0.025em;
+                letter-spacing: 0.015em;
             }
 
             .mobile-nav-link:hover {
@@ -414,6 +459,108 @@ class MobileMenu {
                 height: 60%;
                 background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
                 border-radius: 0 2px 2px 0;
+            }
+
+            /* Mobile Dropdown / Accordion Container */
+            .mobile-menu .nav-dropdown {
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                width: auto;
+                margin: 0.15rem 1rem;
+            }
+
+            /* Mobile Dropdown Trigger Button */
+            .mobile-menu .nav-dropdown-trigger {
+                display: flex !important;
+                align-items: center;
+                justify-content: space-between;
+                width: 100%;
+                padding: 0.85rem 1.25rem;
+                border-radius: 0.75rem;
+                background: transparent;
+                border: none;
+                color: #4b5563;
+                font-size: 1.05rem;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                text-align: left;
+            }
+
+            .mobile-menu .nav-dropdown-trigger:hover {
+                background-color: rgba(239, 68, 68, 0.05);
+                color: #ef4444;
+            }
+
+            .mobile-menu .nav-dropdown-arrow {
+                width: 1rem;
+                height: 1rem;
+                transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                color: #64748b;
+                flex-shrink: 0;
+            }
+
+            .mobile-menu .nav-dropdown.mobile-dropdown-open .nav-dropdown-trigger {
+                color: #dc2626;
+                background-color: rgba(239, 68, 68, 0.05);
+            }
+
+            .mobile-menu .nav-dropdown.mobile-dropdown-open .nav-dropdown-trigger .nav-dropdown-arrow {
+                transform: rotate(180deg);
+                color: #dc2626;
+            }
+
+            /* Mobile Dropdown Sub-menu */
+            .mobile-menu .nav-dropdown-menu {
+                display: none;
+                flex-direction: column;
+                position: static;
+                width: auto;
+                align-self: stretch;
+                box-sizing: border-box;
+                box-shadow: none;
+                border: none;
+                border-left: 2px solid #fee2e2;
+                margin: 0.25rem 0 0.5rem 0.5rem;
+                padding: 0.25rem 0.5rem 0.25rem 0.75rem;
+                background: rgba(254, 242, 242, 0.4);
+                border-radius: 0 0.5rem 0.5rem 0;
+                opacity: 1;
+                transform: none;
+                min-width: unset;
+            }
+
+            .mobile-menu .nav-dropdown.mobile-dropdown-open .nav-dropdown-menu {
+                display: flex !important;
+            }
+
+            /* Mobile Dropdown Items */
+            .mobile-menu .nav-dropdown-item {
+                display: block;
+                width: 100%;
+                box-sizing: border-box;
+                padding: 0.65rem 0.85rem;
+                margin: 0.1rem 0;
+                font-size: 0.95rem;
+                font-weight: 500;
+                color: #475569;
+                text-decoration: none;
+                border-radius: 0.375rem;
+                transition: all 0.2s ease;
+            }
+
+            .mobile-menu .nav-dropdown-item:hover {
+                background-color: #fee2e2;
+                color: #dc2626;
+                transform: translateX(3px);
+            }
+
+            .mobile-menu .nav-dropdown-item.active-dropdown-item {
+                color: #dc2626;
+                font-weight: 700;
+                background-color: #fee2e2;
+                border-left: 3px solid #dc2626;
             }
 
             /* Ensure mobile menu is hidden on desktop */

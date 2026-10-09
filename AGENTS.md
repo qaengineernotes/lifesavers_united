@@ -68,6 +68,16 @@ python -m http.server 8000  # Simple alternative
 
 ## Important Conventions
 
+### Feature & Flow Integrity (Global Rule)
+- You do **NOT** need to check [FEATURE_AND_FLOW_SPECIFICATION.md](FEATURE_AND_FLOW_SPECIFICATION.md) for simple UI/CSS adjustments, styling tweaks, or isolated bug fixes.
+- **ONLY check or update** [FEATURE_AND_FLOW_SPECIFICATION.md](FEATURE_AND_FLOW_SPECIFICATION.md) if the changes could affect core flows/features, or when modifying files directly related to those flows (e.g., user journeys, role boundaries like Donor vs Volunteer vs Admin, automated emails, or database schemas).
+- Do NOT break or contradict existing user flows, permissions, role boundaries, automated emails, or database schemas defined in that specification document.
+
+### Mandatory Confirmation Before Implementation (Strict Global Rule)
+- **NEVER directly implement or write code** when asked to build, modify, or implement a feature/change.
+- **FIRST**, explain your exact understanding of what was requested, outline the intended approach, files to be touched, and potential impact.
+- **WAIT** for the user's explicit confirmation before writing or modifying any code.
+
 ### CSS Build
 The CSS build runs `@dhiwise/component-tagger` BEFORE tailwindcss. Always use:
 ```bash

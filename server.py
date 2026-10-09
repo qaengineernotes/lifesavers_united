@@ -180,6 +180,23 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
             return
 
+        elif self.path == '/doctor-signup':
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length)
+            try:
+                data = json.loads(post_data.decode('utf-8'))
+                doctor_name = data.get('fullName', 'Doctor')
+                print(f"[*] Received doctor signup: {doctor_name} ({data.get('specialty', '')})")
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": True, "message": f"Application for {doctor_name} received for verification."}).encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(json.dumps({"success": False, "error": str(e)}).encode('utf-8'))
+            return
+
         elif self.path == '/donor-registration' or self.path == '/donor-registration-email':
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)

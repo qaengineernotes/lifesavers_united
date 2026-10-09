@@ -66,6 +66,14 @@
         <priority>0.8</priority>
     </url>
 
+    <!-- Doctors Network -->
+    <url>
+        <loc>https://lifesaversunited.org/doctors-network</loc>
+        <lastmod>2026-10-07</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.85</priority>
+    </url>
+
     <!-- About Us -->
     <url>
         <loc>https://lifesaversunited.org/about_us</loc>

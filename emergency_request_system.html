@@ -325,20 +325,56 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="nav-desktop-links hidden md:flex items-center">
                     <a href="/" class="text-text-secondary hover:text-primary transition-smooth">Home</a>
-                    <a href="/donor_registration"
-                        class="text-text-secondary hover:text-primary transition-smooth">Donate</a>
-                    <a href="/donor_portal"
-                        class="text-text-secondary hover:text-primary transition-smooth">Donor Portal</a>
+
+                    <!-- Donate Dropdown -->
+                    <div class="nav-dropdown">
+                        <button type="button" class="nav-dropdown-trigger text-text-secondary hover:text-primary transition-smooth" aria-expanded="false" aria-haspopup="true">
+                            <span>Donate</span>
+                            <svg class="nav-dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        <div class="nav-dropdown-menu" role="menu">
+                            <a href="/donor_registration" class="nav-dropdown-item" role="menuitem">Donate</a>
+                            <a href="/donor_portal" class="nav-dropdown-item" role="menuitem">Donor Portal</a>
+                        </div>
+                    </div>
+
+                    <!-- Emergency (Direct) -->
                     <a href="/emergency_request_system" class="text-primary font-semibold">Emergency</a>
-                    <a href="/emergency_blood_request"
-                        class="text-text-secondary hover:text-primary transition-smooth">Submit Request</a>
-                    <a href="/events" class="text-text-secondary hover:text-primary transition-smooth">Events</a>
-                    <a href="/blood_information_center"
-                        class="text-text-secondary hover:text-primary transition-smooth">Learn</a>
-                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About
-                        Us</a>
+
+                    <!-- Submit Request (Direct) -->
+                    <a href="/emergency_blood_request" class="text-text-secondary hover:text-primary transition-smooth">Submit Request</a>
+
+                    <!-- Network Dropdown -->
+                    <div class="nav-dropdown">
+                        <button type="button" class="nav-dropdown-trigger text-text-secondary hover:text-primary transition-smooth" aria-expanded="false" aria-haspopup="true">
+                            <span>Network</span>
+                            <svg class="nav-dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        <div class="nav-dropdown-menu" role="menu">
+                            <a href="/doctors-network" class="nav-dropdown-item" role="menuitem">Doctors Network</a>
+                            <a href="/volunteers" class="nav-dropdown-item" role="menuitem">Volunteers</a>
+                            <a href="/events" class="nav-dropdown-item" role="menuitem">Events</a>
+                        </div>
+                    </div>
+
+                    <!-- Learn Dropdown -->
+                    <div class="nav-dropdown">
+                        <button type="button" class="nav-dropdown-trigger text-text-secondary hover:text-primary transition-smooth" aria-expanded="false" aria-haspopup="true">
+                            <span>Learn</span>
+                            <svg class="nav-dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        <div class="nav-dropdown-menu" role="menu">
+                            <a href="/blood_information_center" class="nav-dropdown-item" role="menuitem">Blood Information Center</a>
+                            <a href="/health_assessment_tools" class="nav-dropdown-item" role="menuitem">Health Assessment Tools</a>
+                            <a href="/blogs" class="nav-dropdown-item" role="menuitem">Blog</a>
+                            <a href="/faq" class="nav-dropdown-item" role="menuitem">FAQs</a>
+                        </div>
+                    </div>
+
+                    <!-- About Us (Independent) -->
+                    <a href="/about_us" class="text-text-secondary hover:text-primary transition-smooth">About Us</a>
                 </div>
 
                 <!-- Mobile Menu Button -->
@@ -676,9 +712,7 @@
                 <!-- Logo and Mission -->
                 <div>
                     <div class="flex items-center mb-3">
-                        <img src="imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" class="w-auto mr-3"
-                            style="height: 65px;">
-
+                        <img src="imgs/Life-saver-united-logo-white.png" alt="LifeSavers United" class="footer-brand-logo mr-3">
                     </div>
                     <p class="text-gray-300 mb-4">
                         Connecting donors, recipients, and hospitals to save lives through the power of community-driven
@@ -686,7 +720,7 @@
                     </p>
                     <div class="flex space-x-4">
                         <a href="https://www.instagram.com/lifesaversunited_blooddonors/" target="_blank"
-                            rel="noopener noreferrer" rel="noopener noreferrer"
+                            rel="noopener noreferrer" aria-label="Follow LifeSavers United on Instagram"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
@@ -694,14 +728,14 @@
                             </svg>
                         </a>
                         <a href="https://chat.whatsapp.com/HYqsKngbuVAEOvViGF8p6L?mode=ac_t" target="_blank"
-                            rel="noopener noreferrer" rel="noopener noreferrer"
+                            rel="noopener noreferrer" aria-label="Join LifeSavers United on WhatsApp"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
                                     d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
                             </svg>
                         </a>
-                        <a href="https://x.com/lifesaversunit" target="_blank" rel="noopener noreferrer"
+                        <a href="https://x.com/lifesaversunit" target="_blank" rel="noopener noreferrer" aria-label="Follow LifeSavers United on X (Twitter)"
                             class="text-gray-300 hover:text-white transition-smooth">
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                 <path
@@ -716,58 +750,45 @@
                     <h3 class="text-lg font-semibold mb-3">Quick Links</h3>
                     <ul class="space-y-2">
                         <li><a href="/" class="text-gray-300 hover:text-white transition-smooth">Home</a></li>
-                        <li><a href="/donor_registration"
-                                class="text-gray-300 hover:text-white transition-smooth">Donate</a></li>
-                        <li><a href="/donor_portal"
-                                class="text-gray-300 hover:text-white transition-smooth">Donor Portal</a></li>
-                        <li><a href="/emergency_request_system"
-                                class="text-white font-bold transition-smooth">Emergency</a></li>
-                        <li><a href="/emergency_blood_request"
-                                class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
+                        <li><a href="/donor_registration" class="text-gray-300 hover:text-white transition-smooth">Donate</a></li>
+                        <li><a href="/donor_portal" class="text-gray-300 hover:text-white transition-smooth">Donor Portal</a></li>
+                        <li><a href="/emergency_request_system" class="text-white font-bold transition-smooth">Emergency</a></li>
+                        <li><a href="/emergency_blood_request" class="text-gray-300 hover:text-white transition-smooth">Submit Request</a></li>
+                        <li><a href="/doctors-network" class="text-gray-300 hover:text-white transition-smooth">Doctors Network</a></li>
+                        <li><a href="/volunteers" class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
                         <li><a href="/events" class="text-gray-300 hover:text-white transition-smooth">Events</a></li>
-                        <li><a href="/volunteers"
-                                class="text-gray-300 hover:text-white transition-smooth">Volunteers</a></li>
-                        <li><a href="/blood_information_center"
-                                class="text-gray-300 hover:text-white transition-smooth">Learn</a></li>
-                        <li><a href="/about_us" class="text-gray-300 hover:text-white transition-smooth">About Us</a>
-                        </li>
+                        <li><a href="/about_us" class="text-gray-300 hover:text-white transition-smooth">About Us</a></li>
                     </ul>
                 </div>
+
                 <!-- Resources -->
                 <div class="text-center md:text-left">
                     <h3 class="text-lg font-semibold mb-3">Resources</h3>
                     <ul class="space-y-2">
-                        <li><a href="/gallery" class="text-gray-300 hover:text-white transition-smooth">Gallery</a></li>
-                        <li><a href="/faq" class="text-gray-300 hover:text-white transition-smooth">FAQs</a></li>
+                        <li><a href="/blood_information_center" class="text-gray-300 hover:text-white transition-smooth">Blood Information Center</a></li>
+                        <li><a href="/health_assessment_tools" class="text-gray-300 hover:text-white transition-smooth">Health Assessment Tools</a></li>
                         <li><a href="/stories" class="text-gray-300 hover:text-white transition-smooth">Stories</a></li>
-
+                        <li><a href="/gallery" class="text-gray-300 hover:text-white transition-smooth">Gallery</a></li>
                         <li><a href="/blogs" class="text-gray-300 hover:text-white transition-smooth">Blog</a></li>
-                        <li><a href="/health_assessment_tools"
-                                class="text-gray-300 hover:text-white transition-smooth">Health Assessment Tools</a>
-                        </li>
-                        <li><a href="/privacy_policy" class="text-gray-300 hover:text-white transition-smooth">Privacy
-                                Policy</a></li>
+                        <li><a href="/faq" class="text-gray-300 hover:text-white transition-smooth">FAQs</a></li>
+                        <li><a href="/privacy_policy" class="text-gray-300 hover:text-white transition-smooth">Privacy Policy</a></li>
                     </ul>
                 </div>
 
-                <!-- Contact Info -->
+                <!-- Contact Info (Dedicated) -->
                 <div class="text-center md:text-left">
-                    <h3 class="text-lg font-semibold mb-3">Contact</h3>
+                    <h3 class="text-lg font-semibold mb-3">Contact Information</h3>
                     <ul class="space-y-2 text-gray-300">
-                        <li class="font-bold text-primary"><a
-                                href="https://wa.me/919979260393?text=🦺%20URGENT%20🦺%0A%0A*Patient%20Name:*%20%0A*Age:*%20%0A*Blood%20Group:*%20%0A*Units%20Required:*%20%0A*Hospital:*%20%0A*Location:*%20%0A*Suffering%20From:*%20%0A*Contact%20Person:*%20%0A*Contact%20Number:*%20"
-                                target="_blank" rel="noopener noreferrer"
-                                class="hover:text-primary-700 transition-smooth">24/7 Emergency:
-                                9979260393</a></li>
-                        <li>Support: lifesaversunited.india@gmail.com</li>
+                        <li class="font-bold text-primary"><a href="https://wa.me/919979260393?text=Hi%20LifeSavers%20United%20Team%2C%20I%20need%20assistance." target="_blank" rel="noopener noreferrer" class="hover:text-primary-700 transition-smooth">24/7 Helpline: 9979260393</a></li>
+                        <li>Support: <a href="mailto:lifesaversunited.india@gmail.com" class="hover:text-white transition-smooth">lifesaversunited.india@gmail.com</a></li>
+                        <li>Coverage: Ahmedabad, Gujarat &amp; Pan-India</li>
+                        <li>Availability: 24/7 Round-the-clock Response</li>
                     </ul>
                 </div>
             </div>
 
             <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-300">
-                <p>&copy; <span id="currentYear"></span> LifeSavers United. | Made with ❤️ by <a
-                        href="https://qablogs.com" target="_blank" rel="noopener noreferrer"
-                        class="text-gray-300 hover:text-white transition-smooth">QaBlogs</a></p>
+                <p>&copy; <span id="currentYear"></span> LifeSavers United. | Made with ❤️ by <a href="https://qablogs.com" target="_blank" rel="noopener noreferrer" class="text-gray-300 hover:text-white transition-smooth">QaBlogs</a></p>
             </div>
         </div>
     </footer>
