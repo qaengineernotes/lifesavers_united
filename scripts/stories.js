@@ -150,7 +150,7 @@ function createStoryCard(story) {
                 ${getStoryMetrics(story)}
                 
                 <div class="max-w-none mt-4 mb-4">
-                    <p class="text-gray-700 leading-relaxed">${story.fullStory}</p>
+                    ${story.fullStory.split('\n\n').map(paragraph => `<p class="text-gray-700 leading-relaxed mb-3">${paragraph}</p>`).join('')}
                 </div>
                 
                 ${story.testimonial ? `

@@ -136,12 +136,29 @@
             "image": "/imgs/parshwa-birenkumar-shah.webp",
             "featured": true,
             "testimonial": "You are not just arranging blood; you are gifting life, time, and smiles to families in their darkest hours. A single drop of blood can create an ocean of hope."
+        },
+        {
+            "id": 9,
+            "type": "donor",
+            "title": "From One Donation to a Lifelong Mission",
+            "name": "Happy Parmar",
+            "donationCount": "15",
+            "donationType": "Blood",
+            "yearsActive": 13,
+            "location": "Ahmedabad",
+            "date": "2026-10-11",
+            "excerpt": "From a family emergency that opened his eyes to organizing annual blood donation camps and answering urgent calls for O-positive blood, Happy Parmar turned a single donation into a lifelong mission with <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>.",
+            "fullStory": "I first donated blood in 2013 after my father encouraged me, but the true turning point came after moving to Ahmedabad.\n\nMy cousin's infant daughter was born with a heart defect and urgently needed blood for surgery at Civil Hospital. Rushing there to donate alongside colleagues opened my eyes: blood cannot be manufactured in a factory only another human being can provide it. From that day, blood donation became a personal responsibility. Between 2018 and 2025, my friends and I began organizing regular donation camps around Independence Day and Republic Day in association with Prathama Blood Centre.\n\nLater, I connected with <a href='https://lifesaversunited.org/' target='_blank' class='text-primary font-semibold hover:underline'>LifeSavers United</a>. Witnessing the team coordinate round-the-clock emergency requests inspired me to step forward and donate O-positive blood for an urgent patient.\n\nThat single act began an incredible journey. Today, volunteering alongside Moxesh Shah, Nikunj Mistri, Priti Gupta, and the entire team, I know blood donation isn't just about giving blood it's about giving families hope when they need it most.",
+            "motivation": "When we have the ability to save a life, why wait for someone else to do it?",
+            "image": "/imgs/volunteer-happy-parmar-blood-donation.webp",
+            "featured": true,
+            "testimonial": "When we have the ability to save a life, why wait for someone else to do it?"
         }
     ],
     "stats": {
-        "totalStories": 8,
+        "totalStories": 9,
         "totalLivesSaved": 0,
-        "totalDonors": 6,
+        "totalDonors": 7,
         "totalPatients": 2,
         "totalEmergencies": 0
     }
