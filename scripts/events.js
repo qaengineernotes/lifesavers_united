@@ -9,6 +9,88 @@
 // Fallback Sample Event Dataset
 const sampleEventsData = [
     {
+        id: "evt-2026-10-04",
+        title: "Appreciation Program - 3 Years of LifeSavers United",
+        slug: "appreciation-program-3-years-lifesavers-united",
+        date: "2026-10-04",
+        displayDate: "October 4, 2026",
+        location: "Ahmedabad, Gujarat",
+        category: "Volunteer Activities",
+        image: "imgs/appreciation-program-2026/appreciation-program-30.webp",
+        fallbackImage: "imgs/lifesavers-United.webp",
+        description: "Special Appreciation Program organized on October 4, 2026 on the occasion of completing 3 impactful years of LifeSavers United (completed on September 17, 2026), felicitating dedicated blood donors, volunteers, and community partners.",
+        participants: "50+ Donors and Volunteers",
+        bloodUnits: null,
+        galleryImages: [
+            "imgs/appreciation-program-2026/appreciation-program-1.webp",
+            "imgs/appreciation-program-2026/appreciation-program-2.webp",
+            "imgs/appreciation-program-2026/appreciation-program-3.webp",
+            "imgs/appreciation-program-2026/appreciation-program-4.webp",
+            "imgs/appreciation-program-2026/appreciation-program-5.webp",
+            "imgs/appreciation-program-2026/appreciation-program-6.webp",
+            "imgs/appreciation-program-2026/appreciation-program-7.webp",
+            "imgs/appreciation-program-2026/appreciation-program-8.webp",
+            "imgs/appreciation-program-2026/appreciation-program-9.webp",
+            "imgs/appreciation-program-2026/appreciation-program-10.webp",
+            "imgs/appreciation-program-2026/appreciation-program-11.webp",
+            "imgs/appreciation-program-2026/appreciation-program-12.webp",
+            "imgs/appreciation-program-2026/appreciation-program-13.webp",
+            "imgs/appreciation-program-2026/appreciation-program-14.webp",
+            "imgs/appreciation-program-2026/appreciation-program-15.webp",
+            "imgs/appreciation-program-2026/appreciation-program-16.webp",
+            "imgs/appreciation-program-2026/appreciation-program-17.webp",
+            "imgs/appreciation-program-2026/appreciation-program-18.webp",
+            "imgs/appreciation-program-2026/appreciation-program-19.webp",
+            "imgs/appreciation-program-2026/appreciation-program-20.webp",
+            "imgs/appreciation-program-2026/appreciation-program-21.webp",
+            "imgs/appreciation-program-2026/appreciation-program-22.webp",
+            "imgs/appreciation-program-2026/appreciation-program-23.webp",
+            "imgs/appreciation-program-2026/appreciation-program-24.webp",
+            "imgs/appreciation-program-2026/appreciation-program-25.webp",
+            "imgs/appreciation-program-2026/appreciation-program-26.webp",
+            "imgs/appreciation-program-2026/appreciation-program-27.webp",
+            "imgs/appreciation-program-2026/appreciation-program-28.webp",
+            "imgs/appreciation-program-2026/appreciation-program-29.webp",
+            "imgs/appreciation-program-2026/appreciation-program-30.webp",
+            "imgs/appreciation-program-2026/appreciation-program-31.webp",
+            "imgs/appreciation-program-2026/appreciation-program-32.webp",
+            "imgs/appreciation-program-2026/appreciation-program-33.webp",
+            "imgs/appreciation-program-2026/appreciation-program-34.webp",
+            "imgs/appreciation-program-2026/appreciation-program-35.webp",
+            "imgs/appreciation-program-2026/appreciation-program-36.webp",
+            "imgs/appreciation-program-2026/appreciation-program-37.webp",
+            "imgs/appreciation-program-2026/appreciation-program-38.webp",
+            "imgs/appreciation-program-2026/appreciation-program-39.webp",
+            "imgs/appreciation-program-2026/appreciation-program-40.webp",
+            "imgs/appreciation-program-2026/appreciation-program-41.webp",
+            "imgs/appreciation-program-2026/appreciation-program-42.webp",
+            "imgs/appreciation-program-2026/appreciation-program-43.webp",
+            "imgs/appreciation-program-2026/appreciation-program-44.webp",
+            "imgs/appreciation-program-2026/appreciation-program-45.webp",
+            "imgs/appreciation-program-2026/appreciation-program-46.webp",
+            "imgs/appreciation-program-2026/appreciation-program-47.webp",
+            "imgs/appreciation-program-2026/appreciation-program-48.webp",
+            "imgs/appreciation-program-2026/appreciation-program-49.webp",
+            "imgs/appreciation-program-2026/appreciation-program-50.webp",
+            "imgs/appreciation-program-2026/appreciation-program-51.webp",
+            "imgs/appreciation-program-2026/appreciation-program-52.webp",
+            "imgs/appreciation-program-2026/appreciation-program-53.webp",
+            "imgs/appreciation-program-2026/appreciation-program-54.webp",
+            "imgs/appreciation-program-2026/appreciation-program-55.webp",
+            "imgs/appreciation-program-2026/appreciation-program-56.webp",
+            "imgs/appreciation-program-2026/appreciation-program-57.webp",
+            "imgs/appreciation-program-2026/appreciation-program-58.webp",
+            "imgs/appreciation-program-2026/appreciation-program-59.webp",
+            "imgs/appreciation-program-2026/appreciation-program-60.webp",
+            "imgs/appreciation-program-2026/appreciation-program-61.webp",
+            "imgs/appreciation-program-2026/appreciation-program-62.webp",
+            "imgs/appreciation-program-2026/appreciation-program-63.webp",
+            "imgs/appreciation-program-2026/appreciation-program-64.webp",
+            "imgs/appreciation-program-2026/appreciation-program-65.webp",
+            "imgs/appreciation-program-2026/appreciation-program-66.webp"
+        ]
+    },
+    {
         id: "evt-2026-08-30",
         title: "Blood Donation Camp at Sahay with Help Volunteer Blood Center",
         date: "2026-08-30",
@@ -183,7 +265,8 @@ const milestoneData = [
     { year: "2023", title: "First Blood Donation Drive", detail: "Successfully conducted inaugural blood donation drive in Nadiad, collecting 95 units for critical care units." },
     { year: "2024", title: "Volunteer Network Expansion", detail: "Expanded dedicated volunteer team to 50+ members across Ahmedabad, Vadodara, Surat, and Rajkot." },
     { year: "2025", title: "Major Community Outreach", detail: "Hosted over 40 corporate and college awareness seminars, reaching 5,000+ prospective young blood donors." },
-    { year: "2026", title: "1000+ Blood Units Facilitated", detail: "Crossed major milestone of facilitating 1,000+ verified blood units for emergency surgeries and thalassemia children." }
+    { year: "2026", title: "1000+ Blood Units Facilitated", detail: "Crossed major milestone of facilitating 1,000+ verified blood units for emergency surgeries and thalassemia children." },
+    { year: "2026", title: "3 Years Completed & Appreciation Program", detail: "Celebrated 3 impactful years honoring 50+ dedicated donors, volunteers, and doctors across Gujarat." }
 ];
 
 // State Initialization
@@ -471,6 +554,17 @@ function updateEventSchemaJSONLD() {
                 "@type": "Organization",
                 "name": "LifeSavers United",
                 "url": "https://lifesaversunited.org"
+            },
+            "performer": {
+                "@type": "Organization",
+                "name": "LifeSavers United"
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": `https://lifesaversunited.org/events.html#${evt.id}`,
+                "price": "0",
+                "priceCurrency": "INR",
+                "availability": "https://schema.org/InStock"
             }
         }
     }));

@@ -11,6 +11,7 @@
             "firebase-functions/**",
             "functions/**",
             ".agent/**",
+            "_archive/**",
             "*.py"
         ],
         "rewrites": [

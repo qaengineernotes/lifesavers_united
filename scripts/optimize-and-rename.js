@@ -133,7 +133,9 @@ async function run() {
             const reduction = (((originalStats.size - newStats.size) / originalStats.size) * 100).toFixed(1);
             console.log(`✅ ${targetFilename} (${formatSize(originalStats.size)} ➔ ${formatSize(newStats.size)}, -${reduction}%)`);
 
-            outputRelativePaths.push(`imgs/${targetFilename}`);
+            const projectRoot = path.resolve(__dirname, '..');
+            const relPath = path.relative(projectRoot, targetPath).replace(/\\/g, '/');
+            outputRelativePaths.push(relPath);
             processedCount++;
         } catch (err) {
             console.log(`❌ Failed: ${err.message}`);
