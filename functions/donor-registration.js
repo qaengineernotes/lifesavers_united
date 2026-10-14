@@ -110,17 +110,21 @@ function buildDonorEmail(name, blood, city, area, emergency, time, phone = '') {
   const cleanPhone = String(phone || '').replace(/\D/g, '').slice(-10);
   const portalUrl = cleanPhone ? `https://lifesaversunited.org/donor_portal?phone=${encodeURIComponent(cleanPhone)}` : 'https://lifesaversunited.org/donor_portal';
 
+  const currentYear = new Date().getFullYear();
+
   return `<!DOCTYPE html>
 <html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Welcome to LifeSavers United</title></head>
-<body style="margin:0;padding:0;background:#f0f0f0;font-family:'Segoe UI',Arial,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background:#f0f0f0;padding:40px 16px;">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>Welcome to LifeSavers United</title></head>
+<body style="margin:0;padding:0;background-color:#fff5f5;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#fff5f5;padding:40px 10px;">
 <tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.12);">
+<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:24px;overflow:hidden;box-shadow:0 10px 40px rgba(192,57,43,0.1);">
 
   <!-- HEADER -->
-  <tr><td style="background:#ffffff;padding:32px 32px 24px;text-align:center;">
-    <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo.png" alt="LifeSavers United" style="height:70px;width:auto;">
+  <tr><td style="background:#ffffff;padding:40px 40px 20px;text-align:center;">
+    <a href="https://lifesaversunited.org" target="_blank" style="text-decoration:none;">
+      <img src="https://lifesaversunited.org/imgs/Life-saver-united-logo.png" alt="LifeSavers United" style="height:60px;width:auto;display:inline-block;" border="0">
+    </a>
   </td></tr>
 
   <!-- HERO -->
@@ -263,15 +267,21 @@ function buildDonorEmail(name, blood, city, area, emergency, time, phone = '') {
   </td></tr>
 
   <!-- FOOTER -->
-  <tr><td style="background:#1a1a1a;padding:24px 32px;text-align:center;">
-    <p style="margin:0 0 6px;color:#888;font-size:13px;">© ${new Date().getFullYear()} LifeSavers United | Made with ❤️ for India</p>
-    <p style="margin:0 0 8px;">
-      <a href="https://lifesaversunited.org" style="color:#666;text-decoration:none;font-size:12px;">lifesaversunited.org</a>
-      <span style="color:#444;margin:0 6px;">•</span>
-      <a href="https://lifesaversunited.org/privacy_policy" style="color:#666;text-decoration:none;font-size:12px;">Privacy Policy</a>
-    </p>
-    <p style="margin:0;color:#555;font-size:11px;">You received this because you registered as a donor on LifeSavers United.</p>
-  </td></tr>
+  <tr>
+    <td style="background-color:#f9f9f9;padding:30px 40px;text-align:center;border-top:1px solid #f0f0f0;">
+      <div style="margin-bottom:16px;">
+        <a href="mailto:lifesaversunited.india@gmail.com" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Email Us</a>
+        <span style="color:#ddd;">|</span>
+        <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
+        <span style="color:#ddd;">|</span>
+        <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Twitter (X)</a>
+      </div>
+      <p style="color:#999;font-size:12px;line-height:1.6;margin:0;">
+        &copy; ${currentYear} LifeSavers United. All rights reserved.<br>
+        You received this because you registered as a blood donor on LifeSavers United.
+      </p>
+    </td>
+  </tr>
 
 </table>
 </td></tr>
@@ -328,7 +338,8 @@ function buildAdminEmail(name, blood, city, area, email, phone, dob, emergency, 
 
   <!-- FOOTER -->
   <tr><td style="background:#fafafa;padding:16px 32px;border-top:1px solid #eee;text-align:center;">
-    <p style="color:#aaa;font-size:12px;margin:0;">Submitted via lifesaversunited.org/donor_registration</p>
+    <p style="color:#aaa;font-size:12px;margin:0 0 4px;">Submitted via lifesaversunited.org/donor_registration</p>
+    <p style="color:#bbb;font-size:11px;margin:0;">&copy; ${new Date().getFullYear()} LifeSavers United</p>
   </td></tr>
 
 </table>

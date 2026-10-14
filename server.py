@@ -170,10 +170,14 @@ class CORSHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             content_length = int(self.headers['Content-Length'])
             post_data = self.rfile.read(content_length)
             try:
+                data = json.loads(post_data.decode('utf-8'))
+                vol_name = data.get('name', 'Volunteer')
+                vol_email = data.get('email', '')
+                print(f"[*] Received volunteer signup: {vol_name} ({vol_email})")
                 self.send_response(200)
                 self.send_header('Content-Type', 'application/json')
                 self.end_headers()
-                self.wfile.write(json.dumps({"success": True, "message": "Local Mock: Registration received!"}).encode('utf-8'))
+                self.wfile.write(json.dumps({"success": True, "message": f"Local Mock: Application for {vol_name} received!"}).encode('utf-8'))
             except Exception as e:
                 self.send_response(500)
                 self.end_headers()

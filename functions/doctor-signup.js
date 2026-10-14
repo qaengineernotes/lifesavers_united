@@ -362,10 +362,17 @@ export async function onRequestPost(context) {
 
           <!-- Footer -->
           <tr>
-            <td style="background:#f8fafc;padding:20px 36px;border-top:1px solid #edf2f7;text-align:center;">
+            <td style="background:#f8fafc;padding:24px 36px;border-top:1px solid #edf2f7;text-align:center;">
+              <div style="margin-bottom:12px;">
+                <a href="mailto:lifesaversunited.india@gmail.com" style="color:#dc2626;text-decoration:none;margin:0 8px;font-size:12px;font-weight:600;">Email Us</a>
+                <span style="color:#cbd5e1;">|</span>
+                <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#dc2626;text-decoration:none;margin:0 8px;font-size:12px;font-weight:600;">Instagram</a>
+                <span style="color:#cbd5e1;">|</span>
+                <a href="https://x.com/lifesaversunit" style="color:#dc2626;text-decoration:none;margin:0 8px;font-size:12px;font-weight:600;">Twitter (X)</a>
+              </div>
               <p style="color:#94a3b8;font-size:12px;margin:0 0 4px;">LifeSavers United — Voluntary Blood Coordination Platform</p>
               <p style="color:#cbd5e1;font-size:11px;margin:0;">
-                <a href="https://lifesaversunited.org" style="color:#94a3b8;text-decoration:none;">lifesaversunited.org</a> • 
+                &copy; ${new Date().getFullYear()} LifeSavers United. All rights reserved. • 
                 <a href="https://lifesaversunited.org/privacy_policy" style="color:#94a3b8;text-decoration:none;">Privacy Policy</a>
               </p>
             </td>

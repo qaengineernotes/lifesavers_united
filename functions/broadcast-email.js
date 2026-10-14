@@ -130,14 +130,18 @@ ${content}
   </td></tr>
 
   <!-- FOOTER -->
-  <tr><td style="background:#f9f9f9;padding:32px;text-align:center;">
-    <p style="margin:0 0 10px;color:#333;font-size:14px;font-weight:600;">LifeSavers United</p>
-    <p style="margin:0 0 20px;color:#666;font-size:13px;line-height:1.5;">Saving lives through community blood donation.<br>Ahmedabad, Gujarat, India.</p>
-    
-    <div style="padding-top:20px;border-top:1px solid #eee;">
-      <p style="margin:0 0 8px;color:#999;font-size:12px;">📞 WhatsApp: <a href="https://wa.me/919979260393" style="color:#c0392b;text-decoration:none;">+91 9979260393</a></p>
-      <p style="margin:0;color:#999;font-size:12px;">You received this because you are a registered donor with LifeSavers United.</p>
+  <tr><td style="background:#f9f9f9;padding:32px 40px;text-align:center;border-top:1px solid #f0f0f0;">
+    <div style="margin-bottom:16px;">
+      <a href="mailto:lifesaversunited.india@gmail.com" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Email Us</a>
+      <span style="color:#ddd;">|</span>
+      <a href="https://www.instagram.com/lifesaversunited_blooddonors/" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Instagram</a>
+      <span style="color:#ddd;">|</span>
+      <a href="https://x.com/lifesaversunit" style="color:#c0392b;text-decoration:none;margin:0 10px;font-size:13px;font-weight:600;">Twitter (X)</a>
     </div>
+    <p style="color:#999;font-size:12px;line-height:1.6;margin:0;">
+      &copy; ${new Date().getFullYear()} LifeSavers United. All rights reserved.<br>
+      You received this because you are a registered donor with LifeSavers United.
+    </p>
   </td></tr>
 
 </table>
