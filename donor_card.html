@@ -832,7 +832,10 @@
             updatePhotoTransform, 
             downloadHeroCard, 
             shareHeroCard,
-            getOrdinalSuffix 
+            getOrdinalSuffix,
+            hasUserUploadedPhoto,
+            preResolveGalleryFileName,
+            saveHeroCardToGallery
         } from './scripts/donor-hero-card.js';
 
         // DOM Elements
@@ -1245,6 +1248,17 @@
             el.addEventListener('input', scheduleRender);
         });
 
+        let namePreResolveTimeout = null;
+        inputDonorName.addEventListener('input', () => {
+            if (hasUserUploadedPhoto()) {
+                clearTimeout(namePreResolveTimeout);
+                namePreResolveTimeout = setTimeout(() => {
+                    const name = inputDonorName.value.trim();
+                    if (name) preResolveGalleryFileName(name).catch(() => {});
+                }, 400);
+            }
+        });
+
         inputMilestone.addEventListener('input', () => {
             updateMilestonePreview();
             scheduleRender();
@@ -1276,6 +1290,10 @@
                 photoStatusText.textContent = `Attached: ${file.name}`;
                 photoControls.classList.remove('hidden');
                 scheduleRender();
+
+                // Silently pre-resolve gallery filename in background while donor inspects photo
+                const donorName = (inputDonorName.value.trim() || 'Hero Donor');
+                preResolveGalleryFileName(donorName).catch(() => {});
             } catch (err) {
                 console.error('Photo error:', err);
                 photoStatusText.textContent = 'Error loading image file';
@@ -1300,27 +1318,94 @@
             scheduleRender();
         });
 
+        function getStudioCardDetails() {
+            const selectedCause = document.querySelector('input[name="causeType"]:checked')?.value || 'patient';
+            const patientName = selectedCause === 'patient' ? inputPatientName.value.trim() : '';
+            return {
+                donorName: inputDonorName.value.trim() || 'Hero Donor',
+                milestoneNumber: parseInt(inputMilestone.value, 10) || 1,
+                patientName: patientName,
+                hospitalName: inputHospital.value.trim() || 'Blood Bank'
+            };
+        }
+
         // Export Actions
-        downloadBtn.addEventListener('click', () => {
+        downloadBtn.addEventListener('click', async () => {
+            const originalHtml = downloadBtn.innerHTML;
             const name = (inputDonorName.value.trim() || 'Donor').replace(/\s+/g, '_');
             const milestone = inputMilestone.value || '1';
-            downloadHeroCard(canvas, `LifeSavers_United_Hero_Card_${name}_${milestone}th.png`);
+            const downloadFilename = `LifeSavers_United_Hero_Card_${name}_${milestone}th.png`;
+
+            // If photo uploaded, save WebP to Firebase Storage with a 1500ms safety timeout
+            if (hasUserUploadedPhoto()) {
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<span class="btn-icon">⏳</span> <span>Saving & Downloading...</span>';
+
+                try {
+                    const details = getStudioCardDetails();
+                    await Promise.race([
+                        saveHeroCardToGallery(canvas, details),
+                        new Promise((resolve) => setTimeout(resolve, 1500))
+                    ]);
+                    if (canvasRenderStatus) {
+                        canvasRenderStatus.textContent = 'Saved to Gallery ✓';
+                        setTimeout(() => {
+                            if (canvasRenderStatus.textContent === 'Saved to Gallery ✓') {
+                                canvasRenderStatus.textContent = 'Ready';
+                            }
+                        }, 2500);
+                    }
+                } catch (err) {
+                    console.warn('Firebase gallery upload notice:', err);
+                }
+            }
+
+            // Trigger local PNG download
+            downloadHeroCard(canvas, downloadFilename);
+            downloadBtn.innerHTML = '<span class="btn-icon">✓</span> <span>Downloaded!</span>';
+            setTimeout(() => {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = originalHtml;
+            }, 1800);
         });
 
         shareBtn.addEventListener('click', async () => {
+            const originalContent = shareBtn.innerHTML;
             const name = inputDonorName.value.trim() || 'Hero Donor';
             const milestone = inputMilestone.value || '1';
             const shareText = `Honoring ${name} for completing their ${milestone}${getOrdinalSuffix(milestone)} blood donation milestone with LifeSavers United! ❤️🩸 Every blood donation saves up to 3 precious lives. Join our community at https://lifesaversunited.org`;
 
             shareBtn.disabled = true;
-            shareBtn.textContent = 'Sharing...';
+            shareBtn.innerHTML = '<span class="btn-icon">⏳</span> <span>Preparing Share...</span>';
+
+            // If photo uploaded, save WebP to Firebase Storage with a 1500ms safety timeout
+            if (hasUserUploadedPhoto()) {
+                try {
+                    const details = getStudioCardDetails();
+                    await Promise.race([
+                        saveHeroCardToGallery(canvas, details),
+                        new Promise((resolve) => setTimeout(resolve, 1500))
+                    ]);
+                    if (canvasRenderStatus) {
+                        canvasRenderStatus.textContent = 'Saved to Gallery ✓';
+                        setTimeout(() => {
+                            if (canvasRenderStatus.textContent === 'Saved to Gallery ✓') {
+                                canvasRenderStatus.textContent = 'Ready';
+                            }
+                        }, 2500);
+                    }
+                } catch (err) {
+                    console.warn('Firebase gallery upload notice:', err);
+                }
+            }
+
             try {
-                await shareHeroCard(canvas, shareText, `Hero_Card_${name}.png`);
+                await shareHeroCard(canvas, shareText, `Hero_Card_${name.replace(/\s+/g, '_')}.png`);
             } catch (err) {
                 console.error('Share action error:', err);
             } finally {
                 shareBtn.disabled = false;
-                shareBtn.innerHTML = '<span class="btn-icon">💬</span> <span>Share to WhatsApp / Social</span>';
+                shareBtn.innerHTML = originalContent;
             }
         });
 

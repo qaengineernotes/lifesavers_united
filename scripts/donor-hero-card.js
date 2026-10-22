@@ -5,6 +5,7 @@
  */
 
 import { getCurrentUser, onAuthChange } from './firebase-auth-service.js';
+import { storage, ref, listAll, uploadBytes } from './firebase-config.js';
 
 // Configuration constants matching imgs/hero_card_template_transperent.png (1254 x 1254)
 const CANVAS_WIDTH = 1254;
@@ -29,6 +30,12 @@ let userUploadedImage = null;
 let isTemplateLoaded = false;
 let currentRenderBlob = null;
 let currentDonorSession = null;
+let sessionUploadedFileName = null; // Remembers filename saved in THIS editing session (e.g. 'vraj-patel-1.webp')
+let sessionDonorSlug = null;        // Slug corresponding to sessionUploadedFileName
+let lastSavedCardSignature = null;  // Prevents re-uploading identical card
+let preResolvedFileName = null;     // Cached next available filename pre-resolved in background
+let preResolvedSlug = null;         // Slug for preResolvedFileName
+let isPreResolving = false;
 
 // Photo transform controls state
 const photoState = {
@@ -635,3 +642,185 @@ export async function shareHeroCard(targetOrName, maybeTextOrMilestone, maybeFil
     window.open(waUrl, '_blank');
     return { success: true, method: 'whatsapp' };
 }
+
+/**
+ * Check if the user has uploaded their own photo
+ */
+export function hasUserUploadedPhoto() {
+    return !!(userUploadedImage && userUploadedImage.width > 0 && userUploadedImage.height > 0);
+}
+
+/**
+ * Convert donor name to clean kebab-case: firstname-lastname
+ * E.g. "Vraj Patel" -> "vraj-patel", "Mr. Hiral Jain" -> "hiral-jain"
+ */
+export function slugifyDonorName(name) {
+    if (!name || typeof name !== 'string') return 'hero-donor';
+    // Remove common honorifics: Mr, Mrs, Ms, Miss, Dr, Shri, Smt
+    let clean = name.trim().replace(/^(mr|mrs|ms|miss|dr|shri|smt)\.?\s+/i, '');
+    // Replace non-alphanumeric with hyphen
+    clean = clean.replace(/[^a-zA-Z0-9\s-]/g, ' ').trim();
+    clean = clean.replace(/[\s_-]+/g, '-').toLowerCase();
+    return clean || 'hero-donor';
+}
+
+/**
+ * Scan gallery/blood-donors folder to determine next available filename:
+ * firstname-lastname-1.webp, firstname-lastname-2.webp, etc.
+ */
+async function resolveNextGalleryFileName(donorName) {
+    const slug = slugifyDonorName(donorName);
+    try {
+        const folderRef = ref(storage, 'gallery/blood-donors');
+        const res = await listAll(folderRef);
+        let maxIndex = 0;
+        let foundAny = false;
+        const slugPattern = new RegExp(`^${slug}(?:-(\\d+))?\\.(webp|jpg|jpeg|png)$`, 'i');
+
+        if (res && res.items) {
+            res.items.forEach((item) => {
+                const match = item.name.match(slugPattern);
+                if (match) {
+                    foundAny = true;
+                    if (match[1]) {
+                        const num = parseInt(match[1], 10);
+                        if (!isNaN(num) && num > maxIndex) {
+                            maxIndex = num;
+                        }
+                    } else {
+                        // An unnumbered file (e.g., vraj-patel.webp) counts as index 1
+                        if (maxIndex < 1) maxIndex = 1;
+                    }
+                }
+            });
+        }
+
+        const nextIndex = foundAny ? Math.max(maxIndex + 1, 1) : 1;
+        return `${slug}-${nextIndex}.webp`;
+    } catch (e) {
+        console.warn('Could not list gallery/blood-donors folder (using fallback name):', e);
+        return `${slug}-1.webp`;
+    }
+}
+
+/**
+ * Pre-resolve the filename in the background (called when photo uploaded or name typed)
+ * Eliminates folder listing latency at the time user clicks Download/Share.
+ */
+export async function preResolveGalleryFileName(donorName) {
+    if (sessionUploadedFileName) return sessionUploadedFileName;
+    const slug = slugifyDonorName(donorName);
+    if (preResolvedSlug === slug && preResolvedFileName) {
+        return preResolvedFileName;
+    }
+    if (isPreResolving) return null;
+    isPreResolving = true;
+    try {
+        const resolved = await resolveNextGalleryFileName(donorName);
+        preResolvedFileName = resolved;
+        preResolvedSlug = slug;
+        return resolved;
+    } finally {
+        isPreResolving = false;
+    }
+}
+
+/**
+ * Fingerprint the card details and photo transform to detect changes
+ */
+function generateCardSignature(details = {}) {
+    const donor = details.donorName || '';
+    const milestone = details.milestoneNumber || 1;
+    const patient = details.patientName || '';
+    const hospital = details.hospitalName || '';
+    const photoKey = userUploadedImage 
+        ? `${userUploadedImage.src || ''}_${userUploadedImage.width}x${userUploadedImage.height}_${photoState.zoom}_${photoState.panX}_${photoState.panY}`
+        : 'none';
+    return `${donor}|${milestone}|${patient}|${hospital}|${photoKey}`;
+}
+
+/**
+ * Save rendered Hero Card to Firebase Storage in WebP format
+ * Path: gallery/blood-donors/{firstname-lastname-number}.webp
+ * Only executes if user uploaded a photo.
+ * Overwrites existing file if updated within the same session.
+ * Skips redundant upload if nothing changed.
+ */
+export async function saveHeroCardToGallery(canvas, details = {}) {
+    if (!canvas) {
+        return { success: false, reason: 'no_canvas' };
+    }
+    if (!hasUserUploadedPhoto()) {
+        return { success: false, reason: 'no_user_photo' };
+    }
+
+    const currentSlug = slugifyDonorName(details.donorName);
+    const signature = generateCardSignature(details);
+
+    // 1. Identical save protection: Don't upload again if unchanged
+    if (lastSavedCardSignature === signature && sessionUploadedFileName && sessionDonorSlug === currentSlug) {
+        return {
+            success: true,
+            fileName: sessionUploadedFileName,
+            skipped: true,
+            reason: 'already_saved'
+        };
+    }
+
+    // 2. Determine target filename:
+    // If we already saved an image in this editing session for the same donor, overwrite it!
+    let targetFileName = null;
+    let isOverwrite = false;
+
+    if (sessionUploadedFileName && sessionDonorSlug === currentSlug) {
+        targetFileName = sessionUploadedFileName;
+        isOverwrite = true;
+    } else if (preResolvedFileName && preResolvedSlug === currentSlug) {
+        targetFileName = preResolvedFileName;
+    } else {
+        targetFileName = await resolveNextGalleryFileName(details.donorName);
+    }
+
+    // 3. Convert HTML5 Canvas to WebP Blob (quality 0.92)
+    const webpBlob = await new Promise((resolve) => {
+        canvas.toBlob(resolve, 'image/webp', 0.92);
+    });
+
+    if (!webpBlob) {
+        throw new Error('Failed to generate WebP image from canvas');
+    }
+
+    // 4. Upload to Firebase Storage: gallery/blood-donors/
+    const storagePath = `gallery/blood-donors/${targetFileName}`;
+    const fileRef = ref(storage, storagePath);
+
+    const metadata = {
+        contentType: 'image/webp',
+        customMetadata: {
+            sortDate: new Date().toISOString(),
+            donorName: details.donorName || '',
+            milestone: String(details.milestoneNumber || 1),
+            patientName: details.patientName || '',
+            hospitalName: details.hospitalName || '',
+            uploadedFrom: 'donor_card_studio',
+            updatedAt: new Date().toISOString()
+        }
+    };
+
+    await uploadBytes(fileRef, webpBlob, metadata);
+
+    // 5. Update session tracking
+    sessionUploadedFileName = targetFileName;
+    sessionDonorSlug = currentSlug;
+    lastSavedCardSignature = signature;
+    preResolvedFileName = null;
+    preResolvedSlug = null;
+
+    return {
+        success: true,
+        fileName: targetFileName,
+        path: storagePath,
+        overwritten: isOverwrite
+    };
+}
+

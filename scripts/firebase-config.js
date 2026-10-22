@@ -2,7 +2,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, updateProfile, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, getCountFromServer, addDoc, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, onSnapshot, serverTimestamp, arrayUnion } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-import { getStorage, ref, listAll, getDownloadURL, getMetadata } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js";
+import { getStorage, ref, listAll, getDownloadURL, getMetadata, uploadBytes } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-storage.js";
 import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-analytics.js";
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-functions.js";
 
@@ -109,6 +109,7 @@ export {
     listAll,
     getDownloadURL,
     getMetadata,
+    uploadBytes,
     // Cloud Functions
     httpsCallable,
     initAppCheck
