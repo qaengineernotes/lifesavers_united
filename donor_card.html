@@ -826,6 +826,17 @@
         } from './scripts/donor-auth-service.js';
         import { normalizePhoneNumber, formatPhoneNumberForDisplay } from './scripts/phone-normalizer.js';
         import { 
+            db, 
+            doc, 
+            updateDoc, 
+            serverTimestamp, 
+            collection, 
+            query, 
+            where, 
+            getDocs, 
+            getDoc 
+        } from './scripts/firebase-config.js';
+        import { 
             loadCardTemplate, 
             renderHeroCard, 
             setUserImage, 
@@ -890,6 +901,52 @@
 
         let isRendering = false;
         let isStudioReady = false;
+        let currentProfileRef = null;
+
+        async function persistDonorMilestone(newMilestone, profile) {
+            const num = parseInt(newMilestone, 10);
+            if (isNaN(num) || num < 1) return;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const donorId = profile?.id || urlParams.get('donorId');
+            const donorPhone = profile?.contactNumber || urlParams.get('contact') || urlParams.get('phone');
+
+            // 1. Immediately cache in localStorage
+            if (donorId) {
+                try { localStorage.setItem('lsu_donor_milestone_' + donorId, String(num)); } catch (e) {}
+            }
+            if (donorPhone) {
+                const cleanP = normalizePhoneNumber(donorPhone);
+                if (cleanP) {
+                    try { localStorage.setItem('lsu_donor_milestone_' + cleanP, String(num)); } catch (e) {}
+                }
+            }
+
+            // 2. Update local in-memory profile and session
+            if (profile) {
+                profile.lastHeroMilestone = num;
+            }
+            try {
+                const sessStr = localStorage.getItem('lsu_donor_session');
+                if (sessStr) {
+                    const sess = JSON.parse(sessStr);
+                    sess.lastHeroMilestone = num;
+                    localStorage.setItem('lsu_donor_session', JSON.stringify(sess));
+                }
+            } catch (e) {}
+
+            // 3. Persist to Firestore if donorId is known
+            if (donorId && donorId !== 'none' && !String(donorId).startsWith('test_donor_')) {
+                try {
+                    await updateDoc(doc(db, 'donors', donorId), {
+                        lastHeroMilestone: num,
+                        milestoneUpdatedAt: serverTimestamp()
+                    });
+                } catch (dbErr) {
+                    console.warn('Could not persist milestone count to Firestore:', dbErr);
+                }
+            }
+        }
 
         // Initialize Authentication
         function initAuth() {
@@ -939,6 +996,7 @@
         }
 
         async function showStudio(profile) {
+            currentProfileRef = profile;
             loginSection.classList.add('hidden');
             dashboardSection.classList.remove('hidden');
 
@@ -1070,11 +1128,35 @@
             if (pDonorName) inputDonorName.value = pDonorName;
             if (pHospital) inputHospital.value = pHospital;
 
-            if (pMilestone) {
+            // Check stored custom milestone from profile or localStorage
+            let storedMilestone = null;
+            const donorId = profile?.id || urlParams.get('donorId');
+            const donorPhone = profile?.contactNumber || urlParams.get('contact') || urlParams.get('phone');
+
+            if (profile?.lastHeroMilestone) {
+                storedMilestone = parseInt(profile.lastHeroMilestone, 10);
+            } else if (donorId) {
+                const localVal = localStorage.getItem('lsu_donor_milestone_' + donorId);
+                if (localVal) storedMilestone = parseInt(localVal, 10);
+            }
+            if (!storedMilestone && donorPhone) {
+                const cleanP = normalizePhoneNumber(donorPhone);
+                const localVal = cleanP ? localStorage.getItem('lsu_donor_milestone_' + cleanP) : null;
+                if (localVal) storedMilestone = parseInt(localVal, 10);
+            }
+
+            const targetLogId = urlParams.get('logId');
+            if (targetLogId) {
+                // If opening for a specific historical donation log
+                await resolveMilestoneFromDatabase(urlParams, profile, storedMilestone);
+            } else if (storedMilestone) {
+                // Next donation milestone auto-increments by 1 from last saved milestone
+                inputMilestone.value = storedMilestone + 1;
+            } else if (pMilestone) {
                 inputMilestone.value = pMilestone;
             } else {
-                // Pre-fill milestone from database donation logs, default to 1
-                await resolveMilestoneFromDatabase(urlParams, profile);
+                // Fallback to database donation logs count
+                await resolveMilestoneFromDatabase(urlParams, profile, null);
             }
 
             if (pPatient) {
@@ -1121,15 +1203,12 @@
         }
 
         // Auto-resolve milestone count based on donor's logs in Firestore
-        async function resolveMilestoneFromDatabase(urlParams, profile) {
+        async function resolveMilestoneFromDatabase(urlParams, profile, storedMilestone = null) {
             try {
                 const targetLogId = urlParams.get('logId');
                 const targetDonorId = urlParams.get('donorId') || profile?.id;
                 const targetPhone = urlParams.get('contact') || urlParams.get('phone') || profile?.contactNumber;
                 const targetName = (urlParams.get('donorName') || urlParams.get('name') || profile?.fullName || '').trim().toLowerCase();
-
-                const { getFirestore, collection, query, where, getDocs, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js');
-                const { db } = await import('./scripts/firebase-config.js');
 
                 const logsRef = collection(db, 'donation_logs');
                 let foundLogs = [];
@@ -1206,13 +1285,21 @@
                         }
                     }
 
+                    if (storedMilestone && storedMilestone >= logsToUse.length) {
+                        // Offset by stored custom milestone
+                        const baseOffset = storedMilestone - logsToUse.length;
+                        milestone = milestone + baseOffset;
+                    }
+
                     inputMilestone.value = Math.max(1, milestone);
+                } else if (storedMilestone) {
+                    inputMilestone.value = storedMilestone + 1;
                 } else {
                     inputMilestone.value = 1;
                 }
             } catch (err) {
                 console.warn('Could not auto-resolve donor milestone from database:', err);
-                inputMilestone.value = 1;
+                inputMilestone.value = storedMilestone ? (storedMilestone + 1) : 1;
             }
         }
 
@@ -1352,6 +1439,12 @@
             const milestone = inputMilestone.value || '1';
             const downloadFilename = `LifeSavers_United_Hero_Card_${name}_${milestone}th.png`;
 
+            // Persist the current milestone count for the donor
+            const milestoneVal = parseInt(inputMilestone.value, 10);
+            if (!isNaN(milestoneVal) && milestoneVal > 0) {
+                persistDonorMilestone(milestoneVal, currentProfileRef).catch(() => {});
+            }
+
             // If photo uploaded, save WebP to Firebase Storage with a 1500ms safety timeout
             if (hasUserUploadedPhoto()) {
                 downloadBtn.disabled = true;
@@ -1390,6 +1483,12 @@
             const name = inputDonorName.value.trim() || 'Hero Donor';
             const milestone = inputMilestone.value || '1';
             const shareText = `Honoring ${name} for completing their ${milestone}${getOrdinalSuffix(milestone)} blood donation milestone with LifeSavers United! ❤️🩸 Every blood donation saves up to 3 precious lives. Join our community at https://lifesaversunited.org`;
+
+            // Persist the current milestone count for the donor
+            const milestoneVal = parseInt(inputMilestone.value, 10);
+            if (!isNaN(milestoneVal) && milestoneVal > 0) {
+                persistDonorMilestone(milestoneVal, currentProfileRef).catch(() => {});
+            }
 
             shareBtn.disabled = true;
             shareBtn.innerHTML = '<span class="btn-icon">⏳</span> <span>Preparing Share...</span>';

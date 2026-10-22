@@ -805,7 +805,10 @@ function renderStatsAndCountdowns() {
     // Update Hero Card CTA link with donor's actual milestone count
     const heroCardCta = document.getElementById('heroCardStudioCta');
     if (heroCardCta && currentDonorData) {
-        heroCardCta.href = `/donor_card?donorName=${encodeURIComponent(currentDonorData.fullName || '')}&milestone=${totalDonations || 1}${currentDonorData.id ? `&donorId=${encodeURIComponent(currentDonorData.id)}` : ''}`;
+        const nextMilestone = currentDonorData.lastHeroMilestone 
+            ? (parseInt(currentDonorData.lastHeroMilestone, 10) + 1) 
+            : (totalDonations || 1);
+        heroCardCta.href = `/donor_card?donorName=${encodeURIComponent(currentDonorData.fullName || '')}&milestone=${nextMilestone}${currentDonorData.id ? `&donorId=${encodeURIComponent(currentDonorData.id)}` : ''}`;
     }
 
     // Calculate Eligibility

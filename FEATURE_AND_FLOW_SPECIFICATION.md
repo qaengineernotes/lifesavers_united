@@ -176,6 +176,7 @@ graph TD
 - `temporaryRest` *(object/timestamp, optional)*: Snooze expiry date if temporarily unavailable.
 - `lastDonatedAt` *(timestamp, optional)*: Date of most recent donation.
 - `totalDonations` *(number)*: Count of completed donations.
+- `lastHeroMilestone` *(number, optional)*: Last saved/customized milestone count for Hero Appreciation Cards.
 - `registeredAt` *(timestamp)*: Server timestamp of registration.
 
 ### `emergency_requests`
