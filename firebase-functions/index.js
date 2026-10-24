@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { Telegraf, Markup } = require("telegraf");
 const { TwitterApi } = require("twitter-api-v2");
+const { resolveHospital } = require("./hospitals-data");
 
 admin.initializeApp();
 
@@ -57,6 +58,9 @@ const normalizePhoneNumber = (phoneNumber) => {
 
     // Convert to string and trim whitespace
     let normalized = String(phoneNumber).trim();
+
+    // Strip out forwarded message timestamps (e.g., "10:23 AM", "9:45 pm")
+    normalized = normalized.replace(/\b\d{1,2}:\d{2}\s*(?:AM|PM|am|pm)?\b/gi, '').trim();
 
     // Remove all non-digit characters (spaces, +, -, (, ), etc.)
     normalized = normalized.replace(/\D/g, '');
@@ -134,6 +138,27 @@ const parseRequestText = (text) => {
     // Normalize contact number if present
     if (data.contactNumber) {
         data.contactNumber = normalizePhoneNumber(data.contactNumber);
+    }
+
+    // Standardize Hospital Name & enrich location/address if matching master list
+    if (data.hospitalName) {
+        const matchedHospital = resolveHospital(data.hospitalName);
+        if (matchedHospital) {
+            console.log(`🏥 Standardized Telegram hospital: "${data.hospitalName}" -> "${matchedHospital.name}"`);
+            data.hospitalName = matchedHospital.name;
+            if (!data.hospitalCity || data.hospitalCity.trim() === '') {
+                data.hospitalCity = matchedHospital.city;
+            }
+            if (!data.hospitalAddress || data.hospitalAddress.trim() === '') {
+                data.hospitalAddress = matchedHospital.address;
+            }
+        } else {
+            data.hospitalName = toTitleCase(data.hospitalName);
+        }
+    }
+
+    if (data.hospitalCity) {
+        data.hospitalCity = toTitleCase(data.hospitalCity);
     }
 
     // Parse blood components and breakdown from component or units text
@@ -679,7 +704,7 @@ Contact Number: `;
         }
 
         // 2. Reply to User ONLY after database confirmation
-        await ctx.reply(`✅ **Request Created & Saved**\n\n✅ Database confirmed!\nPatient: ${requestData.patientName}\nDocument ID: ${customDocId}\n\nWe will notify donors immediately.`);
+        await ctx.reply(`✅ **Request Created & Saved**\n\n✅ Database confirmed!\nPatient: ${requestData.patientName}\nHospital: ${requestData.hospitalName}\nLocation: ${requestData.hospitalCity || 'N/A'}\nDocument ID: ${customDocId}\n\nWe will notify donors immediately.`);
 
     } catch (error) {
         console.error("Error processing request:", error);
@@ -933,6 +958,23 @@ exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, contex
                 'invalid-argument',
                 `Missing required fields: ${missingFields.join(', ')}`
             );
+        }
+
+        // Standardize Hospital Name in Cloud Function
+        if (requestData.hospitalName) {
+            const matchedHospital = resolveHospital(requestData.hospitalName);
+            if (matchedHospital) {
+                requestData.hospitalName = matchedHospital.name;
+                if (!requestData.city && !requestData.hospitalCity) {
+                    requestData.city = matchedHospital.city;
+                    requestData.hospitalCity = matchedHospital.city;
+                }
+                if (!requestData.hospitalAddress) {
+                    requestData.hospitalAddress = matchedHospital.address;
+                }
+            } else {
+                requestData.hospitalName = toTitleCase(requestData.hospitalName);
+            }
         }
 
         const db = admin.firestore();
