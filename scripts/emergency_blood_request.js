@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeFormValidation();
     initializeDuplicateChecking();
     initializeCaptcha();
+    initializeComponentsSection();
 });
 
 // Initialize form validation
@@ -135,15 +136,23 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
     submitButton.disabled = true;
 
     try {
-        // Collect form data
+        // Collect form data and component breakdown
         const formDataObj = new FormData(this);
+        const componentBreakdown = getSelectedComponents();
+        const bloodComponents = componentBreakdown.map(c => c.component);
+        const totalUnits = componentBreakdown.reduce((sum, c) => sum + c.units, 0);
+        const unitsRequiredText = componentBreakdown.map(c => `${c.units} ${c.units > 1 ? 'units' : 'unit'} ${c.component}`).join(', ');
+
         const data = {
             patientName: toTitleCase(formDataObj.get('patientName')),
             contactPerson: toTitleCase(formDataObj.get('contactPerson')),
             contactNumber: normalizePhoneNumber(formDataObj.get('contactNumber')), // Normalize phone number
             contactEmail: formDataObj.get('contactEmail'),
             bloodType: formDataObj.get('bloodType'),
-            unitsRequired: formDataObj.get('unitsRequired'),
+            unitsRequired: totalUnits || parseInt(formDataObj.get('unitsRequired')) || 1,
+            unitsRequiredText: unitsRequiredText || formDataObj.get('unitsRequiredText') || '1 unit Whole Blood',
+            bloodComponents: bloodComponents.length > 0 ? bloodComponents : ['Whole Blood'],
+            componentBreakdown: componentBreakdown.length > 0 ? componentBreakdown : [{ component: 'Whole Blood', code: 'whole_blood', units: 1 }],
             patientAge: formDataObj.get('patientAge'),
             diagnosis: formDataObj.get('diagnosis'),
             urgency: formDataObj.get('urgency'),
@@ -184,6 +193,8 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
                         patientAge: data.patientAge,
                         requiredBloodGroup: data.bloodType,
                         unitsRequired: data.unitsRequired,
+                        unitsRequiredText: data.unitsRequiredText,
+                        bloodComponents: data.bloodComponents,
                         hospitalName: data.hospitalName,
                         hospitalCity: data.city,
                         contactNumber: data.contactNumber
@@ -237,6 +248,7 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
                 showSuccessMessage('Blood request submitted successfully! We will contact you soon.');
             }
             this.reset(); // Reset form
+            resetComponentsSection(); // Reset component rows
             clearDuplicateWarning(); // Clear any warnings
             generateCaptcha(); // Generate new captcha after successful submission
             // Reset submit button state
@@ -643,3 +655,291 @@ function clearCaptchaError() {
         errorDiv.classList.add('hidden');
     }
 }
+
+// ============================================================================
+// DYNAMIC BLOOD COMPONENT & UNITS MANAGEMENT
+// ============================================================================
+
+const AVAILABLE_COMPONENTS = [
+    { name: 'Whole Blood', label: 'Whole Blood (WB)', code: 'whole_blood' },
+    { name: 'Packed Red Blood Cells (PRBC)', label: 'Packed Red Blood Cells (PRBC)', code: 'prbc' },
+    { name: 'Single Donor Platelets (SDP)', label: 'Single Donor Platelets (SDP)', code: 'platelets_sdp' },
+    { name: 'Random Donor Platelets (RDP)', label: 'Random Donor Platelets (RDP)', code: 'platelets_rdp' },
+    { name: 'Fresh Frozen Plasma (FFP)', label: 'Fresh Frozen Plasma (FFP)', code: 'plasma' },
+    { name: 'Cryoprecipitate', label: 'Cryoprecipitate', code: 'cryoprecipitate' }
+];
+
+let componentRowCounter = 1;
+
+function initializeComponentsSection() {
+    const container = document.getElementById('componentsContainer');
+    const addBtn = document.getElementById('addAnotherComponentBtn');
+
+    if (!container || !addBtn) return;
+
+    // Add another component button click
+    addBtn.addEventListener('click', function () {
+        addComponentRow();
+    });
+
+    // Event delegation on container for steppers, inputs, selects, and remove buttons
+    container.addEventListener('click', function (e) {
+        const plusBtn = e.target.closest('.stepper-plus');
+        const minusBtn = e.target.closest('.stepper-minus');
+        const removeBtn = e.target.closest('.btn-remove-component');
+
+        if (plusBtn) {
+            const stepper = plusBtn.closest('.units-stepper');
+            const input = stepper.querySelector('.stepper-input');
+            let val = parseInt(input.value) || 1;
+            if (val < 50) {
+                input.value = val + 1;
+                updateComponentsSummary();
+            }
+        } else if (minusBtn) {
+            const stepper = minusBtn.closest('.units-stepper');
+            const input = stepper.querySelector('.stepper-input');
+            let val = parseInt(input.value) || 1;
+            if (val > 1) {
+                input.value = val - 1;
+                updateComponentsSummary();
+            }
+        } else if (removeBtn) {
+            const row = removeBtn.closest('.component-row');
+            if (row) {
+                removeComponentRow(row);
+            }
+        }
+    });
+
+    // Delegation for input and select changes
+    container.addEventListener('input', function (e) {
+        if (e.target.classList.contains('stepper-input')) {
+            let val = parseInt(e.target.value);
+            if (isNaN(val) || val < 1) val = 1;
+            if (val > 50) val = 50;
+            e.target.value = val;
+            updateComponentsSummary();
+        }
+    });
+
+    container.addEventListener('change', function (e) {
+        if (e.target.classList.contains('component-select')) {
+            updateAvailableComponentOptions();
+            updateComponentsSummary();
+        }
+    });
+
+    updateRowControls();
+    updateAvailableComponentOptions();
+    updateComponentsSummary();
+}
+
+function updateAvailableComponentOptions() {
+    const container = document.getElementById('componentsContainer');
+    if (!container) return;
+
+    const selects = Array.from(container.querySelectorAll('.component-select'));
+    const selectedValues = selects.map(s => s.value);
+
+    selects.forEach(currentSelect => {
+        const currentValue = currentSelect.value;
+        Array.from(currentSelect.options).forEach(option => {
+            const isSelectedElsewhere = selectedValues.includes(option.value) && option.value !== currentValue;
+            option.disabled = isSelectedElsewhere;
+            const baseComponent = AVAILABLE_COMPONENTS.find(c => c.name === option.value);
+            const baseLabel = baseComponent ? baseComponent.label : option.value;
+            option.textContent = isSelectedElsewhere ? `${baseLabel} (Already selected)` : baseLabel;
+        });
+    });
+}
+
+function addComponentRow() {
+    const container = document.getElementById('componentsContainer');
+    const addBtn = document.getElementById('addAnotherComponentBtn');
+    if (!container) return;
+
+    const currentRows = container.querySelectorAll('.component-row');
+    if (currentRows.length >= AVAILABLE_COMPONENTS.length) return;
+
+    // Find next unselected component
+    const selectedValues = Array.from(container.querySelectorAll('.component-select')).map(s => s.value);
+    const nextAvailable = AVAILABLE_COMPONENTS.find(c => !selectedValues.includes(c.name));
+    if (!nextAvailable) return;
+
+    const rowId = componentRowCounter++;
+    const row = document.createElement('div');
+    row.className = 'component-row';
+    row.setAttribute('data-index', rowId);
+
+    const optionsHtml = AVAILABLE_COMPONENTS.map(c => `
+        <option value="${c.name}" ${c.name === nextAvailable.name ? 'selected' : ''}>${c.label}</option>
+    `).join('');
+
+    row.innerHTML = `
+        <div class="component-select-wrapper">
+            <label class="sr-only" for="componentType_${rowId}">Blood Component</label>
+            <select id="componentType_${rowId}" class="component-select" required>
+                ${optionsHtml}
+            </select>
+        </div>
+        <div class="component-units-wrapper">
+            <label class="sr-only" for="componentUnits_${rowId}">Units</label>
+            <div class="units-stepper">
+                <button type="button" class="stepper-btn stepper-minus" aria-label="Decrease units">−</button>
+                <input type="number" id="componentUnits_${rowId}" class="stepper-input" value="1" min="1" max="50" required>
+                <button type="button" class="stepper-btn stepper-plus" aria-label="Increase units">+</button>
+                <span class="units-suffix">unit(s)</span>
+            </div>
+        </div>
+        <div class="component-action-wrapper">
+            <button type="button" class="btn-remove-component" title="Remove component" aria-label="Remove component">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+            </button>
+        </div>
+    `;
+
+    container.appendChild(row);
+    updateRowControls();
+    updateAvailableComponentOptions();
+    updateComponentsSummary();
+
+    if (container.querySelectorAll('.component-row').length >= AVAILABLE_COMPONENTS.length && addBtn) {
+        addBtn.style.display = 'none';
+    }
+}
+
+function removeComponentRow(row) {
+    const container = document.getElementById('componentsContainer');
+    const addBtn = document.getElementById('addAnotherComponentBtn');
+    if (!container) return;
+
+    // Strictly disallow deleting if only 1 row remains
+    const currentRows = container.querySelectorAll('.component-row');
+    if (currentRows.length <= 1) return;
+
+    row.remove();
+    updateRowControls();
+    updateAvailableComponentOptions();
+    updateComponentsSummary();
+
+    if (addBtn && container.querySelectorAll('.component-row').length < AVAILABLE_COMPONENTS.length) {
+        addBtn.style.display = 'inline-flex';
+    }
+}
+
+function updateRowControls() {
+    const container = document.getElementById('componentsContainer');
+    if (!container) return;
+
+    const rows = container.querySelectorAll('.component-row');
+    rows.forEach(row => {
+        const removeBtn = row.querySelector('.btn-remove-component');
+        if (removeBtn) {
+            if (rows.length > 1) {
+                removeBtn.classList.remove('hidden');
+            } else {
+                removeBtn.classList.add('hidden');
+            }
+        }
+    });
+}
+
+function updateComponentsSummary() {
+    const container = document.getElementById('componentsContainer');
+    const summaryText = document.getElementById('componentsSummaryText');
+    const unitsRequiredHidden = document.getElementById('unitsRequired');
+    const unitsRequiredTextHidden = document.getElementById('unitsRequiredText');
+
+    if (!container) return;
+
+    const breakdown = getSelectedComponents();
+    if (breakdown.length === 0) {
+        if (summaryText) summaryText.textContent = 'Please select at least 1 component';
+        if (unitsRequiredHidden) unitsRequiredHidden.value = '1';
+        if (unitsRequiredTextHidden) unitsRequiredTextHidden.value = '';
+        return;
+    }
+
+    const totalUnits = breakdown.reduce((sum, item) => sum + item.units, 0);
+    const summaryItems = breakdown.map(item => `${item.units} ${item.units > 1 ? 'units' : 'unit'} ${item.component}`);
+    const summaryString = breakdown.length > 1
+        ? `${summaryItems.join(', ')} (Total: ${totalUnits} ${totalUnits > 1 ? 'units' : 'unit'})`
+        : summaryItems.join(', ');
+    const requiredTextString = summaryItems.join(', ');
+
+    if (summaryText) summaryText.textContent = summaryString;
+    if (unitsRequiredHidden) unitsRequiredHidden.value = String(totalUnits);
+    if (unitsRequiredTextHidden) unitsRequiredTextHidden.value = requiredTextString;
+}
+
+function getSelectedComponents() {
+    const container = document.getElementById('componentsContainer');
+    if (!container) return [];
+
+    const rows = container.querySelectorAll('.component-row');
+    const results = [];
+
+    rows.forEach(row => {
+        const select = row.querySelector('.component-select');
+        const input = row.querySelector('.stepper-input');
+
+        if (select && input) {
+            const compName = select.value;
+            const units = parseInt(input.value) || 1;
+            const matched = AVAILABLE_COMPONENTS.find(c => c.name === compName);
+            const code = matched ? matched.code : 'whole_blood';
+
+            results.push({
+                component: compName,
+                code: code,
+                units: units
+            });
+        }
+    });
+
+    return results;
+}
+
+function resetComponentsSection() {
+    const container = document.getElementById('componentsContainer');
+    const addBtn = document.getElementById('addAnotherComponentBtn');
+    if (!container) return;
+
+    // Reset to initial 1-row state
+    container.innerHTML = `
+        <div class="component-row" data-index="0">
+            <div class="component-select-wrapper">
+                <label class="sr-only" for="componentType_0">Blood Component</label>
+                <select id="componentType_0" class="component-select" required>
+                    <option value="Whole Blood" selected>Whole Blood (WB)</option>
+                    <option value="Packed Red Blood Cells (PRBC)">Packed Red Blood Cells (PRBC)</option>
+                    <option value="Single Donor Platelets (SDP)">Single Donor Platelets (SDP)</option>
+                    <option value="Random Donor Platelets (RDP)">Random Donor Platelets (RDP)</option>
+                    <option value="Fresh Frozen Plasma (FFP)">Fresh Frozen Plasma (FFP)</option>
+                    <option value="Cryoprecipitate">Cryoprecipitate</option>
+                </select>
+            </div>
+            <div class="component-units-wrapper">
+                <label class="sr-only" for="componentUnits_0">Units</label>
+                <div class="units-stepper">
+                    <button type="button" class="stepper-btn stepper-minus" aria-label="Decrease units">−</button>
+                    <input type="number" id="componentUnits_0" class="stepper-input" value="1" min="1" max="50" required>
+                    <button type="button" class="stepper-btn stepper-plus" aria-label="Increase units">+</button>
+                    <span class="units-suffix">unit(s)</span>
+                </div>
+            </div>
+            <div class="component-action-wrapper">
+                <button type="button" class="btn-remove-component hidden" title="Remove component" aria-label="Remove component">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+            </div>
+        </div>
+    `;
+
+    if (addBtn) addBtn.style.display = 'inline-flex';
+    updateRowControls();
+    updateAvailableComponentOptions();
+    updateComponentsSummary();
+}
+

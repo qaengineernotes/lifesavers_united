@@ -4,8 +4,7 @@
 import { getCurrentUser, isAuthenticated, onAuthChange } from '/scripts/firebase-auth-service.js';
 import { db, collection, doc, addDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, limit, startAfter, serverTimestamp, arrayUnion, getCountFromServer, initAppCheck } from '/scripts/firebase-config.js';
 import { addHistoryEntry } from '/scripts/firebase-data-service.js';
-import { generateDonorCertificate } from '/scripts/donor-certificate-generator.js';
-import { toDateObj } from '/scripts/donation-interval-validator.js';
+import { toDateObj, normalizeDonationType, getDonationTypeLabel } from '/scripts/donation-interval-validator.js';
 
 /**
  * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
@@ -802,7 +801,7 @@ function createDonationsTab(donor, donations) {
                         onmouseout="this.style.background='#fff';this.style.color='#dc2626'">
                         ✏️ Edit Log
                     </button>
-                    <button onclick="deleteDonationLog('${donation.id}', '${escapeHtml(donation.patientName || 'this log')}', '${escapeHtml(donation.donationType || 'Whole Blood')}')"
+                    <button onclick="deleteDonationLog('${donation.id}', '${escapeHtml(donation.patientName || 'this log')}', '${escapeHtml(getDonationTypeLabel(donation.donationType || 'Whole Blood'))}')"
                         style="flex:1; padding:7px 12px; border-radius:7px; border:1.5px solid #ef4444;
                                background:#fff; color:#ef4444; font-size:12px; font-weight:600;
                                cursor:pointer; transition:all 0.2s;"
@@ -845,7 +844,7 @@ function createDonationsTab(donor, donations) {
                     </div>
                     <div class="info-row">
                         <div class="info-label">Donation Type:</div>
-                        <div class="info-value">${escapeHtml(donation.donationType || 'Whole Blood')}</div>
+                        <div class="info-value">${escapeHtml(getDonationTypeLabel(donation.donationType || 'Whole Blood'))}</div>
                     </div>
                     <div class="info-row">
                         <div class="info-label">Units Donated:</div>
@@ -2186,11 +2185,12 @@ document.addEventListener('DOMContentLoaded', () => {
                                 font-size:14px; color:#1f2937; font-family:inherit;
                                 outline:none; transition:border-color 0.2s; background:#fff;
                             " onfocus="this.style.borderColor='#dc2626'" onblur="this.style.borderColor='#e5e7eb'">
-                                <option value="Whole Blood">🩸 Whole Blood</option>
-                                <option value="SDP">🧪 SDP (Single Donor Platelet)</option>
-                                <option value="Plasma">💉 Plasma</option>
-                                <option value="Packed Cells">🔴 Packed Cells</option>
-                                <option value="Double Red Cells">⭕ Double Red Cells</option>
+                                <option value="whole_blood">🩸 Whole Blood (Standard)</option>
+                                <option value="platelets_sdp">🧪 Single Donor Platelets (SDP / Apheresis)</option>
+                                <option value="platelets_rdp">🩸 Random Donor Platelets (RDP)</option>
+                                <option value="plasma">💉 Plasma (Plasmapheresis / FFP)</option>
+                                <option value="prbc">🔴 Packed Red Blood Cells (PRBC)</option>
+                                <option value="cryoprecipitate">❄️ Cryoprecipitate</option>
                             </select>
                         </div>
                     </div>
@@ -2407,7 +2407,7 @@ window.editDonationLog = function (logId, donationJsonStr) {
     document.getElementById('editLogId').value = logId;
     document.getElementById('editLogPatientName').value = donation.patientName || '';
     document.getElementById('editLogDate').value = _logDateToInputValue(donation.timestamp || donation.donatedAt);
-    document.getElementById('editLogType').value = donation.donationType || 'Whole Blood';
+    document.getElementById('editLogType').value = normalizeDonationType(donation.donationType || 'whole_blood');
     document.getElementById('editLogUnits').value = donation.unitsDonated || donation.unitsGiven || 1;
     document.getElementById('editLogHospital').value = donation.hospital || '';
     document.getElementById('editLogNotes').value = donation.notes || '';
@@ -2471,7 +2471,7 @@ window.saveEditDonationLog = async function () {
             const rows = card.querySelectorAll('.info-value');
             // Row order: patientName[0], bloodGroup[1], donationType[2], unitsDonated[3], hospital[4], date[5], recordedBy[6]
             if (rows[0]) rows[0].innerHTML = `<strong>${escapeHtml(patientName || 'Not specified')}</strong>`;
-            if (rows[2]) rows[2].textContent = typeVal;
+            if (rows[2]) rows[2].textContent = getDonationTypeLabel(typeVal);
             if (rows[3]) rows[3].innerHTML = `<strong>${units} Unit(s)</strong>`;
             if (rows[4]) rows[4].textContent = hospital || '—';
             if (rows[5]) rows[5].textContent = updatedDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });

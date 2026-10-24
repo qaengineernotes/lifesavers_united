@@ -71,8 +71,10 @@ export async function fetchEmergencyRequestsFromFirebase(options = {}) {
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
-                unitsRequiredText: data.unitsRequired || '',
+                unitsRequiredText: data.unitsRequiredText || data.unitsRequired || '',
                 bloodType: data.requiredBloodGroup || '',
+                bloodComponents: data.bloodComponents || (data.donationType ? [data.donationType] : ['Whole Blood']),
+                componentBreakdown: data.componentBreakdown || [],
                 patientAge: data.patientAge || '',
                 hospitalName: data.hospitalName || '',
                 diagnosis: data.patientSufferingFrom || '',
@@ -227,8 +229,10 @@ export function listenToEmergencyRequests(callback) {
                 patientName: data.patientName || '',
                 contactNumber: data.contactNumber || '',
                 unitsRequired: parseInt(data.unitsRequired) || 0,
-                unitsRequiredText: data.unitsRequired || '',
+                unitsRequiredText: data.unitsRequiredText || (data.unitsRequired ? `${data.unitsRequired} units` : ''),
                 bloodType: data.requiredBloodGroup || '',
+                bloodComponents: data.bloodComponents || (data.donationType ? [data.donationType] : ['Whole Blood']),
+                componentBreakdown: data.componentBreakdown || [],
                 patientAge: data.patientAge || '',
                 hospitalName: data.hospitalName || '',
                 diagnosis: data.patientSufferingFrom || '',
@@ -388,6 +392,9 @@ export async function updateRequestInFirebase(originalContactNumber, editedData,
             patientSufferingFrom: editedData.diagnosis || '',
             requiredBloodGroup: editedData.bloodType || '',
             unitsRequired: editedData.unitsRequired || '',
+            unitsRequiredText: editedData.unitsRequiredText || oldData.unitsRequiredText || (editedData.unitsRequired ? `${editedData.unitsRequired} units` : ''),
+            bloodComponents: editedData.bloodComponents || oldData.bloodComponents || ['Whole Blood'],
+            componentBreakdown: editedData.componentBreakdown || oldData.componentBreakdown || [],
             hospitalName: editedData.hospitalName || '',
             hospitalAddress: editedData.hospitalAddress || '',
             hospitalCity: editedData.city || '',
@@ -618,6 +625,20 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                 }
             }
 
+            // Resolve donation component / type from user selection or request data
+            let resolvedDonationType = 'whole_blood';
+            if (donationInfo.donationType) {
+                resolvedDonationType = donationInfo.donationType;
+            } else if (donationInfo.componentCode) {
+                resolvedDonationType = donationInfo.componentCode;
+            } else if (requestData.unitsRequiredText && requestData.unitsRequiredText.toUpperCase().includes('SDP')) {
+                resolvedDonationType = 'platelets_sdp';
+            } else if (requestData.unitsRequiredText && requestData.unitsRequiredText.toUpperCase().includes('PRBC')) {
+                resolvedDonationType = 'prbc';
+            } else if (requestData.unitsRequiredText && requestData.unitsRequiredText.toUpperCase().includes('PLASMA')) {
+                resolvedDonationType = 'plasma';
+            }
+
             // Create donation log entry FIRST before mutating emergency request
             const donationLogRef = await addDoc(collection(db, 'donation_logs'), {
                 requestId: requestId,
@@ -625,7 +646,7 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
                 patientName: requestData.patientName,
                 hospital: requestData.hospitalName || currentData.hospitalName || requestData.hospital || '',
                 hospitalName: requestData.hospitalName || currentData.hospitalName || requestData.hospital || '',
-                donationType: (requestData.unitsRequiredText && requestData.unitsRequiredText.toUpperCase().includes('SDP')) ? 'platelets_sdp' : 'whole_blood',
+                donationType: resolvedDonationType,
                 bloodGroup: bloodGroupToStore || requestData.bloodType,
                 donorBloodGroup: bloodGroupToStore || '',
                 patientBloodGroup: requestData.bloodType || '',
@@ -646,7 +667,9 @@ export async function logDonationToFirebase(requestData, donationInfo, currentUs
 
             // Prepare unified request update data
             const currentSummary = currentData.donorSummary || '';
-            const donorEntry = `${donationInfo.donorName || 'Anonymous'} (${donationInfo.units} unit${parseInt(donationInfo.units) > 1 ? 's' : ''})`;
+            const typeLabel = donationInfo.donationTypeLabel || (donationInfo.donationType ? donationInfo.donationType.replace(/_/g, ' ') : '');
+            const componentSuffix = typeLabel ? ` ${typeLabel}` : '';
+            const donorEntry = `${donationInfo.donorName || 'Anonymous'} (${donationInfo.units} unit${parseInt(donationInfo.units) > 1 ? 's' : ''}${componentSuffix})`;
             const newSummary = currentSummary ? `${currentSummary}, ${donorEntry}` : donorEntry;
 
             const updateData = {

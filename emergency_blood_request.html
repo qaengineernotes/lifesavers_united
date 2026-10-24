@@ -361,7 +361,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label id="bloodTypeLabel">Blood Type Required *</label>
+                        <label id="bloodTypeLabel">Blood Group Required *</label>
                         <div class="blood-type-grid" role="radiogroup" aria-labelledby="bloodTypeLabel"
                             aria-required="true">
                             <div class="blood-type-option">
@@ -402,12 +402,51 @@
                             </div>
                         </div>
                     </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="unitsRequired">Units Required *</label>
-                            <input type="text" id="unitsRequired" name="unitsRequired" required
-                                placeholder="e.g., 2 units, SDP, Platelets, etc.">
+                    <div class="form-group components-section">
+                        <label id="bloodComponentLabel">Blood Component & Units Required *</label>
+                        <div id="componentsContainer" class="components-container">
+                            <div class="component-row" data-index="0">
+                                <div class="component-select-wrapper">
+                                    <label class="sr-only" for="componentType_0">Blood Component</label>
+                                    <select id="componentType_0" class="component-select" required>
+                                        <option value="Whole Blood" selected>Whole Blood (WB)</option>
+                                        <option value="Packed Red Blood Cells (PRBC)">Packed Red Blood Cells (PRBC)</option>
+                                        <option value="Single Donor Platelets (SDP)">Single Donor Platelets (SDP)</option>
+                                        <option value="Random Donor Platelets (RDP)">Random Donor Platelets (RDP)</option>
+                                        <option value="Fresh Frozen Plasma (FFP)">Fresh Frozen Plasma (FFP)</option>
+                                        <option value="Cryoprecipitate">Cryoprecipitate</option>
+                                    </select>
+                                </div>
+                                <div class="component-units-wrapper">
+                                    <label class="sr-only" for="componentUnits_0">Units</label>
+                                    <div class="units-stepper">
+                                        <button type="button" class="stepper-btn stepper-minus" aria-label="Decrease units">−</button>
+                                        <input type="number" id="componentUnits_0" class="stepper-input" value="1" min="1" max="50" required>
+                                        <button type="button" class="stepper-btn stepper-plus" aria-label="Increase units">+</button>
+                                        <span class="units-suffix">unit(s)</span>
+                                    </div>
+                                </div>
+                                <div class="component-action-wrapper">
+                                    <button type="button" class="btn-remove-component hidden" title="Remove component" aria-label="Remove component">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
+                        <div class="component-footer">
+                            <button type="button" id="addAnotherComponentBtn" class="add-component-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                <span>Add Another Component</span>
+                            </button>
+                            <div id="componentsSummaryBadge" class="components-summary-badge">
+                                <span id="componentsSummaryText">1 unit Whole Blood</span>
+                            </div>
+                        </div>
+                        <!-- Hidden inputs for seamless backward compatibility -->
+                        <input type="hidden" id="unitsRequired" name="unitsRequired" value="1">
+                        <input type="hidden" id="unitsRequiredText" name="unitsRequiredText" value="1 unit Whole Blood">
+                    </div>
+                    <div class="form-row">
                         <div class="form-group">
                             <label for="patientAge">Age of Patient</label>
                             <input type="text" id="patientAge" name="patientAge" placeholder="e.g., 45" pattern="[0-9]*"

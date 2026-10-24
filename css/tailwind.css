@@ -7120,3 +7120,213 @@ a[aria-label="Share on Facebook"]:hover {
   cursor: not-allowed;
 }
 
+/* Blood Component & Dynamic Units Row Styles */
+.components-section {
+  margin-bottom: 20px;
+}
+
+.components-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.component-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.component-select-wrapper {
+  flex: 1 1 auto;
+  min-width: 180px;
+}
+
+.emergency-blood-form-page .component-select,
+.component-select {
+  width: 100%;
+  height: 46px;
+  padding: 11px 14px;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #111827;
+  background-color: #FAFAFA;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.emergency-blood-form-page .component-select:focus,
+.component-select:focus {
+  border-color: #B91C1C;
+  background-color: #fff;
+}
+
+.component-select option:disabled {
+  color: #9ca3af;
+  background-color: #f3f4f6;
+}
+
+.component-units-wrapper {
+  flex: 0 0 auto;
+}
+
+.units-stepper {
+  display: inline-flex;
+  align-items: center;
+  background: #FAFAFA;
+  border: 1px solid #E5E7EB;
+  border-radius: 10px;
+  height: 46px;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.units-stepper:focus-within {
+  border-color: #B91C1C;
+  background-color: #fff;
+}
+
+.stepper-btn {
+  background: #f3f4f6;
+  border: none;
+  width: 38px;
+  height: 44px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #4b5563;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.15s, color 0.15s;
+  user-select: none;
+}
+
+.stepper-btn:hover {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.stepper-btn:active {
+  background: #d1d5db;
+}
+
+.stepper-input {
+  width: 40px;
+  height: 44px;
+  border: none;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  background: transparent;
+  -moz-appearance: textfield;
+}
+
+.stepper-input::-webkit-outer-spin-button,
+.stepper-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.units-suffix {
+  padding-left: 10px;
+  padding-right: 14px;
+  font-size: 14px;
+  color: #6b7280;
+  font-weight: 500;
+  user-select: none;
+}
+
+.component-action-wrapper {
+  flex: 0 0 auto;
+}
+
+.btn-remove-component {
+  background: transparent;
+  border: 1px solid transparent;
+  color: #9ca3af;
+  padding: 8px;
+  border-radius: 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  height: 46px;
+  width: 42px;
+  box-sizing: border-box;
+}
+
+.btn-remove-component:hover {
+  color: #e74c3c;
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+.btn-remove-component.hidden {
+  display: none !important;
+}
+
+.component-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.add-component-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 2px dashed #ddd;
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-component-btn:hover {
+  border-color: #e74c3c;
+  background-color: #fef2f2;
+}
+
+.components-summary-badge {
+  font-size: 13px;
+  font-weight: 600;
+  color: #059669;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .component-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .component-select-wrapper {
+    flex: 1 1 100%;
+  }
+  .component-units-wrapper {
+    flex: 1 1 auto;
+  }
+}
+
+

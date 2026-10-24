@@ -294,10 +294,16 @@ async function generatePoster(requestData) {
 }
 
 function generateWhatsAppMessage(requestData) {
+    const componentStr = requestData.unitsRequiredText 
+        ? requestData.unitsRequiredText 
+        : (requestData.bloodComponents && requestData.bloodComponents.length > 0 
+            ? `${requestData.bloodComponents.join(', ')} (${requestData.unitsRequired || 1} units)`
+            : `${requestData.unitsRequired || 'N/A'} units`);
+
     return `Patient Name: ${requestData.patientName || 'N/A'}
 Age: ${requestData.patientAge || 'N/A'}
 Blood Group: ${requestData.bloodType || 'N/A'}
-Units Required: ${requestData.unitsRequiredText || requestData.unitsRequired || 'N/A'}
+Requirement: ${componentStr}
 Hospital: ${requestData.hospitalName || 'N/A'}
 Location: ${requestData.city || 'N/A'}
 Suffering From: ${requestData.diagnosis || 'N/A'}

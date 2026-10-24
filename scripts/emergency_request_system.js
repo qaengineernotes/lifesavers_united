@@ -469,7 +469,88 @@ async function loadEmergencyRequests() {
     }
 }
 
-// Function to create a request card
+// Function to format compact units and component requirements for the card grid
+function formatCompactUnitsRequired(request, unitsRequired) {
+    const totalUnits = unitsRequired || parseInt(request.unitsRequired) || 0;
+    const unitLabel = totalUnits === 1 ? 'Unit' : 'Units';
+
+    // 1. Try to use componentBreakdown if present
+    const breakdown = Array.isArray(request.componentBreakdown) ? request.componentBreakdown : [];
+    if (breakdown.length > 0) {
+        const isOnlyWholeBlood = breakdown.every(item => {
+            const name = (item.component || '').toLowerCase();
+            const code = (item.code || '').toLowerCase();
+            return name.includes('whole') || code === 'whole_blood';
+        });
+
+        if (isOnlyWholeBlood) {
+            return `${totalUnits} ${unitLabel}`;
+        }
+
+        const getShortName = (nameOrCode) => {
+            const str = (nameOrCode || '').toLowerCase();
+            if (str.includes('whole')) return 'Whole';
+            if (str.includes('prbc') || str.includes('packed red')) return 'PRBC';
+            if (str.includes('sdp') || str.includes('single donor')) return 'SDP';
+            if (str.includes('rdp') || str.includes('random donor')) return 'RDP';
+            if (str.includes('ffp') || str.includes('fresh frozen') || str.includes('plasma')) return 'FFP';
+            if (str.includes('cryo')) return 'Cryo';
+            return nameOrCode || 'Units';
+        };
+
+        if (breakdown.length === 1) {
+            const shortName = getShortName(breakdown[0].component || breakdown[0].code);
+            return `${totalUnits} ${unitLabel} (${shortName})`;
+        }
+
+        const parts = breakdown.map(item => `${item.units} ${getShortName(item.component || item.code)}`);
+        return `${totalUnits} ${unitLabel} (${parts.join(' + ')})`;
+    }
+
+    // 2. Try to parse from bloodComponents array if available
+    const components = Array.isArray(request.bloodComponents) ? request.bloodComponents : [];
+    if (components.length > 0) {
+        const isOnlyWholeBlood = components.every(c => String(c).toLowerCase().includes('whole'));
+        if (isOnlyWholeBlood) {
+            return `${totalUnits} ${unitLabel}`;
+        }
+        const getShortName = (name) => {
+            const str = String(name || '').toLowerCase();
+            if (str.includes('whole')) return 'Whole';
+            if (str.includes('prbc')) return 'PRBC';
+            if (str.includes('sdp')) return 'SDP';
+            if (str.includes('rdp')) return 'RDP';
+            if (str.includes('ffp') || str.includes('plasma')) return 'FFP';
+            if (str.includes('cryo')) return 'Cryo';
+            return name;
+        };
+        const parts = components.map(c => getShortName(c));
+        return `${totalUnits} ${unitLabel} (${parts.join(' + ')})`;
+    }
+
+    // 3. Fallback: Parse unitsRequiredText if it contains component names
+    const text = request.unitsRequiredText ? String(request.unitsRequiredText).trim() : '';
+    if (text && text !== String(totalUnits) && text.toLowerCase() !== `${totalUnits} units`) {
+        const lower = text.toLowerCase();
+        if (lower.includes('whole') && !lower.includes('sdp') && !lower.includes('prbc') && !lower.includes('rdp') && !lower.includes('ffp') && !lower.includes('plasma') && !lower.includes('cryo')) {
+            return `${totalUnits} ${unitLabel}`;
+        }
+        const found = [];
+        if (lower.includes('whole')) found.push('Whole');
+        if (lower.includes('prbc')) found.push('PRBC');
+        if (lower.includes('sdp')) found.push('SDP');
+        if (lower.includes('rdp')) found.push('RDP');
+        if (lower.includes('ffp') || lower.includes('plasma')) found.push('FFP');
+        if (lower.includes('cryo')) found.push('Cryo');
+
+        if (found.length > 0) {
+            return `${totalUnits} ${unitLabel} (${found.join(' + ')})`;
+        }
+    }
+
+    return `${totalUnits} ${unitLabel}`;
+}
+
 // Function to create a request card
 function createRequestCard(request) {
     const card = document.createElement('div');
@@ -528,11 +609,8 @@ function createRequestCard(request) {
     // Format patient age display
     const patientAge = request.patientAge ? `, ${request.patientAge} years` : '';
 
-    // Get the original text for units required (e.g., "2 Units", "3 Bags")
-    // If unitsRequiredText exists and is not just a number, use it; otherwise fall back to number + "Units"
-    const unitsRequiredDisplay = request.unitsRequiredText && String(request.unitsRequiredText).trim() !== String(unitsRequired)
-        ? request.unitsRequiredText
-        : `${unitsRequired} Units`;
+    // Format compact units required (e.g. "3 Units", "2 Units (SDP)", or "4 Units (3 Whole + 1 SDP)")
+    const unitsRequiredDisplay = formatCompactUnitsRequired(request, unitsRequired);
 
     // Calculate progress percentage (optional, for future progress bar)
     const progressPercentage = unitsRequired > 0 ? Math.round((unitsFulfilled / unitsRequired) * 100) : 0;
@@ -1043,7 +1121,9 @@ async function logDonation(requestData, button) {
             donorName: donationInfo.donorName || '',
             donorContact: donationInfo.donorContact || '',
             closureReason: donationInfo.closureReason || '',
-            donorId: donationInfo.donorId || ''
+            donorId: donationInfo.donorId || '',
+            donationType: donationInfo.donationType || 'whole_blood',
+            donationTypeLabel: donationInfo.donationTypeLabel || 'Whole Blood'
         };
 
         let result = { success: false };
@@ -1884,6 +1964,34 @@ function showDonationPopup(requestData) {
         const unitsFulfilled = parseInt(requestData.unitsFulfilled) || 0;
         const unitsRemaining = unitsRequired - unitsFulfilled;
 
+        // Build component options for donation
+        const reqComponents = Array.isArray(requestData.bloodComponents) ? requestData.bloodComponents : [];
+        const breakdownCodes = Array.isArray(requestData.componentBreakdown) ? requestData.componentBreakdown.map(b => b.code) : [];
+        const reqText = (requestData.unitsRequiredText || '').toLowerCase();
+
+        const canonicalComponents = [
+            { code: 'whole_blood', label: 'Whole Blood (WB)', patterns: [/\b(whole|wb)\b/i] },
+            { code: 'prbc', label: 'Packed Red Blood Cells (PRBC)', patterns: [/\b(prbc|packed\s*red)\b/i] },
+            { code: 'platelets_sdp', label: 'Single Donor Platelets (SDP)', patterns: [/\b(sdp|single\s*donor)\b/i] },
+            { code: 'platelets_rdp', label: 'Random Donor Platelets (RDP)', patterns: [/\b(rdp|random\s*donor)\b/i] },
+            { code: 'plasma', label: 'Fresh Frozen Plasma (FFP)', patterns: [/\b(ffp|plasma|fresh\s*frozen)\b/i] },
+            { code: 'cryoprecipitate', label: 'Cryoprecipitate', patterns: [/\b(cryo|cryoprecipitate)\b/i] }
+        ];
+
+        let hasSelected = false;
+        let componentOptionsHtml = '';
+        canonicalComponents.forEach(c => {
+            const isRequested = breakdownCodes.includes(c.code) ||
+                reqComponents.some(rc => c.patterns.some(p => p.test(String(rc)))) ||
+                (reqText && c.patterns.some(p => p.test(reqText)));
+
+            // Only mark selected for the FIRST requested component
+            const shouldSelect = isRequested && !hasSelected;
+            if (shouldSelect) hasSelected = true;
+
+            componentOptionsHtml += `<option value="${c.code}" ${shouldSelect ? 'selected' : ''}>${c.label}${isRequested ? ' (Requested)' : ''}</option>`;
+        });
+
         // Create modal overlay
         const modal = document.createElement('div');
         modal.id = 'donationPopup';
@@ -1915,7 +2023,8 @@ function showDonationPopup(requestData) {
 
         modalContent.innerHTML = `
             <h3 style="font-size: 24px; font-weight: bold; margin-bottom: 8px;">Log Blood Donation</h3>
-            <p style="color: #6b7280; margin-bottom: 16px;">Patient: ${requestData.patientName} | Blood Type: ${requestData.bloodType}</p>
+            <p style="color: #6b7280; margin-bottom: 8px;">Patient: ${requestData.patientName} | Blood Group: ${requestData.bloodType}</p>
+            ${requestData.unitsRequiredText ? `<p style="color: #4b5563; font-size: 13px; margin-bottom: 12px;"><strong>Needed:</strong> ${requestData.unitsRequiredText}</p>` : ''}
             <p style="color: #059669; font-weight: 600; margin-bottom: 24px;">${unitsFulfilled} / ${unitsRequired} units fulfilled | ${unitsRemaining} remaining</p>
             
             <div style="margin-bottom: 24px;">
@@ -1934,6 +2043,12 @@ function showDonationPopup(requestData) {
                         <span>Other (close request)</span>
                     </label>
                 </div>
+            </div>
+            <div id="componentSection" style="margin-bottom: 20px; display: none;">
+                <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px;">Blood Component Donated *</label>
+                <select id="donationComponentSelect" style="width: 100%; padding: 10px 12px; border: 1.5px solid #d1d5db; border-radius: 8px; font-size: 14px; font-family: inherit; background: #fff;">
+                    ${componentOptionsHtml}
+                </select>
             </div>
             <div id="unitsSection" style="margin-bottom: 24px; display: none;">
                 <div>
@@ -2133,25 +2248,28 @@ function showDonationPopup(requestData) {
                 const donorDetailsSection = document.getElementById('donorDetailsSection');
                 const closureReasonSection = document.getElementById('closureReasonSection');
                 const unitsSection = document.getElementById('unitsSection');
+                const componentSection = document.getElementById('componentSection');
 
                 if (radio.value === 'donor') {
                     donorDetailsSection.style.display = 'block';
                     closureReasonSection.style.display = 'none';
                     unitsSection.style.display = 'block';
+                    if (componentSection) componentSection.style.display = 'block';
                 } else if (radio.value === 'other') {
                     donorDetailsSection.style.display = 'none';
                     closureReasonSection.style.display = 'block';
                     unitsSection.style.display = 'none';
+                    if (componentSection) componentSection.style.display = 'none';
                 } else if (radio.value === 'relative') {
                     donorDetailsSection.style.display = 'none';
-                    closureReasonSection.style.display = 'block'; // Show closure reason for relative too? Or just hide everything?
-                    // User said "directly close the request With Closer Reason" for BOTH.
-                    // So show closure reason for relative too.
+                    closureReasonSection.style.display = 'block';
                     unitsSection.style.display = 'none';
+                    if (componentSection) componentSection.style.display = 'none';
                 } else {
                     donorDetailsSection.style.display = 'none';
                     closureReasonSection.style.display = 'none';
                     unitsSection.style.display = 'block';
+                    if (componentSection) componentSection.style.display = 'none';
                 }
             });
         });
@@ -2166,7 +2284,6 @@ function showDonationPopup(requestData) {
         document.getElementById('submitBtn').addEventListener('click', () => {
             const donorType = modalContent.querySelector('input[name="donorType"]:checked')?.value;
 
-            // Validation
             // Validation
             if (donorType === 'donor') {
                 if (!selectedUnits || selectedUnits <= 0) {
@@ -2207,6 +2324,10 @@ function showDonationPopup(requestData) {
 
             const donorEmail = document.getElementById('donorLinkedEmail')?.value || '';
             const donorLinkedId = document.getElementById('donorLinkedId')?.value || '';
+            const compSelect = document.getElementById('donationComponentSelect');
+            const donationType = compSelect ? compSelect.value : 'whole_blood';
+            const donationTypeLabel = compSelect && compSelect.selectedIndex >= 0 ? compSelect.options[compSelect.selectedIndex].text.replace(/\s*\(Requested\)/, '').trim() : 'Whole Blood';
+
             document.body.removeChild(modal);
             resolve({
                 units: selectedUnits,
@@ -2215,7 +2336,9 @@ function showDonationPopup(requestData) {
                 donorContact: donorContact,
                 donorId: donorLinkedId,
                 closureReason: closureReason,
-                donorEmail: donorEmail
+                donorEmail: donorEmail,
+                donationType: donationType,
+                donationTypeLabel: donationTypeLabel
             });
         });
 
@@ -2510,6 +2633,72 @@ async function editRequest(requestData, button) {
 }
 
 
+// Helper to parse components and breakdown from coordinator free-text input
+function parseComponentsFromText(text, fallbackTotalUnits) {
+    if (!text || !text.trim()) {
+        const total = parseInt(fallbackTotalUnits) || 1;
+        return {
+            bloodComponents: ['Whole Blood'],
+            componentBreakdown: [{ component: 'Whole Blood', code: 'whole_blood', units: total }],
+            totalUnits: total
+        };
+    }
+
+    const trimmed = text.trim();
+    const segments = trimmed.split(/,|\+|\band\b/i).map(s => s.trim()).filter(Boolean);
+
+    const COMPONENT_PATTERNS = [
+        { code: 'whole_blood', name: 'Whole Blood', regex: /\b(whole|wb)\b/i },
+        { code: 'prbc', name: 'Packed Red Blood Cells (PRBC)', regex: /\b(prbc|packed\s*red)\b/i },
+        { code: 'platelets_sdp', name: 'Single Donor Platelets (SDP)', regex: /\b(sdp|single\s*donor)\b/i },
+        { code: 'platelets_rdp', name: 'Random Donor Platelets (RDP)', regex: /\b(rdp|random\s*donor)\b/i },
+        { code: 'plasma', name: 'Fresh Frozen Plasma (FFP)', regex: /\b(ffp|plasma|fresh\s*frozen)\b/i },
+        { code: 'cryoprecipitate', name: 'Cryoprecipitate', regex: /\b(cryo|cryoprecipitate)\b/i }
+    ];
+
+    const breakdown = [];
+    const bloodComponents = [];
+
+    segments.forEach(seg => {
+        const unitMatch = seg.match(/(\d+)/);
+        const units = unitMatch ? parseInt(unitMatch[1]) : 1;
+
+        let matched = COMPONENT_PATTERNS.find(p => p.regex.test(seg));
+        if (!matched) {
+            matched = COMPONENT_PATTERNS[0]; // fallback to Whole Blood
+        }
+
+        if (!bloodComponents.includes(matched.name)) {
+            bloodComponents.push(matched.name);
+            breakdown.push({
+                component: matched.name,
+                code: matched.code,
+                units: units
+            });
+        } else {
+            const existing = breakdown.find(b => b.code === matched.code);
+            if (existing) existing.units += units;
+        }
+    });
+
+    if (breakdown.length === 0) {
+        const total = parseInt(fallbackTotalUnits) || 1;
+        return {
+            bloodComponents: ['Whole Blood'],
+            componentBreakdown: [{ component: 'Whole Blood', code: 'whole_blood', units: total }],
+            totalUnits: total
+        };
+    }
+
+    const calculatedTotal = breakdown.reduce((sum, b) => sum + b.units, 0);
+
+    return {
+        bloodComponents,
+        componentBreakdown: breakdown,
+        totalUnits: calculatedTotal
+    };
+}
+
 // Function to show edit request modal
 function showEditRequestModal(requestData) {
     return new Promise((resolve) => {
@@ -2589,13 +2778,20 @@ function showEditRequestModal(requestData) {
                         </select>
                     </div>
                     <div>
-                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Units Required *</label>
+                        <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Units Required (Total) *</label>
                         <input type="text" id="editUnitsRequired" value="${escapeHtml(requestData.unitsRequired || '')}" 
                             inputmode="text"
                             pattern=".*"
                             required
                             style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                     </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px;">Component(s) & Breakdown</label>
+                    <input type="text" id="editUnitsRequiredText" value="${escapeHtml(requestData.unitsRequiredText || (requestData.unitsRequired ? `${requestData.unitsRequired} units` : ''))}" 
+                        placeholder="e.g., 4 units Whole Blood, 2 units SDP"
+                        style="width: 100%; padding: 12px 16px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 16px; box-sizing: border-box;">
                 </div>
 
                 <div>
@@ -2681,12 +2877,19 @@ function showEditRequestModal(requestData) {
         form.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            // Collect form data
+            // Collect form data and parse components
+            const rawUnitsText = document.getElementById('editUnitsRequiredText')?.value.trim() || '';
+            const rawUnitsTotal = document.getElementById('editUnitsRequired')?.value.trim() || '';
+            const parsedComponents = parseComponentsFromText(rawUnitsText, rawUnitsTotal);
+
             const editedData = {
                 patientName: toTitleCase(document.getElementById('editPatientName').value.trim()),
                 patientAge: document.getElementById('editPatientAge').value.trim(),
                 bloodType: document.getElementById('editBloodType').value,
-                unitsRequired: document.getElementById('editUnitsRequired').value,
+                unitsRequired: rawUnitsTotal || String(parsedComponents.totalUnits),
+                unitsRequiredText: rawUnitsText || (parsedComponents.totalUnits > 0 ? `${parsedComponents.totalUnits} units` : ''),
+                bloodComponents: parsedComponents.bloodComponents,
+                componentBreakdown: parsedComponents.componentBreakdown,
                 hospitalName: document.getElementById('editHospitalName').value.trim(),
                 hospitalAddress: document.getElementById('editHospitalAddress').value.trim(),
                 city: document.getElementById('editCity').value.trim(),

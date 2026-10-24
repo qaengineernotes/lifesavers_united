@@ -181,16 +181,21 @@ graph TD
 
 ### `emergency_requests`
 - `patientName` *(string)*: Patient requiring blood.
-- `bloodGroup` *(string)*: Requested blood group.
-- `units` *(number)*: Number of units required.
-- `hospital` *(string)*: Hospital name and branch.
-- `city` *(string)*: City where hospital is located.
-- `urgency` *(string)*: `critical` (immediate), `urgent` (within 24h), `normal`.
+- `requiredBloodGroup` / `bloodGroup` *(string)*: Requested ABO/Rh blood group (e.g. `B+`, `A-`, `Any`).
+- `bloodComponents` *(array of strings)*: Requested components (e.g., `['Whole Blood', 'Single Donor Platelets (SDP)']`).
+- `componentBreakdown` *(array of objects)*: Granular unit counts per component (e.g., `[{ component: 'Whole Blood', units: 4 }, { component: 'Single Donor Platelets (SDP)', units: 2 }]`).
+- `unitsRequiredText` *(string)*: Human-readable requirement summary (e.g., `"4 units Whole Blood, 2 units SDP"`).
+- `unitsRequired` / `units` *(number)*: Total numeric units required across all components (used for fulfillment progress tracking).
+- `unitsFulfilled` *(number)*: Total fulfilled units (starts at 0).
+- `hospitalName` / `hospital` *(string)*: Hospital name and branch.
+- `hospitalCity` / `city` *(string)*: City where hospital is located.
+- `urgencyLevel` / `urgency` *(string)*: `Critical` (immediate), `Urgent` (within 24h), `Normal`.
 - `contactPerson` *(string)*: Attendant / requester name.
-- `contactNumber` *(string)*: 10-digit contact number.
-- `status` *(string)*: `pending` ➔ `verified` ➔ `in-progress` ➔ `fulfilled` / `closed`.
+- `contactNumber` *(string)*: 10-digit normalized contact number.
+- `status` *(string)*: `Open` / `pending` ➔ `Verified` / `in-progress` ➔ `Closed` / `fulfilled` / `Reopened`.
+- `donorSummary` *(string)*: Running summary of donations logged (e.g. `"Vikram (1 unit Whole Blood), Rahul (1 unit SDP)"`).
 - `createdAt` *(timestamp)*: Submission timestamp.
-- `verifiedBy` *(string, optional)*: Coordinator name/UID who verified.
+- `verifiedByName` *(string, optional)*: Coordinator name who verified.
 
 ### `donation_logs`
 - `donorId` *(string)*: Firestore Document ID in `donors`.

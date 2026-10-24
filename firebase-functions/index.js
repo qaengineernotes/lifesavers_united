@@ -13,14 +13,19 @@ const db = admin.firestore();
 const telegramConfig = (functions.config && functions.config().telegram) || {};
 const bot = new Telegraf(telegramConfig.token || "");
 
-// Twitter Client Setup
-const twitterConfig = (functions.config && functions.config().twitter) || {};
-const twitterClient = new TwitterApi({
-    appKey: twitterConfig.api_key || "",
-    appSecret: twitterConfig.api_secret || "",
-    accessToken: twitterConfig.access_token || "",
-    accessSecret: twitterConfig.access_secret || "",
-});
+// Twitter Client Setup (Lazy initialized to avoid crash during deployment analysis)
+const getTwitterClient = () => {
+    const twitterConfig = (functions.config && functions.config().twitter) || {};
+    if (!twitterConfig.api_key) {
+        return null;
+    }
+    return new TwitterApi({
+        appKey: twitterConfig.api_key,
+        appSecret: twitterConfig.api_secret || "",
+        accessToken: twitterConfig.access_token || "",
+        accessSecret: twitterConfig.access_secret || "",
+    });
+};
 
 // --- SHARED TWITTER POSTING FUNCTION ---
 
@@ -31,8 +36,20 @@ const twitterClient = new TwitterApi({
  */
 const postBloodRequestToTwitter = async (requestData) => {
     try {
-        // Format: URGENT: [Name], [Age], needs [Units] units [Blood Group] blood RIGHT NOW...
-        const tweetText = `#${requestData.hospitalCity?.replace(/\s/g, "") || "India"} #URGENT: ${requestData.patientName}, ${requestData.patientAge || 'N/A'}, needs ${requestData.unitsRequired} units ${requestData.requiredBloodGroup} #blood TODAY at ${requestData.hospitalName}, ${requestData.hospitalCity || 'N/A'}!
+        const twitterClient = getTwitterClient();
+        if (!twitterClient) {
+            console.warn("⚠️ Twitter config not set. Skipping tweet.");
+            return {
+                success: false,
+                error: "Twitter credentials not configured",
+                tweetLink: "(Twitter posting skipped - not configured)"
+            };
+        }
+
+        // Format: URGENT: [Name], [Age], needs [Units/Components] ([Blood Group]) blood RIGHT NOW...
+        const unitsDisplay = requestData.unitsRequiredText || `${requestData.unitsRequired || ''} units`.trim();
+        const bloodGroupDisplay = requestData.requiredBloodGroup || 'Any Blood Group';
+        const tweetText = `#${requestData.hospitalCity?.replace(/\s/g, "") || "India"} #URGENT: ${requestData.patientName}, ${requestData.patientAge || 'N/A'}, needs ${unitsDisplay} (${bloodGroupDisplay}) #blood TODAY at ${requestData.hospitalName}, ${requestData.hospitalCity || 'N/A'}!
 Your donation can save a life today. Even a retweet helps
 Call US
 https://lifesaversunited.org @GCRI_1972 @civilhospamd 
@@ -105,6 +122,10 @@ const parseRequestText = (text) => {
         "patient name": "patientName",
         "age": "patientAge",
         "blood group": "requiredBloodGroup",
+        "component": "bloodComponentText",
+        "blood component": "bloodComponentText",
+        "donation type": "bloodComponentText",
+        "components": "bloodComponentText",
         "units required": "unitsRequired",
         "hospital": "hospitalName",
         "location": "hospitalCity",
@@ -143,6 +164,82 @@ const parseRequestText = (text) => {
     if (data.contactNumber) {
         data.contactNumber = normalizePhoneNumber(data.contactNumber);
     }
+
+    // Parse blood components and breakdown from component or units text
+    const parseComponentsBreakdown = (componentRawText, unitsRawText) => {
+        const textToAnalyze = `${componentRawText || ''} ${unitsRawText || ''}`.trim();
+        const componentsMap = [
+            { regex: /\b(sdp|single donor platelet|plateletpheresis)\b/i, name: 'Single Donor Platelets (SDP)', code: 'platelets_sdp' },
+            { regex: /\b(rdp|random donor platelet)\b/i, name: 'Random Donor Platelets (RDP)', code: 'platelets_rdp' },
+            { regex: /\b(prbc|packed red blood|packed cells)\b/i, name: 'Packed Red Blood Cells (PRBC)', code: 'prbc' },
+            { regex: /\b(ffp|fresh frozen plasma|plasma)\b/i, name: 'Fresh Frozen Plasma (FFP)', code: 'plasma' },
+            { regex: /\b(cryo|cryoprecipitate)\b/i, name: 'Cryoprecipitate', code: 'cryoprecipitate' },
+            { regex: /\b(whole blood|wb)\b/i, name: 'Whole Blood', code: 'whole_blood' }
+        ];
+
+        const breakdown = [];
+        const detectedComponents = [];
+
+        // Check if explicit multiple components mentioned (e.g., "4 Whole Blood, 2 SDP")
+        const parts = (componentRawText || unitsRawText || '').split(/[,;+&]/);
+        parts.forEach(part => {
+            const cleanPart = part.trim();
+            if (!cleanPart) return;
+
+            const numMatch = cleanPart.match(/\b(\d+)\b/);
+            const units = numMatch ? parseInt(numMatch[1]) : 1;
+
+            const matched = componentsMap.find(c => c.regex.test(cleanPart));
+            if (matched && !detectedComponents.includes(matched.name)) {
+                detectedComponents.push(matched.name);
+                breakdown.push({
+                    component: matched.name,
+                    code: matched.code,
+                    units: units
+                });
+            }
+        });
+
+        // Fallback: check text for component keywords
+        if (breakdown.length === 0 && textToAnalyze) {
+            componentsMap.forEach(c => {
+                if (c.regex.test(textToAnalyze) && !detectedComponents.includes(c.name)) {
+                    detectedComponents.push(c.name);
+                    breakdown.push({
+                        component: c.name,
+                        code: c.code,
+                        units: parseInt(unitsRawText) || 1
+                    });
+                }
+            });
+        }
+
+        // Default to Whole Blood if nothing detected
+        if (breakdown.length === 0) {
+            detectedComponents.push('Whole Blood');
+            breakdown.push({
+                component: 'Whole Blood',
+                code: 'whole_blood',
+                units: parseInt(unitsRawText) || 1
+            });
+        }
+
+        const totalUnits = breakdown.reduce((sum, item) => sum + item.units, 0);
+        const unitsRequiredText = breakdown.map(item => `${item.units} ${item.units > 1 ? 'units' : 'unit'} ${item.component}`).join(', ');
+
+        return {
+            bloodComponents: detectedComponents,
+            componentBreakdown: breakdown,
+            totalUnits: totalUnits,
+            unitsRequiredText: unitsRequiredText
+        };
+    };
+
+    const compInfo = parseComponentsBreakdown(data.bloodComponentText, data.unitsRequired);
+    data.bloodComponents = compInfo.bloodComponents;
+    data.componentBreakdown = compInfo.componentBreakdown;
+    data.unitsRequired = compInfo.totalUnits || parseInt(data.unitsRequired) || 1;
+    data.unitsRequiredText = compInfo.unitsRequiredText;
 
     return data;
 };
@@ -254,6 +351,7 @@ Paste your request in this format:
 Patient Name: 
 Age: 
 Blood Group: 
+Component: (Whole Blood/PRBC/SDP/RDP/FFP)
 Units Required: 
 Hospital: 
 Location: 
@@ -962,7 +1060,10 @@ exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, contex
                 patientAge: requestData.patientAge || currentData.patientAge || '',
                 patientSufferingFrom: requestData.diagnosis || currentData.patientSufferingFrom || '',
                 requiredBloodGroup: requestData.bloodType || currentData.requiredBloodGroup || '',
+                bloodComponents: requestData.bloodComponents || currentData.bloodComponents || ['Whole Blood'],
+                componentBreakdown: requestData.componentBreakdown || currentData.componentBreakdown || [],
                 unitsRequired: requestData.unitsRequired || currentData.unitsRequired || '',
+                unitsRequiredText: requestData.unitsRequiredText || currentData.unitsRequiredText || (requestData.unitsRequired ? `${requestData.unitsRequired} units` : ''),
                 unitsFulfilled: 0,
                 donorSummary: '',
                 donationLogIds: [],
@@ -1026,7 +1127,10 @@ exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, contex
             patientAge: requestData.patientAge || '',
             patientSufferingFrom: requestData.diagnosis || '',
             requiredBloodGroup: requestData.bloodType || '',
+            bloodComponents: requestData.bloodComponents || ['Whole Blood'],
+            componentBreakdown: requestData.componentBreakdown || [],
             unitsRequired: requestData.unitsRequired || '',
+            unitsRequiredText: requestData.unitsRequiredText || (requestData.unitsRequired ? `${requestData.unitsRequired} units` : ''),
             unitsFulfilled: 0,
             hospitalName: requestData.hospitalName || '',
             hospitalAddress: requestData.hospitalAddress || '',

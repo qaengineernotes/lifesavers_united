@@ -675,7 +675,7 @@ function createBloodRequirementCard(request) {
             </div>
             <div class="info-row">
                 <div class="info-label">Units Required:</div>
-                <div class="info-value"><strong>${unitsRequired} Units</strong></div>
+                <div class="info-value"><strong>${request.unitsRequiredText || `${unitsRequired} Units`}</strong></div>
             </div>
             <div class="info-row">
                 <div class="info-label">Units Fulfilled:</div>
