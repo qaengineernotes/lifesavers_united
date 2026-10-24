@@ -3,6 +3,7 @@ const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyf
 
 // Import phone normalizer utility
 import { normalizePhoneNumber } from './phone-normalizer.js';
+import { HOSPITALS } from './hospitals-data.js';
 
 /**
  * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeDuplicateChecking();
     initializeCaptcha();
     initializeComponentsSection();
+    initializeHospitalAutocomplete();
 });
 
 // Initialize form validation
@@ -156,9 +158,9 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
             patientAge: formDataObj.get('patientAge'),
             diagnosis: formDataObj.get('diagnosis'),
             urgency: formDataObj.get('urgency'),
-            hospitalName: formDataObj.get('hospitalName'),
-            city: formDataObj.get('city'),
-            hospitalAddress: formDataObj.get('hospitalAddress'),
+            hospitalName: toTitleCase(formDataObj.get('hospitalName')),
+            city: toTitleCase(formDataObj.get('city')),
+            hospitalAddress: (formDataObj.get('hospitalAddress') || '').trim(),
             additionalInfo: formDataObj.get('additionalInfo'),
             captchaAnswer: formDataObj.get('captchaAnswer')
         };
@@ -180,37 +182,6 @@ document.getElementById('bloodRequestForm').addEventListener('submit', async fun
                     success: false, 
                     error: response.data?.error || 'Cloud Function failed' 
                 };
-            }
-
-            // Post to Twitter if Firebase save was successful
-            if (firebaseResult.success && firebaseResult.action === 'CREATED') {
-                try {
-                    const postToTwitter = httpsCallable(functions, 'postRequestToTwitter');
-
-                    // Prepare data for Twitter (map field names)
-                    const twitterData = {
-                        patientName: data.patientName,
-                        patientAge: data.patientAge,
-                        requiredBloodGroup: data.bloodType,
-                        unitsRequired: data.unitsRequired,
-                        unitsRequiredText: data.unitsRequiredText,
-                        bloodComponents: data.bloodComponents,
-                        hospitalName: data.hospitalName,
-                        hospitalCity: data.city,
-                        contactNumber: data.contactNumber
-                    };
-
-                    const twitterResult = await postToTwitter({ requestData: twitterData });
-
-                    if (twitterResult.data.success) {
-                        // Twitter post successful
-                    } else {
-                        console.warn('⚠️ Twitter posting failed:', twitterResult.data.error);
-                    }
-                } catch (twitterError) {
-                    console.error('⚠️ Twitter posting error:', twitterError);
-                    // Don't fail the whole submission if Twitter fails
-                }
             }
 
         } catch (firebaseError) {
@@ -942,4 +913,200 @@ function resetComponentsSection() {
     updateAvailableComponentOptions();
     updateComponentsSummary();
 }
+
+/**
+ * Escapes HTML characters to prevent XSS in dynamic templates
+ */
+function escapeHtml(str) {
+    if (!str) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
+/**
+ * Initializes the Hospital Autocomplete feature on #hospitalName
+ */
+function initializeHospitalAutocomplete() {
+    const hospitalInput = document.getElementById('hospitalName');
+    const suggestionsDropdown = document.getElementById('hospitalSuggestions');
+    const cityInput = document.getElementById('city');
+    const addressInput = document.getElementById('hospitalAddress');
+
+    if (!hospitalInput || !suggestionsDropdown) return;
+
+    let activeIndex = -1;
+    let currentMatches = [];
+
+    // Filter hospitals based on user query
+    function filterHospitals(query) {
+        const cleanQuery = query.toLowerCase().trim().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
+        if (!cleanQuery) return [];
+
+        return HOSPITALS.map(hospital => {
+            let score = 0;
+            const cleanName = hospital.name.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
+            const cleanArea = hospital.area.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
+            const cleanCity = hospital.city.toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
+
+            // Check exact or starting aliases
+            if (hospital.aliases.some(alias => alias === cleanQuery)) {
+                score += 100;
+            } else if (hospital.aliases.some(alias => alias.startsWith(cleanQuery))) {
+                score += 60;
+            } else if (hospital.aliases.some(alias => alias.includes(cleanQuery))) {
+                score += 35;
+            }
+
+            // Check name matches
+            if (cleanName.startsWith(cleanQuery)) {
+                score += 50;
+            } else if (cleanName.includes(cleanQuery)) {
+                score += 25;
+            }
+
+            // Check area or city matches
+            if (cleanArea.includes(cleanQuery)) {
+                score += 15;
+            }
+            if (cleanCity.includes(cleanQuery)) {
+                score += 10;
+            }
+
+            return { hospital, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 7)
+        .map(item => item.hospital);
+    }
+
+    // Render suggestions list
+    function renderSuggestions(matches) {
+        currentMatches = matches;
+        activeIndex = -1;
+
+        if (matches.length === 0) {
+            suggestionsDropdown.innerHTML = '';
+            suggestionsDropdown.classList.add('hidden');
+            hospitalInput.setAttribute('aria-expanded', 'false');
+            return;
+        }
+
+        suggestionsDropdown.innerHTML = matches.map((h, idx) => `
+            <div class="hospital-suggestion-item" data-index="${idx}" role="option" id="hospital-opt-${idx}">
+                <div class="hospital-suggestion-title">
+                    <span>🏥</span>
+                    <span>${escapeHtml(h.name)}</span>
+                </div>
+                <div class="hospital-suggestion-sub">
+                    <span>${escapeHtml(h.area)}, ${escapeHtml(h.city)}</span>
+                    <span class="hospital-type-badge">${escapeHtml(h.type)}</span>
+                </div>
+            </div>
+        `).join('');
+
+        suggestionsDropdown.classList.remove('hidden');
+        hospitalInput.setAttribute('aria-expanded', 'true');
+    }
+
+    // Select a hospital and pre-fill details
+    function selectHospital(hospital) {
+        if (!hospital) return;
+        hospitalInput.value = hospital.name;
+
+        // Auto-fill City if city input exists and is empty or has standard default
+        if (cityInput && (!cityInput.value.trim() || cityInput.value.trim().toLowerCase() === 'ahmedabad' || cityInput.value.trim().toLowerCase() === hospital.city.toLowerCase())) {
+            cityInput.value = hospital.city;
+        }
+
+        // Auto-fill Address if address textarea exists and is empty or contains previous auto-filled city/standard text
+        if (addressInput) {
+            const curVal = addressInput.value.trim();
+            if (!curVal || curVal.includes('Ahmedabad') || curVal.includes('Surat') || curVal.includes('Vadodara') || curVal.includes('Rajkot') || curVal.includes('Gandhinagar')) {
+                addressInput.value = hospital.address;
+            }
+        }
+
+        closeSuggestions();
+        hospitalInput.focus();
+    }
+
+    function closeSuggestions() {
+        suggestionsDropdown.innerHTML = '';
+        suggestionsDropdown.classList.add('hidden');
+        hospitalInput.setAttribute('aria-expanded', 'false');
+        activeIndex = -1;
+        currentMatches = [];
+    }
+
+    function updateActiveItem() {
+        const items = suggestionsDropdown.querySelectorAll('.hospital-suggestion-item');
+        items.forEach((item, idx) => {
+            if (idx === activeIndex) {
+                item.classList.add('active');
+                item.setAttribute('aria-selected', 'true');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+                item.removeAttribute('aria-selected');
+            }
+        });
+    }
+
+    // Event listeners
+    hospitalInput.addEventListener('input', function () {
+        const query = this.value;
+        if (query.trim().length >= 1) {
+            const matches = filterHospitals(query);
+            renderSuggestions(matches);
+        } else {
+            closeSuggestions();
+        }
+    });
+
+    hospitalInput.addEventListener('keydown', function (e) {
+        if (suggestionsDropdown.classList.contains('hidden') || currentMatches.length === 0) {
+            return;
+        }
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = (activeIndex + 1) % currentMatches.length;
+            updateActiveItem();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = (activeIndex - 1 + currentMatches.length) % currentMatches.length;
+            updateActiveItem();
+        } else if (e.key === 'Enter') {
+            if (activeIndex >= 0 && activeIndex < currentMatches.length) {
+                e.preventDefault();
+                selectHospital(currentMatches[activeIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            closeSuggestions();
+        }
+    });
+
+    suggestionsDropdown.addEventListener('click', function (e) {
+        const item = e.target.closest('.hospital-suggestion-item');
+        if (item) {
+            const idx = parseInt(item.getAttribute('data-index'), 10);
+            if (!isNaN(idx) && currentMatches[idx]) {
+                selectHospital(currentMatches[idx]);
+            }
+        }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.hospital-autocomplete-group')) {
+            closeSuggestions();
+        }
+    });
+}
+
 
