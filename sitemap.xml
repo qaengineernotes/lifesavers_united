@@ -1008,7 +1008,15 @@
     <!-- Privacy Policy -->
     <url>
         <loc>https://lifesaversunited.org/privacy_policy</loc>
-        <lastmod>2026-01-01</lastmod>
+        <lastmod>2026-10-25</lastmod>
+        <changefreq>yearly</changefreq>
+        <priority>0.3</priority>
+    </url>
+
+    <!-- Terms and Conditions -->
+    <url>
+        <loc>https://lifesaversunited.org/terms_and_conditions</loc>
+        <lastmod>2026-10-25</lastmod>
         <changefreq>yearly</changefreq>
         <priority>0.3</priority>
     </url>
