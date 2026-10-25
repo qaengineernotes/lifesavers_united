@@ -5,7 +5,7 @@
  */
 
 import { getCurrentUser, onAuthChange } from './firebase-auth-service.js';
-import { storage, ref, listAll, uploadBytes } from './firebase-config.js';
+import { storage, ref, listAll, uploadBytes, functions, httpsCallable } from './firebase-config.js';
 
 // Configuration constants matching imgs/hero_card_template_transperent.png (1254 x 1254)
 const CANVAS_WIDTH = 1254;
@@ -816,6 +816,26 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
     preResolvedFileName = null;
     preResolvedSlug = null;
 
+    // 6. After saving to Firebase Gallery (Option A: photo uploaded), dispatch PNG format to Telegram
+    try {
+        const pngBase64 = canvas.toDataURL('image/png');
+        const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
+        dispatchHeroCardToTelegram({
+            pngBase64,
+            donorName: details.donorName || '',
+            milestone: details.milestoneNumber || 1,
+            hospitalName: details.hospitalName || '',
+            patientName: details.patientName || '',
+            storagePath: storagePath
+        }).then((resp) => {
+            console.log('✅ Telegram Hero Card dispatch result:', resp?.data);
+        }).catch((tErr) => {
+            console.warn('ℹ️ Telegram hero card notification notice:', tErr?.message || tErr);
+        });
+    } catch (telegramErr) {
+        console.warn('⚠️ Could not trigger Telegram dispatch:', telegramErr);
+    }
+
     return {
         success: true,
         fileName: targetFileName,
@@ -823,4 +843,27 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
         overwritten: isOverwrite
     };
 }
+
+/**
+ * Manually trigger dispatch of Hero Card to Telegram recipients in PNG format
+ */
+export async function dispatchCardToTelegram(canvas, details = {}) {
+    if (!canvas) return { success: false, reason: 'no_canvas' };
+    try {
+        const pngBase64 = canvas.toDataURL('image/png');
+        const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
+        const res = await dispatchHeroCardToTelegram({
+            pngBase64,
+            donorName: details.donorName || '',
+            milestone: details.milestoneNumber || 1,
+            hospitalName: details.hospitalName || '',
+            patientName: details.patientName || ''
+        });
+        return res?.data || { success: true };
+    } catch (err) {
+        console.warn('dispatchCardToTelegram error:', err);
+        return { success: false, error: err.message };
+    }
+}
+
 

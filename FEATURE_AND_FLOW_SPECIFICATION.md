@@ -14,7 +14,7 @@
 - **Database & Auth**: Google Cloud Firestore, Firebase Phone Auth (reCAPTCHA v3 & OTP), Firebase App Check.
 - **Backend / Serverless**:
   - Cloudflare Pages Functions (`functions/`): Multi-provider email engine (`doctor-signup`, `send-thank-you-email`, `broadcast-email`, etc.).
-  - Firebase Cloud Functions (`firebase-functions/`): Telegram bot webhook, user processing.
+  - Firebase Cloud Functions (`firebase-functions/`): Telegram bot webhook, user processing, and `dispatchHeroCardToTelegram` (dispatches studio-saved Hero Appreciation PNG cards to configured Telegram recipients).
   - GitHub Actions Workflows (`.github/workflows/`): Automated daily cron jobs for Birthday and Next Eligible Date reminders.
   - Python Local Dev Server (`server.py`): CORS-aware proxy and Apps Script forwarder.
 

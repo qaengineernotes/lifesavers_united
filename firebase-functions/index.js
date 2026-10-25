@@ -1227,4 +1227,173 @@ exports.normalizeBloodRequestEntities = functions.https.onCall(async (data, cont
     return result;
 });
 
+// --- HERO CARD TELEGRAM NOTIFICATION CONFIG ---
+// Add or remove usernames, numeric chat IDs, or channel handles here.
+// Users must have messaged/started the bot at least once so their telegramId is stored in telegram_users.
+const HERO_CARD_RECIPIENTS = [
+    'nikunjmistri'
+];
+
+// Delivery mode: 'photo' (renders full image card in chat), 'document' (sends lossless .png file), or 'both'
+const HERO_CARD_DELIVERY_MODE = 'photo';
+
+/**
+ * Resolves a recipient string (username, numeric ID, or channel) to a Telegram chatId
+ * @param {string} recipient - e.g. 'nikunjmistri', '@nikunjmistri', '123456789', '@channelname'
+ * @returns {Promise<string|null>} - Resolved numeric or channel chatId, or null if not found
+ */
+const resolveTelegramChatId = async (recipient) => {
+    if (!recipient) return null;
+    const raw = String(recipient).trim();
+
+    // 1. If it's a numeric ID (e.g. "123456789" or "-100123456789")
+    if (/^-?\d+$/.test(raw)) {
+        return raw;
+    }
+
+    const cleanUsername = raw.replace(/^@/, '').toLowerCase();
+
+    // 2. Look up username in telegram_users collection
+    try {
+        const querySnap = await db.collection("telegram_users")
+            .where("username", "==", cleanUsername)
+            .limit(1)
+            .get();
+
+        if (!querySnap.empty) {
+            const data = querySnap.docs[0].data();
+            return String(data.telegramId || querySnap.docs[0].id);
+        }
+
+        // Case-insensitive fallback scan across existing registered telegram users
+        const allUsersSnap = await db.collection("telegram_users").get();
+        for (const doc of allUsersSnap.docs) {
+            const data = doc.data();
+            const u = (data.username || '').replace(/^@/, '').toLowerCase();
+            if (u === cleanUsername) {
+                return String(data.telegramId || doc.id);
+            }
+        }
+    } catch (err) {
+        console.warn(`⚠️ Error querying telegram_users for "${recipient}":`, err.message);
+    }
+
+    // 3. If raw starts with '@' and is a public channel/supergroup
+    if (raw.startsWith('@')) {
+        return raw;
+    }
+
+    return null;
+};
+
+/**
+ * Callable Cloud Function to dispatch generated Hero Appreciation Cards to Telegram recipients in PNG format
+ */
+exports.dispatchHeroCardToTelegram = functions.https.onCall(async (data, context) => {
+    try {
+        if (!telegramConfig.token) {
+            console.warn("⚠️ Telegram bot token is not configured in functions.config().telegram.token. Skipping dispatch.");
+            return { success: false, reason: "bot_token_not_configured" };
+        }
+
+        if (!data || !data.pngBase64) {
+            throw new functions.https.HttpsError("invalid-argument", "Missing required pngBase64 data.");
+        }
+
+        const donorName = (data.donorName || "Hero Donor").trim();
+        const milestone = parseInt(data.milestone, 10) || 1;
+        const hospitalName = (data.hospitalName || "").trim();
+        const patientName = (data.patientName || "").trim();
+
+        // Convert base64 data to binary Buffer
+        const base64Content = data.pngBase64.replace(/^data:image\/\w+;base64,/, "");
+        const imageBuffer = Buffer.from(base64Content, "base64");
+
+        // Ordinal suffix (1st, 2nd, 3rd, 4th...)
+        const getOrdinal = (n) => {
+            const s = ["th", "st", "nd", "rd"];
+            const v = n % 100;
+            return s[(v - 20) % 10] || s[v] || s[0];
+        };
+        const suffix = getOrdinal(milestone);
+        const safeName = donorName.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const filename = `LifeSavers_Hero_${safeName}_${milestone}${suffix}.png`;
+
+        // Format appreciation caption
+        let caption = `🎖️ <b>Hero Appreciation Card Generated!</b>\n\n`;
+        caption += `👤 <b>Donor:</b> ${donorName}\n`;
+        caption += `🩸 <b>Milestone:</b> ${milestone}${suffix} Blood Donation\n`;
+        if (hospitalName) caption += `🏥 <b>Hospital:</b> ${hospitalName}\n`;
+        if (patientName && patientName !== 'Direct / Voluntary Camp' && patientName !== 'Not specified') {
+            caption += `🎗️ <b>Cause/Patient:</b> ${patientName}\n`;
+        }
+        caption += `\n❤️ <i>Saved to LifeSavers Gallery & Studio</i>\n🌐 https://lifesaversunited.org`;
+
+        const dispatchResults = [];
+
+        for (const recipient of HERO_CARD_RECIPIENTS) {
+            try {
+                const chatId = await resolveTelegramChatId(recipient);
+                if (!chatId) {
+                    console.warn(`⚠️ Telegram user "${recipient}" could not be resolved. Ensure they have sent /start to the bot.`);
+                    dispatchResults.push({ recipient, success: false, reason: "user_not_found_or_not_started" });
+                    continue;
+                }
+
+                // Send via configured delivery mode
+                if (HERO_CARD_DELIVERY_MODE === 'document') {
+                    await bot.telegram.sendDocument(chatId, {
+                        source: imageBuffer,
+                        filename: filename
+                    }, {
+                        caption: caption,
+                        parse_mode: "HTML"
+                    });
+                } else if (HERO_CARD_DELIVERY_MODE === 'both') {
+                    await bot.telegram.sendPhoto(chatId, {
+                        source: imageBuffer,
+                        filename: filename
+                    }, {
+                        caption: caption,
+                        parse_mode: "HTML"
+                    });
+                    await bot.telegram.sendDocument(chatId, {
+                        source: imageBuffer,
+                        filename: filename
+                    });
+                } else {
+                    // Default: 'photo' (renders visual image card in chat)
+                    await bot.telegram.sendPhoto(chatId, {
+                        source: imageBuffer,
+                        filename: filename
+                    }, {
+                        caption: caption,
+                        parse_mode: "HTML"
+                    });
+                }
+
+                console.log(`✅ Hero Card PNG dispatched to Telegram recipient: ${recipient} (${chatId})`);
+                dispatchResults.push({ recipient, success: true, chatId });
+            } catch (sendErr) {
+                console.error(`❌ Failed sending Hero Card to "${recipient}":`, sendErr);
+                dispatchResults.push({ recipient, success: false, error: sendErr.message });
+            }
+        }
+
+        return {
+            success: true,
+            totalRecipients: HERO_CARD_RECIPIENTS.length,
+            results: dispatchResults
+        };
+
+    } catch (err) {
+        console.error("❌ Error in dispatchHeroCardToTelegram:", err);
+        if (err instanceof functions.https.HttpsError) {
+            throw err;
+        }
+        throw new functions.https.HttpsError("internal", err.message || "Failed to dispatch hero card to Telegram");
+    }
+});
+
+
 
