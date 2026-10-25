@@ -1300,10 +1300,12 @@ exports.dispatchHeroCardToTelegram = functions.https.onCall(async (data, context
             throw new functions.https.HttpsError("invalid-argument", "Missing required pngBase64 data.");
         }
 
-        const donorName = (data.donorName || "Hero Donor").trim();
+        const rawDonorName = (data.donorName || "Hero Donor").trim();
+        const honorific = (data.honorific || "").trim();
         const milestone = parseInt(data.milestone, 10) || 1;
         const hospitalName = (data.hospitalName || "").trim();
         const patientName = (data.patientName || "").trim();
+        const donationDateRaw = data.donationDate;
 
         // Convert base64 data to binary Buffer
         const base64Content = data.pngBase64.replace(/^data:image\/\w+;base64,/, "");
@@ -1316,18 +1318,108 @@ exports.dispatchHeroCardToTelegram = functions.https.onCall(async (data, context
             return s[(v - 20) % 10] || s[v] || s[0];
         };
         const suffix = getOrdinal(milestone);
-        const safeName = donorName.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const safeName = rawDonorName.replace(/[^a-zA-Z0-9_-]/g, "_");
         const filename = `LifeSavers_Hero_${safeName}_${milestone}${suffix}.png`;
 
-        // Format appreciation caption
-        let caption = `🎖️ <b>Hero Appreciation Card Generated!</b>\n\n`;
-        caption += `👤 <b>Donor:</b> ${donorName}\n`;
-        caption += `🩸 <b>Milestone:</b> ${milestone}${suffix} Blood Donation\n`;
-        if (hospitalName) caption += `🏥 <b>Hospital:</b> ${hospitalName}\n`;
-        if (patientName && patientName !== 'Direct / Voluntary Camp' && patientName !== 'Not specified') {
-            caption += `🎗️ <b>Cause/Patient:</b> ${patientName}\n`;
+        // Determine full donor name with honorific
+        let fullDonorName = rawDonorName;
+        if (honorific && !rawDonorName.toLowerCase().startsWith(honorific.toLowerCase())) {
+            fullDonorName = `${honorific} ${rawDonorName}`.trim();
         }
-        caption += `\n❤️ <i>Saved to LifeSavers Gallery & Studio</i>\n🌐 https://lifesaversunited.org`;
+
+        // Determine pronoun (her/his/their)
+        const h = `${honorific} ${rawDonorName}`.toLowerCase();
+        let pronoun = "their";
+        if (h.includes("mrs") || h.includes("ms") || h.includes("miss") || h.includes("smt") || h.includes("ben")) {
+            pronoun = "her";
+        } else if (h.includes("mr") || h.includes("shri") || h.includes("bhai")) {
+            pronoun = "his";
+        }
+
+        // Determine friendly calling name
+        const cleanNameOnly = rawDonorName.replace(/^(mrs\.?|mr\.?|ms\.?|miss|smt\.?|dr\.?|shri)\s+/i, '').trim();
+        const firstName = cleanNameOnly.split(/\s+/)[0] || rawDonorName;
+        let callingName = (data.callingName || '').trim();
+        if (!callingName) {
+            callingName = firstName;
+            if (pronoun === 'her' && !callingName.toLowerCase().endsWith('ben') && !callingName.toLowerCase().endsWith('ji')) {
+                callingName = `${callingName}ben`;
+            }
+        }
+
+        // Format donation date e.g. "25th Oct 2026"
+        const formatCaptionDate = (rawDate) => {
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            let d = null;
+            if (rawDate) {
+                if (typeof rawDate === 'string' && rawDate.includes('-')) {
+                    const parts = rawDate.split('-');
+                    if (parts.length === 3) {
+                        const y = parseInt(parts[0], 10);
+                        const m = parseInt(parts[1], 10) - 1;
+                        const day = parseInt(parts[2], 10);
+                        if (!isNaN(y) && !isNaN(m) && !isNaN(day)) {
+                            d = new Date(y, m, day);
+                        }
+                    }
+                }
+                if (!d || isNaN(d.getTime())) {
+                    const parsed = new Date(rawDate);
+                    if (!isNaN(parsed.getTime())) d = parsed;
+                }
+            }
+            if (!d || isNaN(d.getTime())) {
+                d = new Date();
+            }
+            const day = d.getDate();
+            const s = ["th", "st", "nd", "rd"];
+            const v = day % 100;
+            const daySuffix = s[(v - 20) % 10] || s[v] || s[0];
+            const monthStr = months[d.getMonth()];
+            const yearStr = d.getFullYear();
+            return `${day}${daySuffix} ${monthStr} ${yearStr}`;
+        };
+        const formattedDate = formatCaptionDate(donationDateRaw);
+
+        // Determine cause/patient text
+        const isVoluntary = !patientName || patientName === 'Direct / Voluntary Camp' || patientName === 'Not specified';
+        const patientText = isVoluntary ? 'a voluntary life-saving cause' : patientName;
+
+        // Dedicated milestone celebration line for 1st, 25th, 50th, 100th, and >100
+        let milestoneCelebration = '';
+        if (milestone === 1) {
+            milestoneCelebration = `Marking ${pronoun === 'her' ? 'her' : (pronoun === 'his' ? 'his' : 'their')} very 1st life-saving blood donation and beginning an inspiring journey.`;
+        } else if (milestone === 25) {
+            milestoneCelebration = `Celebrating an incredible Silver Milestone of 25 Blood Donations.`;
+        } else if (milestone === 50) {
+            milestoneCelebration = `Achieving a monumental Golden Milestone of 50 Blood Donations.`;
+        } else if (milestone === 100) {
+            milestoneCelebration = `Achieving the legendary Century Milestone of 100 Blood Donations.`;
+        } else if (milestone > 100) {
+            milestoneCelebration = `Continuing an extraordinary legacy with ${pronoun === 'her' ? 'her' : (pronoun === 'his' ? 'his' : 'their')} ${milestone}${suffix} Blood Donation.`;
+        }
+
+        // HTML safety helper for Telegram parse_mode: HTML
+        const escapeHtml = (str) => String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+        const safeFullDonorName = escapeHtml(fullDonorName);
+        const safeCallingName = escapeHtml(callingName);
+        const safePatientText = escapeHtml(patientText);
+        const safeFormattedDate = escapeHtml(formattedDate);
+
+        // Format appreciation caption matching exact user template (no em-dash)
+        let caption = `A Hero Among Us!\n\n`;
+        caption += `We are beyond proud to celebrate ${safeFullDonorName} one of our very own for ${pronoun} incredible act of kindness on ${safeFormattedDate}.\n\n`;
+        caption += `${safeCallingName} stepped forward and donated Blood for ${safePatientText}, bringing hope and strength at a time when it was needed the most. 🙏\n\n`;
+        if (milestoneCelebration) {
+            caption += `${escapeHtml(milestoneCelebration)}\n\n`;
+        }
+        caption += `This is what LifeSavers United is all about a community that shows up for one another without hesitation.\n\n`;
+        caption += `Thank you, ${safeCallingName}. You truly saved a life today. 💉🌟\n\n`;
+        caption += `LifeSavers United 🤍`;
 
         const dispatchResults = [];
 

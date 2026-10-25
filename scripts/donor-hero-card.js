@@ -822,8 +822,10 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
         const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
         dispatchHeroCardToTelegram({
             pngBase64,
+            honorific: details.honorific || '',
             donorName: details.donorName || '',
             milestone: details.milestoneNumber || 1,
+            donationDate: details.donationDate || '',
             hospitalName: details.hospitalName || '',
             patientName: details.patientName || '',
             storagePath: storagePath
@@ -854,8 +856,10 @@ export async function dispatchCardToTelegram(canvas, details = {}) {
         const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
         const res = await dispatchHeroCardToTelegram({
             pngBase64,
+            honorific: details.honorific || '',
             donorName: details.donorName || '',
             milestone: details.milestoneNumber || 1,
+            donationDate: details.donationDate || '',
             hospitalName: details.hospitalName || '',
             patientName: details.patientName || ''
         });

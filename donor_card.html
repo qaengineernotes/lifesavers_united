@@ -1425,8 +1425,10 @@
             const selectedCause = document.querySelector('input[name="causeType"]:checked')?.value || 'patient';
             const patientName = selectedCause === 'patient' ? inputPatientName.value.trim() : '';
             return {
+                honorific: typeof inputHonorific !== 'undefined' && inputHonorific ? inputHonorific.value : '',
                 donorName: inputDonorName.value.trim() || 'Hero Donor',
                 milestoneNumber: parseInt(inputMilestone.value, 10) || 1,
+                donationDate: typeof inputDonationDate !== 'undefined' && inputDonationDate ? inputDonationDate.value : '',
                 patientName: patientName,
                 hospitalName: inputHospital.value.trim() || 'Blood Bank'
             };
