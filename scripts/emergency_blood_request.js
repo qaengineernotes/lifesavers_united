@@ -4,6 +4,7 @@ const SUBMIT_URL = 'https://script.google.com/macros/s/AKfycbzam6IZ55zyXe70MdOyf
 // Import phone normalizer utility
 import { normalizePhoneNumber } from './phone-normalizer.js';
 import { HOSPITALS } from './hospitals-data.js';
+import { DIAGNOSES, scoreDiagnosis } from './diagnoses-data.js';
 
 /**
  * Formats a string to Title Case (e.g., "nikunj mistri" -> "Nikunj Mistri")
@@ -24,6 +25,7 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeCaptcha();
     initializeComponentsSection();
     initializeHospitalAutocomplete();
+    initializeDiagnosisAutocomplete();
 });
 
 // Initialize form validation
@@ -1108,5 +1110,152 @@ function initializeHospitalAutocomplete() {
         }
     });
 }
+
+/**
+ * Initializes the Diagnosis / Patient Suffering From Autocomplete feature on #diagnosis
+ */
+function initializeDiagnosisAutocomplete() {
+    const diagnosisInput = document.getElementById('diagnosis');
+    const suggestionsDropdown = document.getElementById('diagnosisSuggestions');
+
+    if (!diagnosisInput || !suggestionsDropdown) return;
+
+    let activeIndex = -1;
+    let currentMatches = [];
+
+    // Filter diagnoses based on query or return popular suggestions if query is empty
+    function filterDiagnoses(query) {
+        const trimmed = (query || '').trim();
+        if (!trimmed) {
+            // Show popular initial conditions
+            return DIAGNOSES.slice(0, 6);
+        }
+
+        return DIAGNOSES.map(diag => {
+            const score = scoreDiagnosis(trimmed, diag);
+            return { diagnosis: diag, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 7)
+        .map(item => item.diagnosis);
+    }
+
+    // Render suggestions dropdown
+    function renderSuggestions(matches) {
+        currentMatches = matches;
+        activeIndex = -1;
+
+        if (matches.length === 0) {
+            suggestionsDropdown.innerHTML = '';
+            suggestionsDropdown.classList.add('hidden');
+            diagnosisInput.setAttribute('aria-expanded', 'false');
+            return;
+        }
+
+        suggestionsDropdown.innerHTML = matches.map((d, idx) => `
+            <div class="diagnosis-suggestion-item" data-index="${idx}" role="option" id="diagnosis-opt-${idx}">
+                <div class="diagnosis-suggestion-title">
+                    <span>🩺 ${escapeHtml(d.name)}</span>
+                    <span class="diagnosis-badge">${escapeHtml(d.badge || d.category)}</span>
+                </div>
+                <div class="diagnosis-suggestion-sub">
+                    <span>${escapeHtml(d.category)}</span>
+                </div>
+            </div>
+        `).join('');
+
+        suggestionsDropdown.classList.remove('hidden');
+        diagnosisInput.setAttribute('aria-expanded', 'true');
+    }
+
+    function selectDiagnosis(diag) {
+        if (!diag) return;
+        diagnosisInput.value = diag.name;
+        closeSuggestions();
+        diagnosisInput.focus();
+    }
+
+    function closeSuggestions() {
+        suggestionsDropdown.innerHTML = '';
+        suggestionsDropdown.classList.add('hidden');
+        diagnosisInput.setAttribute('aria-expanded', 'false');
+        activeIndex = -1;
+        currentMatches = [];
+    }
+
+    function updateActiveItem() {
+        const items = suggestionsDropdown.querySelectorAll('.diagnosis-suggestion-item');
+        items.forEach((item, idx) => {
+            if (idx === activeIndex) {
+                item.classList.add('active');
+                item.setAttribute('aria-selected', 'true');
+                item.scrollIntoView({ block: 'nearest' });
+            } else {
+                item.classList.remove('active');
+                item.removeAttribute('aria-selected');
+            }
+        });
+    }
+
+    // Event listeners
+    diagnosisInput.addEventListener('input', function () {
+        const query = this.value;
+        if (query.trim().length >= 1) {
+            const matches = filterDiagnoses(query);
+            renderSuggestions(matches);
+        } else {
+            closeSuggestions();
+        }
+    });
+
+    // Show initial suggestions on focus
+    diagnosisInput.addEventListener('focus', function () {
+        const query = this.value;
+        const matches = filterDiagnoses(query);
+        renderSuggestions(matches);
+    });
+
+    diagnosisInput.addEventListener('keydown', function (e) {
+        if (suggestionsDropdown.classList.contains('hidden') || currentMatches.length === 0) {
+            return;
+        }
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            activeIndex = (activeIndex + 1) % currentMatches.length;
+            updateActiveItem();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            activeIndex = (activeIndex - 1 + currentMatches.length) % currentMatches.length;
+            updateActiveItem();
+        } else if (e.key === 'Enter') {
+            if (activeIndex >= 0 && activeIndex < currentMatches.length) {
+                e.preventDefault();
+                selectDiagnosis(currentMatches[activeIndex]);
+            }
+        } else if (e.key === 'Escape') {
+            closeSuggestions();
+        }
+    });
+
+    suggestionsDropdown.addEventListener('click', function (e) {
+        const item = e.target.closest('.diagnosis-suggestion-item');
+        if (item) {
+            const idx = parseInt(item.getAttribute('data-index'), 10);
+            if (!isNaN(idx) && currentMatches[idx]) {
+                selectDiagnosis(currentMatches[idx]);
+            }
+        }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.diagnosis-autocomplete-group')) {
+            closeSuggestions();
+        }
+    });
+}
+
 
 

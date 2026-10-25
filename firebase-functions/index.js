@@ -2,7 +2,8 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const { Telegraf, Markup } = require("telegraf");
 const { TwitterApi } = require("twitter-api-v2");
-const { resolveHospital } = require("./hospitals-data");
+const { resolveHospital, resolveHospitalHybrid } = require("./hospitals-data");
+const { resolveDiagnosis, resolveDiagnosisHybrid } = require("./diagnoses-data");
 
 admin.initializeApp();
 
@@ -91,7 +92,7 @@ const toTitleCase = (str) => {
 };
 
 // Parse the "One-Shot" Text
-const parseRequestText = (text) => {
+const parseRequestText = async (text, db = null) => {
     // Map Telegram field names to Firestore database field names
     const mapping = {
         "patient name": "patientName",
@@ -140,17 +141,17 @@ const parseRequestText = (text) => {
         data.contactNumber = normalizePhoneNumber(data.contactNumber);
     }
 
-    // Standardize Hospital Name & enrich location/address if matching master list
+    // Standardize Hospital Name & enrich location/address (Hybrid: Predefined -> Cache -> Gemini AI)
     if (data.hospitalName) {
-        const matchedHospital = resolveHospital(data.hospitalName);
-        if (matchedHospital) {
-            console.log(`🏥 Standardized Telegram hospital: "${data.hospitalName}" -> "${matchedHospital.name}"`);
+        const matchedHospital = await resolveHospitalHybrid(data.hospitalName, db);
+        if (matchedHospital && matchedHospital.name) {
+            console.log(`🏥 Standardized Telegram hospital (${matchedHospital.source || 'hybrid'}): "${data.hospitalName}" -> "${matchedHospital.name}"`);
             data.hospitalName = matchedHospital.name;
             if (!data.hospitalCity || data.hospitalCity.trim() === '') {
-                data.hospitalCity = matchedHospital.city;
+                data.hospitalCity = matchedHospital.city || '';
             }
             if (!data.hospitalAddress || data.hospitalAddress.trim() === '') {
-                data.hospitalAddress = matchedHospital.address;
+                data.hospitalAddress = matchedHospital.address || '';
             }
         } else {
             data.hospitalName = toTitleCase(data.hospitalName);
@@ -159,6 +160,17 @@ const parseRequestText = (text) => {
 
     if (data.hospitalCity) {
         data.hospitalCity = toTitleCase(data.hospitalCity);
+    }
+
+    // Standardize Diagnosis / Suffering From (Hybrid: Predefined -> Cache -> Gemini AI)
+    if (data.patientSufferingFrom) {
+        const resolved = await resolveDiagnosisHybrid(data.patientSufferingFrom, db);
+        if (resolved && resolved.name) {
+            console.log(`🩺 Standardized Telegram diagnosis (${resolved.source || 'hybrid'}): "${data.patientSufferingFrom}" -> "${resolved.name}"`);
+            data.patientSufferingFrom = resolved.name;
+        } else {
+            data.patientSufferingFrom = toTitleCase(data.patientSufferingFrom);
+        }
     }
 
     // Parse blood components and breakdown from component or units text
@@ -346,6 +358,7 @@ Paste your request in this format:
 
 Patient Name: 
 Age: 
+Diagnosis: 
 Blood Group: 
 Component: (Whole Blood/PRBC/SDP/RDP/FFP)
 Units Required: 
@@ -362,7 +375,7 @@ Contact Number: `;
         return; // Silent fail for random text to avoid spamming
     }
 
-    const requestData = parseRequestText(cleanText);
+    const requestData = await parseRequestText(cleanText, db);
     console.log("📝 Parsed request data:", JSON.stringify(requestData));
 
     const missingFields = validateRequest(requestData);
@@ -1091,20 +1104,45 @@ exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, contex
 
         requestId = generateRequestId(requestData.patientName, searchContact);
 
+        // Hybrid entity standardization for web form submissions
+        let normalizedDiagnosis = requestData.diagnosis || '';
+        if (normalizedDiagnosis) {
+            const diagRes = await resolveDiagnosisHybrid(normalizedDiagnosis, db);
+            if (diagRes && diagRes.name) {
+                normalizedDiagnosis = diagRes.name;
+            } else {
+                normalizedDiagnosis = toTitleCase(normalizedDiagnosis);
+            }
+        }
+
+        let normalizedHospital = requestData.hospitalName || '';
+        let normalizedCity = requestData.city || '';
+        let normalizedAddress = requestData.hospitalAddress || '';
+        if (normalizedHospital) {
+            const hospRes = await resolveHospitalHybrid(normalizedHospital, db);
+            if (hospRes && hospRes.name) {
+                normalizedHospital = hospRes.name;
+                if (!normalizedCity) normalizedCity = hospRes.city || '';
+                if (!normalizedAddress) normalizedAddress = hospRes.address || '';
+            } else {
+                normalizedHospital = toTitleCase(normalizedHospital);
+            }
+        }
+
         const firestoreData = {
             createdAt: admin.firestore.FieldValue.serverTimestamp(),
             patientName: requestData.patientName || '',
             patientAge: requestData.patientAge || '',
-            patientSufferingFrom: requestData.diagnosis || '',
+            patientSufferingFrom: normalizedDiagnosis,
             requiredBloodGroup: requestData.bloodType || '',
             bloodComponents: requestData.bloodComponents || ['Whole Blood'],
             componentBreakdown: requestData.componentBreakdown || [],
             unitsRequired: requestData.unitsRequired || '',
             unitsRequiredText: requestData.unitsRequiredText || (requestData.unitsRequired ? `${requestData.unitsRequired} units` : ''),
             unitsFulfilled: 0,
-            hospitalName: requestData.hospitalName || '',
-            hospitalAddress: requestData.hospitalAddress || '',
-            hospitalCity: requestData.city || '',
+            hospitalName: normalizedHospital,
+            hospitalAddress: normalizedAddress,
+            hospitalCity: normalizedCity,
             contactPerson: requestData.contactPerson || '',
             contactNumber: searchContact,
             contactEmail: requestData.contactEmail || '',
@@ -1166,4 +1204,27 @@ exports.submitEmergencyBloodRequest = functions.https.onCall(async (data, contex
         );
     }
 });
+
+/**
+ * Callable function to normalize blood request entities (Diagnosis & Hospital) on demand
+ */
+exports.normalizeBloodRequestEntities = functions.https.onCall(async (data, context) => {
+    const rawDiagnosis = data && data.diagnosis;
+    const rawHospital = data && data.hospital;
+
+    const result = {
+        diagnosis: null,
+        hospital: null
+    };
+
+    if (rawDiagnosis) {
+        result.diagnosis = await resolveDiagnosisHybrid(rawDiagnosis, db);
+    }
+    if (rawHospital) {
+        result.hospital = await resolveHospitalHybrid(rawHospital, db);
+    }
+
+    return result;
+});
+
 

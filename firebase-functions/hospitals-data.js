@@ -320,7 +320,40 @@ function resolveHospital(rawText) {
     return bestMatch;
 }
 
+/**
+ * Hybrid Hospital Resolver:
+ * Tier 1: Predefined master hospital list (0ms, 0 API calls)
+ * Tier 2 & 3: Firestore Cache & Gemini Flash AI Normalizer
+ */
+async function resolveHospitalHybrid(rawText, db = null) {
+    if (!rawText || typeof rawText !== 'string' || !rawText.trim()) return null;
+
+    // Tier 1: Check Predefined Master List
+    const predefinedMatch = resolveHospital(rawText);
+    if (predefinedMatch) {
+        return {
+            ...predefinedMatch,
+            source: "predefined"
+        };
+    }
+
+    // Tier 2 & 3: Check Firestore Cache & Gemini AI
+    try {
+        const { normalizeHospitalWithAI } = require("./ai-resolver");
+        const aiResult = await normalizeHospitalWithAI(rawText, db);
+        if (aiResult && aiResult.matched) {
+            return aiResult;
+        }
+    } catch (e) {
+        console.warn("⚠️ AI hospital resolution error:", e.message);
+    }
+
+    return null;
+}
+
 module.exports = {
     HOSPITALS,
-    resolveHospital
+    resolveHospital,
+    resolveHospitalHybrid
 };
+

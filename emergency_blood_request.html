@@ -601,26 +601,17 @@
                                 <input type="text" id="patientAge" name="patientAge" placeholder="e.g., 45"
                                     pattern="[0-9]*" inputmode="numeric">
                             </div>
-                            <div class="form-group">
+                            <div class="form-group diagnosis-autocomplete-group">
                                 <label for="diagnosis">Diagnosis / Patient Suffering From</label>
-                                <select id="diagnosis" name="diagnosis">
-                                    <option value="">Select diagnosis...</option>
-                                    <option value="Accident/Trauma">Accident/Trauma</option>
-                                    <option value="Surgery">Surgery</option>
-                                    <option value="Cancer Treatment">Cancer Treatment</option>
-                                    <option value="Childbirth/Postpartum">Childbirth/Postpartum</option>
-                                    <option value="Anemia">Anemia</option>
-                                    <option value="Thalassemia">Thalassemia</option>
-                                    <option value="Leukemia">Leukemia</option>
-                                    <option value="Dengue">Dengue</option>
-                                    <option value="Malaria">Malaria</option>
-                                    <option value="Kidney Disease">Kidney Disease</option>
-                                    <option value="Liver Disease">Liver Disease</option>
-                                    <option value="Heart Surgery">Heart Surgery</option>
-                                    <option value="Bone Marrow Transplant">Bone Marrow Transplant</option>
-                                    <option value="Bleeding Disorder">Bleeding Disorder</option>
-                                    <option value="Other">Other</option>
-                                </select>
+                                <div class="diagnosis-autocomplete-wrapper">
+                                    <input type="text" id="diagnosis" name="diagnosis"
+                                        placeholder="Type condition, surgery, or reason (e.g. Dialysis, Dengue, Bypass...)"
+                                        autocomplete="off" role="combobox" aria-autocomplete="list"
+                                        aria-expanded="false" aria-haspopup="listbox">
+                                    <div id="diagnosisSuggestions" class="diagnosis-suggestions-dropdown hidden"
+                                        role="listbox" aria-label="Diagnosis suggestions"></div>
+                                </div>
+                                <span class="diagnosis-hint-badge">💡 Pick a suggestion or type any medical condition freely.</span>
                             </div>
                         </div>
 
