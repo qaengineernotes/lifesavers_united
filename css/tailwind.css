@@ -6738,6 +6738,21 @@ a[aria-label="Share on Facebook"]:hover {
   border: 1px solid #fee2e2;
 }
 
+.section-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 1rem;
+  background-color: #fee2e2;
+  color: #dc2626;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 9999px;
+  margin-bottom: 0.75rem;
+}
+
 /* ==========================================================================
    GLOBAL NAVIGATION & DROPDOWNS (LifeSavers United Shared Component)
    ========================================================================== */
