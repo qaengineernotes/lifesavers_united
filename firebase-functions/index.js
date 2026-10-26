@@ -1231,7 +1231,7 @@ exports.normalizeBloodRequestEntities = functions.https.onCall(async (data, cont
 // Add or remove usernames, numeric chat IDs, or channel handles here.
 // Users must have messaged/started the bot at least once so their telegramId is stored in telegram_users.
 const HERO_CARD_RECIPIENTS = [
-    'nikunjmistri'
+    '8493696376'
 ];
 
 // Delivery mode: 'photo' (renders full image card in chat), 'document' (sends lossless .png file), or 'both'
@@ -1239,19 +1239,24 @@ const HERO_CARD_DELIVERY_MODE = 'photo';
 
 /**
  * Resolves a recipient string (username, numeric ID, or channel) to a Telegram chatId
- * @param {string} recipient - e.g. 'nikunjmistri', '@nikunjmistri', '123456789', '@channelname'
+ * @param {string} recipient - e.g. 'nikunjmistri', '@nikunjmistri', '8493696376', '@channelname'
  * @returns {Promise<string|null>} - Resolved numeric or channel chatId, or null if not found
  */
 const resolveTelegramChatId = async (recipient) => {
     if (!recipient) return null;
     const raw = String(recipient).trim();
 
-    // 1. If it's a numeric ID (e.g. "123456789" or "-100123456789")
+    // 1. If it's a numeric ID (e.g. "8493696376" or "-100123456789")
     if (/^-?\d+$/.test(raw)) {
         return raw;
     }
 
     const cleanUsername = raw.replace(/^@/, '').toLowerCase();
+
+    // Known direct username overrides
+    if (cleanUsername === 'nikunjmistri') {
+        return '8493696376';
+    }
 
     // 2. Look up username in telegram_users collection
     try {

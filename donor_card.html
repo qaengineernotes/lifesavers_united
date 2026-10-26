@@ -1448,18 +1448,14 @@
                 persistDonorMilestone(milestoneVal, currentProfileRef).catch(() => {});
             }
 
-            // If photo uploaded, save WebP to Firebase Storage with a 1500ms safety timeout
+            // If photo uploaded, save WebP to Firebase Storage and dispatch PNG to Telegram
             if (hasUserUploadedPhoto()) {
                 downloadBtn.disabled = true;
                 downloadBtn.innerHTML = '<span class="btn-icon">⏳</span> <span>Saving & Downloading...</span>';
 
-                try {
-                    const details = getStudioCardDetails();
-                    await Promise.race([
-                        saveHeroCardToGallery(canvas, details),
-                        new Promise((resolve) => setTimeout(resolve, 1500))
-                    ]);
-                    if (canvasRenderStatus) {
+                const details = getStudioCardDetails();
+                saveHeroCardToGallery(canvas, details).then((saveRes) => {
+                    if (saveRes?.success && canvasRenderStatus) {
                         canvasRenderStatus.textContent = 'Saved to Gallery ✓';
                         setTimeout(() => {
                             if (canvasRenderStatus.textContent === 'Saved to Gallery ✓') {
@@ -1467,9 +1463,9 @@
                             }
                         }, 2500);
                     }
-                } catch (err) {
+                }).catch((err) => {
                     console.warn('Firebase gallery upload notice:', err);
-                }
+                });
             }
 
             // Trigger local PNG download
@@ -1496,15 +1492,11 @@
             shareBtn.disabled = true;
             shareBtn.innerHTML = '<span class="btn-icon">⏳</span> <span>Preparing Share...</span>';
 
-            // If photo uploaded, save WebP to Firebase Storage with a 1500ms safety timeout
+            // If photo uploaded, save WebP to Firebase Storage and dispatch PNG to Telegram
             if (hasUserUploadedPhoto()) {
-                try {
-                    const details = getStudioCardDetails();
-                    await Promise.race([
-                        saveHeroCardToGallery(canvas, details),
-                        new Promise((resolve) => setTimeout(resolve, 1500))
-                    ]);
-                    if (canvasRenderStatus) {
+                const details = getStudioCardDetails();
+                saveHeroCardToGallery(canvas, details).then((saveRes) => {
+                    if (saveRes?.success && canvasRenderStatus) {
                         canvasRenderStatus.textContent = 'Saved to Gallery ✓';
                         setTimeout(() => {
                             if (canvasRenderStatus.textContent === 'Saved to Gallery ✓') {
@@ -1512,9 +1504,9 @@
                             }
                         }, 2500);
                     }
-                } catch (err) {
+                }).catch((err) => {
                     console.warn('Firebase gallery upload notice:', err);
-                }
+                });
             }
 
             try {

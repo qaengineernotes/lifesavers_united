@@ -672,7 +672,10 @@ async function resolveNextGalleryFileName(donorName) {
     const slug = slugifyDonorName(donorName);
     try {
         const folderRef = ref(storage, 'gallery/blood-donors');
-        const res = await listAll(folderRef);
+        const res = await Promise.race([
+            listAll(folderRef),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('listAll timeout')), 1500))
+        ]);
         let maxIndex = 0;
         let foundAny = false;
         const slugPattern = new RegExp(`^${slug}(?:-(\\d+))?\\.(webp|jpg|jpeg|png)$`, 'i');
@@ -781,7 +784,35 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
         targetFileName = await resolveNextGalleryFileName(details.donorName);
     }
 
-    // 3. Convert HTML5 Canvas to WebP Blob (quality 0.92)
+    const storagePath = `gallery/blood-donors/${targetFileName}`;
+    const fileRef = ref(storage, storagePath);
+
+    // 3. Initiate Telegram PNG dispatch concurrently so storage upload never delays or blocks Telegram
+    let telegramPromise = null;
+    try {
+        const pngBase64 = canvas.toDataURL('image/png');
+        const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
+        telegramPromise = dispatchHeroCardToTelegram({
+            pngBase64,
+            honorific: details.honorific || '',
+            donorName: details.donorName || '',
+            milestone: details.milestoneNumber || 1,
+            donationDate: details.donationDate || '',
+            hospitalName: details.hospitalName || '',
+            patientName: details.patientName || '',
+            storagePath: storagePath
+        }).then((resp) => {
+            console.log('✅ Telegram Hero Card dispatch result:', resp?.data);
+            return resp?.data;
+        }).catch((tErr) => {
+            console.warn('ℹ️ Telegram hero card notification notice:', tErr?.message || tErr);
+            return { success: false, error: tErr?.message || tErr };
+        });
+    } catch (telegramErr) {
+        console.warn('⚠️ Could not trigger Telegram dispatch:', telegramErr);
+    }
+
+    // 4. Convert HTML5 Canvas to WebP Blob (quality 0.92) and upload to Firebase Storage
     const webpBlob = await new Promise((resolve) => {
         canvas.toBlob(resolve, 'image/webp', 0.92);
     });
@@ -789,10 +820,6 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
     if (!webpBlob) {
         throw new Error('Failed to generate WebP image from canvas');
     }
-
-    // 4. Upload to Firebase Storage: gallery/blood-donors/
-    const storagePath = `gallery/blood-donors/${targetFileName}`;
-    const fileRef = ref(storage, storagePath);
 
     const metadata = {
         contentType: 'image/webp',
@@ -816,26 +843,8 @@ export async function saveHeroCardToGallery(canvas, details = {}) {
     preResolvedFileName = null;
     preResolvedSlug = null;
 
-    // 6. After saving to Firebase Gallery (Option A: photo uploaded), dispatch PNG format to Telegram
-    try {
-        const pngBase64 = canvas.toDataURL('image/png');
-        const dispatchHeroCardToTelegram = httpsCallable(functions, 'dispatchHeroCardToTelegram');
-        dispatchHeroCardToTelegram({
-            pngBase64,
-            honorific: details.honorific || '',
-            donorName: details.donorName || '',
-            milestone: details.milestoneNumber || 1,
-            donationDate: details.donationDate || '',
-            hospitalName: details.hospitalName || '',
-            patientName: details.patientName || '',
-            storagePath: storagePath
-        }).then((resp) => {
-            console.log('✅ Telegram Hero Card dispatch result:', resp?.data);
-        }).catch((tErr) => {
-            console.warn('ℹ️ Telegram hero card notification notice:', tErr?.message || tErr);
-        });
-    } catch (telegramErr) {
-        console.warn('⚠️ Could not trigger Telegram dispatch:', telegramErr);
+    if (telegramPromise) {
+        await telegramPromise;
     }
 
     return {
