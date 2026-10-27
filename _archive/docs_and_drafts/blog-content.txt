@@ -1,138 +1,169 @@
-Serum Protein Test for Regular SDP Donors: What Every Platelet Donor in India Should Know
-Published by LifeSavers United | lifesaversunited.org
+Here is the full blog, ready to paste into your site. It is in plain text, with the SEO details first and the sources at the end.
 
-A Message Before We Begin
-If you are someone who donates platelets regularly, first of all, thank you. Single Donor Platelet donation, which most people in India know as SDP donation, is one of the most generous and impactful things a person can do. The platelets you donate go directly to cancer patients, thalassemia children, accident victims, and people undergoing major surgeries. Your contribution is not just a medical procedure. It is a lifeline for real people and real families.
-But because you donate regularly and because platelet donation works differently from whole blood donation, your body deserves extra attention and care. One of the most important ways to protect your health as a regular SDP donor is through a simple but significant test called the Serum Protein Test.
-This blog is written for you. It explains what this test is, why it matters, and how it fits into your journey as a responsible and healthy platelet donor in India.
+SEO DETAILS
 
-What Is SDP Donation and Why Is It Different
-Before we understand the serum protein test, it helps to understand what makes SDP donation unique.
-Single Donor Platelet donation is a process called apheresis. During this procedure, blood is drawn from your arm, passed through a special machine that separates out only the platelets, and then the remaining components including red blood cells and plasma are returned to your body. The entire process takes about 60 to 90 minutes and is done at apheresis centres in hospitals and blood banks across India.
-Because only platelets are removed and the rest of the blood is returned, SDP donation is considered safer in many ways than whole blood donation. It also means that a healthy person can donate platelets more frequently, usually once every two to four weeks, depending on the guidelines followed by the blood bank.
-However, this frequency comes with a responsibility. Because you are donating more often, your body needs to consistently recover well. And that recovery depends significantly on your protein levels.
+Blog title (H1): Thalassemia BMT Financial Help in India: Government Schemes, NGOs and How to Apply (2026 Guide)
 
-What Is a Serum Protein Test
-A serum protein test is a blood test that measures the total amount of protein present in the liquid part of your blood, which is called serum. It primarily measures two key proteins: albumin and globulin. Together, these are reported as total serum protein.
-Proteins in your blood are not just numbers on a lab report. They perform essential functions in your body. They help carry nutrients and hormones. They support your immune system. They regulate fluid balance between your blood vessels and tissues. They assist in clotting. And importantly, they help your body recover after procedures like platelet donation.
-Normal total serum protein levels in adults are generally between 6.0 and 8.3 grams per decilitre, though individual blood banks and hospitals in India may use slightly varying reference ranges based on their laboratory standards.
-For a regular SDP donor, the serum protein test is a way of checking that your body is maintaining these levels adequately despite the frequency of donation.
+Meta title (under 60 characters): Thalassemia BMT Funding in India: Schemes and How to Apply
 
-Why Regular SDP Donors Need This Test
-Here is something that many donors do not fully realise. When you donate platelets, small amounts of plasma proteins are also removed along with the platelets during the apheresis process. Modern apheresis machines used in India are designed to minimise this, but over time and with repeated donations, there can be a gradual impact on your protein levels if your diet and recovery are not adequate.
-A person who donates platelets once and never again faces a very different physiological situation from someone who donates every three to four weeks throughout the year. The regular donor's body is continuously asked to replenish what has been taken. If protein intake or absorption is insufficient, levels can slowly drop without the donor even noticing.
-Low protein levels, a condition called hypoproteinemia, can cause fatigue, reduced immunity, slow healing, fluid retention, and a general decline in physical wellbeing. In more significant cases it can affect organ function. None of these outcomes are what anyone wants for a person who is voluntarily giving their time and health to save others.
-The serum protein test is simply a way of making sure your body is keeping up. It is a check in, a health safeguard, and a way for the blood bank and medical team to catch any decline early before it becomes a problem.
+Meta description (under 160 characters): Need money for a thalassemia bone marrow transplant? Learn about the Thalassemia Bal Sewa Yojana, Ayushman Bharat, Gujarat schemes, NGOs and how to apply.
 
-What Indian Blood Bank Guidelines Say
-Blood banks and apheresis centres in India operate under the guidelines set by the Drugs and Cosmetic Act, the National Blood Transfusion Council, and the standards maintained by the National AIDS Control Organisation. Many leading hospitals also follow international standards from organisations like the AABB and WHO as a reference.
-Under these frameworks, regular SDP donors are expected to meet certain eligibility criteria before each donation. Total serum protein is one of the parameters checked to confirm donor fitness. Most centres in India require a minimum total serum protein level of 6.0 g/dL or above before allowing a donor to proceed with apheresis.
-In practice, the approach varies across centres. Some hospitals check serum protein before every donation session. Others conduct it at regular intervals, such as every three months for donors who donate frequently. Some centres test it only when a donor reports symptoms or when routine haematological values raise a concern.
-The important point is that this test is not optional or bureaucratic. It exists because donor safety is a medical and ethical priority for every responsible blood bank in India.
+URL slug: thalassemia-bmt-financial-help-government-schemes-ngo-india
 
-Real Situations from Indian Apheresis Centres
-Let us look at some everyday scenarios that help illustrate why this test matters.
-Consider Ramesh, a 34 year old IT professional from Hyderabad who has been donating platelets regularly for the past two years. He donates once every three to four weeks and has always been told he is a healthy donor. But over the past few months he has been feeling unusually tired, and his concentration at work has dropped. When his blood bank runs a serum protein test before his next donation, they find his albumin level has dropped below normal range. A closer look reveals that his diet had become irregular due to work stress, and his protein intake was insufficient to support his donation schedule. The blood bank advises him to pause donation for six weeks, improve his diet, and return for a retest. Ramesh recovers, his levels normalise, and he resumes donation safely.
-Now consider Priya, a 28 year old schoolteacher from Pune who donates platelets to support a childhood friend undergoing cancer treatment. She donates once a month and is diligent about her diet and sleep. Her serum protein levels consistently fall within the healthy range at every check. For Priya, the serum protein test is reassurance. It tells her that her body is managing well and that she can continue to help her friend and others like him without compromising her own health.
-Both stories reflect what happens in apheresis centres every week across cities like Delhi, Mumbai, Chennai, Bengaluru, Kolkata, Ahmedabad, and beyond. The test is not about discouraging donation. It is about making sure donation remains sustainable and safe for the long term.
+Focus keyword: thalassemia bone marrow transplant financial help
 
-How Frequent Platelet Donation Affects Protein Levels
-To understand this more clearly, let us think about what happens in your body with repeated donations.
-Each time you undergo apheresis, your body enters a mild recovery state. It needs to replenish the platelets that have been removed, restore the small amount of plasma proteins that accompany the process, and stabilise its internal fluid and electrolyte balance. For most healthy donors, this recovery happens within 48 to 72 hours for platelets, and a bit longer for full protein restoration.
-If you donate again before this recovery is complete, or if your nutritional intake is not supporting recovery, the cumulative effect can be a slow downward drift in protein levels. This is not dramatic or sudden. It is gradual. And that is exactly why it can go unnoticed without testing.
-Factors that make Indian donors more vulnerable to this include irregular meal patterns, a predominantly low protein vegetarian diet without adequate compensation, high physical activity or labour intensive occupations, periods of illness or infection between donations, and economic or lifestyle constraints that affect nutrition quality.
-None of these are reasons to stop donating. They are reasons to monitor more carefully and support the donor with guidance and education.
+Other keywords: Thalassemia Bal Sewa Yojana, BMT cost in India, thalassemia government scheme, PMJAY thalassemia, bone marrow transplant NGO India, how to apply for BMT aid, thalassemia treatment Gujarat
 
-Proteins, Platelet Donation, and the Indian Diet
-India is a country of immense dietary diversity, and the nutritional needs of a regular SDP donor need to be understood in the context of what most people actually eat.
-A significant proportion of donors across India are vegetarian. While a well planned vegetarian diet can absolutely provide adequate protein, many people do not consume enough protein rich foods consistently. Dal, paneer, curd, milk, rajma, chana, moong, soybean, and nuts are all excellent protein sources available across India. But portion sizes, cooking methods, and regularity of consumption vary widely.
-Non vegetarian donors have access to eggs, chicken, fish, and mutton, which are high quality complete protein sources. However, affordability, personal preferences, and availability can affect intake.
-When a blood bank conducts a serum protein test and finds a donor's levels are borderline or below normal, the follow up conversation often includes dietary counselling. A clinical nutritionist or the blood bank's medical officer may advise on increasing protein intake through food, sometimes with specific guidance on meal planning suitable for the donor's region, religion, and budget.
-This is one of the quieter but genuinely important ways that blood banks in India look after their donors. It is healthcare that goes beyond the donation itself.
+Suggested image alt text: Child with thalassemia and parents at a hospital discussing bone marrow transplant funding
 
-Signs That Your Protein Levels May Need Attention
-Your body often gives signals before a test confirms anything. As a regular SDP donor, it is worth paying attention to these signs and discussing them honestly with the medical team at your apheresis centre.
-Persistent fatigue that is not explained by lack of sleep or overwork can be an early sign. Feeling unusually weak or finding that your recovery after donation takes longer than before is worth noting. Swelling or puffiness around the face, ankles, or feet, which can indicate fluid imbalance related to low albumin, is something to bring up with your doctor. Frequent infections or slower healing of minor wounds may point to reduced immune proteins.
-None of these symptoms automatically mean your protein levels are low. But they are signals worth investigating. And the serum protein test is exactly the right starting point.
-The most important thing is not to hide these symptoms or feel embarrassed about them. The medical team at your blood bank wants to know. They are there to help you stay healthy, not to turn you away.
+Internal links to add: your Thalassemia in India: The Complete Story guide, the Request Blood page, the Donor Registration page and the Doctors Network page.
 
-How the Serum Protein Test Is Done
-The test itself is straightforward and familiar. A small sample of blood is drawn from your vein, usually from the arm. The sample is sent to the laboratory where it is processed to measure total protein, albumin, and globulin levels. Results are typically available within a few hours to one day depending on the laboratory setup.
-In most apheresis centres attached to large hospitals in India, the test is done in house. In smaller standalone blood banks, it may be sent to an affiliated laboratory. The cost is minimal and in many cases is covered as part of the pre donation screening process.
-You do not need to fast before a standard serum protein test in most situations, though your blood bank may give you specific instructions depending on whether other tests are being done at the same time.
-Once results are available, the medical officer at the blood bank will review them alongside your other health parameters and advise accordingly. If your levels are within normal range, you proceed with donation as planned. If they are borderline or below normal, the doctor will guide you on next steps, which may include a temporary pause in donation, dietary changes, or referral for further evaluation if needed.
 
-Where Can You Get the Serum Protein Test Done
-One of the most reassuring things about this test is how accessible it is. You do not need a referral, a specialist, or a long wait. The total serum protein test is a standard blood test available at hundreds of labs, diagnostic chains, and online booking platforms across India. Here is a practical guide to your options, whether you are in Ahmedabad, a metro city, or a smaller town.
-Option 1: At your blood bank or apheresis centre
-This is always the first place to ask. Most apheresis centres attached to hospitals run pre-donation blood work in house. The serum protein test is typically part of or can be added to your regular donor health screening. In most cases it costs you nothing, as it is covered under the donation process. Before your next session, simply ask the medical officer: "When was my serum protein last checked?" If it has been more than three months, request it on the spot.
-Option 2: Major diagnostic laboratory chains
-For donors who want an independent check between donation visits, several trusted, NABL and CAP accredited chains offer this test across India with walk-in and home collection options.
-Metropolis Healthcare is one of the most widely available options for donors in Gujarat and across India. The price of the Total Proteins Test (Serum) at Metropolis in Ahmedabad is ₹170, making it genuinely affordable. Metropolis provides home sample collection in Ahmedabad, with reports typically available on the same day once the sample reaches the lab. Reports can be received via email, WhatsApp, or the Metropolis app. Metropolis has labs and collection centres across Mumbai (₹300), Pune, Chennai, Bengaluru, Delhi, and many Tier 2 cities. Metropolis India LabMetropolis India Lab
-Thyrocare is another widely trusted pan-India option, especially known for affordable pricing. Thyrocare lists the Total Protein test at ₹231 and operates across Delhi, Hyderabad, Bengaluru, Kolkata, Mumbai, Pune, and Chennai. Thyrocare works primarily through a network of collection agents who visit your home, making it a largely home-collection-first service. Bookmytest
-Dr. Lal PathLabs is one of India's oldest and most trusted diagnostic chains with over 5,500 collection centres and 280 labs nationwide. It is well represented across metros and many Tier 2 cities. Pricing for the total protein serum test varies by city, with Delhi and Mumbai priced slightly higher than smaller cities. Expect to pay in the ₹150 to ₹300 range for the standalone test. Home collection is available nationwide and online discounts are available when booking through the Dr. Lal PathLabs app. Watchdoq + 2
-Sterling Accuris Diagnostics is the most important chain for donors in Gujarat specifically. Sterling Accuris is one of the fastest growing NABL accredited pathology lab chains in India, with a particularly strong presence in Gujarat, Rajasthan, and Madhya Pradesh, and more than 250 collection centres and labs. Their NABL accredited reference laboratories are located in Ahmedabad, Vadodara, Surat, Jamnagar, Bhavnagar, and Mehsana, among other Gujarat cities. For donors in Ahmedabad, Surat, Vadodara, Rajkot, Gandhinagar, Bharuch, Bhuj, Mehsana, Palanpur, or smaller towns like Anand, Deesa, and Himmatnagar, Sterling Accuris is often the most locally accessible NABL certified lab. You can call them on 812 813 0000 or book through their website sterlingaccuris.com to confirm test availability and pricing at your nearest centre. STERLING ACCURISSTERLING ACCURIS
-SRL Diagnostics and Apollo Diagnostics are additional reliable options available across metros and major cities. Apollo also operates Apollo 24|7, an app-based platform that includes home sample collection. Apollo 24|7 provides home blood sample collection in Ahmedabad with a straightforward online booking process through their app or website. Apollo 24*7
-Option 3: Online health platforms with home sample collection
-If walking into a lab is inconvenient or you prefer to get tested from home, these platforms connect you with certified collection agents who come to your doorstep:
-Tata 1mg Labs (www.1mg.com) allows you to search for "Protein Total Serum," select your city, and book a time slot. A trained phlebotomist visits your home, and reports are delivered digitally. Available across most metros and major cities.
-Healthians (www.healthians.com) is available in Ahmedabad and other Gujarat cities including Surat and Vadodara, with transparent pricing and home collection. They also offer free doctor consultation with reports.
-Redcliffe Labs (www.redcliffelabs.com) has expanded actively into Gujarat cities including Ahmedabad, with home collection and digital reports. Redcliffe Labs offers free home sample collection with 100% accurate reports and a free doctor consultation alongside test results. Redcliffe labs
-Platforms like Practo and Healthians also partner with certified labs and offer competitive pricing along with doorstep sample collection. Watchdoq
-When booking on any of these platforms, search for "Total Protein Serum" or "Protein Total Serum." Do not confuse it with "Serum Protein Electrophoresis," which is a different and more specialised test not required for routine donor monitoring.
 
-How Much Does the Test Cost
-This test is genuinely affordable. Here is a city-wise and lab-wise breakdown based on current pricing:
-Lab / PlatformAhmedabadMumbaiDelhiOther citiesMetropolis Healthcare₹170₹300₹200–₹280₹150–₹300Thyrocare~₹231~₹231~₹231~₹231 (uniform)Dr. Lal PathLabs₹150–₹200₹200–₹300₹200–₹300₹150–₹250Sterling AccurisCall 812 813 0000——Competitive, Gujarat-wide1mg / Healthians / Redcliffe₹150–₹250₹200–₹300₹150–₹280Varies
-At your apheresis centre or blood bank, the test is often free, covered as part of donor screening. If you are getting tested independently outside of a donation visit, budget between ₹150 and ₹300 at any reputable NABL accredited lab. Smaller local labs may charge even less but always ensure they are accredited.
-Note: Prices are indicative as of 2025 and may vary by city and lab branch. Please confirm current pricing when booking.
+================== BLOG STARTS HERE =========================
 
-How Long Does It Take to Get Your Results
-The total serum protein test is a fast, automated, routine test. Here is what to expect:
-At your blood bank or hospital lab on donation day, results are usually ready within 2 to 4 hours, often before you leave the centre.
-At a walk-in diagnostic chain like Metropolis, Sterling Accuris, or SRL, reports are typically available on the same day once the sample reaches the laboratory. Metropolis India Lab
-For home collection bookings through Thyrocare, 1mg, Healthians, or Redcliffe, a trained phlebotomist typically collects your sample in the morning, and reports are delivered within 24 to 48 hours via SMS and email, though for a standard total protein test, same-day results are common at most centres. SecondMedic
-There is no dramatic wait or uncertainty involved. This is a simple, high-volume, automated test that modern labs process quickly. You do not need to take a day off or plan around it.
+THALASSEMIA BMT FINANCIAL HELP IN INDIA: GOVERNMENT SCHEMES, NGOs AND HOW TO APPLY (2026 GUIDE)
 
-Addressing Common Concerns of Regular SDP Donors
-Will I be disqualified from donating forever if my protein levels drop?
-Almost always, no. A temporary deferral is a pause, not a permanent exclusion. With proper nutrition and rest, protein levels typically recover within a few weeks. Most donors who are deferred due to low protein return to regular donation after following the recommended dietary and recovery plan.
-Should I take protein supplements?
-This is a question many donors ask, especially younger donors who are health and fitness conscious. The honest answer is that food based protein is almost always preferred and sufficient for most donors. Supplements may be recommended in specific cases by the doctor, but self medicating with protein powders without medical guidance is not advisable. Focus on a balanced diet rich in natural protein sources first.
-How often should I get this test done?
-This depends on how frequently you donate and what your blood bank's protocol is. If you donate once a month or more, most responsible apheresis centres will check serum protein at least every three to six months. If you are donating less frequently, it may be checked periodically or whenever a clinical need arises. Ask your blood bank directly about their protocol so you are informed.
-Is this test required by law in India?
-Indian regulatory guidelines mandate certain pre donation checks. The specific frequency and scope of serum protein testing may vary, but reputable blood banks and apheresis centres include it as a standard part of caring for regular donors. If your centre does not check it regularly, it is entirely appropriate to request it or ask why.
+Introduction
 
-The Responsibility of Blood Banks Towards Donors
-It is easy to focus on what donors give. But responsible blood banking is a two way relationship. Just as donors give their time, health, and commitment, blood banks and apheresis centres have a duty of care toward every person who walks through their door.
-This duty includes thorough pre donation screening, honest communication about test results, respectful counselling when levels are not adequate, follow up after a deferral period, and creating an environment where donors feel safe to share health concerns without fear of being judged or turned away.
-In India, the best blood banks and apheresis centres already do this. They treat their regular donors like extended family. They know their names, know their histories, and genuinely care about their wellbeing beyond the donation session.
-LifeSavers United stands firmly behind this model of donor care. A donor who is healthy, informed, and supported will donate safely for years. A donor who is neglected or ill informed may face health consequences that no one wanted. Building a culture of mutual responsibility between donors and healthcare providers is central to a sustainable blood donation ecosystem in India.
+When a doctor says "your child needs a bone marrow transplant", most parents hear two things at once: a ray of hope and a very big number. A bone marrow transplant (BMT), also called a stem cell transplant, is the only established cure for thalassemia major. But it is expensive, and many families do not know that help exists.
 
-Nutrition Tips for Regular SDP Donors in India
-While dietary advice should always be personalised and given by a qualified professional, here are some general principles that most healthcare educators recommend for regular platelet donors in India.
-Include a good protein source in every main meal. This could be dal and curd together, paneer with vegetables, eggs in any preparation, chicken or fish for non vegetarians, or a combination of legumes and whole grains that together provide complete protein.
-Do not skip meals, especially on donation days and the day before. Your body needs nourishment to prepare for the donation and to recover afterwards.
-Stay well hydrated. Water and fluids support circulation, make the apheresis process smoother, and support overall recovery.
-Include iron rich foods alongside protein foods, since many donors need to support both haemoglobin and protein levels simultaneously. Spinach, methi, horsegram, and fortified foods are helpful here.
-Rest adequately after donation. Physical recovery and nutritional recovery go hand in hand. Avoid strenuous physical activity on the day of donation.
-If you have specific dietary restrictions due to health conditions, allergies, or personal beliefs, talk to the medical officer at your blood bank. There is almost always a practical and culturally appropriate way to meet your nutritional needs.
+This guide explains, in simple language, how much a BMT can cost in India, which government schemes and organisations may help, who is eligible, and the step-by-step process to apply. If you are looking for blood or want to understand the disease itself, you can also read our complete guide to thalassemia in India.
 
-Why This Matters to LifeSavers United
-At LifeSavers United, we believe that saving lives cannot come at the cost of the person who is doing the saving. Our donors are not just a supply of platelets. They are community heroes who deserve full information, genuine care, and ongoing support.
-The serum protein test is one small but meaningful piece of that larger commitment to donor health. It is a test that says we value you, we are watching over your health, and we want you to keep giving safely for as long as you choose to.
-Our work across India involves not just encouraging donation but educating donors about their rights and responsibilities, supporting blood banks in strengthening their donor care practices, and raising public awareness about what responsible platelet donation looks like.
-When a regular SDP donor in Nagpur or Kochi or Jaipur knows what a serum protein test is and why it matters, they are a more informed and empowered donor. And informed donors are the foundation of a strong, safe, and sustainable blood donation system.
+Important note: Scheme rules, hospital lists and amounts change. Please confirm the latest details on the official portal or with the hospital before you apply. This blog is for information only and is not medical or legal advice.
 
-A Gentle Call to Action
-If you are a regular SDP donor, please ask your apheresis centre when your serum protein was last checked. If it has been a while, request the test at your next visit. Take your diet seriously, not just on donation days but every day.
-If you are someone who has been thinking about starting platelet donation, know that responsible blood banks in India take your health seriously and have processes in place to protect you every step of the way.
-And if you work in a blood bank, apheresis centre, or hospital setting, we encourage you to make serum protein testing a consistent and transparent part of your regular donor care protocol. It is a small investment that protects your donors and builds lasting trust.
-Visit lifesaversunited.org to learn more about safe donation practices, donor health resources, and how LifeSavers United is working to strengthen platelet donation awareness across India. Share this blog with a fellow donor, a blood bank volunteer, or anyone in your community who might benefit from this information.
-Your health matters. Your donation matters. And together, we can make sure that giving life never costs you yours.
+How much does a BMT for thalassemia cost in India?
 
-In Summary
-The serum protein test is a straightforward and essential health check for anyone who donates platelets regularly in India. It measures the total protein in your blood and ensures that your body is coping well with the demands of frequent donation. For regular SDP donors, this test is a safeguard, a health monitor, and a sign that the blood bank genuinely cares about the person behind the donation.
-Getting tested regularly, eating well, staying hydrated, and communicating openly with your medical team are the four pillars of long term healthy donation. When these are in place, you can continue to be the lifesaver that so many patients in India are counting on.
-Thank you for what you do. Stay healthy. Keep giving.
+The cost depends on the hospital, the child's age and weight, the type of donor and whether complications arise. A news report on a new BMT facility in Andhra Pradesh quoted a range of roughly 8 lakh to 40 lakh rupees for BMT in India. A Health Ministry document on the Coal India transplant programme said that a low-risk transplant in a young child without major complications costs about 10 lakh rupees, but the bill can be higher in 30 to 40 percent of patients. The same document said that the two years after the transplant can need another 1 to 2 lakh rupees for medicines and tests.
+
+So when you plan, ask the hospital for a written estimate that includes the pre-transplant tests, donor tests, hospital stay, medicines, and follow-up care. Also plan for travel and living costs near the hospital.
+
+Who is the best candidate for a funded BMT?
+
+Doctors and schemes generally prefer transplants that happen early, before iron overload damages the liver and heart. The Health Ministry document says that children up to 7 years of age who have been well chelated have success rates above 90 percent, while older children also do well, with success rates around 75 to 85 percent when carefully managed. It also notes that the scheme gave preference to children under 7.
+
+Most funded programmes need a fully matched family donor, usually a brother or sister. So the first practical step is HLA typing of the patient and siblings.
+
+SCHEME 1: Thalassemia Bal Sewa Yojana (TBSY)
+
+What it is. TBSY is the main financial aid scheme for thalassemia BMT in India. It was launched in 2017 and is run by the Ministry of Health and Family Welfare with funding from Coal India Limited's CSR programme. Eligible patients can get up to 10 lakh rupees for a transplant. The money is sent directly to the transplant hospital and not to the family.
+
+Important detail: 10 lakh is the maximum assistance. It is not an unlimited reimbursement of every medical expense. If the total bill is higher, the family or hospital may need to find other funds.
+
+Who is eligible. Eligibility has been updated across the phases of the scheme, so read the current rules on the portal. The following points come from the scheme's official documents and public information pages:
+- Thalassemia patients up to 12 years of age, and aplastic anaemia patients up to 18 years, according to the government information page on Vikaspedia.
+- The original programme guidelines required annual family income of 5 lakh rupees or less, with an income certificate from the competent authority.
+- The patient should have transfusion-dependent thalassemia and a matched related donor. In the original guidelines, unrelated donor, cord blood and half-matched (haploidentical) transplants were not covered, but later public information says rules differ for thalassemia, matched unrelated donor and aplastic anaemia cases, so check the latest rules.
+- The patient is assessed by the transplant centre, and the original guidelines excluded patients in the highest-risk class (Class IIIB).
+- Meeting the conditions does not by itself guarantee funding. Each case is examined before approval.
+
+How the money is paid. Under the original guidelines, an initial 5 lakh rupees was sent to the transplant centre after the pre-transplant evaluation, and the balance was paid after the hospital sent the bills. The guidelines also said the transplant should happen within one to two months after the patient is allotted to a centre, and not later than three months after referral.
+
+Where to apply. In May 2023 the Health Ministry launched an online TBSY portal on which families can track their application from registration to closure. According to the Vikaspedia page, eligible families can apply online at coalindia.in/tbsy. Applications can also be initiated through participating hospitals and through Thalassemics India, the coordinating organisation.
+
+Hospitals. In the first two phases the scheme ran with 10 empanelled hospitals, and it later expanded. Hospitals named by the government information page include Narayana Hrudayalaya in Bangalore, CMC Ludhiana, Tata Medical Centre in Kolkata and Indraprastha Apollo in New Delhi, and AIIMS and Rajiv Gandhi Cancer Institute have also been reported. A recent policy summary says the network has grown to 21 hospitals and that more than 1,050 transplants have been completed. Because the list changes, always use the current "Selected Transplant Centres" list on the official portal, and do not rely on old lists on third-party websites.
+
+SCHEME 2: Ayushman Bharat PM-JAY and PMJAY-MA Yojana (Gujarat)
+
+In Gujarat, Ayushman Bharat PM-JAY works together with the state's Mukhyamantri Amrutum scheme under the combined name PMJAY-MA Yojana, which was integrated in 2019. According to the Gujarat Cancer and Research Institute, the cover is 10 lakh rupees per family per year for Gujarat beneficiaries, and treatment is cashless at empanelled hospitals across India. News reports say over 1.2 crore families in Gujarat are covered, with more than 2,000 empanelled hospitals.
+
+Does it cover thalassemia BMT? A reply in the Indian Parliament said that treatment for anaemia and related complications, including bone marrow transplant and blood transfusion, is available in the Health Benefit Package list. However, coverage for a specific transplant depends on the package, the hospital and pre-authorisation, so do not assume. Ask the hospital's Ayushman Mitra (help desk) to confirm in writing whether your child's BMT and the associated costs can be approved under your PMJAY-MA card.
+
+How to use it. Check that your family has a valid PMJAY-MA card. Ask the empanelled hospital to check the package and send the pre-authorisation request. Helplines listed by GCRI for PMJAY are 14555 and 1800 233 1022.
+
+Support for tribal families in Gujarat. A state scheme reported by the media provides extra help for Scheduled Tribe patients in Gujarat who hold a PMJAY or MA card. It covers the remaining cost after the PMJAY amount has been deducted, and a valid caste certificate is needed. Check the Tribal Development Department for current rules.
+
+SCHEME 3: Other government help
+
+State programmes. Some states run their own transplant support. For example, Bihar has started a programme offering free BMT to children with thalassemia through sibling-matching camps, as reported in the press. Ask your state health department or district hospital whether your state has something similar.
+
+National Health Mission. Thalassemia care, including screening and blood services, falls under national health programmes, and your district hospital or civil hospital can tell you about free blood and medicines available locally.
+
+Rashtriya Arogya Nidhi, Prime Minister's and Chief Minister's relief funds. These are one-time government assistance routes for serious illness. Rules, limits and eligibility change, so ask the hospital social worker or the concerned government office for the current process. These are mostly for patients being treated in government hospitals.
+
+NGOs and community support
+
+Thalassemics India. This national organisation coordinates the TBSY programme. Under the programme guidelines, applications are processed by thalassemia societies and state health departments and then sent to Thalassemics India, which forwards eligible cases to a central screening committee. Contacting your local thalassemia society is therefore one of the best first steps.
+
+Local thalassemia societies and charitable trusts. Many cities have societies that provide free or subsidised blood, chelation medicines and guidance on applications. Ask your treating hospital for the nearest one. If you are in Gujarat, our team at LifeSavers United can also help you connect with blood donors and local support.
+
+Donor registries. If no sibling matches, a doctor may suggest a matched unrelated donor. Registries such as DATRI help find volunteer stem cell donors. Note that some schemes cover only matched family donors, so ask about funding before choosing this route.
+
+Crowdfunding. Platforms such as Ketto and Milaap are used by many families. Use only the hospital's official estimate, share real documents, give regular updates and never pay anyone who promises "guaranteed approval".
+
+Step-by-step: how to apply for BMT financial aid
+
+Step 1. Confirm the diagnosis. Keep the HPLC or genetic report, transfusion history and recent reports for ferritin, liver function and heart evaluation.
+
+Step 2. Consult a BMT specialist early. Ask whether your child is a good candidate and whether to do HLA typing for the siblings. Do not wait for complications.
+
+Step 3. Do HLA typing. Test the patient and the siblings (and parents if the doctor advises). A fully matched sibling opens the most funding options.
+
+Step 4. Choose a transplant centre. Ask whether it is empanelled under TBSY and accepts PMJAY-MA. Check the current list on the official portal.
+
+Step 5. Get the cost estimate in writing. Ask for a breakdown of what is included and what is not.
+
+Step 6. Collect your documents. Typically these include:
+- Child's Aadhaar or birth certificate and parents' identity proof
+- Address proof and ration card, if available
+- Income certificate from the competent authority
+- Thalassemia diagnosis and transfusion records
+- HLA typing report of patient and donor
+- Hospital's BMT recommendation and cost estimate
+- PMJAY-MA card, if you have one
+- Bank details of the parent (for non-scheme help such as relief funds)
+- Photographs and any extra documents requested during scrutiny
+
+Step 7. Apply. For TBSY, apply on the official portal or through the hospital or thalassemia society. For PMJAY-MA, the hospital sends the pre-authorisation. For relief funds, follow the office's process.
+
+Step 8. Follow up. Keep copies of everything, note the application number and track the status on the portal. Ask the hospital's social worker or patient coordinator for help.
+
+Step 9. Plan for the gaps. If the estimate is higher than the approved amount, begin parallel plans early, such as NGO help, relief funds and crowdfunding, so the transplant is not delayed.
+
+Common mistakes to avoid
+- Waiting too long. Early transplant gives better outcomes and the scheme has had preferences for younger children.
+- Not doing HLA typing early.
+- Relying on an old hospital list or an agent. Use only official portals.
+- Paying anyone for "guaranteed approval".
+- Forgetting post-transplant costs. Budget for medicines, tests and stay for at least two years.
+
+Frequently asked questions
+
+Is BMT for thalassemia free in India?
+Not automatically. Eligible children can get up to 10 lakh rupees through TBSY, some states and hospitals offer free or subsidised transplants, and PMJAY-MA may cover costs in Gujarat depending on the package. Confirm with your hospital.
+
+What is the age limit for TBSY?
+According to the government information page, thalassemia patients up to 12 years of age are covered. Check the portal for any changes.
+
+Can I apply if I do not have a matched sibling?
+Rules differ by scheme and phase. The original TBSY guidelines needed a matched related donor, but recent public information mentions separate eligibility for matched unrelated donors. Ask the transplant centre and check the portal.
+
+Is the 10 lakh paid to the family?
+No. The funds are paid directly to the hospital performing the transplant.
+
+Where can I apply for TBSY?
+Through the official TBSY portal on the Coal India website, or through participating hospitals and thalassemia societies.
+
+Conclusion
+
+A bone marrow transplant can free a child from a lifetime of transfusions, and financial help does exist. The most important steps are to act early, get HLA typing done, choose an empanelled hospital, keep your documents ready and apply through official channels. If you need blood for a thalassemia patient, or want to become a regular donor, visit LifeSavers United's Request Blood and Donor Registration pages.
+
+Medical disclaimer: This article is for general information only. Please consult a haematologist or BMT specialist for advice about your child's treatment.
+
+SOURCES
+
+1. Ministry of Health and Family Welfare, National Health Mission: "HSCT Project: Support for Bone Marrow / Stem Cell Transplantation for Thalassemia Major" (Coal India CSR project guidelines): nhm.gov.in
+2. Vikaspedia (Government of India information portal): Thalassemia Bal Sewa Yojana: vikaspedia.in/schemesall/schemes-for-child/thalassemia-bal-sewa-yojana
+3. Coal India Limited, TBSY online portal: coalindia.in/tbsy
+4. BioSpectrum India: "Health Ministry releases standard treatment guidelines for sickle cell anaemia disease" (third phase of TBSY, 10 lakh per HSCT): biospectrumindia.com
+5. BioVoice News: "356 bone marrow transplants for Thalassemia patients successfully completed under Thalassemia Bal Sewa Yojana": biovoicenews.com
+6. The CSR Journal: "World Thalassemia Day: Learn about Coal India's CSR initiative Thalassemia Bal Sewa Yojana": thecsrjournal.in
+7. IMPRI India policy update on TBSY (transplant numbers and hospital count; confirm against official sources): impriindia.com
+8. govtschemes.in: Thalassemia Bal Sewa Yojana scheme page (eligibility, documents and a note to use the current portal): govtschemes.in
+9. Gujarat Cancer and Research Institute: PMJAY information sheet: gcriindia.org
+10. Lok Sabha / Rajya Sabha answers on AB-PMJAY, Health Benefit Packages and TBSY: eparlib.sansad.in and rsdebate.nic.in
+11. Prime Minister's Office: PMJAY-MA Yojana in Gujarat: pmindia.gov.in
+12. The Week / PTI: "Over 1.20 crore families in Gujarat get benefits under PMJAY-MA health scheme" (Dec 2025): theweek.in
+13. News Arena India: Gujarat tribal patients' medical assistance scheme: newsarenaindia.com
+14. Medical Dialogues: AIIMS Mangalagiri BMT facility (cost range 8 to 40 lakh): medicaldialogues.in
+15. Patna Press: Bihar free bone marrow transplants for children with thalassemia: patnapress.com
